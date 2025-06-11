@@ -74,6 +74,6 @@ const onClose = () => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import './Message.scss';
 </style>

@@ -3,47 +3,48 @@
   <div class="logo-container">
     <!-- Logo under Chinese black theme on PC -->
     <div v-if="!isMobile && isZH && isDarkTheme">
-      <svg-icon :icon="LogoOfPCInChineseBlackIcon" />
+      <IconLogoOfPCInChineseBlack style="width: 484px; height: 63px" />
     </div>
     <!-- Logo under Chinese white theme on PC -->
     <div v-if="!isMobile && isZH && isLightTheme">
-      <svg-icon :icon="LogoOfPCInChineseWhiteIcon" />
+      <IconLogoOfPCInChineseWhite style="width: 484px; height: 63px" />
     </div>
     <!-- Mobile Chinese black and white theme logo -->
     <div v-if="isMobile && isZH" class="mobile-zh-logo">
       <span class="logo" :class="isLightTheme ? 'light' : 'dark'">
-        <svg-icon :icon="LogoOfMobileInChinese" />
+        <IconLogoOfMobileInChinese style="width: 136px; height: 36px" />
       </span>
       <span class="title">
-        <svg-icon :icon="LogoTitleOfMobileInChinese" />
+        <IconLogoTitleOfMobileInChinese style="width: 144px; height: 23px" />
       </span>
     </div>
     <!-- English black and white theme logo -->
     <div v-if="isEN" :class="['pc-en-logo', { mobile: isMobile }]">
       <span class="logo">
-        <svg-icon :icon="LogoInEnglish" />
+        <IconLogoInEnglish style="width: 68px; height: 63px" />
       </span>
       <span class="title" :class="isLightTheme ? 'light' : 'dark'">
-        <svg-icon :icon="LogoTitleInEnglish" />
+        <IconLogoTitleInEnglish style="width: 271px; height: 35px" />
       </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import {
+  useUIKit,
+  IconLogoOfPCInChineseBlack,
+  IconLogoOfPCInChineseWhite,
+  IconLogoOfMobileInChinese,
+  IconLogoTitleOfMobileInChinese,
+  IconLogoInEnglish,
+  IconLogoTitleInEnglish,
+} from '@tencentcloud/uikit-base-component-vue3';
 import i18n from '../../locales/index';
 import { isMobile } from '../../utils/environment';
 import { computed } from 'vue';
-import SvgIcon from './base/SvgIcon.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
-import LogoOfPCInChineseBlackIcon from './icons/LogoOfPCInChineseBlackIcon.vue';
-import LogoOfPCInChineseWhiteIcon from './icons/LogoOfPCInChineseWhiteIcon.vue';
-import LogoOfMobileInChinese from './icons/LogoOfMobileInChinese.vue';
-import LogoTitleOfMobileInChinese from './icons/LogoTitleOfMobileInChinese.vue';
-import LogoInEnglish from './icons/LogoInEnglish.vue';
-import LogoTitleInEnglish from './icons/LogoTitleInEnglish.vue';
-import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 
 const { theme } = useUIKit();
 const basicStore = useBasicStore();

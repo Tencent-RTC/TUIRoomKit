@@ -10,27 +10,37 @@ import TUIChatEngine, {
   StoreName,
   IMessageModel,
 } from '@tencentcloud/chat-uikit-engine';
-import { ISearchCloudMessageResult, IFriendType, ISearchResultListItem, IUserProfile } from '../../interface';
+import {
+  ISearchCloudMessageResult,
+  IFriendType,
+  ISearchResultListItem,
+  IUserProfile,
+} from '../../interface';
 import { searchMessageTypeList } from './search-type-list';
-import { Toast, TOAST_TYPE } from '../common/Toast/index';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { messageTypeAbstractMap } from './type';
 import { isUniFrameWork } from '../../utils/env';
 import { TUIGlobal } from '@tencentcloud/universal-api';
 
-/**************************************
+/** ************************************
  * TUISearch search logic
  **************************************/
 
 export const searchCloudMessages = (
-  params: SearchCloudMessagesParams,
+  params: SearchCloudMessagesParams
 ): Promise<{ data: ISearchCloudMessageResult }> => {
   return TUIChatService.searchCloudMessages(params)
-    .then((imResponse) => {
+    .then(imResponse => {
       return imResponse;
     })
-    .catch((error) => {
-      Toast({
-        message: TUITranslateService.t('TUISearch.消息云端搜索失败：') + error?.message,
+    .catch(error => {
+      TUIToast({
+        message:
+          TUITranslateService.t('TUISearch.消息云端搜索失败：') +
+          error?.message,
         type: TOAST_TYPE.ERROR,
         duration: 3000,
       });
@@ -41,13 +51,14 @@ export const searchCloudMessages = (
 export const searchFriends = (userIDList: any[]): Promise<any[]> => {
   // Only show users who are already friends
   return TUIFriendService.getFriendProfile({ userIDList })
-    .then((imResponse) => {
+    .then(imResponse => {
       return imResponse;
     })
-    .catch((error) => {
+    .catch(error => {
       console.warn('search user failed:', error?.message);
-      Toast({
-        message: TUITranslateService.t('TUISearch.查找联系人失败：') + error?.message,
+      TUIToast({
+        message:
+          TUITranslateService.t('TUISearch.查找联系人失败：') + error?.message,
         type: TOAST_TYPE.ERROR,
         duration: 1000,
       });
@@ -60,24 +71,25 @@ export const searchGroups = (groupIDList: any[]): Promise<any[]> => {
   const promiseList: any[] = [];
   groupIDList.forEach((groupID: string) => {
     const promise = TUIGroupService.searchGroupByID(groupID)
-      .then((imResponse) => {
+      .then(imResponse => {
         // Only show joined group chats
         if (imResponse?.data?.group?.isJoinedGroup) {
           return imResponse?.data?.group;
         }
       })
-      .catch((error) => {
+      .catch(error => {
         console.warn('search group failed:', error?.message);
       });
     promiseList.push(promise);
   });
   return Promise.all(promiseList)
-    .then((imResponse) => {
+    .then(imResponse => {
       return imResponse.filter(x => x !== undefined);
     })
-    .catch((error) => {
-      Toast({
-        message: TUITranslateService.t('TUISearch.查找群聊失败：') + error?.message,
+    .catch(error => {
+      TUIToast({
+        message:
+          TUITranslateService.t('TUISearch.查找群聊失败：') + error?.message,
         type: TOAST_TYPE.ERROR,
         duration: 1000,
       });
@@ -85,13 +97,18 @@ export const searchGroups = (groupIDList: any[]): Promise<any[]> => {
     });
 };
 
-/**************************************
+/** ************************************
  * TUISearch interaction logic
  **************************************/
 // switch conversation
-export const enterConversation = (item: { conversationID?: string; groupID?: string; userID?: string }) => {
-  const conversationID
-    = item?.conversationID || (item?.groupID ? `GROUP${item?.groupID}` : `C2C${item?.userID}`);
+export const enterConversation = (item: {
+  conversationID?: string;
+  groupID?: string;
+  userID?: string;
+}) => {
+  const conversationID =
+    item?.conversationID ||
+    (item?.groupID ? `GROUP${item?.groupID}` : `C2C${item?.userID}`);
   TUIConversationService.switchConversation(conversationID)
     .then(() => {
       TUIStore.update(StoreName.SEARCH, 'currentSearchingStatus', {
@@ -102,13 +119,14 @@ export const enterConversation = (item: { conversationID?: string; groupID?: str
         value: '',
         searchType: 'global',
       });
-      isUniFrameWork && TUIGlobal?.navigateTo({
-        url: '/TUIKit/components/TUIChat/index',
-      });
+      isUniFrameWork &&
+        TUIGlobal?.navigateTo({
+          url: '/TUIKit/components/TUIChat/index',
+        });
     })
-    .catch((error) => {
+    .catch(error => {
       console.warn('switch conversation failed:', error?.message);
-      Toast({
+      TUIToast({
         message: TUITranslateService.t('TUISearch.进入会话失败'),
         type: TOAST_TYPE.ERROR,
         duration: 1000,
@@ -116,10 +134,18 @@ export const enterConversation = (item: { conversationID?: string; groupID?: str
     });
 };
 
-/**************************************
+/** ************************************
  * TUISearch UI display logic
  **************************************/
-export const generateSearchResultShowName = (result: IMessageModel | ISearchResultListItem | IGroupModel | IFriendType | IUserProfile, resultContent: Record<string, string>): string => {
+export const generateSearchResultShowName = (
+  result:
+    | IMessageModel
+    | ISearchResultListItem
+    | IGroupModel
+    | IFriendType
+    | IUserProfile,
+  resultContent: Record<string, string>
+): string => {
   if (!result) {
     return '';
   }
@@ -130,37 +156,69 @@ export const generateSearchResultShowName = (result: IMessageModel | ISearchResu
     return (result as IGroupModel).name || (result as IGroupModel).groupID;
   }
   if ((result as IFriendType | IUserProfile).userID) {
-    return (result as IFriendType).remark || (result as IUserProfile).nick || (result as IFriendType).userID || '';
+    return (
+      (result as IFriendType).remark ||
+      (result as IUserProfile).nick ||
+      (result as IFriendType).userID ||
+      ''
+    );
   }
   if ((result as ISearchResultListItem).conversation?.conversationID) {
-    if (typeof (result as ISearchResultListItem).conversation.getShowName === 'function') {
+    if (
+      typeof (result as ISearchResultListItem).conversation.getShowName ===
+      'function'
+    ) {
       return (result as ISearchResultListItem).conversation.getShowName();
-    } else {
-      return TUIStore.getConversationModel((result as ISearchResultListItem).conversation.conversationID)?.getShowName?.() || (result as ISearchResultListItem).conversation.conversationID;
     }
+    return (
+      TUIStore.getConversationModel(
+        (result as ISearchResultListItem).conversation.conversationID
+      )?.getShowName?.() ||
+      (result as ISearchResultListItem).conversation.conversationID
+    );
   }
   return '';
 };
 
-export const generateSearchResultAvatar = (result: IMessageModel | ISearchResultListItem | IGroupModel | IFriendType | IUserProfile): string => {
+export const generateSearchResultAvatar = (
+  result:
+    | IMessageModel
+    | ISearchResultListItem
+    | IGroupModel
+    | IFriendType
+    | IUserProfile
+): string => {
   if (!result) {
     return '';
   }
   if ((result as IMessageModel).ID) {
-    return (result as IMessageModel).avatar || 'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png';
+    return (
+      (result as IMessageModel).avatar ||
+      'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'
+    );
   }
   if ((result as IGroupModel).groupID) {
-    return (result as IGroupModel).avatar || `https://web.sdk.qcloud.com/im/assets/images/${(result as IGroupModel)?.type}.svg`;
+    return (
+      (result as IGroupModel).avatar ||
+      `https://web.sdk.qcloud.com/im/assets/images/${(result as IGroupModel)?.type}.svg`
+    );
   }
   if ((result as IUserProfile).userID) {
-    return (result as IUserProfile).avatar || 'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png';
+    return (
+      (result as IUserProfile).avatar ||
+      'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'
+    );
   }
   if ((result as ISearchResultListItem)?.conversation?.conversationID) {
-    if (typeof (result as ISearchResultListItem).conversation.getAvatar === 'function') {
+    if (
+      typeof (result as ISearchResultListItem).conversation.getAvatar ===
+      'function'
+    ) {
       return (result as ISearchResultListItem).conversation?.getAvatar();
-    } else {
-      return TUIStore.getConversationModel((result as ISearchResultListItem).conversation.conversationID)?.getAvatar?.();
     }
+    return TUIStore.getConversationModel(
+      (result as ISearchResultListItem).conversation.conversationID
+    )?.getAvatar?.();
   }
   return '';
 };
@@ -170,7 +228,7 @@ export const generateSearchResultShowContent = (
   result: IMessageModel | ISearchResultListItem | IGroupModel | IUserProfile,
   resultType: string,
   keywordList: any[],
-  isTypeShow = true,
+  isTypeShow = true
 ): any[] => {
   if ((result as IGroupModel)?.groupID) {
     return [
@@ -184,8 +242,14 @@ export const generateSearchResultShowContent = (
       { text: (result as IUserProfile).userID, isHighlight: true },
     ];
   }
-  if ((result as ISearchResultListItem)?.conversation || (result as IMessageModel)?.flow) {
-    if ((result as ISearchResultListItem)?.messageCount === 1 || (result as IMessageModel)?.flow) {
+  if (
+    (result as ISearchResultListItem)?.conversation ||
+    (result as IMessageModel)?.flow
+  ) {
+    if (
+      (result as ISearchResultListItem)?.messageCount === 1 ||
+      (result as IMessageModel)?.flow
+    ) {
       // Single message summary display result:
       // Text message, display message content + keyword highlight
       // File type message, display [file] file name + keyword highlight
@@ -194,30 +258,40 @@ export const generateSearchResultShowContent = (
       const message: IMessageModel = (result as IMessageModel)?.flow
         ? (result as IMessageModel)
         : (result as ISearchResultListItem)?.messageList[0];
-      const text
-        = message?.payload?.text || message?.payload?.fileName || message?.payload?.description;
+      const text =
+        message?.payload?.text ||
+        message?.payload?.fileName ||
+        message?.payload?.description;
       const abstract: any[] = [];
-      if (message?.type && isTypeShow && message.type !== TUIChatEngine.TYPES.MSG_TEXT) {
+      if (
+        message?.type &&
+        isTypeShow &&
+        message.type !== TUIChatEngine.TYPES.MSG_TEXT
+      ) {
         abstract.push({
-          text: TUITranslateService.t(`TUISearch.${messageTypeAbstractMap[message.type]}`),
+          text: TUITranslateService.t(
+            `TUISearch.${messageTypeAbstractMap[message.type]}`
+          ),
           isHighlight: false,
         });
       }
       abstract.push(...generateMessageContentHighlight(text, keywordList));
       return abstract;
-    } else {
-      return [
-        {
-          text: `${(result as ISearchResultListItem)?.messageCount}${TUITranslateService.t(
-            'TUISearch.条相关',
-          )}${TUITranslateService.t(
-            `TUISearch.${resultType === 'allMessage' ? '结果' : searchMessageTypeList[resultType]?.label
-            }`,
-          )}`,
-          isHighlight: false,
-        },
-      ];
     }
+    return [
+      {
+        text: `${(result as ISearchResultListItem)?.messageCount}${TUITranslateService.t(
+          'TUISearch.条相关'
+        )}${TUITranslateService.t(
+          `TUISearch.${
+            resultType === 'allMessage'
+              ? '结果'
+              : searchMessageTypeList[resultType]?.label
+          }`
+        )}`,
+        isHighlight: false,
+      },
+    ];
   }
   return [];
 };
@@ -225,7 +299,7 @@ export const generateSearchResultShowContent = (
 // Parse the search message results [highlight keywords] position
 export const generateMessageContentHighlight = (
   content: string,
-  keywordList: any[],
+  keywordList: any[]
 ): any[] => {
   if (!content || !keywordList || !keywordList.length) {
     return [{ text: content || '', isHighlight: false }];
@@ -282,7 +356,15 @@ export const generateMessageContentHighlight = (
 // calculate timestamp
 export const generateSearchResultTime = (timestamp: number): string => {
   const todayZero = new Date().setHours(0, 0, 0, 0);
-  const thisYear = new Date(new Date().getFullYear(), 0, 1, 0, 0, 0, 0).getTime();
+  const thisYear = new Date(
+    new Date().getFullYear(),
+    0,
+    1,
+    0,
+    0,
+    0,
+    0
+  ).getTime();
   const target = new Date(timestamp);
 
   const oneDay = 24 * 60 * 60 * 1000;
@@ -290,48 +372,61 @@ export const generateSearchResultTime = (timestamp: number): string => {
   const diff = todayZero - target.getTime();
 
   function formatNum(num: number): string {
-    return num < 10 ? '0' + num : num.toString();
+    return num < 10 ? `0${num}` : num.toString();
   }
 
   if (diff <= 0) {
     // today, only display hour:minute
     return `${formatNum(target.getHours())}:${formatNum(target.getMinutes())}`;
-  } else if (diff <= oneDay) {
+  }
+  if (diff <= oneDay) {
     // yesterday, display yesterday:hour:minute
     return `${TUITranslateService.t('time.昨天')} ${formatNum(target.getHours())}:${formatNum(
-      target.getMinutes(),
+      target.getMinutes()
     )}`;
-  } else if (diff <= oneWeek - oneDay) {
+  }
+  if (diff <= oneWeek - oneDay) {
     // Within a week, display weekday hour:minute
-    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const weekdays = [
+      '星期日',
+      '星期一',
+      '星期二',
+      '星期三',
+      '星期四',
+      '星期五',
+      '星期六',
+    ];
     const weekday = weekdays[target.getDay()];
-    return `${TUITranslateService.t('time.' + weekday)} ${formatNum(target.getHours())}:${formatNum(
-      target.getMinutes(),
+    return `${TUITranslateService.t(`time.${weekday}`)} ${formatNum(target.getHours())}:${formatNum(
+      target.getMinutes()
     )}`;
-  } else if (target.getTime() >= thisYear) {
+  }
+  if (target.getTime() >= thisYear) {
     // Over a week, within this year, display mouth/day hour:minute
     return `${target.getMonth() + 1}/${target.getDate()} ${formatNum(
-      target.getHours(),
-    )}:${formatNum(target.getMinutes())}`;
-  } else {
-    // Not within this year, display year/mouth/day hour:minute
-    return `${target.getFullYear()}/${target.getMonth() + 1}/${target.getDate()} ${formatNum(
-      target.getHours(),
+      target.getHours()
     )}:${formatNum(target.getMinutes())}`;
   }
+  // Not within this year, display year/mouth/day hour:minute
+  return `${target.getFullYear()}/${target.getMonth() + 1}/${target.getDate()} ${formatNum(
+    target.getHours()
+  )}:${formatNum(target.getMinutes())}`;
 };
 
 // Calculated date functions
 export const generateSearchResultYMD = (timestamp: number): string => {
   const date = new Date(timestamp * 1000); // Convert timestamp to milliseconds
   const year = date.getFullYear();
-  const month = ('0' + (date.getMonth() + 1)).slice(-2);
-  const day = ('0' + date.getDate()).slice(-2);
+  const month = `0${date.getMonth() + 1}`.slice(-2);
+  const day = `0${date.getDate()}`.slice(-2);
 
   return `${year}-${month}-${day}`; // Returns a string in year-month-day format
 };
 
-export const debounce = <F extends (...args: any[]) => void>(func: F, waitFor: number) => {
+export const debounce = <F extends (...args: any[]) => void>(
+  func: F,
+  waitFor: number
+) => {
   let timeout: ReturnType<typeof setTimeout> | null = null;
 
   const debounced = (...args: Parameters<F>) => {

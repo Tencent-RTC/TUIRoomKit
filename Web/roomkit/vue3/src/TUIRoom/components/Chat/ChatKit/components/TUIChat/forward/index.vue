@@ -1,8 +1,5 @@
 <template>
-  <Overlay
-    :visible="isShowForwardPanel"
-    :useMask="false"
-  >
+  <Overlay :visible="isShowForwardPanel" :useMask="false">
     <Transfer
       :title="TUITranslateService.t('TUIChat.转发')"
       :isSearch="false"
@@ -25,10 +22,15 @@ import TUIChatEngine, {
 } from '@tencentcloud/chat-uikit-engine';
 import Overlay from '../../common/Overlay/index.vue';
 import Transfer from '../../common/Transfer/index.vue';
-import { Toast, TOAST_TYPE } from '../../../components/common/Toast';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { isUniFrameWork } from '../../../utils/env';
 import { isEnabledMessageReadReceiptGlobal } from '../utils/utils';
-import OfflinePushInfoManager, { IOfflinePushInfoCreateParams } from '../offlinePushInfoManager/index';
+import OfflinePushInfoManager, {
+  IOfflinePushInfoCreateParams,
+} from '../offlinePushInfoManager/index';
 
 interface IEmits {
   (e: 'toggleMultipleSelectMode', visible?: boolean): void;
@@ -67,7 +69,9 @@ function onSingleForwardMessageIDUpdated(messageID: string | undefined) {
   }
 }
 
-function onMultipleForwardMessageIDUpdated(params: { isMergeForward: boolean; messageIDList: string[] } | undefined) {
+function onMultipleForwardMessageIDUpdated(
+  params: { isMergeForward: boolean; messageIDList: string[] } | undefined
+) {
   if (!params) {
     return;
   }
@@ -81,7 +85,7 @@ function onMultipleForwardMessageIDUpdated(params: { isMergeForward: boolean; me
     selectedToForwardMessageIDList = selectedMessageIDList;
     openForwardPanel();
   } else {
-    Toast({
+    TUIToast({
       message: TUITranslateService.t('TUIChat.未选择消息'),
       type: TOAST_TYPE.ERROR,
     });
@@ -104,14 +108,18 @@ function openForwardPanel(): void {
   isShowForwardPanel.value = true;
 }
 
-function finishSelected(selectedConvIDWrapperList: Array<{ userID: string }>): void {
+function finishSelected(
+  selectedConvIDWrapperList: Array<{ userID: string }>
+): void {
   if (selectedConvIDWrapperList?.length === 0) return;
   // to reuse Transfer, so we have to get conversationModel by userID instead of ConversationID
-  const selectedConversationList = selectedConvIDWrapperList.map(IDWrapper => TUIStore.getConversationModel(IDWrapper.userID));
+  const selectedConversationList = selectedConvIDWrapperList.map(IDWrapper =>
+    TUIStore.getConversationModel(IDWrapper.userID)
+  );
   const unsentMessageQueue = selectedToForwardMessageIDList
     .map(messageID => TUIStore.getMessageModel(messageID))
     .sort((a, b) => a.time - b.time);
-  const forwardPromises = selectedConversationList.map((conversation) => {
+  const forwardPromises = selectedConversationList.map(conversation => {
     const offlinePushInfoCreateParams: IOfflinePushInfoCreateParams = {
       conversation,
       messageType: TUIChatEngine.TYPES.MSG_MERGER,
@@ -121,19 +129,24 @@ function finishSelected(selectedConvIDWrapperList: Array<{ userID: string }>): v
       unsentMessageQueue,
       {
         needMerge: isMergeForward,
-        offlinePushInfo: OfflinePushInfoManager.create(offlinePushInfoCreateParams),
+        offlinePushInfo: OfflinePushInfoManager.create(
+          offlinePushInfoCreateParams
+        ),
         params: {
           needReadReceipt: isEnabledMessageReadReceiptGlobal(),
         },
-      },
+      }
     );
   });
-  Promise.allSettled(forwardPromises).then((results) => {
+  Promise.allSettled(forwardPromises).then(results => {
     for (const result of results) {
       const { status } = result;
       if (status === 'rejected') {
-        const errorMessage = result.reason.code === 80001 ? TUITranslateService.t('TUIChat.内容包含敏感词汇') : result.reason.message as string;
-        Toast({
+        const errorMessage =
+          result.reason.code === 80001
+            ? TUITranslateService.t('TUIChat.内容包含敏感词汇')
+            : (result.reason.message as string);
+        TUIToast({
           message: errorMessage,
           type: TOAST_TYPE.ERROR,
         });
@@ -147,7 +160,7 @@ function finishSelected(selectedConvIDWrapperList: Array<{ userID: string }>): v
 
 function getTransforRenderDataList() {
   const conversationList = TUIStore.getData(StoreName.CONV, 'conversationList');
-  customConversationList.value = conversationList.map((conversation) => {
+  customConversationList.value = conversationList.map(conversation => {
     return {
       // To achieve reusability of Transfer, userID is used here instead of ConversationID
       userID: conversation.conversationID,

@@ -6,9 +6,8 @@
         <span class="invite-member-content" :title="item.content">
           {{ item.content }}
         </span>
-        <svg-icon
+        <IconCopy
           class="copy"
-          :icon="copyIcon"
           v-if="item.isShowCopyIcon"
           @click="onCopy(item.content)"
         />
@@ -20,8 +19,7 @@
 <script setup lang="ts">
 import { defineProps, computed } from 'vue';
 import useRoomInfo from '../../components/RoomHeader/RoomInfo/useRoomInfoHooks';
-import copyIcon from '../common/icons/CopyIcon.vue';
-import SvgIcon from '../common/base/SvgIcon.vue';
+import { IconCopy } from '@tencentcloud/uikit-base-component-vue3';
 import { isMobile, isWeChat } from '../../utils/environment';
 import { useI18n } from '../../locales';
 import { getUrlWithRoomId } from '../../utils/utils';
@@ -75,7 +73,7 @@ const scheduleInviteList = computed(() => {
 
   .invite-member-container {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     min-width: 400px;
     font-size: 14px;
     font-weight: 400;
@@ -97,9 +95,6 @@ const scheduleInviteList = computed(() => {
     }
 
     .copy {
-      width: 20px;
-      min-width: 20px;
-      height: 20px;
       margin-left: 8px;
       cursor: pointer;
       color: var(--text-color-link);

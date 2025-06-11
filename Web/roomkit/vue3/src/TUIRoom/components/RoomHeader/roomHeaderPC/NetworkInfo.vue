@@ -31,11 +31,11 @@
         <span>{{ t('Packet loss') }}</span>
         <div class="network-detail-packet">
           <div class="network-detail-packet-item">
-            <ArrowStrokeUpIcon />
+            <IconArrowStrokeUp />
             <span>{{ `${networkInfo.upLoss}%` }}</span>
           </div>
           <div class="network-detail-packet-item">
-            <ArrowStrokeUpIcon class="arrow-down" />
+            <IconArrowStrokeUp class="arrow-down" />
             <span>{{ `${networkInfo.downLoss}%` }}</span>
           </div>
         </div>
@@ -57,11 +57,13 @@ import TUIRoomEngine, {
 import useRoomEngine from '../../../hooks/useRoomEngine';
 import IconButton from '../../common/base/IconButton.vue';
 import vClickOutside from '../../../directives/vClickOutside';
-import NetworkStabilityIcon from '../../common/icons/NetworkStabilityIcon.vue';
-import NetworkFluctuationIcon from '../../common/icons/NetworkFluctuationIcon.vue';
-import NetworkLagIcon from '../../common/icons/NetworkLagIcon.vue';
-import NetworkDisconnectedIcon from '../../common/icons/NetworkDisconnectedIcon.vue';
-import ArrowStrokeUpIcon from '../../common/icons/ArrowStrokeUpIcon.vue';
+import {
+  IconNetworkStability,
+  IconNetworkFluctuation,
+  IconNetworkLag,
+  IconNetworkDisconnected,
+  IconArrowStrokeUp,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { IconButtonLayout } from '../../../constants/room';
 
 const roomEngine = useRoomEngine();
@@ -96,22 +98,22 @@ const qualityMap: {
   [TUINetworkQuality.kQualityExcellent]: {
     title: 'Stability',
     titleType: 'success',
-    icon: shallowRef(NetworkStabilityIcon),
+    icon: shallowRef(IconNetworkStability),
   },
   [TUINetworkQuality.kQualityPoor]: {
     title: 'Fluctuation',
     titleType: 'warning',
-    icon: shallowRef(NetworkFluctuationIcon),
+    icon: shallowRef(IconNetworkFluctuation),
   },
   [TUINetworkQuality.kQualityVeryBad]: {
     title: 'Lag',
     titleType: 'danger',
-    icon: shallowRef(NetworkLagIcon),
+    icon: shallowRef(IconNetworkLag),
   },
   [TUINetworkQuality.kQualityDown]: {
     title: 'Disconnected',
     titleType: 'info',
-    icon: shallowRef(NetworkDisconnectedIcon),
+    icon: shallowRef(IconNetworkDisconnected),
   },
 };
 

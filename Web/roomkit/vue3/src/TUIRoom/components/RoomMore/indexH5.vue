@@ -11,11 +11,7 @@
     >
       <span class="contact-title">{{ t(item.title) }}</span>
       <span class="contact-content">{{ item.content }}</span>
-      <svg-icon
-        v-tap="() => onCopy(item.copyLink)"
-        :icon="CopyIcon"
-        class="copy"
-      />
+      <IconCopy v-tap="() => onCopy(item.copyLink)" class="copy" />
     </div>
     <span class="contact-bottom">
       {{
@@ -29,8 +25,7 @@
 
 <script setup lang="ts">
 import useRoomMoreControl from './useRoomMoreHooks';
-import SvgIcon from '../common/base/SvgIcon.vue';
-import CopyIcon from '../common/icons/CopyIcon.vue';
+import { IconCopy } from '@tencentcloud/uikit-base-component-vue3';
 import vTap from '../../directives/vTap';
 
 const { t, onCopy, contactContentList } = useRoomMoreControl();
@@ -131,8 +126,6 @@ span {
   }
 
   .copy {
-    width: 20px;
-    height: 20px;
     margin-left: 30px;
     color: var(--text-color-link);
   }

@@ -8,7 +8,7 @@ import TUIRoomEngine, {
   TUIErrorCode,
 } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from './useRoomEngine';
-import TUIMessage from '../components/common/base/Message/index';
+import { TUIToast, TOAST_TYPE } from '@tencentcloud/uikit-base-component-vue3';
 import { MESSAGE_DURATION } from '../constants/message';
 import { useRoomStore, UserInfo } from '../stores/room';
 import { storeToRefs } from 'pinia';
@@ -27,7 +27,7 @@ export default function () {
   const { applyToAnchorList } = storeToRefs(roomStore);
   const { showApplyUserList } = storeToRefs(basicStore);
   const { t } = useI18n();
-  let notification: { close: Function } | null;
+  let notification: { close: () => void } | null;
   const applyToAnchorUserIdList = computed(() =>
     applyToAnchorList.value.map(item => item.userId)
   );
@@ -83,7 +83,10 @@ export default function () {
       }
     } catch (error: any) {
       if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
-        TUIMessage({ type: 'warning', message: t('The stage is full') });
+        TUIToast({
+          type: TOAST_TYPE.WARNING,
+          message: t('The stage is full'),
+        });
       } else {
         logger.error('Failure to process a user request', error);
       }
@@ -108,7 +111,10 @@ export default function () {
       }
     } catch (error: any) {
       if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
-        TUIMessage({ type: 'warning', message: t('The stage is full') });
+        TUIToast({
+          type: TOAST_TYPE.WARNING,
+          message: t('The stage is full'),
+        });
       } else {
         logger.error('Failed application for consent to go on stage', error);
       }
@@ -154,8 +160,8 @@ export default function () {
       } catch (error) {
         if (!hasErrorOccurred) {
           logger.error(actionFailedMessage);
-          TUIMessage({
-            type: 'warning',
+          TUIToast({
+            type: TOAST_TYPE.WARNING,
             message: t('The stage is full'),
             duration: MESSAGE_DURATION.NORMAL,
           });
@@ -211,22 +217,22 @@ export default function () {
         roomStore.removeInviteToAnchorUser(userId);
         switch (requestCallbackType) {
           case TUIRequestCallbackType.kRequestAccepted:
-            TUIMessage({
-              type: 'success',
+            TUIToast({
+              type: TOAST_TYPE.SUCCESS,
               message: `${userName || userId} ${t('accepted the invitation to the stage')}`,
               duration: MESSAGE_DURATION.NORMAL,
             });
             break;
           case TUIRequestCallbackType.kRequestRejected:
-            TUIMessage({
-              type: 'warning',
+            TUIToast({
+              type: TOAST_TYPE.WARNING,
               message: `${userName || userId} ${t('declined the invitation to the stage')}`,
               duration: MESSAGE_DURATION.NORMAL,
             });
             break;
           case TUIRequestCallbackType.kRequestTimeout:
-            TUIMessage({
-              type: 'warning',
+            TUIToast({
+              type: TOAST_TYPE.WARNING,
               message: t('The invitation to sb to go on stage has timed out', {
                 name: userName || userId,
               }),
@@ -235,8 +241,8 @@ export default function () {
             break;
           case TUIRequestCallbackType.kRequestError:
             if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
-              TUIMessage({
-                type: 'warning',
+              TUIToast({
+                type: TOAST_TYPE.WARNING,
                 message: t(
                   'This member has already received the same request, please try again later'
                 ),

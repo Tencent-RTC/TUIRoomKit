@@ -83,9 +83,8 @@
               :placeholder="t('Please enter the member name')"
             >
               <template #suffixIcon>
-                <svg-icon
+                <IconScheduleAttendees
                   @click="selectScheduleAttends"
-                  :icon="ScheduleAttendees"
                   :class="['select-attendees']"
                 />
               </template>
@@ -112,7 +111,7 @@
                 <p class="form-attendees-item-name" :title="user.userName">
                   {{ user.userName }}
                 </p>
-                <CloseIcon
+                <IconClose
                   class="form-attendees-item-remove"
                   @click="removeSelectUser(user)"
                 />
@@ -152,17 +151,15 @@
               :type="inputType"
             >
               <template #suffixIcon>
-                <svg-icon
+                <IconShowContent
                   v-if="isShowPassword"
                   class="icon"
                   @click="toggleShowPassword"
-                  :icon="ShowContentIcon"
                 />
-                <svg-icon
+                <IconHideContent
                   v-else
                   class="icon"
                   @click="toggleShowPassword"
-                  :icon="HideContentIcon"
                 />
               </template>
             </TuiInput>
@@ -192,7 +189,9 @@
       </div>
       <template #footer>
         <div class="schedule-conference-footer">
-          <TUIButton @click="cancel" style="min-width: 88px">{{ t('Cancel') }}</TUIButton>
+          <TUIButton @click="cancel" style="min-width: 88px">{{
+            t('Cancel')
+          }}</TUIButton>
           <TUIButton
             v-if="!isEditMode"
             @click="scheduleConference"
@@ -234,7 +233,13 @@ import TuiInput from '../../common/base/Input';
 import TuiSelect from '../../common/base/Select';
 import TuiOption from '../../common/base/Option';
 import TuiCheckbox from '../../common/base/Checkbox';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconHideContent,
+  IconShowContent,
+  IconScheduleAttendees,
+  IconClose,
+} from '@tencentcloud/uikit-base-component-vue3';
 import TuiAvatar from '../../common/Avatar.vue';
 import TuiDatepicker from '../../common/base/Datepicker';
 import TuiTimepicker from '../../common/base/Timepicker';
@@ -242,11 +247,7 @@ import TuiDurationTimePicker from '../DurationTimePicker.vue';
 import TimezonePicker from '../TimezonePicker.vue';
 import TuiShareLink from '../ShareLink.vue';
 import Contacts from '../Contacts.vue';
-import ScheduleAttendees from '../../common/icons/ScheduleAttendees.vue';
 import PanelContainer from '../PanelContainer.vue';
-import CloseIcon from '../../common/icons/CloseIcon.vue';
-import HideContentIcon from '../../common/icons/HideContentIcon.vue';
-import ShowContentIcon from '../../common/icons/ShowContentIcon.vue';
 import { EventType, roomService } from '../../../services';
 import { PASSWORD_MAX_LENGTH_LIMIT } from '../../../constants/room';
 import {
@@ -262,7 +263,6 @@ import {
   convertToTimestamp,
   calculateEndTime,
 } from '../scheduleUtils';
-import SvgIcon from '../../common/base/SvgIcon.vue';
 
 const { t } = useI18n();
 const shareLinkData = ref({});

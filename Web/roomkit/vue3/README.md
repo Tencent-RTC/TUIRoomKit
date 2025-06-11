@@ -6,16 +6,14 @@ Conference (TUIRoomKit) is a product suitable for multi-person audio and video c
 ## Usage Guide
 For your convenience, this component comes with several usage guides:
 - If you want to experience online, please visit [TUIRoomKit Online Experience Link](https://trtc.io/demo/homepage/#/detail?scene=roomkit) to experience more features of TUIRoomKit.
-- If you want to access TUIRoomKit in the project, please visit [TUIRoomKit Quick Access](https://cloud.tencent.com/document/product/647/81962).
-- If you want to modify the UI interface, please visit [TUIRoomKit Interface Customization](https://cloud.tencent.com/document/product/647/81965).
+- If you want to access TUIRoomKit in the project, please visit [TUIRoomKit Quick Access]( https://trtc.io/document/54845).
+- If you want to modify the UI interface, please visit [TUIRoomKit Interface Customization](https://trtc.io/document/54851).
 
 ## API List
-For a detailed API list, please refer to the document: [Client API (TUIRoomKit)](https://cloud.tencent.com/document/product/647/81969).
-## Changelog
-Please check [Release Log (TUIRoomKit)](https://cloud.tencent.com/document/product/647/90288) for version update logs.
+For a detailed API list, please refer to the document: [Client API (TUIRoomKit)]( https://trtc.io/document/54880).
 
 ## Appendix
-- If you encounter difficulties, you can first refer to [Frequently Asked Questions](https://cloud.tencent.com/document/product/647/81977);
+- If you encounter difficulties, you can first refer to [Frequently Asked Questions](https://trtc.io/document/37340);
 - If you find a bug in the sample code, you are welcome to submit an issue;
-- If you have any needs or feedback during the access or use process, you are welcome to join [Tencent Cloud Real-time Audio and Video TRTC Technical Exchange Group](https://zhiliao.qq.com/s/cWSPGIIM62CC/c3TPGIIM62CQ) for technical exchange and problem feedback.
+- If you have any needs or feedback during the access or use process, you are welcome to join [Tencent Cloud Real-time Audio and Video TRTC Group](https://t.me/+EPk6TMZEZMM5OGY1) for technical exchange and problem feedback.
 Rewrite as English document

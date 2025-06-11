@@ -67,7 +67,7 @@ import { EventType, roomService } from './services/index';
 import ScheduleRoomList from './components/ScheduleConference/ScheduleRoomList.vue';
 import Logo from './components/common/Logo.vue';
 import TUIMessageBox from './components/common/base/MessageBox/index';
-import TUIMessage from './components/common/base/Message/index';
+import { TUIToast, TOAST_TYPE } from '@tencentcloud/uikit-base-component-vue3';
 import { MESSAGE_DURATION } from './constants/message';
 import { isMobile } from './utils/environment';
 
@@ -155,12 +155,12 @@ const showMessageBox = (data: {
   });
 };
 const showMessage = (data: {
-  type: 'warning' | 'success' | 'error' | 'info';
+  type: TOAST_TYPE;
   message: string;
   duration: MESSAGE_DURATION;
 }) => {
   const { type, message, duration } = data;
-  TUIMessage({
+  TUIToast({
     type,
     message,
     duration,
@@ -188,6 +188,7 @@ onUnmounted(() => {
 :root[tui-theme-mode='dark'] {
   --preconference-background: var(--bg-color-topbar);
 }
+
 .pre-conference-container {
   display: flex;
   align-items: center;
@@ -195,9 +196,9 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   font-family: 'PingFang SC';
-  background-size: cover;
-  background: var(--preconference-background);
   color: var(--text-color-primary);
+  background: var(--preconference-background);
+  background-size: cover;
 
   .header {
     position: absolute;

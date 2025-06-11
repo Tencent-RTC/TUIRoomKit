@@ -12,7 +12,7 @@
             class="invite-item"
             v-tap="() => item.function()"
           >
-            <svg-icon class="icon" :icon="item.icon" />
+            <TUIIcon class="icon" :icon="item.icon" size="20" />
             <span class="invite-title">{{ t(item.text) }}</span>
           </div>
         </div>
@@ -28,10 +28,9 @@
         >
           <span class="invite-title">{{ t(item.title) }}</span>
           <span class="invite-content">{{ item.content }}</span>
-          <svg-icon
+          <IconCopy
             v-if="item.isShowCopyIcon"
             v-tap="() => onCopy(item.content)"
-            :icon="CopyIcon"
             class="copy"
           />
         </div>
@@ -54,11 +53,10 @@
 </template>
 
 <script setup lang="ts">
-import SvgIcon from '../common/base/SvgIcon.vue';
+import { TUIIcon, IconCopy } from '@tencentcloud/uikit-base-component-vue3';
 import useRoomInviteControl from './useRoomInviteHooks';
 import ActionSheep from '../common/base/ActionSheep.vue';
 import Contacts from '../ScheduleConference/Contacts.vue';
-import CopyIcon from '../common/icons/CopyIcon.vue';
 import vTap from '../../directives/vTap';
 
 const {
@@ -109,8 +107,6 @@ span {
   .icon {
     display: flex;
     align-items: center;
-    width: 20px;
-    height: 20px;
     margin: 0 5px;
   }
 }
@@ -145,8 +141,6 @@ span {
   }
 
   .copy {
-    width: 20px;
-    height: 20px;
     margin-left: 30px;
     color: var(--text-color-link);
   }

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="image-previewer"
-    :class="[isMobile && 'image-previewer-h5']"
-  >
+  <div class="image-previewer" :class="[isMobile && 'image-previewer-h5']">
     <div
       ref="image"
       class="image-wrapper"
@@ -23,11 +20,7 @@
           transition: '0.5s',
         }"
       >
-        <li
-          v-for="(item, index) in imageList"
-          :key="index"
-          class="image-item"
-        >
+        <li v-for="(item, index) in imageList" :key="index" class="image-item">
           <ImageItem
             :zoom="zoom"
             :rotate="rotate"
@@ -38,16 +31,8 @@
         </li>
       </ul>
     </div>
-    <div
-      v-show="isPC"
-      class="icon icon-close"
-      @click="close"
-    >
-      <Icon
-        :file="iconClose"
-        width="16px"
-        height="16px"
-      />
+    <div v-show="isPC" class="icon icon-close" @click="close">
+      <Icon :file="iconClose" width="16px" height="16px" />
     </div>
     <div
       v-if="isPC && currentImageIndex > 0"
@@ -64,70 +49,40 @@
       <Icon :file="iconArrowLeft" />
     </div>
     <div :class="['actions-bar', isMobile && 'actions-bar-h5']">
-      <div
-        v-if="isPC"
-        class="icon-zoom-in"
-        @click="zoomIn"
-      >
-        <Icon
-          :file="iconZoomIn"
-          width="27px"
-          height="27px"
-        />
+      <div v-if="isPC" class="icon-zoom-in" @click="zoomIn">
+        <Icon :file="iconZoomIn" width="27px" height="27px" />
       </div>
-      <div
-        v-if="isPC"
-        class="icon-zoom-out"
-        @click="zoomOut"
-      >
-        <Icon
-          :file="iconZoomOut"
-          width="27px"
-          height="27px"
-        />
+      <div v-if="isPC" class="icon-zoom-out" @click="zoomOut">
+        <Icon :file="iconZoomOut" width="27px" height="27px" />
       </div>
-      <div
-        v-if="isPC"
-        class="icon-refresh-left"
-        @click="rotateLeft"
-      >
-        <Icon
-          :file="iconRotateLeft"
-          width="27px"
-          height="27px"
-        />
+      <div v-if="isPC" class="icon-refresh-left" @click="rotateLeft">
+        <Icon :file="iconRotateLeft" width="27px" height="27px" />
       </div>
-      <div
-        v-if="isPC"
-        class="icon-refresh-right"
-        @click="rotateRight"
-      >
-        <Icon
-          :file="iconRotateRight"
-          width="27px"
-          height="27px"
-        />
+      <div v-if="isPC" class="icon-refresh-right" @click="rotateRight">
+        <Icon :file="iconRotateRight" width="27px" height="27px" />
       </div>
       <span class="image-counter">
         {{ currentImageIndex + 1 }} / {{ imageList.length }}
       </span>
     </div>
-    <div
-      class="save"
-      @click.stop.prevent="save"
-    >
-      <Icon
-        :file="iconDownload"
-        width="20px"
-        height="20px"
-      />
+    <div class="save" @click.stop.prevent="save">
+      <Icon :file="iconDownload" width="20px" height="20px" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect, onMounted, onUnmounted, withDefaults } from '../../../adapter-vue';
-import { IMessageModel, TUITranslateService } from '@tencentcloud/chat-uikit-engine';
+import {
+  ref,
+  watchEffect,
+  onMounted,
+  onUnmounted,
+  withDefaults,
+} from '../../../adapter-vue';
+import {
+  IMessageModel,
+  TUITranslateService,
+} from '@tencentcloud/chat-uikit-engine';
 import { TUIGlobal, getPlatform } from '@tencentcloud/universal-api';
 import Icon from '../../common/Icon.vue';
 import iconClose from '../../../assets/icon/icon-close.svg';
@@ -138,7 +93,10 @@ import iconRotateLeft from '../../../assets/icon/rotate-left.svg';
 import iconRotateRight from '../../../assets/icon/rotate-right.svg';
 import iconDownload from '../../../assets/icon/download.svg';
 import ImageItem from './image-item.vue';
-import { Toast, TOAST_TYPE } from '../../common/Toast/index';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { isPC, isMobile, isUniFrameWork } from '../../../utils/env';
 
 interface touchesPosition {
@@ -154,9 +112,9 @@ const props = withDefaults(
     currentImage: IMessageModel;
   }>(),
   {
-    imageList: () => ([] as IMessageModel[]),
-    messageItem: () => ({} as IMessageModel),
-  },
+    imageList: () => [] as IMessageModel[],
+    messageItem: () => ({}) as IMessageModel,
+  }
 );
 
 const imageFormatMap = new Map([
@@ -292,33 +250,33 @@ const handleTwoTouches = (e: any) => {
     startX: number,
     startY: number,
     stopX: number,
-    stopY: number,
+    stopY: number
   ) => {
     return Math.hypot(stopX - startX, stopY - startY);
   };
   if (
-    !isNumber(touchStore.pageX1)
-    || !isNumber(touchStore.pageY1)
-    || !isNumber(touchStore.pageX2)
-    || !isNumber(touchStore.pageY2)
+    !isNumber(touchStore.pageX1) ||
+    !isNumber(touchStore.pageY1) ||
+    !isNumber(touchStore.pageX2) ||
+    !isNumber(touchStore.pageY2)
   ) {
     return;
   }
-  const touchZoom
-    = getDistance(touch1.pageX, touch1.pageY, touch2.pageX, touch2.pageY)
-    / getDistance(
+  const touchZoom =
+    getDistance(touch1.pageX, touch1.pageY, touch2.pageX, touch2.pageY) /
+    getDistance(
       touchStore.pageX1 as number,
       touchStore.pageY1 as number,
       touchStore.pageX2 as number,
-      touchStore.pageY2 as number,
+      touchStore.pageY2 as number
     );
   zoom.value = Math.min(Math.max(0.5, zoom.value * touchZoom), 4);
 };
 
 onMounted(() => {
   // web: close on esc keydown
-  document?.addEventListener
-  && document?.addEventListener('keydown', handleEsc);
+  document?.addEventListener &&
+    document?.addEventListener('keydown', handleEsc);
 });
 
 const handleEsc = (e: any) => {
@@ -331,8 +289,8 @@ const zoomIn = () => {
   zoom.value += 0.1;
 };
 const zoomOut = () => {
-  zoom.value
-    = zoom.value - 0.1 > minZoom.value ? zoom.value - 0.1 : minZoom.value;
+  zoom.value =
+    zoom.value - 0.1 > minZoom.value ? zoom.value - 0.1 : minZoom.value;
 };
 const close = () => {
   emit('close');
@@ -344,8 +302,8 @@ const rotateRight = () => {
   rotate.value += 90;
 };
 const goNext = () => {
-  currentImageIndex.value < props.imageList.length - 1
-  && currentImageIndex.value++;
+  currentImageIndex.value < props.imageList.length - 1 &&
+    currentImageIndex.value++;
   initStyle();
 };
 const goPrev = () => {
@@ -360,9 +318,8 @@ const initStyle = () => {
 const getImageUrl = (message: IMessageModel) => {
   if (isPC) {
     return message?.payload?.imageInfoArray[0]?.url;
-  } else {
-    return message?.payload?.imageInfoArray[2]?.url;
   }
+  return message?.payload?.imageInfoArray[2]?.url;
 };
 
 const save = () => {
@@ -371,7 +328,7 @@ const save = () => {
   ] as IMessageModel;
   const imageSrc = imageMessage?.payload?.imageInfoArray[0]?.url;
   if (!imageSrc) {
-    Toast({
+    TUIToast({
       message: TUITranslateService.t('component.图片 url 不存在'),
       type: TOAST_TYPE.ERROR,
     });
@@ -402,7 +359,7 @@ const save = () => {
                         },
                       });
                     } else if (res.cancel) {
-                      return Toast({
+                      return TUIToast({
                         message: TUITranslateService.t('component.已取消'),
                         type: TOAST_TYPE.ERROR,
                       });
@@ -417,7 +374,7 @@ const save = () => {
           }
         },
         fail: () => {
-          Toast({
+          TUIToast({
             message: TUITranslateService.t('component.获取权限失败'),
             type: TOAST_TYPE.ERROR,
           });
@@ -439,21 +396,21 @@ const downloadImgInUni = (src: string) => {
   });
   TUIGlobal.downloadFile({
     url: src,
-    success: function (res: any) {
+    success(res: any) {
       TUIGlobal.hideLoading();
       TUIGlobal.saveImageToPhotosAlbum({
         filePath: res.tempFilePath,
         success: () => {
-          Toast({
+          TUIToast({
             message: TUITranslateService.t('component.已保存至相册'),
             type: TOAST_TYPE.SUCCESS,
           });
         },
       });
     },
-    fail: function () {
+    fail() {
       TUIGlobal.hideLoading();
-      Toast({
+      TUIToast({
         message: TUITranslateService.t('component.图片下载失败'),
         type: TOAST_TYPE.ERROR,
       });
@@ -473,7 +430,7 @@ const downloadImgInWeb = (src: string) => {
   ] as IMessageModel;
   const imageFormat: number = imageMessage?.payload?.imageFormat;
   if (!imageFormatMap.has(imageFormat)) {
-    Toast({
+    TUIToast({
       message: TUITranslateService.t('component.暂不支持下载此类型图片'),
       type: TOAST_TYPE.ERROR,
     });
@@ -483,30 +440,30 @@ const downloadImgInWeb = (src: string) => {
   if ((window as any).fetch) {
     fetch(src, option)
       .then(res => res.blob())
-      .then((blob) => {
+      .then(blob => {
         const a = document.createElement('a');
         const url = window.URL.createObjectURL(blob);
         a.href = url;
-        a.download = url + '.' + imageFormatMap.get(imageFormat);
+        a.download = `${url}.${imageFormatMap.get(imageFormat)}`;
         a.click();
       });
   } else {
     const a = document.createElement('a');
     a.href = src;
     a.target = '_blank';
-    a.download = src + '.' + imageFormatMap.get(imageFormat);
+    a.download = `${src}.${imageFormatMap.get(imageFormat)}`;
     a.click();
   }
 };
 
 onUnmounted(() => {
-  document?.removeEventListener
-  && document?.removeEventListener('keydown', handleEsc);
+  document?.removeEventListener &&
+    document?.removeEventListener('keydown', handleEsc);
 });
 </script>
 
 <style lang="scss" scoped>
-@import "../../../assets/styles/common";
+@import '../../../assets/styles/common';
 
 .actions-bar {
   display: flex;

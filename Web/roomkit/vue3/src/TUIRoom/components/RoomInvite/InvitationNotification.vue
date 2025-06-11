@@ -44,7 +44,7 @@
         type="primary"
         style="min-width: 88px"
       >
-        <svg-icon class="icon" :icon="EnterRoomIcon" />
+        <IconEnterRoom size="16" />
         <span class="button-text">{{ t('Enter Now') }}</span>
       </TUIButton>
     </div>
@@ -52,11 +52,9 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, defineEmits } from 'vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import { TUIButton, IconEnterRoom } from '@tencentcloud/uikit-base-component-vue3';
 import Avatar from '../common/Avatar.vue';
 import { useI18n } from '../../locales';
-import EnterRoomIcon from '../common/icons/EnterRoomIcon.vue';
-import SvgIcon from '../common/base/SvgIcon.vue';
 import {
   TUIConferenceInvitationManagerEvents,
   TUIInvitation,
@@ -235,8 +233,6 @@ onUnmounted(() => {
   .icon {
     display: flex;
     align-items: center;
-    width: 16px;
-    height: 16px;
   }
 
   .invitation-notification-room-name {

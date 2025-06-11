@@ -1,20 +1,14 @@
 <template>
-  <div
-    ref="manageRef"
-    class="manage"
-  >
+  <div ref="manageRef" class="manage">
     <header
-      v-if="!isUniFrameWork || currentTab ==='admin'"
+      v-if="!isUniFrameWork || currentTab === 'admin'"
       class="manage-header"
     >
-      <Icon
-        :file="backSVG"
-        @onClick="back"
-      />
+      <Icon :file="backSVG" @onClick="back" />
       <div class="manage-header-content">
         {{ TUITranslateService.t(`TUIGroup.${TabName}`) }}
       </div>
-      <div />
+      <div></div>
     </header>
     <main
       v-if="!currentTab || (isUniFrameWork && currentTab != 'admin')"
@@ -27,10 +21,7 @@
         @update="updateProfile"
       />
       <div class="user-info space-top">
-        <header
-          class="user-info-header"
-          @click="setCurrentTab('member')"
-        >
+        <header class="user-info-header" @click="setCurrentTab('member')">
           <label class="user-info-header-left">
             {{ TUITranslateService.t(`TUIGroup.群成员`) }}
           </label>
@@ -56,47 +47,25 @@
                 class="avatar"
                 :src="
                   item.avatar ||
-                    'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'
+                  'https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'
                 "
                 onerror="this.onerror=null;this.src='https://web.sdk.qcloud.com/component/TUIKit/assets/avatar_21.png'"
-              >
+              />
             </dt>
             <dd class="user-info-list-item-info">
               {{ item.nick || item.userID }}
             </dd>
           </dl>
-          <dl
-            v-if="isShowAddMember"
-            class="user-info-list-item"
-          >
-            <dt
-              class="avatar"
-              @click="toggleMask('add')"
-            >
-              +
-            </dt>
+          <dl v-if="isShowAddMember" class="user-info-list-item">
+            <dt class="avatar" @click="toggleMask('add')">+</dt>
           </dl>
-          <dl
-            v-if="currentSelfRole === 'Owner'"
-            class="user-info-list-item"
-          >
-            <dt
-              class="avatar"
-              @click="toggleMask('remove')"
-            >
-              -
-            </dt>
+          <dl v-if="currentSelfRole === 'Owner'" class="user-info-list-item">
+            <dt class="avatar" @click="toggleMask('remove')">-</dt>
           </dl>
         </ol>
       </div>
-      <ul
-        class="content list space-top"
-        @click="editLableName = ''"
-      >
-        <li
-          class="list-item"
-          @click="setCurrentTab('notification')"
-        >
+      <ul class="content list space-top" @click="editLableName = ''">
+        <li class="list-item" @click="setCurrentTab('notification')">
           <aside class="aside">
             <label class="label">{{
               TUITranslateService.t(`TUIGroup.群公告`)
@@ -105,10 +74,7 @@
               {{ currentGroup.notification }}
             </article>
           </aside>
-          <Icon
-            :file="rightIcon"
-            class="end"
-          />
+          <Icon :file="rightIcon" class="end" />
         </li>
         <li
           v-if="(isAdmin || isOwner) && isSetMuteTime"
@@ -136,10 +102,10 @@
             class="avatar"
             :src="
               currentGroup.avatar ||
-                'https://web.sdk.qcloud.com/im/demo/TUIkit/web/img/constomer.svg'
+              'https://web.sdk.qcloud.com/im/demo/TUIkit/web/img/constomer.svg'
             "
             onerror="this.onerror=null;this.src='https://web.sdk.qcloud.com/im/demo/TUIkit/web/img/constomer.svg'"
-          >
+          />
         </li>
         <li class="list-item">
           <label class="label">{{
@@ -175,11 +141,7 @@
         >
           {{ TUITranslateService.t(`TUIGroup.解散群聊`) }}
         </li>
-        <li
-          v-else
-          class="list-item"
-          @click.stop="quitGroup(currentGroup)"
-        >
+        <li v-else class="list-item" @click.stop="quitGroup(currentGroup)">
           {{ TUITranslateService.t(`TUIGroup.退出群组`) }}
         </li>
       </ul>
@@ -220,10 +182,7 @@
       @removeMute="toggleMask('removeMute')"
       @close="setCurrentTab('')"
     />
-    <MaskLayer
-      :show="mask"
-      @update:show="(e) => (mask = e)"
-    >
+    <MaskLayer :show="mask" @update:show="e => (mask = e)">
       <Transfer
         :title="TUITranslateService.t(`TUIGroup.${transferTitle}`)"
         :list="transferList"
@@ -244,18 +203,12 @@
       :center="true"
       :isHeaderShow="isPC"
       @submit="handleManage(deletedUserList, 'remove')"
-      @update:show="(e) => (delDialogShow = e)"
+      @update:show="e => (delDialogShow = e)"
     >
-      <p
-        v-if="deletedUserList.length === 1"
-        class="del-dialog-title"
-      >
+      <p v-if="deletedUserList.length === 1" class="del-dialog-title">
         {{ TUITranslateService.t(`TUIGroup.确定从群聊中删除该成员？`) }}
       </p>
-      <p
-        v-if="deletedUserList.length > 1"
-        class="del-dialog-title"
-      >
+      <p v-if="deletedUserList.length > 1" class="del-dialog-title">
         {{ TUITranslateService.t(`TUIGroup.确定从群聊中删除所选成员？`) }}
       </p>
     </Dialog>
@@ -291,7 +244,10 @@ import ManageAdmin from './manage-admin.vue';
 import Icon from '../../common/Icon.vue';
 import backSVG from '../../../assets/icon/back.svg';
 import rightIcon from '../../../assets/icon/right-icon.svg';
-import { Toast, TOAST_TYPE } from '../../common/Toast/index';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { isPC, isUniFrameWork } from '../../../utils/env';
 import Server from '../server';
 import { enableSampleTaskStatus } from '../../../utils/enableSampleTaskStatus';
@@ -389,7 +345,7 @@ TUIStore.watch(StoreName.GRP, {
     });
     const time: number = new Date().getTime();
     member.value.muteMember = Array.from(memberList).filter(
-      (item: any) => item?.muteUntil * 1000 - time > 0,
+      (item: any) => item?.muteUntil * 1000 - time > 0
     );
   },
 });
@@ -401,7 +357,9 @@ TUIStore.watch(StoreName.CONV, {
 });
 
 watchEffect(() => {
-  const params = TUIGroupServer.getOnCallParams(TUIConstants.TUIGroup.SERVICE.METHOD.OPEN_GROUP_MANAGEMENT);
+  const params = TUIGroupServer.getOnCallParams(
+    TUIConstants.TUIGroup.SERVICE.METHOD.OPEN_GROUP_MANAGEMENT
+  );
   currentGroupID.value = params?.groupID || groupIDValue.value;
   currentTab.value = props.groupCurrentTab;
 });
@@ -468,7 +426,7 @@ const updateProfile = async (newGroupProfile: any) => {
       editLableName.value = '';
     })
     .catch((error: any) => {
-      Toast({
+      TUIToast({
         message: error?.message,
         type: TOAST_TYPE.ERROR,
       });
@@ -496,16 +454,20 @@ const toggleMask = async (type?: string) => {
   switch (type) {
     case 'add':
       isRadio.value = false;
-      memberUserIDList = [...member.value.admin, ...member.value.member].map((item: IUserProfile) => item.userID);
-      transferList.value = (await friendList()).filter((item: IFriendProfile) => {
-        return item.userID && memberUserIDList.indexOf(item.userID) < 0;
-      });
+      memberUserIDList = [...member.value.admin, ...member.value.member].map(
+        (item: IUserProfile) => item.userID
+      );
+      transferList.value = (await friendList()).filter(
+        (item: IFriendProfile) => {
+          return item.userID && memberUserIDList.indexOf(item.userID) < 0;
+        }
+      );
       transferTitle.value = '添加成员';
       break;
     case 'remove':
       isRadio.value = false;
       transferList.value = groupMemberList.value.filter(
-        (item: any) => item.userID !== currentGroup?.value?.selfInfo?.userID,
+        (item: any) => item.userID !== currentGroup?.value?.selfInfo?.userID
       );
       transferTitle.value = '删除成员';
       break;
@@ -553,8 +515,8 @@ const friendList = async () => {
   return friendList.filter(
     (item: any) =>
       !userInfo.value.list.some(
-        (infoItem: any) => infoItem.userID === item.userID,
-      ),
+        (infoItem: any) => infoItem.userID === item.userID
+      )
   );
 };
 
@@ -563,8 +525,8 @@ const canIDissmissGroup = computed(() => {
   const groupType = currentGroup?.value?.type;
 
   return (
-    userRole === TUIChatEngine.TYPES.GRP_MBR_ROLE_OWNER
-    && groupType !== TUIChatEngine.TYPES.GRP_WORK
+    userRole === TUIChatEngine.TYPES.GRP_MBR_ROLE_OWNER &&
+    groupType !== TUIChatEngine.TYPES.GRP_WORK
   );
 });
 
@@ -618,7 +580,7 @@ const submit = (userList: any) => {
 const dismissGroup = async (group: any) => {
   await TUIGroupService.dismissGroup(group.groupID);
   enableSampleTaskStatus('dismissGroup');
-  Toast({
+  TUIToast({
     message: TUITranslateService.t('TUIGroup.群组解散成功'),
     type: TOAST_TYPE.SUCCESS,
   });
@@ -641,12 +603,12 @@ const setAllMuteTime = (value: boolean) => {
   updateProfile({ key: 'muteAllMembers', value });
   if (value) {
     enableSampleTaskStatus('muteGroup');
-    Toast({
+    TUIToast({
       message: TUITranslateService.t('TUIGroup.禁言设置成功'),
       type: TOAST_TYPE.SUCCESS,
     });
   } else {
-    Toast({
+    TUIToast({
       message: TUITranslateService.t('TUIGroup.取消禁言成功'),
       type: TOAST_TYPE.SUCCESS,
     });
@@ -665,7 +627,7 @@ const handleSearchMember = async (value: string) => {
       try {
         imMemberResponse = await TUIGroupService.getGroupMemberProfile(options);
         transferList.value = transferList.value.filter(
-          (item: any) => item.userID !== imResponse.data[0]?.userID,
+          (item: any) => item.userID !== imResponse.data[0]?.userID
         );
         transferList.value = [...transferList.value, ...imResponse.data];
         if (imMemberResponse?.data?.memberList.length > 0) {
@@ -678,7 +640,7 @@ const handleSearchMember = async (value: string) => {
         }
       } catch (error: any) {
         const message = TUITranslateService.t('TUIGroup.该用户不存在');
-        Toast({
+        TUIToast({
           message,
           type: TOAST_TYPE.ERROR,
         });
@@ -689,13 +651,13 @@ const handleSearchMember = async (value: string) => {
         imResponse = await TUIGroupService.getGroupMemberProfile(options);
         if (imResponse.data.memberList.length === 0) {
           const message = TUITranslateService.t('TUIGroup.该用户不在群组内');
-          Toast({
+          TUIToast({
             message,
             type: TOAST_TYPE.ERROR,
           });
         }
         transferList.value = transferList.value.filter(
-          (item: any) => item.userID !== imResponse?.data?.memberList[0]?.userID,
+          (item: any) => item.userID !== imResponse?.data?.memberList[0]?.userID
         );
         if (imResponse?.data?.memberList.length) {
           transferList.value = [
@@ -705,7 +667,7 @@ const handleSearchMember = async (value: string) => {
         }
       } catch (error: any) {
         const message = TUITranslateService.t('TUIGroup.该用户不存在');
-        Toast({
+        TUIToast({
           message,
           type: TOAST_TYPE.ERROR,
         });
@@ -818,7 +780,9 @@ const back = () => {
 
 const handleCompleteManage = () => {
   TUIStore.update(StoreName.GRP, 'isShowManageComponent', false);
-  const callback = TUIGroupServer.getOnCallCallback(TUIConstants.TUIGroup.SERVICE.METHOD.OPEN_GROUP_MANAGEMENT);
+  const callback = TUIGroupServer.getOnCallCallback(
+    TUIConstants.TUIGroup.SERVICE.METHOD.OPEN_GROUP_MANAGEMENT
+  );
   callback && callback();
 };
 </script>

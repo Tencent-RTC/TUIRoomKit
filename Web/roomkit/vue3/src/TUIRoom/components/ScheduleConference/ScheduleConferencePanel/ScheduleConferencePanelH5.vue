@@ -80,9 +80,8 @@
                 :border="false"
               >
                 <template #suffixIcon>
-                  <svg-icon
+                  <IconScheduleAttendees
                     @click="selectScheduleAttends"
-                    :icon="ScheduleAttendees"
                     :class="['select-attendees']"
                   />
                 </template>
@@ -114,7 +113,7 @@
                   <p class="form-attendees-item-name" :title="user.userName">
                     {{ user.userName }}
                   </p>
-                  <CloseIcon
+                  <IconClose
                     class="form-attendees-item-remove"
                     @click="removeSelectUser(user)"
                   />
@@ -217,7 +216,11 @@ import { useI18n } from '../../../locales';
 import TuiInput from '../../common/base/Input';
 import TuiSelect from '../../common/base/Select';
 import TuiOption from '../../common/base/Option';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconScheduleAttendees,
+  IconClose,
+} from '@tencentcloud/uikit-base-component-vue3';
 import TuiAvatar from '../../common/Avatar.vue';
 import TuiDatepicker from '../../common/base/Datepicker';
 import TuiTimepicker from '../../common/base/Timepicker';
@@ -225,12 +228,9 @@ import TuiSwitch from '../../common/base/TuiSwitch.vue';
 import TuiDurationTimePicker from '../DurationTimePicker.vue';
 import TimezonePicker from '../TimezonePicker.vue';
 import Contacts from '../Contacts.vue';
-import ScheduleAttendees from '../../common/icons/ScheduleAttendees.vue';
 import PanelContainer from '../PanelContainer.vue';
-import CloseIcon from '../../common/icons/CloseIcon.vue';
 import InvitePanel from '../InvitePanel.vue';
 import ActionSheep from '../../common/base/ActionSheep.vue';
-import SvgIcon from '../../common/base/SvgIcon.vue';
 import { PASSWORD_MAX_LENGTH_LIMIT } from '../../../constants/room';
 
 import { EventType, roomService } from '../../../services';

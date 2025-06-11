@@ -7,15 +7,17 @@
       :class="['arrow', { 'has-stroke': hasStroke }]"
       @click="handleClickArrow"
     >
-      <arrow-stroke-left-icon :class="arrowDirection" />
+      <IconArrowStrokeLeft
+        :class="arrowDirection"
+        style="width: 8px; height: 12px"
+      />
     </svg-icon>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import SvgIcon from './base/SvgIcon.vue';
-import ArrowStrokeLeftIcon from './icons/ArrowStrokeLeftIcon.vue';
+import { IconArrowStrokeLeft } from '@tencentcloud/uikit-base-component-vue3';
 
 interface Props {
   strokePosition: string;

@@ -7,19 +7,14 @@
         class="off-camera-info"
         >{{ t('Off Camera') }}
       </span>
-      <svg-icon
-        v-if="isCameraTestLoading"
-        :icon="LoadingIcon"
-        class="loading"
-      />
+      <IconLoading size="36" v-if="isCameraTestLoading" class="loading" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
-import LoadingIcon from '../../../components/common/icons/LoadingIcon.vue';
-import SvgIcon from '../../../components/common/base/SvgIcon.vue';
+import { IconLoading } from '@tencentcloud/uikit-base-component-vue3';
 import { useVideoDeviceState } from '../../hooks';
 import { useI18n } from '../../../locales';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
@@ -44,7 +39,7 @@ onUnmounted(async () => {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--uikit-theme-base-color-black-1);
+  background-color: var(--uikit-color-black-1);
   border-radius: 8px;
 
   .video-preview {
@@ -69,7 +64,7 @@ onUnmounted(async () => {
       font-size: 22px;
       font-weight: 400;
       line-height: 34px;
-      color: var(--uikit-theme-base-color-gray-7);
+      color: var(--uikit-color-gray-7);
     }
 
     .loading {

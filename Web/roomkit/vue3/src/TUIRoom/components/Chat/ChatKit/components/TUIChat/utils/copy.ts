@@ -1,5 +1,8 @@
 import { TUITranslateService } from '@tencentcloud/chat-uikit-engine';
-import { Toast, TOAST_TYPE } from '../../common/Toast';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { isH5 } from '../../../utils/env';
 
 type SavedNativeSelection = {
@@ -43,15 +46,18 @@ class CopyManager {
       return;
     }
 
-    const { anchorNode, anchorOffset, focusNode, focusOffset } = this.savedSelection;
+    const { anchorNode, anchorOffset, focusNode, focusOffset } =
+      this.savedSelection;
     if (!anchorNode || !focusNode) {
       return;
     }
 
     const range = document.createRange();
-    const isForwardSelection = anchorNode === focusNode
-      ? anchorOffset <= focusOffset
-      : anchorNode.compareDocumentPosition(focusNode) & Node.DOCUMENT_POSITION_FOLLOWING;
+    const isForwardSelection =
+      anchorNode === focusNode
+        ? anchorOffset <= focusOffset
+        : anchorNode.compareDocumentPosition(focusNode) &
+          Node.DOCUMENT_POSITION_FOLLOWING;
     if (isForwardSelection) {
       range.setStart(anchorNode, anchorOffset);
       range.setEnd(focusNode, focusOffset);
@@ -87,8 +93,11 @@ class CopyManager {
     this.savedSelection = null;
   }
 
-  public async copyTextOrHtml(content: string, type: 'text' | 'html'): Promise<void> {
-    const mimeType = (type === 'html') ? 'text/html' : 'text/plain';
+  public async copyTextOrHtml(
+    content: string,
+    type: 'text' | 'html'
+  ): Promise<void> {
+    const mimeType = type === 'html' ? 'text/html' : 'text/plain';
     // prefer use clipboard api to copy node or text
     if (navigator.clipboard) {
       try {
@@ -127,7 +136,7 @@ class CopyManager {
     try {
       document.execCommand('copy');
     } catch (err) {
-      Toast({
+      TUIToast({
         message: TUITranslateService.t('TUIChat.此机型暂不支持复制'),
         type: TOAST_TYPE.ERROR,
       });

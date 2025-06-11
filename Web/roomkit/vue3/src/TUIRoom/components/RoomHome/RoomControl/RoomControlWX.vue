@@ -2,15 +2,15 @@
   <div class="control-container">
     <div class="container-button-group">
       <div class="button-item" @click="enterRoom">
-        <svg-icon class="button-icon" :icon="EnterRoomIcon" />
+        <IconEnterRoom size="22" class="button-icon" />
         <span>{{ t('Join Room') }}</span>
       </div>
       <div class="button-item" @click="createRoom">
-        <svg-icon class="button-icon" :icon="CreateRoomIcon" />
+        <IconCreateRoom size="22" class="button-icon" />
         <span>{{ t('New Room') }}</span>
       </div>
       <div class="button-item" @click="scheduleRoom">
-        <svg-icon class="button-icon" :icon="ScheduleRoomIcon" />
+        <IconScheduleRoom size="22" class="button-icon" />
         <span>{{ t('Schedule') }}</span>
       </div>
     </div>
@@ -19,11 +19,7 @@
     </div>
     <div v-if="showRoomDetail || hasGivenRoomId" class="room-detail">
       <div class="room-detail-header">
-        <svg-icon
-          v-tap="handleClose"
-          class="close-icon"
-          :icon="ArrowStrokeBackIcon"
-        />
+        <IconArrowStrokeBack v-tap="handleClose" class="close-icon" />
         <span
           v-if="isJoinRoom || hasGivenRoomId"
           class="room-detail-header-title"
@@ -50,10 +46,7 @@
             <div class="room-show-title">
               <span class="room-show-title">{{ roomType }}</span>
             </div>
-            <svg-icon
-              class="chevron-down-icon"
-              :icon="ArrowStrokeSelectDownIcon"
-            />
+            <IconArrowStrokeSelectDown class="chevron-down-icon" size="14" />
           </div>
           <div class="room-detail-info-box">
             <span class="room-detail-title">{{ t('Your Name') }}</span>
@@ -144,18 +137,20 @@ import {
   defineProps,
   defineExpose,
 } from 'vue';
-import SvgIcon from '../../common/base/SvgIcon.vue';
+import {
+  IconEnterRoom,
+  IconCreateRoom,
+  IconScheduleRoom,
+  IconArrowStrokeSelectDown,
+  IconArrowStrokeBack,
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomStore } from '../../../stores/room';
 import useRoomControl from './useRoomControlHooks';
 import vTap from '../../../directives/vTap';
-import CreateRoomIcon from '../../common/icons/CreateRoomIcon.vue';
-import EnterRoomIcon from '../../common/icons/EnterRoomIcon.vue';
-import ArrowStrokeBackIcon from '../../common/icons/ArrowStrokeBackIcon.vue';
-import ArrowStrokeSelectDownIcon from '../../common/icons/ArrowStrokeSelectDownIcon.vue';
-import ScheduleRoomIcon from '../../common/icons/ScheduleRoomIcon.vue';
 import ScheduleRoomList from '../../ScheduleConference/ScheduleRoomList.vue';
 import ScheduleConferencePanel from '../../ScheduleConference/ScheduleConferencePanel';
-import TUIMessage from '../../common/base/Message/index';
 
 const { t } = useRoomControl();
 
@@ -275,8 +270,8 @@ function handleRoomOption(
   switch (type) {
     case 'Join':
       if (!roomId.value && !params?.roomId) {
-        TUIMessage({
-          type: 'error',
+        TUIToast({
+          type: TOAST_TYPE.ERROR,
           message: t('Please enter the room number'),
         });
         return;
@@ -334,15 +329,12 @@ onUnmounted(() => {
       width: 90px;
       height: 80px;
       font-size: 14px;
-      color: var(--uikit-color-white-1);
-      border-radius: 8px;
-      text-align: center;
       color: var(--text-color-button);
+      text-align: center;
       background-color: var(--button-color-primary-default);
+      border-radius: 8px;
 
       .button-icon {
-        width: 22px;
-        height: 22px;
         background-size: cover;
       }
     }
@@ -462,16 +454,14 @@ onUnmounted(() => {
 
   &-title {
     flex: 1;
-    text-align: center;
     color: var(--text-color-primary);
+    text-align: center;
   }
 }
 
 .close-icon {
   position: absolute;
   left: 22px;
-  width: 10px;
-  height: 18px;
   background-size: cover;
 }
 
@@ -481,8 +471,8 @@ onUnmounted(() => {
 
 .room-detail-info {
   margin-top: 20px;
-  border-radius: 6px;
   background-color: var(--bg-color-operate);
+  border-radius: 6px;
 }
 
 .room-detail-info-box {
@@ -498,8 +488,6 @@ onUnmounted(() => {
 
 .chevron-down-icon {
   display: flex;
-  width: 14px;
-  height: 9px;
 }
 
 .room-show-title {
@@ -513,9 +501,9 @@ onUnmounted(() => {
   max-width: 180px;
   padding-left: 56px;
   overflow: hidden;
+  color: var(--text-color-secondary);
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--text-color-secondary);
 }
 
 .roomid-input {
@@ -523,16 +511,16 @@ onUnmounted(() => {
   width: 100%;
   padding-left: 56px;
   font-size: 16px;
-  border: 0;
-  outline: none;
   color: var(--text-color-primary);
   background-color: var(--bg-color-operate);
+  border: 0;
+  outline: none;
 }
 
 .room-detail-setting {
   margin-top: 20px;
-  border-radius: 6px;
   background-color: var(--bg-color-operate);
+  border-radius: 6px;
 }
 
 .room-detail-setting-list {
@@ -571,10 +559,10 @@ onUnmounted(() => {
   z-index: 11;
   width: 100vw;
   padding-bottom: 25px;
+  background-color: var(--bg-color-operate);
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   transition: all 0.25s linear;
-  background-color: var(--bg-color-operate);
 }
 
 .close-room-type-container {
@@ -584,10 +572,10 @@ onUnmounted(() => {
   z-index: 11;
   width: 100vw;
   height: 0;
+  background-color: var(--bg-color-operate);
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   transition: all 0.25s linear;
-  background-color: var(--bg-color-operate);
 }
 
 .room-choose-mobile {

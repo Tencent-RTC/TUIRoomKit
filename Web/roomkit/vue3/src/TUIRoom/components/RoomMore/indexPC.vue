@@ -1,7 +1,7 @@
 <template>
   <div class="more-container">
     <div class="more-title">
-      <svg-icon class="email-icon" :icon="EmailIcon" />
+      <IconEmail class="email-icon" />
       <div class="more-notice">
         {{ t('If you have any questions, please email us.') }}
       </div>
@@ -13,17 +13,18 @@
     <div class="more-item">
       <div class="item-title">{{ t('Our email address') }}</div>
       <div class="more-content">{{ email }}</div>
-      <svg-icon class="copy-icon" :icon="CopyIcon" @click="onCopy(email)" />
+      <IconCopy class="copy-icon" @click="onCopy(email)" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconCopy,
+  IconEmail,
+} from '@tencentcloud/uikit-base-component-vue3';
 import useRoomMoreControl from './useRoomMoreHooks';
-import SvgIcon from '../common/base/SvgIcon.vue';
-import CopyIcon from '../common/icons/CopyIcon.vue';
-import EmailIcon from '../common/icons/EmailIcon.vue';
 
 const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
 </script>
@@ -34,6 +35,7 @@ const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
 
   .more-title {
     display: flex;
+    align-items: center;
 
     .email-icon {
       color: var(--uikit-color-gray-7);
@@ -90,13 +92,11 @@ const { t, onCopy, handleClick, email, isZH } = useRoomMoreControl();
 
       .copy-icon {
         position: absolute;
-        top: 36px;
-        right: 0;
+        top: 45px;
+        right: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 32px;
-        height: 32px;
         cursor: pointer;
         color: var(--text-color-link);
       }

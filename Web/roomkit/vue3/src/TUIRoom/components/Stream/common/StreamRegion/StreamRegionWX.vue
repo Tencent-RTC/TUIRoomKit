@@ -34,7 +34,7 @@
         v-if="showIcon"
         :class="showMasterIcon ? 'master-icon' : 'admin-icon'"
       >
-        <svg-icon :icon="UserIcon" />
+        <IconUser size="20" />
       </div>
       <audio-icon
         v-if="!isScreenStream"
@@ -43,11 +43,7 @@
         :is-muted="!streamInfo.hasAudioStream"
         size="small"
       />
-      <svg-icon
-        v-if="isScreenStream"
-        :icon="ScreenOpenIcon"
-        class="screen-icon"
-      />
+      <IconScreenOpen v-if="isScreenStream" size="20" class="screen-icon" />
       <span class="user-name" :title="displayName">{{ displayName }}</span>
       <span v-if="isScreenStream"> {{ t('is sharing their screen') }} </span>
     </div>
@@ -64,14 +60,15 @@ import {
   defineProps,
   defineEmits,
 } from 'vue';
+import {
+  IconScreenOpen,
+  IconUser,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { StreamInfo, useRoomStore } from '../../../../stores/room';
 import Avatar from '../../../common/Avatar.vue';
 import { useBasicStore } from '../../../../stores/basic';
 import logger from '../../../../utils/common/logger';
 import AudioIcon from '../../../common/AudioIcon.vue';
-import SvgIcon from '../../../common/base/SvgIcon.vue';
-import UserIcon from '../../../../assets/icons/UserIcon.svg';
-import ScreenOpenIcon from '../../../../assets/icons/ScreenOpenIcon.svg';
 import { useI18n } from '../../../../locales';
 import {
   TUIVideoStreamType,

@@ -2,7 +2,7 @@
   <div class="manage-member-container">
     <div class="manage-member-header">
       <div class="search-container">
-        <svg-icon :icon="SearchIcon" />
+        <IconSearch size="20" />
         <input
           v-model="searchText"
           class="search-input"
@@ -31,7 +31,7 @@
       v-if="applyToAnchorList.length > 0 && !isGeneralUser"
       class="apply-on-stage-info"
     >
-      <svg-icon :icon="ApplyTipsIcon" class="apply-icon" />
+      <IconApplyTips class="apply-icon" />
       <div class="apply-info">{{ applyToAnchorUserContent }}</div>
       <div class="apply-check" @click="showApplyUserList">{{ t('Check') }}</div>
     </div>
@@ -70,10 +70,9 @@
           style="min-width: 108px"
         >
           {{ t('More') }}
-          <svg-icon
+          <IconArrowUp
             size="12"
             :class="['more-arrow', showMoreControl ? 'up' : 'down']"
-            :icon="ArrowUpIcon"
           />
         </TUIButton>
         <div v-show="showMoreControl" class="drop-down">
@@ -83,7 +82,7 @@
             class="user-operate-item"
             @click="item.func(item.type)"
           >
-            <svg-icon :icon="item.icon" />
+            <TUIIcon :icon="item.icon" />
             <span class="operate-text">{{ item.title }}</span>
           </div>
         </div>
@@ -133,14 +132,16 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import MemberItem from '../ManageMember/MemberItem';
-import SvgIcon from '../common/base/SvgIcon.vue';
-import SearchIcon from '../common/icons/SearchIcon.vue';
-import ApplyTipsIcon from '../common/icons/ApplyTipsIcon.vue';
+import {
+  TUIButton,
+  TUIIcon,
+  IconSearch,
+  IconApplyTips,
+  IconArrowUp,
+} from '@tencentcloud/uikit-base-component-vue3';
 import Dialog from '../common/base/Dialog';
 import { useRoomStore } from '../../stores/room';
 import useIndex from './useIndexHooks';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
-import ArrowUpIcon from '../common/icons/ArrowUpIcon.vue';
 import vClickOutside from '../../directives/vClickOutside';
 import { USERS_STATUS } from '../../constants/room';
 
@@ -198,19 +199,19 @@ const handleShowMoreControl = () => {
     bottom: 40px;
     z-index: 1;
     padding: 8px 7px;
-    border-radius: 8px;
     background-color: var(--dropdown-color-default);
+    border-radius: 8px;
     box-shadow:
-      0px 3px 8px var(--uikit-color-black-8),
-      0px 6px 40px var(--uikit-color-black-8);
+      0 3px 8px var(--uikit-color-black-8),
+      0 6px 40px var(--uikit-color-black-8);
 
     .user-operate-item {
       display: flex;
       align-items: center;
       height: 20px;
       margin: 5px 7px;
-      cursor: pointer;
       color: var(--text-color-secondary);
+      cursor: pointer;
 
       .operate-text {
         margin-left: 8px;
@@ -241,18 +242,18 @@ const handleShowMoreControl = () => {
       align-items: center;
       height: 32px;
       padding: 0 16px;
-      border-radius: 16px;
-      background-color: var(--bg-color-input);
       color: var(--text-color-primary);
+      background-color: var(--bg-color-input);
+      border-radius: 16px;
 
       .search-input {
         width: 100%;
         margin-left: 8px;
         font-size: 14px;
+        color: var(--text-color-primary);
         background: none;
         border: none;
         outline: none;
-        color: var(--text-color-primary);
       }
     }
   }
@@ -265,8 +266,8 @@ const handleShowMoreControl = () => {
     height: 36px;
     margin: 16px 20px 0;
     cursor: pointer;
-    border-radius: 20px;
     background-color: var(--bg-color-input);
+    border-radius: 20px;
 
     .user-status {
       display: flex;
@@ -293,12 +294,12 @@ const handleShowMoreControl = () => {
     .apply-not-stage {
       font-size: 14px;
       font-weight: 400;
+      color: var(--text-color-secondary);
       filter: drop-shadow(0 2px 4px var(--uikit-color-black-8))
         drop-shadow(0 6px 10px var(--uikit-color-black-8))
         drop-shadow(0 3px 14px var(--uikit-color-black-8));
       border-radius: 20px;
       transform: translateX(4px);
-      color: var(--text-color-secondary);
     }
 
     .apply-not-stage {
@@ -340,9 +341,9 @@ const handleShowMoreControl = () => {
       font-size: 14px;
       font-weight: 400;
       line-height: 32px;
+      color: var(--text-color-link);
       text-align: center;
       cursor: pointer;
-      color: var(--text-color-link);
     }
   }
 

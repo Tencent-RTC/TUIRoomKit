@@ -1,11 +1,10 @@
 <template>
   <div class="camera-icon">
-    <svg-icon v-tap="handleSwitchCamera" :icon="CameraSwitchIcon" />
+    <IconCameraSwitch v-tap="handleSwitchCamera" size="20" />
   </div>
 </template>
 <script setup lang="ts">
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import CameraSwitchIcon from '../../common/icons/CameraSwitchIcon.vue';
+import { IconCameraSwitch } from '@tencentcloud/uikit-base-component-vue3';
 import vTap from '../../../directives/vTap';
 import { useVideoDeviceState } from '../../../core';
 

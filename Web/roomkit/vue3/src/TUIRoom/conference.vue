@@ -63,7 +63,11 @@ import {
 import { MESSAGE_DURATION } from './constants/message';
 
 import TUIMessageBox from './components/common/base/MessageBox/index';
-import TUIMessage from './components/common/base/Message/index';
+import {
+  TUIToast,
+  TOAST_TYPE,
+  useUIKit,
+} from '@tencentcloud/uikit-base-component-vue3';
 import useTRTCDetect from './hooks/useTRTCDetect';
 import {
   roomService,
@@ -73,7 +77,6 @@ import {
 } from './services/index';
 import useCustomizedAutoPlayDialog from './hooks/useCustomizedAutoPlayDialog';
 import { storeToRefs } from 'pinia';
-import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 
 const { theme } = useUIKit();
 
@@ -155,12 +158,12 @@ const showMessageBox = (data: {
   });
 };
 const showMessage = (data: {
-  type: 'warning' | 'success' | 'error' | 'info';
+  type: TOAST_TYPE;
   message: string;
   duration: MESSAGE_DURATION;
 }) => {
   const { type, message, duration } = data;
-  TUIMessage({
+  TUIToast({
     type,
     message,
     duration,
@@ -371,9 +374,9 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
   min-width: 850px;
   height: 100%;
   min-height: 400px;
+  color: var(--text-color-primary);
   text-align: left;
   background-color: var(--bg-color-topbar);
-  color: var(--text-color-primary);
 
   .header {
     position: absolute;
@@ -383,8 +386,8 @@ const onKickedOffLine = (eventInfo: { message: string }) => {
     width: 100%;
     height: 64px;
     background-color: var(--bg-color-topbar);
-    box-shadow: 0 1px 0 var(--uikit-color-black-8);
     border-bottom: 1px solid var(--stroke-color-primary);
+    box-shadow: 0 1px 0 var(--uikit-color-black-8);
   }
 
   .content {

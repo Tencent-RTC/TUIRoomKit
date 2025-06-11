@@ -1,14 +1,13 @@
 <template>
   <div class="loading-overlay">
-    <svg-icon :icon="LoadingScheduleIcon" class="loading" />
+    <IconLoadingSchedule class="loading" size="36" />
     <span class="loading-text">{{ t('Entering the room now...') }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
+import { IconLoadingSchedule } from '@tencentcloud/uikit-base-component-vue3';
 import { useI18n } from '../../locales';
-import SvgIcon from '../common/base/SvgIcon.vue';
-import LoadingScheduleIcon from '../common/icons/LoadingScheduleIcon.vue';
 const { t } = useI18n();
 </script>
 

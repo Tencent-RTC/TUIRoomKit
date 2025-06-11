@@ -45,7 +45,7 @@
         </div>
       </div>
       <div v-else class="apply-nobody">
-        <svg-icon :icon="ApplyStageLabelIcon" />
+        <IconApplyStageLabel size="48" />
         <span class="apply-text">{{
           t('Currently no member has applied to go on stage')
         }}</span>
@@ -73,11 +73,10 @@
 </template>
 
 <script setup lang="ts">
-import ApplyStageLabelIcon from '../../../common/icons/ApplyStageLabelIcon.vue';
+import { IconApplyStageLabel } from '@tencentcloud/uikit-base-component-vue3';
 import useMasterApplyControl from '../../../../hooks/useMasterApplyControl';
 import Avatar from '../../../common/Avatar.vue';
 import Dialog from '../../../common/base/Dialog';
-import SvgIcon from '../../../common/base/SvgIcon.vue';
 import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import { roomService } from '../../../../services';
 

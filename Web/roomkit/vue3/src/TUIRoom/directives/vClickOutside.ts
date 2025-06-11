@@ -16,11 +16,13 @@ const vClickOutside = {
     const nodeCallbackList = nodeMap.get(el);
     nodeCallbackList.push(listenerFunction);
     document.addEventListener('click', listenerFunction);
+    document.addEventListener('touchend', listenerFunction);
   },
   unmounted(el: HTMLElement) {
     const nodeCallbackList = nodeMap.get(el);
     nodeCallbackList.forEach((callback: any) => {
       document.removeEventListener('click', callback);
+      document.addEventListener('touchend', callback);
     });
   },
 };

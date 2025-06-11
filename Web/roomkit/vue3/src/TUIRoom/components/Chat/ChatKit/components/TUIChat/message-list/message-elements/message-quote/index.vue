@@ -3,21 +3,16 @@
     v-if="hasQuoteContent"
     :class="{
       'reference-content': true,
-      'reverse': message.flow === 'out',
+      reverse: message.flow === 'out',
     }"
     @click="scrollToOriginalMessage"
   >
-    <div
-      v-if="isMessageRevoked"
-      class="revoked-text"
-    >
+    <div v-if="isMessageRevoked" class="revoked-text">
       {{ TUITranslateService.t('TUIChat.引用内容已撤回') }}
     </div>
-    <div
-      v-else
-      class="max-double-line"
-    >
-      {{ messageQuoteContent.messageSender }}: {{ transformTextWithKeysToEmojiNames(messageQuoteText) }}
+    <div v-else class="max-double-line">
+      {{ messageQuoteContent.messageSender }}:
+      {{ transformTextWithKeysToEmojiNames(messageQuoteText) }}
     </div>
   </div>
 </template>
@@ -30,10 +25,20 @@ import {
   IMessageModel,
   TUITranslateService,
 } from '@tencentcloud/chat-uikit-engine';
-import { getBoundingClientRect, getScrollInfo } from '@tencentcloud/universal-api';
+import {
+  getBoundingClientRect,
+  getScrollInfo,
+} from '@tencentcloud/universal-api';
 import { isUniFrameWork } from '../../../../../utils/env';
-import { Toast, TOAST_TYPE } from '../../../../../components/common/Toast/index';
-import { ICloudCustomData, IQuoteContent, MessageQuoteTypeEnum } from './interface.ts';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
+import {
+  ICloudCustomData,
+  IQuoteContent,
+  MessageQuoteTypeEnum,
+} from './interface.ts';
 import { transformTextWithKeysToEmojiNames } from '../../../emoji-config';
 
 export interface IProps {
@@ -47,7 +52,7 @@ export interface IEmits {
 
 const emits = defineEmits<IEmits>();
 const props = withDefaults(defineProps<IProps>(), {
-  message: () => ({} as IMessageModel),
+  message: () => ({}) as IMessageModel,
 });
 
 let selfAddValue = 0;
@@ -57,8 +62,12 @@ const messageQuoteContent = ref<IQuoteContent>({} as IQuoteContent);
 
 const isMessageRevoked = computed<boolean>(() => {
   try {
-    const cloudCustomData: ICloudCustomData = JSON.parse(props.message?.cloudCustomData || '{}');
-    const quotedMessageModel = TUIStore.getMessageModel(cloudCustomData.messageReply.messageID);
+    const cloudCustomData: ICloudCustomData = JSON.parse(
+      props.message?.cloudCustomData || '{}'
+    );
+    const quotedMessageModel = TUIStore.getMessageModel(
+      cloudCustomData.messageReply.messageID
+    );
     return quotedMessageModel?.isRevoked;
   } catch (error) {
     return true;
@@ -67,7 +76,9 @@ const isMessageRevoked = computed<boolean>(() => {
 
 onMounted(() => {
   try {
-    const cloudCustomData: ICloudCustomData = JSON.parse(props.message?.cloudCustomData || '{}');
+    const cloudCustomData: ICloudCustomData = JSON.parse(
+      props.message?.cloudCustomData || '{}'
+    );
     hasQuoteContent.value = Boolean(cloudCustomData.messageReply);
     if (hasQuoteContent.value) {
       messageQuoteContent.value = cloudCustomData.messageReply;
@@ -79,8 +90,8 @@ onMounted(() => {
 });
 
 function performQuoteContent(params: IQuoteContent) {
-  let messageKey: string = '';
-  let quoteContent: string = '';
+  let messageKey = '';
+  let quoteContent = '';
   switch (params.messageType) {
     case MessageQuoteTypeEnum.TYPE_TEXT:
       messageKey = '[文本]';
@@ -117,14 +128,15 @@ function performQuoteContent(params: IQuoteContent) {
       break;
   }
   if (
-    [
-      MessageQuoteTypeEnum.TYPE_TEXT,
-      MessageQuoteTypeEnum.TYPE_MERGER,
-    ].includes(params.messageType)
+    [MessageQuoteTypeEnum.TYPE_TEXT, MessageQuoteTypeEnum.TYPE_MERGER].includes(
+      params.messageType
+    )
   ) {
     quoteContent = params.messageAbstract;
   }
-  return quoteContent ? quoteContent : TUITranslateService.t(`TUIChat.${messageKey}`);
+  return quoteContent
+    ? quoteContent
+    : TUITranslateService.t(`TUIChat.${messageKey}`);
 }
 
 async function scrollToOriginalMessage() {
@@ -133,13 +145,28 @@ async function scrollToOriginalMessage() {
   }
   const originMessageID = messageQuoteContent.value?.messageID;
   const currentMessageList = TUIStore.getData(StoreName.CHAT, 'messageList');
-  const isOriginalMessageInScreen = currentMessageList.some(msg => msg.ID === originMessageID);
+  const isOriginalMessageInScreen = currentMessageList.some(
+    msg => msg.ID === originMessageID
+  );
   if (originMessageID && isOriginalMessageInScreen) {
     try {
-      const scrollViewRect = await getBoundingClientRect('#messageScrollList', 'messageList');
-      const originalMessageRect = await getBoundingClientRect('#tui-' + originMessageID, 'messageList');
-      const { scrollTop } = await getScrollInfo('#messageScrollList', 'messageList');
-      const finalScrollTop = originalMessageRect.top + scrollTop - scrollViewRect.top - (selfAddValue++ % 2);
+      const scrollViewRect = await getBoundingClientRect(
+        '#messageScrollList',
+        'messageList'
+      );
+      const originalMessageRect = await getBoundingClientRect(
+        `#tui-${originMessageID}`,
+        'messageList'
+      );
+      const { scrollTop } = await getScrollInfo(
+        '#messageScrollList',
+        'messageList'
+      );
+      const finalScrollTop =
+        originalMessageRect.top +
+        scrollTop -
+        scrollViewRect.top -
+        (selfAddValue++ % 2);
       const isNeedScroll = originalMessageRect.top < scrollViewRect.top;
       if (!isUniFrameWork && window) {
         const scrollView = document.getElementById('messageScrollList');
@@ -154,7 +181,7 @@ async function scrollToOriginalMessage() {
       console.error(error);
     }
   } else {
-    Toast({
+    TUIToast({
       message: TUITranslateService.t('TUIChat.无法定位到原消息'),
       type: TOAST_TYPE.WARNING,
     });
@@ -180,8 +207,8 @@ async function scrollToOriginalMessage() {
 }
 
 .reverse.reference-content {
-    margin-right: 44px;
-    margin-left: auto;
+  margin-right: 44px;
+  margin-left: auto;
 }
 
 .revoked-text {

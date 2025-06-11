@@ -4,7 +4,7 @@
     class="virtualBackground-control-container"
   >
     <icon-button :title="t('VirtualBackground')" @click-icon="openSettingPanel">
-      <virtual-background-icon />
+      <IconVirtualBackground size="24" />
     </icon-button>
 
     <Dialog
@@ -69,9 +69,11 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconVirtualBackground,
+} from '@tencentcloud/uikit-base-component-vue3';
 import IconButton from '../common/base/IconButton.vue';
-import VirtualBackgroundIcon from '../common/icons/VirtualBackgroundIcon.vue';
 import { useI18n } from '../../locales';
 import { roomService } from '../../services';
 import Dialog from '../common/base/Dialog';

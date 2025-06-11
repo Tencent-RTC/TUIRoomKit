@@ -7,9 +7,9 @@
     <div class="user-info-content" @click="handleUserControl">
       <Avatar class="avatar" :img-src="avatarUrl" />
       <div class="name">{{ props.userName || props.userId }}</div>
-      <svg-icon
+      <IconArrowStrokeSelectDown
+        size="12"
         :class="[showUserControl ? 'up-icon' : 'down-icon']"
-        :icon="ArrowStrokeSelectDownIcon"
       />
     </div>
     <div v-if="showUserControl" class="user-control-container">
@@ -48,10 +48,7 @@
         >
           {{ t('Cancel') }}
         </TUIButton>
-        <TUIButton
-          @click="saveUserName(tempUserName)"
-          style="min-width: 88px"
-        >
+        <TUIButton @click="saveUserName(tempUserName)" style="min-width: 88px">
           {{ t('Save') }}
         </TUIButton>
       </template>
@@ -62,14 +59,16 @@
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import { defineProps, defineEmits } from 'vue';
 import Dialog from '../../common/base/Dialog';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconArrowStrokeSelectDown,
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import TuiInput from '../../common/base/Input';
-import ArrowStrokeSelectDownIcon from '../../common/icons/ArrowStrokeSelectDownIcon.vue';
 import useUserInfo from './useUserInfoHooks';
 import Avatar from '../../common/Avatar.vue';
 import { roomService } from '../../../services';
-import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
@@ -102,8 +101,8 @@ const props = defineProps<{
 async function saveUserName(userName: string) {
   const { userId } = props;
   if (userName.length === 0) {
-    TUIMessage({
-      type: 'warning',
+    TUIToast({
+      type: TOAST_TYPE.WARNING,
       message: t('Username length should be greater than 0'),
       duration: MESSAGE_DURATION.NORMAL,
     });
@@ -139,9 +138,9 @@ async function saveUserName(userName: string) {
       margin-left: 10px;
       overflow: hidden;
       font-size: 16px;
+      color: var(--text-color-primary);
       text-overflow: ellipsis;
       white-space: nowrap;
-      color: var(--text-color-primary);
     }
 
     .down-icon {
@@ -161,9 +160,9 @@ async function saveUserName(userName: string) {
     min-width: 100px;
     padding: 10px;
     background: var(--bg-color-dialog);
-    filter: drop-shadow(0px 0px 4px var(--uikit-color-black-8))
-      drop-shadow(0px 4px 10px var(--uikit-color-black-8))
-      drop-shadow(0px 1px 14px var(--uikit-color-black-8));
+    filter: drop-shadow(0 0 4px var(--uikit-color-black-8))
+      drop-shadow(0 4px 10px var(--uikit-color-black-8))
+      drop-shadow(0 1px 14px var(--uikit-color-black-8));
     border-radius: 8px;
 
     &::before {

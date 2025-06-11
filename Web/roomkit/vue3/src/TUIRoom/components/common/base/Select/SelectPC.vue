@@ -16,9 +16,9 @@
           {{ selectedLabel || selectedValue }}
         </span>
       </template>
-      <svg-icon
+      <IconArrowStrokeSelectDown
+        size="12"
         :class="['arrow-icon', { reverse: showSelectDropdown }]"
-        :icon="ArrowStrokeSelectDownIcon"
       />
     </div>
     <Transition name="select-fade">
@@ -45,8 +45,7 @@ import {
   defineProps,
   defineEmits,
 } from 'vue';
-import SvgIcon from '../SvgIcon.vue';
-import ArrowStrokeSelectDownIcon from '../../icons/ArrowStrokeSelectDownIcon.vue';
+import { IconArrowStrokeSelectDown } from '@tencentcloud/uikit-base-component-vue3';
 import useZIndex from '../../../../hooks/useZIndex';
 import vClickOutside from '../../../../directives/vClickOutside';
 import { roomService } from '../../../../services';

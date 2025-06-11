@@ -3,9 +3,9 @@
     <div class="title-container" @click="toggleShowRoomInfoStatus">
       <div class="title-text">
         <span class="text">{{ conferenceTitle }}</span>
-        <svg-icon
+        <IconArrowUp
+          size="12"
           :class="['arrow-icon', { 'arrow-down-icon': arrowDirection }]"
-          :icon="Arrow"
         />
       </div>
       <room-time class="text" />
@@ -27,7 +27,7 @@
               class="copy-container"
               @click="onCopy(item.copyLink)"
             >
-              <svg-icon class="copy" :icon="copyIcon" />
+              <IconCopy />
             </div>
           </div>
         </div>
@@ -43,10 +43,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { IconArrowUp, IconCopy } from '@tencentcloud/uikit-base-component-vue3';
 import useRoomInfo from './useRoomInfoHooks';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import Arrow from '../../common/icons/ArrowUpIcon.vue';
-import copyIcon from '../../common/icons/CopyIcon.vue';
 import RoomTime from '../../common/RoomTime.vue';
 
 const {
@@ -206,11 +204,6 @@ const {
         margin-left: auto;
         cursor: pointer;
         color: var(--text-color-link);
-
-        .copy {
-          width: 20px;
-          height: 20px;
-        }
       }
     }
 

@@ -1,11 +1,11 @@
 import { createVNode, render } from 'vue';
 
-import TUIMessageBox from './index.vue';
+import TUIMessageBox, { Action } from './index.vue';
 
 export type MessageProps = {
   title: string;
   message: string;
-  callback?: () => void;
+  callback?: (action: Action) => void;
   duration?: number;
   cancelButtonText?: string;
   confirmButtonText?: string;
@@ -22,7 +22,8 @@ const MessageBox = ({
   const fullscreenElement =
     document.fullscreenElement ||
     document.getElementById('roomContainer') ||
-    document.getElementById('pre-conference-container');
+    document.getElementById('pre-conference-container') ||
+    document.querySelector('body');
   if (!fullscreenElement) return;
   fullscreenElement.appendChild(container);
 

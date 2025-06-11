@@ -3,7 +3,7 @@
     <div class="mask" v-show="show && showMask" v-tap="toggleShow"></div>
     <div class="container" v-show="show" :style="{ height: props.height }">
       <div class="container-close" v-tap="toggleShow" v-if="showClose">
-        <svg-icon :icon="ArrowDown" />
+        <TUIIcon :icon="IconArrowDown" size="28" />
       </div>
       <div v-if="title" class="container-header">{{ title }}</div>
       <slot></slot>
@@ -12,8 +12,7 @@
 </template>
 <script setup lang="ts">
 import { ref, defineProps, watch, defineEmits } from 'vue';
-import SvgIcon from './SvgIcon.vue';
-import ArrowDown from '../icons/ArrowDown.vue';
+import { IconArrowDown } from '@tencentcloud/uikit-base-component-vue3';
 import vTap from '../../../directives/vTap';
 const props = defineProps({
   visible: {

@@ -7,7 +7,8 @@
       v-bind="$attrs"
     >
       <span class="label"> {{ selectedLabel || props.value }}</span>
-      <svg-icon class="icon-arrow" :icon="ArrowStrokeSelectDownIcon" />
+      <IconArrowStrokeSelectDown size="12" />
+      size=12
     </div>
 
     <ActionSheep :visible="drawerShow" @input="drawerShow = $event">
@@ -20,9 +21,8 @@
 
 <script setup>
 import { ref, defineEmits, defineProps, provide, watch, nextTick } from 'vue';
+import { IconArrowStrokeSelectDown } from '@tencentcloud/uikit-base-component-vue3';
 import ActionSheep from '../ActionSheep.vue';
-import SvgIcon from '../SvgIcon.vue';
-import ArrowStrokeSelectDownIcon from '../../icons/ArrowStrokeSelectDownIcon.vue';
 
 const props = defineProps({
   value: {

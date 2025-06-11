@@ -1,16 +1,19 @@
 <template>
   <div>
     <div class="apply-control-container">
-      <icon-button
-        :title="iconTitle"
-        :icon="iconName"
-        @click-icon="toggleApplySpeechDebounce"
-      />
+      <icon-button :title="iconTitle" @click-icon="toggleApplySpeechDebounce">
+        <IconStepDown v-if="localUser.onSeat" size="24" />
+        <IconCancelStage
+          v-else-if="!localUser.onSeat && isApplyingOnSeat"
+          size="24"
+        />
+        <IconApplyStage v-else size="24" />
+      </icon-button>
       <div v-if="showMemberApplyAttention" class="attention member-attention">
         <span :class="isMobile ? 'mobile-info' : 'info'">{{
           t('Please raise your hand to apply')
         }}</span>
-        <svg-icon :icon="CloseIcon" class="close" @click="hideApplyAttention" />
+        <IconClose class="close" size="26" @click="hideApplyAttention" />
       </div>
     </div>
     <Dialog
@@ -50,13 +53,7 @@
 import { ref, Ref, watch, onBeforeUnmount, computed } from 'vue';
 import { isMobile } from '../../../utils/environment';
 import IconButton from '../../common/base/IconButton.vue';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import StepDownIcon from '../../common/icons/StepDownIcon.vue';
-import ApplyStageIcon from '../../common/icons/ApplyStageIcon.vue';
-import CancelStageIcon from '../../common/icons/CancelStageIcon.vue';
-import CloseIcon from '../../common/icons/CloseIcon.vue';
 import Dialog from '../../common/base/Dialog';
-import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
@@ -72,7 +69,15 @@ import TUIRoomEngine, {
   TUIRole,
   TUIErrorCode,
 } from '@tencentcloud/tuiroom-engine-js';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  TUIToast,
+  TOAST_TYPE,
+  IconClose,
+  IconStepDown,
+  IconApplyStage,
+  IconCancelStage,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { debounce } from '../../../utils/utils';
 
 const roomEngine = useGetRoomEngine();
@@ -85,7 +90,6 @@ const { localUser, isGeneralUser, isAdmin } = storeToRefs(roomStore);
 
 const isApplyingOnSeat: Ref<boolean> = ref(false);
 const showMemberApplyAttention: Ref<boolean> = ref(true);
-const iconName = ref();
 const iconTitle: Ref<string> = ref('');
 const applyToAnchorRequestId: Ref<string> = ref('');
 const inviteToAnchorRequestId: Ref<string> = ref('');
@@ -99,15 +103,12 @@ watch(
   [localUser, isApplyingOnSeat, lang],
   ([localUser, isApplyingOnSeat]) => {
     if (localUser.onSeat) {
-      iconName.value = StepDownIcon;
       iconTitle.value = t('Step down');
       hideApplyAttention();
     } else {
       if (isApplyingOnSeat) {
-        iconName.value = CancelStageIcon;
         iconTitle.value = t('Cancel Apply');
       } else {
-        iconName.value = ApplyStageIcon;
         iconTitle.value = t('Apply for the stage');
       }
     }
@@ -159,12 +160,12 @@ const currentDialogInfo = computed(() =>
 async function sendSeatApplication() {
   if (isAdmin.value) {
     await roomEngine.instance?.takeSeat({ seatIndex: -1, timeout: 0 });
-    TUIMessage({ type: 'success', message: t('Succeed on stage') });
+    TUIToast({ type: TOAST_TYPE.SUCCESS, message: t('Succeed on stage') });
     return;
   }
   if (isGeneralUser.value) {
-    TUIMessage({
-      type: 'info',
+    TUIToast({
+      type: TOAST_TYPE.INFO,
       message: `${t('The request to go on stage has been sent out, please wait for the roomOwner/administrator to approve it')}`,
       duration: MESSAGE_DURATION.NORMAL,
     });
@@ -179,17 +180,20 @@ async function sendSeatApplication() {
       const { requestCallbackType } = callbackInfo;
       switch (requestCallbackType) {
         case TUIRequestCallbackType.kRequestAccepted:
-          TUIMessage({ type: 'success', message: t('Succeed on stage') });
+          TUIToast({
+            type: TOAST_TYPE.SUCCESS,
+            message: t('Succeed on stage'),
+          });
           break;
         case TUIRequestCallbackType.kRequestRejected:
-          TUIMessage({
-            type: 'warning',
+          TUIToast({
+            type: TOAST_TYPE.WARNING,
             message: t('Application to go on stage was rejected'),
           });
           break;
         case TUIRequestCallbackType.kRequestTimeout:
-          TUIMessage({
-            type: 'warning',
+          TUIToast({
+            type: TOAST_TYPE.WARNING,
             message: t('The request to go on stage has timed out'),
           });
           break;
@@ -206,8 +210,8 @@ async function sendSeatApplication() {
  * Cancellation of application stage
  **/
 async function cancelSeatApplication() {
-  TUIMessage({
-    type: 'info',
+  TUIToast({
+    type: TOAST_TYPE.INFO,
     message: `${t('Canceled application to go on stage')}`,
     duration: MESSAGE_DURATION.NORMAL,
   });
@@ -283,8 +287,8 @@ async function handleInvite(agree: boolean) {
     });
   } catch (error: any) {
     if (error.code === TUIErrorCode.ERR_ALL_SEAT_OCCUPIED) {
-      TUIMessage({
-        type: 'warning',
+      TUIToast({
+        type: TOAST_TYPE.WARNING,
         message: t('The stage is full, please contact the host'),
       });
     } else {
@@ -302,8 +306,8 @@ async function handleInvite(agree: boolean) {
  * Kicked off the stage by the host
  */
 async function onKickedOffSeat() {
-  TUIMessage({
-    type: 'warning',
+  TUIToast({
+    type: TOAST_TYPE.WARNING,
     message: t(
       'You have been invited by the host to step down, please raise your hand if you need to speak'
     ),
@@ -337,8 +341,8 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-radius: 8px;
     background-color: var(--text-color-link);
+    border-radius: 8px;
     box-shadow: 0 4px 16px 0 var(--uikit-color-black-8);
 
     &::after {
@@ -348,8 +352,8 @@ onBeforeUnmount(() => {
       display: block;
       content: '';
       border: 5px solid transparent;
-      transform: translateX(-50%);
       border-top-color: var(--text-color-link);
+      transform: translateX(-50%);
     }
   }
 
@@ -358,6 +362,7 @@ onBeforeUnmount(() => {
 
     .info,
     .mobile-info {
+      background: var(--uikit-color-transparent);
       height: 20px;
       font-size: 14px;
       font-weight: 500;

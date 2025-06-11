@@ -3,19 +3,20 @@
     <icon-button
       :is-active="sidebarName === 'aiTranscription'"
       :title="t('AI Assistant')"
-      :icon="AIIcon"
       @click-icon="toggleToolBox"
-    />
+    >
+      <IconAIIcon size="24" />
+    </icon-button>
     <div v-if="!isSidebarOpen && showToolBox" class="tool-box">
       <div class="tool-box-item" @click="openAISubtitles">
-        <SvgIcon class="icon" :icon="AISubtitlesIcon" />
+        <IconAISubtitles class="icon" />
         <span v-if="!showSubtitles">{{
           t('Turn on AI real-time subtitles')
         }}</span>
         <span v-else>{{ t('Turn off AI real-time subtitles') }}</span>
       </div>
       <div class="tool-box-item" @click="toggleAITranscription">
-        <SvgIcon class="icon" :icon="AITranscription" />
+        <IconAITranscription class="icon" />
         <span>{{ t('Enable AI real-time meeting recording') }}</span>
       </div>
     </div>
@@ -25,12 +26,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import IconButton from '../common/base/IconButton.vue';
-import AIIcon from '../common/icons/AIIcon.vue';
-import AITranscription from '../common/icons/AITranscription.vue';
-import AISubtitlesIcon from '../common/icons/AISubtitles.vue';
+import {
+  IconAIIcon,
+  IconAISubtitles,
+  IconAITranscription,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { roomService } from '../../services';
 import { useI18n } from '../../locales';
-import SvgIcon from '../common/base/SvgIcon.vue';
 import {
   useRoomOverlayHooks,
   OverlayMap,

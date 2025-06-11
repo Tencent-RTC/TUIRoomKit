@@ -1,14 +1,16 @@
 <template>
   <div class="audio-route-icon">
-    <svg-icon v-tap="handleSwitchAudioRoute" :icon="icon" />
+    <TUIIcon v-tap="handleSwitchAudioRoute" :icon="icon" size="20" />
   </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
 import { TUIAudioRoute } from '@tencentcloud/tuiroom-engine-js';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import SpeakerPhoneIcon from '../../common/icons/SpeakerPhoneIcon.vue';
-import EarpieceIcon from '../../common/icons/EarpieceIcon.vue';
+import {
+  TUIIcon,
+  IconSpeakerPhone,
+  IconEarpiece,
+} from '@tencentcloud/uikit-base-component-vue3';
 import vTap from '../../../directives/vTap';
 import { useAudioDeviceState } from '../../../core';
 
@@ -16,8 +18,8 @@ const { currentAudioRoute, speaker } = useAudioDeviceState();
 
 const icon = computed(() =>
   currentAudioRoute.value === TUIAudioRoute.kAudioRouteSpeakerphone
-    ? SpeakerPhoneIcon
-    : EarpieceIcon
+    ? IconSpeakerPhone
+    : IconEarpiece
 );
 
 async function handleSwitchAudioRoute() {

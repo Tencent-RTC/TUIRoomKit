@@ -1,7 +1,7 @@
 <template>
   <div v-if="componentConfig.visible" class="basicBeauty-control-container">
     <icon-button :title="t('Beauty')" @click-icon="openBeautySettingPanel">
-      <basic-beauty-icon />
+      <IconBasicBeauty size="24" />
     </icon-button>
     <Dialog
       v-model="isDialogVisible"
@@ -14,7 +14,7 @@
     >
       <div id="test-preview" class="test-preview">
         <div class="reset" @click="handleShowResetDialog">
-          <svg-icon :icon="ResetIcon" />
+          <IconReset />
           <span class="text">{{ t('Reset') }}</span>
         </div>
         <div v-if="isShowDegree" class="degree">
@@ -27,7 +27,7 @@
           @mousedown="handleMouseDown"
           @mouseup="handleMouseUp"
         >
-          <svg-icon :icon="CompareIcon" />
+          <IconCompare size="20" />
           <span class="text">{{ t('Compare') }}</span>
         </div>
         <div v-if="isLoading" class="mask"></div>
@@ -46,7 +46,7 @@
             @click="onBeautyPropertyClick(item.value)"
           >
             <i class="setting-item-icon">
-              <svg-icon :icon="item.icon" />
+              <TUIIcon :icon="item.icon" size="32" />
             </i>
             <span>{{ t(item.text) }}</span>
           </div>
@@ -65,10 +65,7 @@
         >
           {{ t('Save') }}
         </TUIButton>
-        <TUIButton
-          @click="closeBeautySettingPanel"
-          style="min-width: 88px"
-        >
+        <TUIButton @click="closeBeautySettingPanel" style="min-width: 88px">
           {{ t('Cancel') }}
         </TUIButton>
       </div>
@@ -92,10 +89,7 @@
         >
           {{ t('Reset') }}
         </TUIButton>
-        <TUIButton
-          @click="isShowResetDialog = false"
-          style="min-width: 88px"
-        >
+        <TUIButton @click="isShowResetDialog = false" style="min-width: 88px">
           {{ t('Cancel') }}
         </TUIButton>
       </template>
@@ -106,20 +100,22 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
+import {
+  TUIButton,
+  TUIIcon,
+  IconCompare,
+  IconReset,
+  IconBasicBeauty,
+  IconCloseBeauty,
+  IconSmootherBeauty,
+  IconWhiteningBeauty,
+  IconRuddyBeauty,
+} from '@tencentcloud/uikit-base-component-vue3';
 import IconButton from '../common/base/IconButton.vue';
-import SvgIcon from '../common/base/SvgIcon.vue';
-import BasicBeautyIcon from '../common/icons/BasicBeautyIcon.vue';
 import { useI18n } from '../../locales';
 import { roomService, MetricsKey } from '../../services';
 import Dialog from '../common/base/Dialog';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import Slider from '../common/base/Slider.vue';
-import CloseBeautyIcon from '../common/icons/CloseBeautyIcon.vue';
-import SmootherBeautyIcon from '../common/icons/SmootherBeautyIcon.vue';
-import WhiteningBeautyIcon from '../common/icons/WhiteningBeautyIcon.vue';
-import RuddyBeautyIcon from '../common/icons/RuddyBeautyIcon.vue';
-import ResetIcon from '../common/icons/ResetIcon.vue';
-import CompareIcon from '../common/icons/CompareIcon.vue';
 import useGetRoomEngine from '../../hooks/useRoomEngine';
 import { useBasicStore } from '../../stores/basic';
 import { isMobile } from '../../utils/environment';
@@ -184,10 +180,10 @@ const beautyOptionList: {
   text: string;
   icon: any;
 }[] = [
-  { value: 'close', text: 'Close', icon: CloseBeautyIcon },
-  { value: 'smoother', text: 'Smoother', icon: SmootherBeautyIcon },
-  { value: 'whitening', text: 'Whitening', icon: WhiteningBeautyIcon },
-  { value: 'ruddy', text: 'Ruddy', icon: RuddyBeautyIcon },
+  { value: 'close', text: 'Close', icon: IconCloseBeauty },
+  { value: 'smoother', text: 'Smoother', icon: IconSmootherBeauty },
+  { value: 'whitening', text: 'Whitening', icon: IconWhiteningBeauty },
+  { value: 'ruddy', text: 'Ruddy', icon: IconRuddyBeauty },
 ];
 
 const openBeautySettingPanel = async () => {

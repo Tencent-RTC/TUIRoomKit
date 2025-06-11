@@ -3,7 +3,7 @@
     v-if="languageConfig.visible"
     :title="title"
     :layout="IconButtonLayout.HORIZONTAL"
-    :icon="LanguageIcon"
+    :icon="IconLanguage"
     @click-icon="handleChange"
   />
 </template>
@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import IconButton from './base/IconButton.vue';
 import { IconButtonLayout } from '../../constants/room';
-import LanguageIcon from './icons/LanguageIcon.vue';
+import { IconLanguage } from '@tencentcloud/uikit-base-component-vue3';
 import { useBasicStore } from '../../stores/basic';
 import i18n from '../../locales/index';
 import { computed } from 'vue';

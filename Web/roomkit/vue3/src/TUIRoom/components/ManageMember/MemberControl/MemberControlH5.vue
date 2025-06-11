@@ -5,11 +5,9 @@
       <div class="member-title-content">
         {{ roomService.getDisplayName(userInfo) }}
       </div>
-      <span
-        v-if="isWeChat"
-        v-tap.stop="handleCloseControl"
-        class="tab-cancel"
-        >{{ t('Cancel') }}</span>
+      <span v-if="isWeChat" v-tap.stop="handleCloseControl" class="tab-cancel">
+        {{ t('Cancel') }}
+      </span>
     </div>
     <div
       v-for="item in controlList"
@@ -17,7 +15,7 @@
       v-tap="() => item.func(userInfo)"
       class="user-operate-item"
     >
-      <svg-icon :icon="item.icon" class="icon-svg" />
+      <TUIIcon v-if="item.icon" :icon="item.icon" class="icon-svg" />
       <div class="control-title">{{ item.title }}</div>
     </div>
     <Dialog
@@ -57,8 +55,9 @@
 </template>
 
 <script setup lang="ts">
+import { defineProps, defineEmits } from 'vue';
 import Avatar from '../../common/Avatar.vue';
-import SvgIcon from '../../common/base/SvgIcon.vue';
+import { TUIIcon } from '@tencentcloud/uikit-base-component-vue3';
 import { isWeChat } from '../../../utils/environment';
 import Dialog from '../../common/base/Dialog';
 import vTap from '../../../directives/vTap';
@@ -116,10 +115,10 @@ function handleCloseInput(event: any) {
   flex-direction: column !important;
   width: 100%;
   padding: 22px 16px;
+  background-color: var(--bg-color-operate);
   border-radius: 15px 15px 0 0;
   animation-name: popup;
   animation-duration: 200ms;
-  background-color: var(--bg-color-operate);
 
   @keyframes popup {
     from {
@@ -205,10 +204,10 @@ function handleCloseInput(event: any) {
     font-style: normal;
     font-weight: 450;
     line-height: 4vh;
-    resize: none;
-    border: none;
-    background-color: var(--bg-color-topbar);
     color: var(--text-color-secondary);
+    resize: none;
+    background-color: var(--bg-color-topbar);
+    border: none;
   }
 
   .input {
