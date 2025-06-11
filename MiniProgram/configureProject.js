@@ -105,8 +105,7 @@ class InitProject {
   copyFile() {
     const { creationMethod, createViteConfig, createTsConfig } = this.answers;
 
-    // Copy roomkit and locales directories
-    ['roomkit', 'locales', 'router'].forEach((dir) => {
+    ['roomkit'].forEach((dir) => {
       copyDir(
         path.join(this.sourceBase, './src', dir),
         path.join(this.srcPath, dir),
