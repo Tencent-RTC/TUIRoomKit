@@ -35,15 +35,8 @@ This document describes how to quickly run the TUIRoomKit demo project to try ou
 └── vue.config.js
 ```
 
-### Step 1. Create a TRTC application
-1. Enter the [Application Management](https://www.tencentcloud.com/account/login) interface of the Tencent Cloud Live Audio/Video Console, select Create Application, enter the application name,click **Create Application**.
-2. Find your application in the application list and Click **Application Info**.
-    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a12607f338b311ed8088525400463ef7.png" width="900">
-		
-3. Follow the steps below to get the application’s `SDKAppID` and key.
-    <img src="https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/a0eb96e038b311ed8088525400463ef7.png" width="900">
-
->! This component uses two basic PaaS services of Tencent Cloud: [TRTC](https://intl.cloud.tencent.com/document/product/647/35078) and [IM](https://intl.cloud.tencent.com/document/product/1047). When you activate TRTC, IM will be activated automatically. For information about the billing of IM, see [Pricing](https://intl.cloud.tencent.com/document/product/1047/34350).
+### Step 1. Activate the service
+1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/54845) to obtain your own SDKAppID and SDKSecreKey.
 
 ### Step 2: Download the source code and configure the project
 1. Clone or download the source code in our repository (**You can start the repository to save it**).
