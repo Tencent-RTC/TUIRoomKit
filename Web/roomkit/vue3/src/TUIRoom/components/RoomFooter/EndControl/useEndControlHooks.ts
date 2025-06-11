@@ -11,7 +11,7 @@ import TUIRoomEngine, {
   TUIUserInfo,
 } from '@tencentcloud/tuiroom-engine-js';
 import logger from '../../../utils/common/logger';
-import TUIMessage from '../../common/base/Message/index';
+import { TUIToast, TOAST_TYPE } from '@tencentcloud/uikit-base-component-vue3';
 import { roomService } from '../../../services';
 
 export default function useEndControl() {
@@ -147,8 +147,8 @@ export default function useEndControl() {
       case TUIRole.kGeneralUser:
         if (isLocal) {
           if (oldUserRole === TUIRole.kAdministrator) {
-            TUIMessage({
-              type: 'warning',
+            TUIToast({
+              type: TOAST_TYPE.WARNING,
               message: t('Your administrator status has been revoked'),
             });
           }
@@ -156,8 +156,8 @@ export default function useEndControl() {
         break;
       case TUIRole.kAdministrator:
         if (isLocal) {
-          TUIMessage({
-            type: 'success',
+          TUIToast({
+            type: TOAST_TYPE.SUCCESS,
             message: t('You have become a administrator'),
           });
           if (roomStore.isSpeakAfterTakingSeatMode) {
@@ -168,8 +168,8 @@ export default function useEndControl() {
       case TUIRole.kRoomOwner: {
         roomStore.setMasterUserId(userId);
         if (isLocal) {
-          TUIMessage({
-            type: 'success',
+          TUIToast({
+            type: TOAST_TYPE.SUCCESS,
             message: `${t('You are now a room owner')}`,
           });
           if (roomStore.isSpeakAfterTakingSeatMode) {

@@ -16,7 +16,17 @@
       @click-icon="handleClickIcon"
       @click-more="handleMore"
     >
-      <svg-icon :icon="icon" />
+      <template v-if="!basicStore.roomId">
+        <IconCameraOn size="24" v-if="isCameraTesting" />
+        <IconCameraOff size="24" v-else />
+      </template>
+      <template v-else>
+        <IconCameraOn
+          size="24"
+          v-if="cameraState === MediaDeviceState.DeviceOn"
+        />
+        <IconCameraOff size="24" v-else />
+      </template>
     </icon-button>
     <video-setting-tab v-show="showVideoSettingTab" class="video-tab" />
   </div>
@@ -24,10 +34,11 @@
 
 <script setup lang="ts">
 import { ref, computed, Ref, defineEmits, inject } from 'vue';
+import {
+  IconCameraOn,
+  IconCameraOff,
+} from '@tencentcloud/uikit-base-component-vue3';
 import IconButton from '../../../components/common/base/IconButton.vue';
-import SvgIcon from '../../../components/common/base/SvgIcon.vue';
-import CameraOnIcon from '../../../components/common/icons/CameraOnIcon.vue';
-import CameraOffIcon from '../../../components/common/icons/CameraOffIcon.vue';
 import VideoSettingTab from './VideoSettingTab.vue';
 import { useI18n } from '../../../locales';
 import vClickOutside from '../../../directives/vClickOutside';
@@ -53,14 +64,6 @@ const { localUser } = storeToRefs(roomStore);
 
 const { t } = useI18n();
 const showVideoSettingTab: Ref<boolean> = ref(false);
-const icon = computed(() => {
-  if (!basicStore.roomId) {
-    return isCameraTesting.value ? CameraOnIcon : CameraOffIcon;
-  }
-  return cameraState.value === MediaDeviceState.DeviceOn
-    ? CameraOnIcon
-    : CameraOffIcon;
-});
 
 async function handleClickIcon() {
   showVideoSettingTab.value = false;

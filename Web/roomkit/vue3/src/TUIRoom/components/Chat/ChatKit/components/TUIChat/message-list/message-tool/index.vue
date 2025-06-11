@@ -4,10 +4,7 @@
     ref="messageToolDom"
     :class="['dialog-item', !isPC ? 'dialog-item-h5' : 'dialog-item-web']"
   >
-    <slot
-      v-if="featureConfig.EmojiReaction"
-      name="TUIEmojiPlugin"
-    />
+    <slot v-if="featureConfig.EmojiReaction" name="TUIEmojiPlugin"></slot>
     <div
       class="dialog-item-list"
       :class="!isPC ? 'dialog-item-list-h5' : 'dialog-item-list-web'"
@@ -20,10 +17,7 @@
           @click="getFunction(index)"
           @mousedown="beforeCopy(item.key)"
         >
-          <Icon
-            :file="item.iconUrl"
-            :size="'15px'"
-          />
+          <Icon :file="item.iconUrl" :size="'15px'" />
           <span class="list-item-text">{{ item.text }}</span>
         </div>
       </template>
@@ -39,9 +33,18 @@ import TUIChatEngine, {
   IMessageModel,
 } from '@tencentcloud/chat-uikit-engine';
 import { TUIGlobal } from '@tencentcloud/universal-api';
-import { ref, watchEffect, computed, onMounted, onUnmounted } from '../../../../adapter-vue';
+import {
+  ref,
+  watchEffect,
+  computed,
+  onMounted,
+  onUnmounted,
+} from '../../../../adapter-vue';
 import Icon from '../../../common/Icon.vue';
-import { Toast, TOAST_TYPE } from '../../../common/Toast/index';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import delIcon from '../../../../assets/icon/msg-del.svg';
 import copyIcon from '../../../../assets/icon/msg-copy.svg';
 import quoteIcon from '../../../../assets/icon/msg-quote.svg';
@@ -77,7 +80,7 @@ const props = withDefaults(defineProps<IProps>(), {
 });
 const featureConfig = TUIChatConfig.getFeatureConfig();
 
-const TYPES = TUIChatEngine.TYPES;
+const { TYPES } = TUIChatEngine;
 
 const actionItems = ref([
   {
@@ -86,9 +89,12 @@ const actionItems = ref([
     iconUrl: copyIcon,
     renderCondition() {
       if (!featureConfig.DownloadFile || !message.value) return false;
-      return isPC && (message.value?.type === TYPES.MSG_FILE
-        || message.value.type === TYPES.MSG_VIDEO
-        || message.value.type === TYPES.MSG_IMAGE);
+      return (
+        isPC &&
+        (message.value?.type === TYPES.MSG_FILE ||
+          message.value.type === TYPES.MSG_VIDEO ||
+          message.value.type === TYPES.MSG_IMAGE)
+      );
     },
     clickEvent: openMessage,
   },
@@ -150,7 +156,10 @@ const actionItems = ref([
     iconUrl: translateIcon,
     renderCondition() {
       if (!featureConfig.TranslateMessage || !message.value) return false;
-      return message.value.status === 'success' && message.value.type === TYPES.MSG_TEXT;
+      return (
+        message.value.status === 'success' &&
+        message.value.type === TYPES.MSG_TEXT
+      );
     },
     clickEvent: translateMessage,
   },
@@ -161,7 +170,10 @@ const actionItems = ref([
     iconUrl: convertText,
     renderCondition() {
       if (!featureConfig.VoiceToText || !message.value) return false;
-      return message.value.status === 'success' && message.value.type === TYPES.MSG_AUDIO;
+      return (
+        message.value.status === 'success' &&
+        message.value.type === TYPES.MSG_AUDIO
+      );
     },
     clickEvent: convertVoiceToText,
   },
@@ -240,7 +252,7 @@ function revokeMessage() {
       // The message cannot be recalled after the time limit was reached, which is 2 minutes by default.
       if (error.code === 20016 || error.code === 10031) {
         const message = TUITranslateService.t('TUIChat.已过撤回时限');
-        Toast({
+        TUIToast({
           message,
           type: TOAST_TYPE.ERROR,
         });
@@ -293,7 +305,7 @@ function quoteMessage() {
 function translateMessage() {
   const enable = TUIStore.getData(StoreName.APP, 'enabledTranslationPlugin');
   if (!enable) {
-    Toast({
+    TUIToast({
       message: TUITranslateService.t('TUIChat.请开通翻译功能'),
       type: TOAST_TYPE.WARNING,
     });
@@ -312,7 +324,7 @@ function translateMessage() {
 function convertVoiceToText() {
   const enable = TUIStore.getData(StoreName.APP, 'enabledVoiceToText');
   if (!enable) {
-    Toast({
+    TUIToast({
       message: TUITranslateService.t('TUIChat.请开通语音转文字功能'),
     });
     return;
@@ -338,7 +350,9 @@ function onMessageTranslationInfoUpdated(info: Map<string, ITranslateInfo[]>) {
   for (let i = 0; i < translationInfoList.length; ++i) {
     const { messageID, visible } = translationInfoList[i];
     if (messageID === props.messageItem.ID) {
-      actionItems.value[idx].text = TUITranslateService.t(visible ? 'TUIChat.隐藏' : 'TUIChat.翻译');
+      actionItems.value[idx].text = TUITranslateService.t(
+        visible ? 'TUIChat.隐藏' : 'TUIChat.翻译'
+      );
       actionItems.value[idx].visible = !!visible;
       return;
     }
@@ -353,7 +367,9 @@ function onMessageConvertInfoUpdated(info: Map<string, IConvertInfo[]>) {
   for (let i = 0; i < convertInfoList.length; ++i) {
     const { messageID, visible } = convertInfoList[i];
     if (messageID === props.messageItem.ID) {
-      actionItems.value[idx].text = TUITranslateService.t(visible ? 'TUIChat.隐藏' : 'TUIChat.转文字');
+      actionItems.value[idx].text = TUITranslateService.t(
+        visible ? 'TUIChat.隐藏' : 'TUIChat.转文字'
+      );
       actionItems.value[idx].visible = !!visible;
       return;
     }
@@ -367,7 +383,7 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-@import "../../../../assets/styles/common";
+@import '../../../../assets/styles/common';
 
 .dialog-item-web {
   background: #fff;

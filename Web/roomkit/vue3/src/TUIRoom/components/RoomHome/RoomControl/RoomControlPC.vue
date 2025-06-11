@@ -25,7 +25,7 @@
                 size="large"
                 type="primary"
               >
-                <svg-icon :icon="CreateRoomIcon" />
+                <IconCreateRoom size="20" />
                 <span class="button-text">{{ t('New Room') }}</span>
               </TUIButton>
               <div
@@ -42,7 +42,7 @@
                     class="create-room-option"
                     >{{ t('On-stage Speaking Room') }}
                   </span>
-                  <svg-icon class="create-room-icon" :icon="NextIcon" />
+                  <IconNext size="12" class="create-room-icon" />
                 </div>
                 <div
                   class="create-room-item"
@@ -53,7 +53,7 @@
                     class="create-room-option"
                     >{{ t('Free Speech Room') }}
                   </span>
-                  <svg-icon class="create-room-icon" :icon="NextIcon" />
+                  <IconNext size="12" class="create-room-icon" />
                 </div>
               </div>
             </div>
@@ -65,7 +65,7 @@
                 size="large"
                 type="primary"
               >
-                <svg-icon :icon="EnterRoomIcon" />
+                <IconEnterRoom size="20" />
                 <span class="button-text">{{ t('Join Room') }}</span>
               </TUIButton>
               <div v-if="showEnterRoomAction" class="enter-room-action">
@@ -82,7 +82,7 @@
                   ]"
                   @click="enterRoom"
                 >
-                  <svg-icon :icon="EnterRoomIcon" />
+                  <IconEnterRoom size="20" />
                 </div>
               </div>
             </div>
@@ -96,7 +96,7 @@
                 size="large"
                 type="primary"
               >
-                <svg-icon :icon="ScheduleRoomIcon" />
+                <IconScheduleRoom size="18" />
                 <span class="button-text">{{ t('Schedule') }}</span>
               </TUIButton>
             </div>
@@ -123,13 +123,14 @@ import {
   onMounted,
   onUnmounted,
 } from 'vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import NextIcon from '../../common/icons/NextIcon.vue';
+import {
+  TUIButton,
+  IconNext,
+  IconEnterRoom,
+  IconCreateRoom,
+  IconScheduleRoom,
+} from '@tencentcloud/uikit-base-component-vue3';
 import useRoomControl from './useRoomControlHooks';
-import CreateRoomIcon from '../../common/icons/CreateRoomIcon.vue';
-import EnterRoomIcon from '../../common/icons/EnterRoomIcon.vue';
-import ScheduleRoomIcon from '../../common/icons/ScheduleRoomIcon.vue';
 import ScheduleConferencePanel from '../../ScheduleConference/ScheduleConferencePanel';
 import vClickOutside from '../../../directives/vClickOutside';
 import {
@@ -341,6 +342,7 @@ onUnmounted(() => {
 
           .create-room-item {
             display: flex;
+            align-items: center;
             justify-content: space-between;
             padding: 19px 32px;
             color: var(--text-color-primary);

@@ -10,7 +10,7 @@
       v-if="visible && switchThemeConfig.visible"
       :title="t('Switch Theme')"
       :layout="IconButtonLayout.HORIZONTAL"
-      :icon="SwitchThemeIcon"
+      :icon="IconSwitchTheme"
       @click-icon="handleSwitchTheme"
     />
     <div
@@ -70,12 +70,11 @@
 <script setup lang="ts">
 import { withDefaults, defineProps, ref, computed } from 'vue';
 import IconButton from './base/IconButton.vue';
-import SwitchThemeIcon from './icons/SwitchThemeIcon.vue';
 import { IconButtonLayout } from '../../constants/room';
 import { useI18n } from '../../locales';
 import { roomService } from '../../services';
 import { useBasicStore } from '../../stores/basic';
-import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { useUIKit, IconSwitchTheme } from '@tencentcloud/uikit-base-component-vue3';
 import { Theme } from '../../services/manager/configManager';
 import { isMobile } from '../../utils/environment';
 import vClickOutside from '../../directives/vClickOutside';

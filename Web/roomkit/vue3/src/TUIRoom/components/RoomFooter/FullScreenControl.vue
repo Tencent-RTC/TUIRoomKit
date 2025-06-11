@@ -5,15 +5,15 @@
       :title="title"
       @click-icon="toggleScreen"
     >
-      <full-screen-icon />
+      <IconFullScreen size="24" />
     </icon-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { IconFullScreen } from '@tencentcloud/uikit-base-component-vue3';
 import IconButton from '../common/base/IconButton.vue';
-import FullScreenIcon from '../common/icons/FullScreenIcon.vue';
 import { setFullScreen, exitFullScreen } from '../../utils/utils';
 import { useI18n } from '../../locales';
 import { roomService } from '../../services';

@@ -5,7 +5,7 @@
       class="tui-notification-container-mobile"
       :style="overlayContainerStyle"
     >
-      <svg-icon :icon="ApplyTipsIcon" class="tui-notification-mobile-icon" />
+      <IconApplyTips class="tui-notification-mobile-icon" />
       <span class="tui-notification-mobile-content">{{ message }}</span>
       <div class="tui-notification-mobile-check" @click="handleAgree">
         {{ confirmButtonText }}
@@ -19,15 +19,11 @@
       <div class="tui-notification-header">
         <div class="tui-notification-title">{{ message }}</div>
         <div class="close">
-          <svg-icon :size="16" :icon="CloseIcon" @click="handleClose" />
+          <IconClose @click="handleClose" />
         </div>
       </div>
       <div class="tui-notification-footer">
-        <TUIButton
-          @click="handleAgree"
-          type="primary"
-          style="min-width: 88px"
-          >
+        <TUIButton @click="handleAgree" type="primary" style="min-width: 88px">
           {{ confirmButtonText }}
         </TUIButton>
         <TUIButton @click="handleReject" style="min-width: 88px">
@@ -47,12 +43,16 @@ import {
   defineProps,
   defineEmits,
 } from 'vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
-import SvgIcon from '../SvgIcon.vue';
-import CloseIcon from '../../icons/CloseIcon.vue';
+import {
+  TUIButton,
+  IconClose,
+  IconApplyTips,
+} from '@tencentcloud/uikit-base-component-vue3';
+// import SvgIcon from '../SvgIcon.vue';
+// import CloseIcon from '../../icons/CloseIcon.vue';
+// import ApplyTipsIcon from '../../icons/ApplyTipsIcon.vue';
 import useZIndex from '../../../../hooks/useZIndex';
 import { isMobile } from '../../../../utils/environment';
-import ApplyTipsIcon from '../../icons/ApplyTipsIcon.vue';
 
 const visible = ref(false);
 const overlayContainerStyle = ref({});

@@ -2,10 +2,10 @@
   <div :class="['chat-editor', isMessageDisabled ? 'disable-editor' : '']">
     <div class="chat-input-container">
       <div class="input-content">
-        <svg-icon
+        <IconEmoji
           v-tap="togglePopover"
-          :icon="EmojiIcon"
-          :class="['emoji-icon', { 'disable-emoji': isMessageDisabled }]"
+          size="20"
+          :class="{ 'disable-emoji': isMessageDisabled }"
         />
         <input
           ref="editorInputEle"
@@ -33,10 +33,9 @@
 </template>
 
 <script setup lang="ts">
+import { IconEmoji } from '@tencentcloud/uikit-base-component-vue3';
 import emoji from '../EditorTools';
 import useChatEditor from './useChatEditor';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import EmojiIcon from '../../common/icons/EmojiIcon.vue';
 import vTap from '../../../directives/vTap';
 const {
   t,
@@ -113,11 +112,6 @@ const {
   width: 100vw;
   padding: 5px 0;
   background-color: var(--bg-color-operate);
-}
-
-.emoji-icon {
-  width: 20px;
-  height: 20px;
 }
 
 .disable-emoji {

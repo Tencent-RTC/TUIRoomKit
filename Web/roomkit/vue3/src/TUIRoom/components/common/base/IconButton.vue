@@ -15,7 +15,7 @@
       :class="['icon-content', iconContentClass, `${disabled && 'disabled'}`]"
     >
       <slot></slot>
-      <svg-icon v-if="icon" :icon="icon" />
+      <TUIIcon v-if="icon" :icon="icon" />
       <span class="title">{{ title }}</span>
     </div>
     <div
@@ -24,12 +24,8 @@
       @click="handleClickEvent"
     >
       <slot></slot>
-      <svg-icon v-if="icon" :icon="icon" />
-      <svg-icon
-        v-if="isNotSupport"
-        class="unsupport-icon"
-        :icon="UnSupportIcon"
-      />
+      <TUIIcon v-if="icon" :icon="icon" />
+      <IconUnSupport v-if="isNotSupport" class="unsupport-icon" size="14" />
       <span class="title">
         {{ title }}
         <slot name="title"></slot>
@@ -41,18 +37,20 @@
       class="icon-arrow"
       @click="$emit('click-more')"
     >
-      <svg-icon :icon="ArrowUp" />
+      <IconArrowUp size="12" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { withDefaults, computed, defineProps, defineEmits } from 'vue';
-import SvgIcon from './SvgIcon.vue';
-import ArrowUp from '../icons/ArrowUpIcon.vue';
+import {
+  TUIIcon,
+  IconArrowUp,
+  IconUnSupport,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { IconButtonLayout } from '../../../constants/room';
 import { isMobile } from '../../../utils/environment';
-import UnSupportIcon from '../icons/UnSupportIcon.vue';
 import vTap from '../../../directives/vTap';
 import type { Component } from 'vue';
 

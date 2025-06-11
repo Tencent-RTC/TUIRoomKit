@@ -9,7 +9,7 @@ import useRoomEngine from '../../../hooks/useRoomEngine';
 import useDeviceManager from '../../../hooks/useDeviceManager';
 import i18n from '../../../locales';
 import TUIMessageBox from '../../../components/common/base/MessageBox';
-import TUIMessage from '../../../components/common/base/Message';
+import { TUIToast, TOAST_TYPE } from '@tencentcloud/uikit-base-component-vue3';
 import { isWeChat, isMobile } from '../../../utils/environment';
 import { MediaDeviceState } from '../../type';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../../constants/message';
@@ -98,8 +98,8 @@ class Camera {
       } else if (roomService.roomStore.isCameraDisableForAllUser) {
         warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_CAMERA_FAIL_MUTE_ALL;
       }
-      TUIMessage({
-        type: 'warning',
+      TUIToast({
+        type: TOAST_TYPE.WARNING,
         message: t(warningMessage),
         duration: MESSAGE_DURATION.NORMAL,
       });

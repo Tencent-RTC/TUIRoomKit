@@ -1,11 +1,12 @@
 <template>
   <div class="more-control-container">
     <icon-button
-      :icon="MoreIcon"
       :is-active="sidebarName === 'more'"
       :title="t('Contact us')"
       @click-icon="toggleContactSidebar"
-    />
+    >
+      <IconMore size="24" />
+    </icon-button>
     <div v-if="isShowContactTab" class="contact-container">
       <room-contact ref="contactRef" @on-close-contact="handleOnCloseContact" />
     </div>
@@ -14,9 +15,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { IconMore } from '@tencentcloud/uikit-base-component-vue3';
 import IconButton from '../common/base/IconButton.vue';
 import { useBasicStore } from '../../stores/basic';
-import MoreIcon from '../common/icons/MoreIcon.vue';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
 import { isMobile } from '../../utils/environment';

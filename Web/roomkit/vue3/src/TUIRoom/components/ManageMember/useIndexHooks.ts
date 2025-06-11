@@ -5,11 +5,14 @@ import { UserInfo, useRoomStore } from '../../stores/room';
 import { useBasicStore } from '../../stores/basic';
 import { useI18n } from '../../locales';
 import { TUIMediaDevice } from '@tencentcloud/tuiroom-engine-js';
-import TUIMessage from '../common/base/Message/index';
+import {
+  TUIToast,
+  TOAST_TYPE,
+  IconAllMembersShareScreen,
+  IconHostShareScreen,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { MESSAGE_DURATION } from '../../constants/message';
 import { isMobile } from '../../utils/environment';
-import AllMembersShareScreenIcon from '../common/icons/AllMembersShareScreenIcon.vue';
-import HostShareScreenIcon from '../common/icons/HostShareScreenIcon.vue';
 import { roomService } from '../../services';
 import { USERS_STATUS } from '../../constants/room';
 
@@ -140,8 +143,8 @@ export default function useIndex() {
         ? t('All members can share screen')
         : t('Screen sharing for host/admin only'),
       icon: roomStore.isScreenShareDisableForAllUser
-        ? AllMembersShareScreenIcon
-        : HostShareScreenIcon,
+        ? IconAllMembersShareScreen
+        : IconHostShareScreen,
       func: toggleManageAllMember,
       type: ManageControlType.SCREEN,
     },
@@ -249,8 +252,8 @@ export default function useIndex() {
       const tipMessage = stateForAllAudio
         ? t('All audios disabled')
         : t('All audios enabled');
-      TUIMessage({
-        type: 'success',
+      TUIToast({
+        type: TOAST_TYPE.SUCCESS,
         message: tipMessage,
         duration: MESSAGE_DURATION.NORMAL,
       });
@@ -268,8 +271,8 @@ export default function useIndex() {
       const tipMessage = stateForAllVideo
         ? t('All videos disabled')
         : t('All videos enabled');
-      TUIMessage({
-        type: 'success',
+      TUIToast({
+        type: TOAST_TYPE.SUCCESS,
         message: tipMessage,
         duration: MESSAGE_DURATION.NORMAL,
       });
@@ -303,8 +306,8 @@ export default function useIndex() {
       (item: UserInfo) => item.userId
     );
     roomService.conferenceInvitationManager.inviteUsers({ userIdList });
-    TUIMessage({
-      type: 'success',
+    TUIToast({
+      type: TOAST_TYPE.SUCCESS,
       message: t('Invitation sent, waiting for members to join.'),
       duration: MESSAGE_DURATION.NORMAL,
     });

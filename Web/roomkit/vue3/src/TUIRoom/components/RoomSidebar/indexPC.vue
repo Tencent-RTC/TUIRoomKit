@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import Drawer from '../common/base/Drawer.vue';
 import useSideBar from './useSideBarHooks';
-import ManageMember from '../ManageMember';
+import ManageMember from '../ManageMember/index';
 import RoomMore from '../RoomMore';
 import Chat from '../Chat/index';
 import AITranscription from '../common/widgets/AITools/AITranscription.vue';

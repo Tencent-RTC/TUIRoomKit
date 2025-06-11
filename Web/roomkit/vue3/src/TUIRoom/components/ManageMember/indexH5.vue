@@ -22,7 +22,7 @@
         v-if="applyToAnchorList.length > 0 && !isGeneralUser"
         class="apply-on-stage-info"
       >
-        <svg-icon :icon="ApplyTipsIcon" class="apply-icon" />
+        <IconApplyTips class="apply-icon" />
         <div class="apply-info">{{ applyToAnchorUserContent }}</div>
         <div class="apply-check" @click="showApplyUserList">
           {{ t('Check') }}
@@ -66,7 +66,7 @@
               class="user-operate-item"
               @touchstart="item.func(item.type)"
             >
-              <svg-icon :icon="item.icon" />
+              <TUIIcon v-if="item.icon" :icon="item.icon" />
               <span class="operate-text">{{ item.title }}</span>
             </div>
           </div>
@@ -109,8 +109,10 @@ import Dialog from '../common/base/Dialog';
 import useIndex from './useIndexHooks';
 import { storeToRefs } from 'pinia';
 import { useRoomStore } from '../../stores/room';
-import SvgIcon from '../common/base/SvgIcon.vue';
-import ApplyTipsIcon from '../common/icons/ApplyTipsIcon.vue';
+import {
+  TUIIcon,
+  IconApplyTips,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { USERS_STATUS } from '../../constants/room';
 
 const roomStore = useRoomStore();
@@ -182,9 +184,9 @@ const {
         font-size: 14px;
         font-weight: 400;
         line-height: 32px;
+        color: var(--text-color-link);
         text-align: center;
         cursor: pointer;
-        color: var(--text-color-link);
       }
     }
 
@@ -211,9 +213,9 @@ const {
     height: 36px;
     margin: 16px 20px 0;
     cursor: pointer;
+    background-color: var(--bg-color-input);
     border-radius: 20px;
     -webkit-tap-highlight-color: var(--uikit-color-transparent);
-    background-color: var(--bg-color-input);
 
     .user-status {
       display: flex;
@@ -240,12 +242,12 @@ const {
     .apply-not-stage {
       font-size: 14px;
       font-weight: 400;
+      color: var(--text-color-secondary);
       filter: drop-shadow(0 2px 4px var(--uikit-color-black-8))
         drop-shadow(0 6px 10px var(--uikit-color-black-8))
         drop-shadow(0 3px 14px var(--uikit-color-black-8));
       border-radius: 20px;
       transform: translateX(4px);
-      color: var(--text-color-secondary);
     }
 
     .apply-not-stage {
@@ -267,14 +269,14 @@ const {
   }
 
   .button-bottom {
-    width: 80%;
     display: flex;
     justify-content: center;
+    width: 80%;
     padding: 13px 24px;
     font-weight: 400;
-    border-radius: 10px;
-    background-color: var(--bg-color-operate);
     color: var(--text-color-secondary);
+    background-color: var(--bg-color-operate);
+    border-radius: 10px;
   }
 
   .member-list-container {
@@ -314,9 +316,9 @@ const {
     .manage-member-button {
       padding: 13px 24px;
       font-weight: 400;
-      border-radius: 10px;
-      background-color: var(--bg-color-function);
       color: var(--text-color-primary);
+      background-color: var(--bg-color-function);
+      border-radius: 10px;
     }
 
     .lift-all {
@@ -344,10 +346,10 @@ const {
     width: 100%;
     padding: 50px 25px;
     padding-bottom: 4vh;
+    background-color: var(--bg-color-operate);
     border-radius: 15px 15px 0 0;
     animation-name: popup;
     animation-duration: 200ms;
-    background-color: var(--bg-color-operate);
 
     @keyframes popup {
       from {
@@ -366,8 +368,8 @@ const {
     display: flex;
     align-items: center;
     height: 20px;
-    cursor: pointer;
     color: var(--text-color-primary);
+    cursor: pointer;
 
     .operate-text {
       margin-left: 8px;

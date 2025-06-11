@@ -11,7 +11,7 @@
         <div class="tui-message-box-header">
           <div class="tui-message-box-title">{{ title }}</div>
           <div class="close">
-            <svg-icon :size="16" :icon="CloseIcon" @click="handleClose" />
+            <IconClose @click="handleClose" />
           </div>
         </div>
         <div class="tui-message-box-body">
@@ -23,10 +23,14 @@
             class="button-container"
             @click="handleClose('cancel')"
           >
-            <TUIButton type="primary" style="min-width: 88px">{{ cancelButtonText }}</TUIButton>
+            <TUIButton type="primary" style="min-width: 88px">{{
+              cancelButtonText
+            }}</TUIButton>
           </div>
           <div class="button-container" @click="handleClose('confirm')">
-            <TUIButton type="primary" style="min-width: 88px">{{ confirmButtonText }}</TUIButton>
+            <TUIButton type="primary" style="min-width: 88px">{{
+              confirmButtonText
+            }}</TUIButton>
           </div>
         </div>
         <div v-else class="tui-message-box-footer">
@@ -58,11 +62,9 @@ import {
   defineProps,
   defineEmits,
 } from 'vue';
-import SvgIcon from '../SvgIcon.vue';
-import CloseIcon from '../../icons/CloseIcon.vue';
+import { TUIButton, IconClose } from '@tencentcloud/uikit-base-component-vue3';
 import { isMobile } from '../../../../utils/environment';
 import useZIndex from '../../../../hooks/useZIndex';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 
 const visible = ref(false);
 const overlayContentStyle = ref({});
@@ -100,7 +102,7 @@ watch(visible, val => {
 
 const emit = defineEmits(['close']);
 
-type Action = 'cancel' | 'confirm' | 'close';
+export type Action = 'cancel' | 'confirm' | 'close';
 function handleClose(action: Action) {
   if (timer) {
     clearTimeout(timer);
@@ -162,9 +164,9 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   width: 480px;
+  background-color: var(--bg-color-dialog);
   border-radius: 20px;
   transform: translate(-50%, -50%);
-  background-color: var(--bg-color-dialog);
 
   .tui-message-box-header {
     position: relative;
@@ -192,9 +194,9 @@ onMounted(async () => {
       justify-content: center;
       width: 32px;
       height: 32px;
+      color: var(--text-color-primary);
       cursor: pointer;
       transform: translateY(-50%);
-      color: var(--text-color-primary);
     }
   }
 
@@ -228,10 +230,10 @@ onMounted(async () => {
   min-width: 80vw;
   max-width: 80vw;
   font-style: normal;
+  color: var(--text-color-primary);
+  background-color: var(--bg-color-dialog);
   border-radius: 8px;
   transform: translate(-50%, -50%);
-  background-color: var(--bg-color-dialog);
-  color: var(--text-color-primary);
 
   .tui-message-box-header {
     box-sizing: border-box;
@@ -251,8 +253,8 @@ onMounted(async () => {
     padding: 0 24px 20px;
     font-size: 14px;
     font-weight: 400;
-    text-align: center;
     color: var(--text-color-secondary);
+    text-align: center;
   }
 
   .tui-message-box-footer {
@@ -270,6 +272,18 @@ onMounted(async () => {
       &:not(:first-child) {
         border-left: 1px solid var(--stroke-color-module);
       }
+    }
+
+    .button {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .confirm-button {
+      color: var(--text-color-link);
+      text-align: center;
+      background-color: var(--bg-color-dialog);
+      border: none;
     }
   }
 }

@@ -8,10 +8,7 @@
       }"
     >
       <main class="edit-h5-main">
-        <header
-          v-if="!isPC"
-          class="edit-h5-header"
-        >
+        <header v-if="!isPC" class="edit-h5-header">
           <aside class="left">
             <h1>{{ TUITranslateService.t(`TUIGroup.修改群聊名称`) }}</h1>
             <span>{{
@@ -20,10 +17,7 @@
               )
             }}</span>
           </aside>
-          <span
-            class="close"
-            @click="toggleEditStatus"
-          >{{
+          <span class="close" @click="toggleEditStatus">{{
             TUITranslateService.t(`关闭`)
           }}</span>
         </header>
@@ -35,34 +29,21 @@
             class="input"
             type="text"
             @blur="updateProfile"
-          >
-          <span
-            v-if="!isPC"
-            class="tip"
-          >{{
+          />
+          <span v-if="!isPC" class="tip">{{
             TUITranslateService.t(
               `TUIGroup.仅限中文、字母、数字和下划线，2-20个字`
             )
           }}</span>
         </div>
-        <footer
-          v-if="!isPC"
-          class="edit-h5-footer"
-        >
-          <button
-            class="btn"
-            @click="updateProfile"
-          >
+        <footer v-if="!isPC" class="edit-h5-footer">
+          <button class="btn" @click="updateProfile">
             {{ TUITranslateService.t(`确认`) }}
           </button>
         </footer>
       </main>
     </div>
-    <p
-      v-if="!isEdit || !isPC"
-      class="name"
-      @click="toggleEditStatus"
-    >
+    <p v-if="!isEdit || !isPC" class="name" @click="toggleEditStatus">
       <span>{{ groupProfile.name }}</span>
       <Icon
         v-if="isAuthor"
@@ -83,7 +64,10 @@ import {
 } from '@tencentcloud/chat-uikit-engine';
 import Icon from '../../common/Icon.vue';
 import editIcon from '../../../assets/icon/edit.svg';
-import { Toast, TOAST_TYPE } from '../../common/Toast/index';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { isMobile, isPC } from '../../../utils/env';
 
 const props = defineProps({
@@ -109,7 +93,7 @@ watchEffect(() => {
 const emit = defineEmits(['update']);
 const updateProfile = () => {
   if (!inputGroupName.value) {
-    Toast({
+    TUIToast({
       message: TUITranslateService.t('TUIGroup.群名称不能为空'),
       type: TOAST_TYPE.ERROR,
     });
@@ -118,7 +102,7 @@ const updateProfile = () => {
       emit('update', { key: 'name', value: inputGroupName.value });
       groupProfile.value.name = inputGroupName.value;
       inputGroupName.value = '';
-      Toast({
+      TUIToast({
         message: TUITranslateService.t('TUIGroup.群名称修改成功'),
         type: TOAST_TYPE.SUCCESS,
       });
@@ -144,12 +128,12 @@ watch(
         nameInputRef.value?.focus();
       });
     }
-  },
+  }
 );
 </script>
 
 <style lang="scss" scoped>
-@import "../../../assets/styles/common";
+@import '../../../assets/styles/common';
 
 .group-name {
   padding: 14px 20px;

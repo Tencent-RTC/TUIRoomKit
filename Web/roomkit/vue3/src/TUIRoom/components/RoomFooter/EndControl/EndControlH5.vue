@@ -2,7 +2,7 @@
   <div>
     <div class="end-control-container">
       <div v-tap="handleEndBtnClick" class="end-button" tabindex="1">
-        <svg-icon :icon="EndRoomIcon" />
+        <IconEndRoom size="20" />
         <span class="end-button-title">{{ t('EndH5') }}</span>
       </div>
     </div>
@@ -64,7 +64,7 @@
           <div class="transfer-list-container">
             <div class="transfer-header">
               <div class="search-container">
-                <svg-icon :icon="SearchIcon" />
+                <IconSearch size="20" />
                 <input
                   v-model="searchName"
                   type="text"
@@ -86,9 +86,8 @@
                   <div class="user-name">
                     {{ roomService.getDisplayName(user) }}
                   </div>
-                  <svg-icon
+                  <IconCorrect
                     v-if="selectedUser === user.userId"
-                    :icon="CorrectIcon"
                     class="correct"
                   />
                 </div>
@@ -111,15 +110,16 @@
 
 <script setup lang="ts">
 import { TUIRole } from '@tencentcloud/tuiroom-engine-js';
+import {
+  IconCorrect,
+  IconSearch,
+  IconEndRoom,
+} from '@tencentcloud/uikit-base-component-vue3';
 import useEndControl from './useEndControlHooks';
 import logger from '../../../utils/common/logger';
 import popup from '../../common/base/PopUpH5.vue';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import CorrectIcon from '../../common/icons/CorrectIcon.vue';
-import SearchIcon from '../../common/icons/SearchIcon.vue';
 import Avatar from '../../common/Avatar.vue';
 import vTap from '../../../directives/vTap';
-import EndRoomIcon from '../../common/icons/EndRoomIcon.vue';
 import { roomService } from '../../../services';
 
 const {
@@ -443,8 +443,6 @@ async function transferAndLeave() {
         .correct {
           position: absolute;
           right: 5vw;
-          width: 24px;
-          height: 16px;
           background-size: cover;
         }
       }

@@ -1,5 +1,5 @@
 import { computed } from 'vue';
-import TUIMessage from '../common/base/Message/index';
+import { TUIToast, TOAST_TYPE } from '@tencentcloud/uikit-base-component-vue3';
 import { useI18n } from '../../locales';
 import { clipBoard } from '../../utils/utils';
 import i18n from '../../locales/index';
@@ -13,14 +13,14 @@ export default function useRoomMoreHooks() {
   async function onCopy(value: string | number) {
     try {
       await clipBoard(value);
-      TUIMessage({
+      TUIToast({
         message: t('Copied successfully'),
-        type: 'success',
+        type: TOAST_TYPE.SUCCESS,
       });
     } catch (error) {
-      TUIMessage({
+      TUIToast({
         message: t('Copied failure'),
-        type: 'error',
+        type: TOAST_TYPE.ERROR,
       });
     }
   }

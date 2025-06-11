@@ -7,11 +7,7 @@
     <div class="setting-container">
       <div class="setting-header">
         <span class="setting-title">{{ t('Settings') }}</span>
-        <svg-icon
-          class="close-icon"
-          :icon="CloseIcon"
-          @click="handleCloseSettingDialog"
-        />
+        <IconClose class="close-icon" @click="handleCloseSettingDialog" />
       </div>
       <div class="setting-body">
         <div class="setting-tabs">
@@ -46,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import SvgIcon from '../common/base/SvgIcon.vue';
+import { IconClose } from '@tencentcloud/uikit-base-component-vue3';
 import {
   AudioSetting,
   VideoSetting,
@@ -56,7 +52,6 @@ import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
 import { computed } from 'vue';
-import CloseIcon from '../common/icons/CloseIcon.vue';
 
 const { t } = useI18n();
 
@@ -126,8 +121,6 @@ function handleOverlayClick(event: any) {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
       cursor: pointer;
       transform: translateY(-50%);
       color: var(--text-color-primary);

@@ -3,7 +3,10 @@ import { useI18n } from '../../../locales';
 import { useBasicStore } from '../../../stores/basic';
 import { useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
-import TUIMessage from '../../common/base/Message/index';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { clipBoard } from '../../../utils/utils';
 import useRoomInviteControl from '../../RoomInvite/useRoomInviteHooks';
 import { isWeChat } from '../../../utils/environment';
@@ -95,14 +98,14 @@ export default function useRoomInfo() {
   async function onCopy(value: string | number) {
     try {
       await clipBoard(value);
-      TUIMessage({
+      TUIToast({
         message: t('Copied successfully'),
-        type: 'success',
+        type: TOAST_TYPE.SUCCESS,
       });
     } catch (error) {
-      TUIMessage({
+      TUIToast({
         message: t('Copied failure'),
-        type: 'error',
+        type: TOAST_TYPE.ERROR,
       });
     }
   }

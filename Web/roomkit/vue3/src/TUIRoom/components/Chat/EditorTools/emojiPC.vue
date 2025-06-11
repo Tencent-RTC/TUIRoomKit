@@ -1,10 +1,6 @@
 <template>
   <div class="emoji-tool">
-    <svg-icon
-      :icon="EmojiIcon"
-      class="emoji-icon"
-      @click.stop="handleEmojiToobar"
-    />
+    <IconEmoji class="emoji-icon" @click.stop="handleEmojiToobar" />
     <div
       v-show="showEmojiToolbar"
       v-click-outside="handleClickOutsideEmojiToobar"
@@ -24,10 +20,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { IconEmoji } from '@tencentcloud/uikit-base-component-vue3';
 import { emojiBaseUrl, emojiMap, emojiList } from '../util';
 import { isMobile } from '../../../utils/environment';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import EmojiIcon from '../../common/icons/EmojiIcon.vue';
 import vClickOutside from '../../../directives/vClickOutside';
 
 const emit = defineEmits(['choose-emoji']);

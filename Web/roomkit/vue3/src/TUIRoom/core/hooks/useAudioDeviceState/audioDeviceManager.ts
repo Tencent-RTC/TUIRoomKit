@@ -8,7 +8,7 @@ import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import useDeviceManager from '../../../hooks/useDeviceManager';
 import { isWeChat, isElectron } from '../../../utils/environment';
 import TUIMessageBox from '../../../components/common/base/MessageBox';
-import TUIMessage from '../../../components/common/base/Message';
+import { TUIToast, TOAST_TYPE } from '@tencentcloud/uikit-base-component-vue3';
 import i18n from '../../../locales';
 import { WARNING_MESSAGE, MESSAGE_DURATION } from '../../../constants/message';
 import { roomService } from '../../../services';
@@ -108,8 +108,8 @@ class Microphone {
       } else if (roomService.roomStore.isMicrophoneDisableForAllUser) {
         warningMessage = WARNING_MESSAGE.UNMUTE_LOCAL_MIC_FAIL_MUTE_ALL;
       }
-      TUIMessage({
-        type: 'warning',
+      TUIToast({
+        type: TOAST_TYPE.WARNING,
         message: t(warningMessage),
         duration: MESSAGE_DURATION.NORMAL,
       });

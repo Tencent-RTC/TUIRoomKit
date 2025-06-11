@@ -12,7 +12,7 @@
             class="copy-container"
             @click="onCopy(item.content)"
           >
-            <svg-icon class="copy" :icon="copyIcon" />
+            <IconCopy />
           </span>
           <div
             v-if="item.isShowStatus"
@@ -31,9 +31,8 @@
 
 <script setup lang="ts">
 import { defineProps } from 'vue';
+import { IconCopy } from '@tencentcloud/uikit-base-component-vue3';
 import useRoomInfo from '../../components/RoomHeader/RoomInfo/useRoomInfoHooks';
-import copyIcon from '../common/icons/CopyIcon.vue';
-import SvgIcon from '../common/base/SvgIcon.vue';
 import { isMobile } from '../../utils/environment';
 import {
   TUIConferenceStatus,
@@ -119,11 +118,6 @@ const getStatusTextAndClass = (status?: TUIConferenceStatus | null) => {
     margin-left: 6px;
     cursor: pointer;
     color: var(--text-color-link);
-
-    .copy {
-      width: 20px;
-      height: 20px;
-    }
   }
 
   .detail-status {

@@ -18,10 +18,13 @@
 <script setup lang="ts">
 import { ref, watch, defineProps } from 'vue';
 import { UserInfo } from '../../../stores/room';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { useI18n } from '../../../locales';
 import { roomService, TUIInvitationStatus } from '../../../services';
-import TUIMessage from '../../common/base/Message/index';
 import { MESSAGE_DURATION } from '../../../constants/message';
 const { t } = useI18n();
 
@@ -35,8 +38,8 @@ const handleInvite = () => {
   roomService.conferenceInvitationManager.inviteUsers({
     userIdList: [props.userInfo.userId],
   });
-  TUIMessage({
-    type: 'success',
+  TUIToast({
+    type: TOAST_TYPE.SUCCESS,
     message: t('Invitation sent, waiting for members to join.'),
     duration: MESSAGE_DURATION.NORMAL,
   });

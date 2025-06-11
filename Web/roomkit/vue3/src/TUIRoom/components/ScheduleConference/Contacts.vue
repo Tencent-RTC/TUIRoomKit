@@ -24,7 +24,7 @@
             "
           >
             <template #suffixIcon>
-              <SearchIcon class="search-icon" @mousedown.prevent />
+              <IconSearch class="search-icon" @mousedown.prevent />
             </template>
           </TuiInput>
         </div>
@@ -86,19 +86,17 @@
             >
               {{ item.userInfo.profile.nick || item.userInfo.profile.userID }}
             </p>
-            <CloseIcon
+            <IconClose
               class="chosen-list-item-remove"
               @click="removeSelectUser(item)"
             />
           </div>
         </div>
         <div class="chosen-footer">
-          <TUIButton @click="cancel" style="min-width: 88px">{{ t('Cancel') }}</TUIButton>
-          <TUIButton
-            @click="confirm"
-            type="primary"
-            style="min-width: 88px"
-          >
+          <TUIButton @click="cancel" style="min-width: 88px">{{
+            t('Cancel')
+          }}</TUIButton>
+          <TUIButton @click="confirm" type="primary" style="min-width: 88px">
             {{ t('Confirm') }}
           </TUIButton>
         </div>
@@ -134,12 +132,14 @@ import {
   computed,
   withDefaults,
 } from 'vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconClose,
+  IconSearch,
+} from '@tencentcloud/uikit-base-component-vue3';
 import TuiInput from '../common/base/Input';
 import TuiCheckbox from '../common/base/Checkbox';
 import TuiAvatar from '../common/Avatar.vue';
-import SearchIcon from '../common/icons/SearchIcon.vue';
-import CloseIcon from '../common/icons/CloseIcon.vue';
 import PanelContainer from './PanelContainer.vue';
 
 import { useI18n } from '../../locales';

@@ -7,7 +7,7 @@
     :close-on-click-modal="true"
     width="540px"
     :append-to-body="true"
-    :title-icon="SuccessIcon"
+    :title-icon="IconSuccess"
   >
     <div class="invite-member">
       <div
@@ -18,11 +18,7 @@
         <div class="invite-member-title">{{ t(item.title) }}</div>
         <div class="invite-member-item">
           <span class="invite-member-content"> {{ item.content }}</span>
-          <svg-icon
-            class="copy"
-            :icon="copyIcon"
-            @click="onCopy(item.content)"
-          />
+          <IconCopy class="copy" @click="onCopy(item.content)" />
         </div>
       </div>
     </div>
@@ -39,13 +35,14 @@
 <script setup lang="ts">
 import { ref, defineProps, watch, computed, defineEmits } from 'vue';
 import { storeToRefs } from 'pinia';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconCopy,
+  IconSuccess,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { useI18n } from '../../locales';
 import TuiDialog from '../common/base/Dialog';
-import SuccessIcon from '../common/icons/SuccessIcon.vue';
 import { TUIConferenceInfo } from '@tencentcloud/tuiroom-engine-js';
-import copyIcon from '../common/icons/CopyIcon.vue';
-import SvgIcon from '../common/base/SvgIcon.vue';
 import useRoomInfo from '../RoomHeader/RoomInfo/useRoomInfoHooks';
 import { getUrlWithRoomId } from '../../utils/utils';
 import { useBasicStore } from '../../stores/basic';
@@ -160,8 +157,6 @@ watch(
     }
 
     .copy {
-      width: 20px;
-      height: 20px;
       cursor: pointer;
       color: var(--text-color-link);
     }

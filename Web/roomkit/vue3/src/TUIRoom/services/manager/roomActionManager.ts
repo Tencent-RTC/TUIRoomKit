@@ -188,7 +188,6 @@ export class RoomActionManager {
         roomType: TUIRoomType.kConference,
         password: roomParam?.password || '',
       });
-
       this.service.roomStore.setRoomInfo(roomInfo);
       await this.getUserList();
       await this.syncUserInfo(this.service.basicStore.userId);

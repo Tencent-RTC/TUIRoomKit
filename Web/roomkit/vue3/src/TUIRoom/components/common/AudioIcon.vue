@@ -3,18 +3,17 @@
     <div class="audio-level-container">
       <div class="audio-level" :style="audioLevelStyle"></div>
     </div>
-    <svg-icon class="audio-icon" :icon="icon" />
+    <IconMicOff class="audio-icon" size="24" v-if="props.isMuted" />
+    <IconMicOn class="audio-icon" size="24" v-else />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import SvgIcon from './base/SvgIcon.vue';
+import { IconMicOn, IconMicOff } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomStore } from '../../stores/room';
 import { storeToRefs } from 'pinia';
 import { isUndefined } from '../../utils/utils';
-import MicOnIcon from './icons/MicOnIcon.vue';
-import MicOffIcon from './icons/MicOffIcon.vue';
 
 interface Props {
   userId?: string;
@@ -38,8 +37,6 @@ const currentAudioVolume = computed(() => {
 });
 
 const props = defineProps<Props>();
-
-const icon = computed(() => (props.isMuted ? MicOffIcon : MicOnIcon));
 
 const audioLevelStyle = computed(() => {
   if (props.isMuted || !currentAudioVolume.value) {

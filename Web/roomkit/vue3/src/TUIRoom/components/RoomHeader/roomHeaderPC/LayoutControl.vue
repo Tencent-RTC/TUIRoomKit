@@ -16,7 +16,7 @@
       :layout="IconButtonLayout.HORIZONTAL"
       @click-icon="handleClickLayoutIcon"
     >
-      <layout-icon />
+      <IconLayout size="20" />
     </icon-button>
     <div v-if="showLayoutList" class="layout-list">
       <!--
@@ -101,7 +101,7 @@ import { storeToRefs } from 'pinia';
 import { useI18n } from '../../../locales';
 import { IconButtonLayout } from '../../../constants/room';
 import IconButton from '../../common/base/IconButton.vue';
-import LayoutIcon from '../../common/icons/LayoutIcon.vue';
+import { IconLayout } from '@tencentcloud/uikit-base-component-vue3';
 import vClickOutside from '../../../directives/vClickOutside';
 import { roomService } from '../../../services';
 

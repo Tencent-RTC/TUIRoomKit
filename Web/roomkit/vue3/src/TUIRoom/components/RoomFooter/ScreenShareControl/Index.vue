@@ -8,8 +8,8 @@
       :is-not-support="!isScreenShareSupported"
       @click-icon="toggleScreenShare"
     >
-      <stop-screen-share-icon v-if="isSharing" />
-      <screen-share-icon v-else />
+      <IconStopScreenShare size="24" v-if="isSharing" />
+      <IconScreenShare size="24" v-else />
     </icon-button>
     <Dialog
       v-model="isShowFraudDialog"
@@ -34,10 +34,8 @@
           >
             {{ t('Continue sharing') }}
           </TUIButton>
-          <TUIButton
-            @click="isShowFraudDialog = false"
-            style="min-width: 88px"
-            >{{ t('Cancel') }}
+          <TUIButton @click="isShowFraudDialog = false" style="min-width: 88px">
+            {{ t('Cancel') }}
           </TUIButton>
         </span>
       </template>
@@ -66,11 +64,8 @@
           >
             {{ t('End sharing') }}
           </TUIButton>
-          <TUIButton
-            class="button"
-            @click="cancelStop"
-            style="min-width: 88px"
-            >{{ t('Cancel') }}
+          <TUIButton class="button" @click="cancelStop" style="min-width: 88px">
+            {{ t('Cancel') }}
           </TUIButton>
         </span>
       </template>
@@ -80,13 +75,16 @@
 
 <script setup lang="ts">
 import { ref, Ref, computed, onUnmounted, watch } from 'vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconStopScreenShare,
+  IconScreenShare,
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { storeToRefs } from 'pinia';
-import TUIMessage from '../../common/base/Message/index';
 import Dialog from '../../common/base/Dialog';
 import IconButton from '../../common/base/IconButton.vue';
-import ScreenShareIcon from '../../common/icons/ScreenShareIcon.vue';
-import StopScreenShareIcon from '../../common/icons/StopScreenShareIcon.vue';
 import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
 import { useRoomStore } from '../../../stores/room';
@@ -140,8 +138,8 @@ async function toggleScreenShare() {
   }
 
   if (isAudience.value) {
-    TUIMessage({
-      type: 'warning',
+    TUIToast({
+      type: TOAST_TYPE.WARNING,
       message: t(
         'You currently do not have sharing permission, please raise your hand to apply for sharing permission first'
       ),
@@ -151,8 +149,8 @@ async function toggleScreenShare() {
   }
 
   if (remoteScreenStream.value) {
-    TUIMessage({
-      type: 'warning',
+    TUIToast({
+      type: TOAST_TYPE.WARNING,
       message: t('Another user is sharing the screen.'),
       duration: MESSAGE_DURATION.LONG,
     });
@@ -160,16 +158,16 @@ async function toggleScreenShare() {
   }
 
   if (!isScreenShareSupported) {
-    TUIMessage({
-      type: 'warning',
+    TUIToast({
+      type: TOAST_TYPE.WARNING,
       message: t('The current browser does not support screen sharing'),
       duration: MESSAGE_DURATION.LONG,
     });
     return;
   }
   if (isGeneralUser.value && isScreenShareDisableForAllUser.value) {
-    TUIMessage({
-      type: 'warning',
+    TUIToast({
+      type: TOAST_TYPE.WARNING,
       message: t(
         'Failed to initiate screen sharing, currently only host/admin can share screen.'
       ),
@@ -229,8 +227,8 @@ async function startScreenShare() {
         );
         break;
     }
-    TUIMessage({
-      type: 'warning',
+    TUIToast({
+      type: TOAST_TYPE.WARNING,
       message,
       duration: MESSAGE_DURATION.LONG,
     });
@@ -287,11 +285,11 @@ onUnmounted(() => {
   width: 131px;
   height: 48px;
   font-size: 14px;
+  color: var(--text-color-primary);
   cursor: pointer;
+  background-color: var(--bg-color-operate);
   border-radius: 4px;
   transform: translateX(-50%);
-  color: var(--text-color-primary);
-  background-color: var(--bg-color-operate);
 }
 
 .stop-share-icon {

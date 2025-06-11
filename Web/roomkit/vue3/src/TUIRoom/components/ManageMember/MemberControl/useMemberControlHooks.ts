@@ -10,26 +10,30 @@ import {
   TUIRequestCallbackType,
   TUIErrorCode,
 } from '@tencentcloud/tuiroom-engine-js';
-import AudioOpenIcon from '../../common/icons/AudioOpenIcon.vue';
-import VideoOpenIcon from '../../common/icons/VideoOpenIcon.vue';
-import ChatForbiddenIcon from '../../common/icons/ChatForbiddenIcon.vue';
-import KickOutIcon from '../../common/icons/KickOutIcon.vue';
-import InviteOnStageIcon from '../../common/icons/InviteOnStageIcon.vue';
-import DenyOnStageIcon from '../../common/icons/DenyOnStageIcon.vue';
-import OnStageIcon from '../../common/icons/OnStageIcon.vue';
-import OffStageIcon from '../../common/icons/OffStageIcon.vue';
-import TransferOwnerIcon from '../../common/icons/TransferOwnerIcon.vue';
-import SetAdminIcon from '../../common/icons/SetAdminIcon.vue';
-import RevokeAdminIcon from '../../common/icons/RevokeAdminIcon.vue';
-import EditNameCardIcon from '../../common/icons/EditNameCardIcon.vue';
 import { storeToRefs } from 'pinia';
-import TUIMessage from '../../common/base/Message';
 import { MESSAGE_DURATION } from '../../../constants/message';
 import eventBus from '../../../hooks/useMitt';
 import useMemberItemHooks from '../MemberItem/useMemberItemHooks';
 import { roomService } from '../../../services';
 import { isMobile } from '../../../utils/environment';
 import { calculateByteLength } from '../../../utils/utils';
+import {
+  TUIToast,
+  TOAST_TYPE,
+  IconAudioOpen,
+  IconVideoOpen,
+  IconChatForbidden,
+  IconTransferOwner,
+  IconRevokeAdmin,
+  IconSetAdmin,
+  IconDenyOnStage,
+  IconInviteOnStage,
+  IconOnStage,
+  IconOffStage,
+  IconEditNameCard,
+  IconKickOut,
+} from '@tencentcloud/uikit-base-component-vue3';
+
 interface ObjectType {
   [key: string]: any;
 }
@@ -169,7 +173,7 @@ export default function useMemberControl(props?: any) {
 
   const audioControl = computed(() => ({
     key: 'audioControl',
-    icon: AudioOpenIcon,
+    icon: IconAudioOpen,
     title: props.userInfo.hasAudioStream ? t('Mute') : t('Unmute'),
     func: muteUserAudio,
   }));
@@ -180,7 +184,7 @@ export default function useMemberControl(props?: any) {
       : t('Enable video');
     return {
       key: 'videoControl',
-      icon: VideoOpenIcon,
+      icon: IconVideoOpen,
       title: videoControlTitle,
       func: muteUserVideo,
     };
@@ -188,7 +192,7 @@ export default function useMemberControl(props?: any) {
 
   const chatControl = computed(() => ({
     key: 'chatControl',
-    icon: ChatForbiddenIcon,
+    icon: IconChatForbidden,
     title: props.userInfo.isMessageDisabled
       ? t('Enable chat')
       : t('Disable chat'),
@@ -197,7 +201,7 @@ export default function useMemberControl(props?: any) {
 
   const transferOwner = computed(() => ({
     key: 'transferOwner',
-    icon: TransferOwnerIcon,
+    icon: IconTransferOwner,
     title: t('Make host'),
     func: () => handleOpenDialog('transferOwner'),
   }));
@@ -206,8 +210,8 @@ export default function useMemberControl(props?: any) {
     key: 'setOrRevokeAdmin',
     icon:
       props.userInfo.userRole === TUIRole.kAdministrator
-        ? RevokeAdminIcon
-        : SetAdminIcon,
+        ? IconRevokeAdmin
+        : IconSetAdmin,
     title:
       props.userInfo.userRole === TUIRole.kAdministrator
         ? t('Remove administrator')
@@ -217,7 +221,7 @@ export default function useMemberControl(props?: any) {
 
   const kickUser = computed(() => ({
     key: 'kickUser',
-    icon: KickOutIcon,
+    icon: IconKickOut,
     title: t('Kick out'),
     func: () => handleOpenDialog('kickUser'),
   }));
@@ -225,8 +229,8 @@ export default function useMemberControl(props?: any) {
   const inviteOnStage = computed(() => ({
     key: 'inviteOnStage',
     icon: props.userInfo.isInvitingUserToAnchor
-      ? DenyOnStageIcon
-      : InviteOnStageIcon,
+      ? IconDenyOnStage
+      : IconInviteOnStage,
     title: props.userInfo.isInvitingUserToAnchor
       ? t('Cancel stage')
       : t('Invite stage'),
@@ -235,27 +239,27 @@ export default function useMemberControl(props?: any) {
 
   const agreeOnStage = computed(() => ({
     key: 'agreeOnStage',
-    icon: OnStageIcon,
+    icon: IconOnStage,
     title: t('Agree to the stage'),
     func: agreeUserOnStage,
   }));
 
   const denyOnStage = computed(() => ({
     key: 'denyOnStage',
-    icon: DenyOnStageIcon,
+    icon: IconDenyOnStage,
     title: t('Refuse stage'),
     func: denyUserOnStage,
   }));
   const makeOffStage = computed(() => ({
     key: 'makeOffStage',
-    icon: OffStageIcon,
+    icon: IconOffStage,
     title: t('Step down'),
     func: kickUserOffStage,
   }));
 
   const changeUserNameCard = computed(() => ({
     key: 'changeUserNameCard',
-    icon: EditNameCardIcon,
+    icon: IconEditNameCard,
     title: t('change name'),
     func: () => handleOpenDialog('changeUserNameCard'),
   }));
@@ -268,8 +272,8 @@ export default function useMemberControl(props?: any) {
       cancelInviteUserOnStage(userInfo);
     } else {
       if (anchorUserList.value.length === maxSeatCount.value) {
-        TUIMessage({
-          type: 'warning',
+        TUIToast({
+          type: TOAST_TYPE.WARNING,
           message: `${t('The stage is full')}`,
           duration: MESSAGE_DURATION.NORMAL,
         });
@@ -290,8 +294,8 @@ export default function useMemberControl(props?: any) {
       });
     } else {
       if (userInfo.isRequestingUserOpenMic) {
-        TUIMessage({
-          type: 'info',
+        TUIToast({
+          type: TOAST_TYPE.INFO,
           message: `${t('An invitation to open the microphone has been sent to sb.', { name: roomService.getDisplayName(userInfo) })}`,
           duration: MESSAGE_DURATION.NORMAL,
         });
@@ -313,8 +317,8 @@ export default function useMemberControl(props?: any) {
           switch (requestCallbackType) {
             case TUIRequestCallbackType.kRequestError:
               if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
-                TUIMessage({
-                  type: 'warning',
+                TUIToast({
+                  type: TOAST_TYPE.WARNING,
                   message: t(
                     'This member has already received the same request, please try again later'
                   ),
@@ -325,8 +329,8 @@ export default function useMemberControl(props?: any) {
           }
         },
       });
-      TUIMessage({
-        type: 'info',
+      TUIToast({
+        type: TOAST_TYPE.INFO,
         message: `${t('An invitation to open the microphone has been sent to sb.', { name: roomService.getDisplayName(userInfo) })}`,
         duration: MESSAGE_DURATION.NORMAL,
       });
@@ -351,8 +355,8 @@ export default function useMemberControl(props?: any) {
       });
     } else {
       if (userInfo.isRequestingUserOpenCamera) {
-        TUIMessage({
-          type: 'info',
+        TUIToast({
+          type: TOAST_TYPE.INFO,
           message: `${t('An invitation to open the camera has been sent to sb.', { name: roomService.getDisplayName(userInfo) })}`,
           duration: MESSAGE_DURATION.NORMAL,
         });
@@ -374,8 +378,8 @@ export default function useMemberControl(props?: any) {
           switch (requestCallbackType) {
             case TUIRequestCallbackType.kRequestError:
               if (code === TUIErrorCode.ERR_REQUEST_ID_REPEAT) {
-                TUIMessage({
-                  type: 'warning',
+                TUIToast({
+                  type: TOAST_TYPE.WARNING,
                   message: t(
                     'This member has already received the same request, please try again later'
                   ),
@@ -386,8 +390,8 @@ export default function useMemberControl(props?: any) {
           }
         },
       });
-      TUIMessage({
-        type: 'info',
+      TUIToast({
+        type: TOAST_TYPE.INFO,
         message: `${t('An invitation to open the camera has been sent to sb.', { name: roomService.getDisplayName(userInfo) })}`,
         duration: MESSAGE_DURATION.NORMAL,
       });
@@ -412,8 +416,8 @@ export default function useMemberControl(props?: any) {
       });
       roomStore.setMuteUserChat(userInfo.userId, !isMessageDisabled);
     } catch (error) {
-      TUIMessage({
-        type: 'error',
+      TUIToast({
+        type: TOAST_TYPE.ERROR,
         message: t('Failed to disable chat'),
         duration: MESSAGE_DURATION.NORMAL,
       });
@@ -448,16 +452,16 @@ export default function useMemberControl(props?: any) {
           userRole: TUIRole.kRoomOwner,
         });
         roomStore.setMasterUserId(userInfo.userId);
-        TUIMessage({
-          type: 'success',
+        TUIToast({
+          type: TOAST_TYPE.SUCCESS,
           message: t('The room owner has been transferred to sb', {
             name: roomService.getDisplayName(userInfo),
           }),
           duration: MESSAGE_DURATION.NORMAL,
         });
       } catch (error) {
-        TUIMessage({
-          type: 'error',
+        TUIToast({
+          type: TOAST_TYPE.ERROR,
           message: t('Make host failed, please try again.'),
           duration: MESSAGE_DURATION.NORMAL,
         });
@@ -482,7 +486,7 @@ export default function useMemberControl(props?: any) {
       newRole === TUIRole.kAdministrator
         ? `${t('sb has been set as administrator', { name: updatedUserName })}`
         : `${t('The administrator status of sb has been withdrawn', { name: updatedUserName })}`;
-    TUIMessage({ type: 'success', message: tipMessage });
+    TUIToast({ type: TOAST_TYPE.SUCCESS, message: tipMessage });
     roomStore.setRemoteUserRole(userInfo.userId, newRole);
     if (newRole === TUIRole.kGeneralUser && userInfo.hasScreenStream) {
       await roomEngine.instance?.closeRemoteDeviceByAdmin({
@@ -541,8 +545,8 @@ export default function useMemberControl(props?: any) {
   const nameCardCheck = () => {
     const result = calculateByteLength(tempUserName.value) <= 32;
     !result &&
-      TUIMessage({
-        type: 'warning',
+      TUIToast({
+        type: TOAST_TYPE.WARNING,
         message: t('The user name cannot exceed 32 characters'),
         duration: MESSAGE_DURATION.NORMAL,
       });
@@ -559,14 +563,14 @@ export default function useMemberControl(props?: any) {
         userId: userInfo.userId,
         nameCard: tempUserName.value,
       });
-      TUIMessage({
-        type: 'success',
+      TUIToast({
+        type: TOAST_TYPE.SUCCESS,
         message: t('Name changed successfully'),
         duration: MESSAGE_DURATION.NORMAL,
       });
     } catch (error) {
-      TUIMessage({
-        type: 'error',
+      TUIToast({
+        type: TOAST_TYPE.ERROR,
         message: t('change name failed, please try again.'),
         duration: MESSAGE_DURATION.NORMAL,
       });

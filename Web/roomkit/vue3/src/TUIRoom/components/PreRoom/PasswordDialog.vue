@@ -20,11 +20,7 @@
       maxlength="32"
     >
       <template #suffixIcon>
-        <svg-icon
-          class="svg-icon"
-          @click="inputPassword = ''"
-          :icon="CloseInputIcon"
-        />
+        <IconCloseInput @click="inputPassword = ''" class="svg-icon" />
       </template>
     </TuiInput>
     <template #footer>
@@ -48,14 +44,15 @@
 <script setup lang="ts">
 import { ref, Ref, watch, defineProps, nextTick, computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import {
+  TUIButton,
+  IconCloseInput,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { EventType, roomService } from '../../services';
 import { useI18n } from '../../locales';
 import TuiDialog from '../common/base/Dialog';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import TuiInput from '../common/base/Input';
-import CloseInputIcon from '../common/icons/CloseInputIcon.vue';
 import { useBasicStore } from '../../stores/basic';
-import svgIcon from '../common/base/SvgIcon.vue';
 import { invalidPasswordRegex } from '../../utils/common';
 
 const basicStore = useBasicStore();

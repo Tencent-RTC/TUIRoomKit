@@ -2,7 +2,7 @@
   <div class="local-screen-container" ref="localScreenContainerRef">
     <div :class="['local-screen-control-container', { mini: isMiniRegion }]">
       <div class="local-screen-info">
-        <svg-icon :icon="ScreenSharingIcon" />
+        <IconScreenSharing size="44" />
         <span class="text">{{ t('You are sharing the screen...') }}</span>
       </div>
       <TUIButton color="red" @click="openStopConfirmDialog" type="primary">
@@ -47,9 +47,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import SvgIcon from '../../../common/base/SvgIcon.vue';
-import ScreenSharingIcon from '../../../common/icons/ScreenSharingIcon.vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconScreenSharing,
+} from '@tencentcloud/uikit-base-component-vue3';
 import Dialog from '../../../common/base/Dialog';
 import eventBus from '../../../../hooks/useMitt';
 import { useI18n } from '../../../../locales';

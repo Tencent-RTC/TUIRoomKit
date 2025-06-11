@@ -3,9 +3,9 @@
     <div v-if="isShowRoomInfoTitle">
       <div class="title-container" @click.stop="toggleShowRoomInfoStatus">
         <span class="text">{{ conferenceTitle }}</span>
-        <svg-icon
+        <IconArrowUp
+          size="12"
           :class="['arrow-icon', { 'arrow-down-icon': arrowDirection }]"
-          :icon="Arrow"
         />
         <room-time class="room-timing" />
       </div>
@@ -28,7 +28,7 @@
           class="copy-container"
           @click="onCopy(item.copyLink)"
         >
-          <svg-icon class="copy" :icon="copyIcon" />
+          <IconCopy />
           <span>{{ t('Copy') }}</span>
         </div>
       </div>
@@ -36,10 +36,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { IconArrowUp, IconCopy } from '@tencentcloud/uikit-base-component-vue3';
 import useRoomInfo from './useRoomInfoHooks';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import Arrow from '../../common/icons/ArrowUpIcon.vue';
-import copyIcon from '../../common/icons/CopyIcon.vue';
 import vClickOutside from '../../../directives/vClickOutside';
 import RoomTime from '../../common/RoomTime.vue';
 
@@ -135,11 +133,6 @@ const {
       margin-left: auto;
       cursor: pointer;
       color: var(--text-color-link);
-
-      .copy {
-        width: 20px;
-        height: 20px;
-      }
     }
   }
 }

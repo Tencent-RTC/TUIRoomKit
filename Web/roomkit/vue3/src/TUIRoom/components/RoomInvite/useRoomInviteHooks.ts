@@ -1,13 +1,12 @@
 import { computed, ref, shallowRef } from 'vue';
 import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
-import TUIMessage from '../common/base/Message/index';
+import { TUIToast, TOAST_TYPE } from '@tencentcloud/uikit-base-component-vue3';
 import { storeToRefs } from 'pinia';
 import { useI18n } from '../../locales';
 import { clipBoard, getUrlWithRoomId } from '../../utils/utils';
 import { isElectron } from '../../utils/environment';
-import InviteIcon from '../common/icons/InviteIcon.vue';
-import ShareIcon from '../common/icons/ShareIcon.vue';
+import { IconInvite, IconShare } from '@tencentcloud/uikit-base-component-vue3';
 import { roomService, TUIUserInfo } from '../../services';
 import { MESSAGE_DURATION } from '../../constants/message';
 export default function useRoomInvite() {
@@ -59,7 +58,7 @@ export default function useRoomInvite() {
 
   const invitationFeatureDetails = ref([
     {
-      icon: shallowRef(InviteIcon),
+      icon: shallowRef(IconInvite),
       text: 'addMember',
       function: async () => {
         contacts.value =
@@ -68,7 +67,7 @@ export default function useRoomInvite() {
       },
     },
     {
-      icon: shallowRef(ShareIcon),
+      icon: shallowRef(IconShare),
       text: 'shareRoom',
       function: () => {
         isShowRoomShareForm.value = true;
@@ -81,14 +80,14 @@ export default function useRoomInvite() {
   async function onCopy(value: string | number) {
     try {
       await clipBoard(value);
-      TUIMessage({
+      TUIToast({
         message: t('Copied successfully'),
-        type: 'success',
+        type: TOAST_TYPE.SUCCESS,
       });
     } catch (error) {
-      TUIMessage({
+      TUIToast({
         message: t('Copied failure'),
-        type: 'error',
+        type: TOAST_TYPE.ERROR,
       });
     }
   }
@@ -165,8 +164,8 @@ export default function useRoomInvite() {
   const contactsConfirm = async (contacts: TUIUserInfo[]) => {
     const userIdList = contacts.map(contacts => contacts.userId);
     await roomService.conferenceInvitationManager.inviteUsers({ userIdList });
-    TUIMessage({
-      type: 'success',
+    TUIToast({
+      type: TOAST_TYPE.SUCCESS,
       message: t('Invitation sent, waiting for members to join.'),
       duration: MESSAGE_DURATION.NORMAL,
     });

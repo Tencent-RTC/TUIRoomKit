@@ -5,8 +5,9 @@
         v-tap="showMore"
         :is-active="sidebarName === 'more'"
         :title="t('More')"
-        :icon="ExtensionIcon"
-      />
+      >
+        <IconExtension size="24" />
+      </icon-button>
     </div>
     <div v-if="showMoreContent" ref="moreContentRef" class="show-more-content">
       <div class="control-compent">
@@ -26,13 +27,13 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, defineEmits } from 'vue';
+import { IconExtension } from '@tencentcloud/uikit-base-component-vue3';
 import IconButton from '../../common/base/IconButton.vue';
 import userMoreControl from './useMoreControlHooks';
 import ChatControl from '../ChatControl.vue';
 import InviteControl from '../InviteControl.vue';
 import ContactControl from '../ContactControl.vue';
 import { useRoomStore } from '../../../stores/room';
-import ExtensionIcon from '../../common/icons/ExtensionIcon.vue';
 import bus from '../../../hooks/useMitt';
 import vTap from '../../../directives/vTap';
 import { roomService } from '../../../services';

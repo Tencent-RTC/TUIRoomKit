@@ -11,10 +11,9 @@
       <Avatar class="avatar-url" :img-src="userInfo.avatarUrl" />
       <div class="user-name">{{ roomService.getDisplayName(userInfo) }}</div>
       <div class="role-info">
-        <svg-icon
+        <IconUser
+          size="20"
           v-if="isTargetUserRoomOwner || isTargetUserAdmin"
-          :icon="UserIcon"
-          :color="isTargetUserAdmin ? '#F06C4B' : '#4791FF'"
           :class="isTargetUserAdmin ? 'admin-icon' : 'master-icon'"
         />
         <div
@@ -26,7 +25,7 @@
     </div>
     <!-- User audio and video status information -->
     <div v-if="showStateIcon" class="member-av-state">
-      <svg-icon
+      <TUIIcon
         v-for="(item, index) in iconList"
         :key="index"
         :icon="item.icon"
@@ -47,17 +46,19 @@ import Avatar from '../../common/Avatar.vue';
 import { useBasicStore } from '../../../stores/basic';
 import { UserInfo, useRoomStore } from '../../../stores/room';
 import { storeToRefs } from 'pinia';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import VideoOpenIcon from '../../common/icons/VideoOpenIcon.vue';
-import VideoCloseIcon from '../../common/icons/VideoCloseIcon.vue';
-import AudioOpenIcon from '../../common/icons/AudioOpenIcon.vue';
-import AudioCloseIcon from '../../common/icons/AudioCloseIcon.vue';
-import ScreenOpenIcon from '../../common/icons/ScreenOpenIcon.vue';
-import ApplyActiveIcon from '../../common/icons/ApplyActiveIcon.vue';
 import MemberInvite from '../MemberInvite/MemberInvite.vue';
 import { useI18n } from '../../../locales';
 import { isMobile } from '../../../utils/environment';
-import UserIcon from '../../common/icons/UserIcon.vue';
+import {
+  TUIIcon,
+  IconVideoOpen,
+  IconVideoClose,
+  IconAudioOpen,
+  IconAudioClose,
+  IconScreenOpen,
+  IconApplyActive,
+  IconUser,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { TUIRole } from '@tencentcloud/tuiroom-engine-js';
 import { roomService } from '../../../services';
 
@@ -108,22 +109,22 @@ const isAudienceRole = computed(
 const iconList = computed(() => {
   const list = [];
   if (props.userInfo.hasScreenStream) {
-    list.push({ icon: ScreenOpenIcon });
+    list.push({ icon: IconScreenOpen });
   }
   if (!isAudienceRole.value) {
     list.push({
-      icon: props.userInfo.hasAudioStream ? AudioOpenIcon : AudioCloseIcon,
+      icon: props.userInfo.hasAudioStream ? IconAudioOpen : IconAudioClose,
     });
     list.push({
-      icon: props.userInfo.hasVideoStream ? VideoOpenIcon : VideoCloseIcon,
+      icon: props.userInfo.hasVideoStream ? IconVideoOpen : IconVideoClose,
     });
   }
   if (isAudienceRole.value && !props.userInfo.isUserApplyingToAnchor) {
-    list.push({ icon: AudioCloseIcon, disable: true });
-    list.push({ icon: VideoCloseIcon, disable: true });
+    list.push({ icon: IconAudioClose, disable: true });
+    list.push({ icon: IconVideoClose, disable: true });
   }
   if (isAudienceRole.value && props.userInfo.isUserApplyingToAnchor) {
-    list.push({ icon: ApplyActiveIcon, size: 20 });
+    list.push({ icon: IconApplyActive, size: 20 });
   }
   return list;
 });
@@ -158,9 +159,9 @@ const iconList = computed(() => {
       font-size: 14px;
       font-weight: 400;
       line-height: 22px;
+      color: var(--text-color-secondary);
       text-overflow: ellipsis;
       white-space: nowrap;
-      color: var(--text-color-secondary);
     }
 
     .role-info {
@@ -189,8 +190,8 @@ const iconList = computed(() => {
       }
 
       .user-extra-info-admin {
-        transition: none;
         color: var(--text-color-warning);
+        transition: none;
       }
     }
   }

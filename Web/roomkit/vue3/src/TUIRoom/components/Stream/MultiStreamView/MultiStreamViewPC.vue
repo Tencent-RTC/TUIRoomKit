@@ -16,14 +16,14 @@
         class="turn-page-arrow-container left-container"
         @click="handleTurnPageLeft"
       >
-        <svg-icon :icon="ArrowStrokeTurnPageIcon" />
+        <IconArrowStrokeTurnPage size="20" />
       </div>
       <div
         v-show="showTurnPageRightArrow"
         class="turn-page-arrow-container right-container"
         @click="handleTurnPageRight"
       >
-        <svg-icon class="turn-page-right" :icon="ArrowStrokeTurnPageIcon" />
+        <IconArrowStrokeTurnPage class="turn-page-right" size="20" />
       </div>
     </div>
   </div>
@@ -31,8 +31,7 @@
 
 <script setup lang="ts">
 import { computed, defineProps, defineEmits } from 'vue';
-import ArrowStrokeTurnPageIcon from '../../common/icons/ArrowStrokeTurnPageIcon.vue';
-import SvgIcon from '../../common/base/SvgIcon.vue';
+import { IconArrowStrokeTurnPage } from '@tencentcloud/uikit-base-component-vue3';
 import StreamList from '../common/StreamList/index.vue';
 import { TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
 import {

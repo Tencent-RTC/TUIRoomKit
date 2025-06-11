@@ -30,7 +30,7 @@
           <slot name="title"></slot>
         </template>
         <div class="close" @click="handleClose">
-          <svg-icon :size="16" :icon="CloseIcon" />
+          <IconClose />
         </div>
       </div>
       <div class="drawer-content">
@@ -49,8 +49,7 @@ import {
   defineProps,
   defineEmits,
 } from 'vue';
-import SvgIcon from './SvgIcon.vue';
-import CloseIcon from '../icons/CloseIcon.vue';
+import { IconClose } from '@tencentcloud/uikit-base-component-vue3';
 import { addSuffix } from '../../../utils/utils';
 
 type DoneFn = () => void;

@@ -41,7 +41,7 @@
           {{ cancelButtonText }}
         </span>
         <TUIButton type="primary" @click="handleConfirm">
-          <svg-icon class="icon" :icon="EnterRoomIcon" />
+          <IconEnterRoom class="icon" />
           <span class="button-text">{{ confirmButtonText }}</span>
         </TUIButton>
       </div>
@@ -51,10 +51,11 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted, withDefaults, defineProps } from 'vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
-import SvgIcon from '../../../base/SvgIcon.vue';
+import {
+  TUIButton,
+  IconEnterRoom,
+} from '@tencentcloud/uikit-base-component-vue3';
 import useZIndex from '../../../../../hooks/useZIndex';
-import EnterRoomIcon from '../../../../common/icons/EnterRoomIcon.vue';
 import { useI18n } from '../../../../../locales';
 import Avatar from '../../../Avatar.vue';
 import { invitationInfo } from './index';
@@ -196,8 +197,6 @@ onMounted(() => {
   .icon {
     display: flex;
     align-items: center;
-    width: 16px;
-    height: 16px;
   }
 
   .invitation-notification-room-name {

@@ -6,10 +6,10 @@
           <span class="schedule-title-text">
             {{ item.basicRoomInfo.roomName }}
           </span>
-          <svg-icon
+          <IconChevronRight
             class="schedule-title-icon"
             v-if="isMobile"
-            :icon="ChevronRight"
+            size="10"
           />
         </div>
         <div class="schedule-content">
@@ -35,11 +35,11 @@
         </div>
       </div>
       <div ref="moreBtnRef" class="schedule-room-operate">
-        <svg-icon
+        <IconEllipsis
           class="ellipsis"
-          :icon="EllipsisIcon"
           @click="toggleClickMoreBtn"
           v-if="!isMobile"
+          size="13"
         />
         <div
           v-show="showMoreControl"
@@ -64,10 +64,10 @@
             </div>
           </template>
         </div>
-        <svg-icon
+        <IconLink
           v-if="!isMobile"
+          size="13"
           class="link"
-          :icon="LinkIcon"
           @click="toggleInviteRoom"
         />
         <TUIButton @click="joinConference" type="primary">
@@ -125,7 +125,7 @@
         ></div>
         <div class="invite-member-panel" v-if="invitePanelShow">
           <div class="invite-member-close" @click="toggleInvitePanelShow">
-            <svg-icon :icon="ArrowDown" />
+            <IconArrowDown />
           </div>
           <div class="invite-member-header">
             {{ t('Inviting members to join') }}
@@ -168,7 +168,7 @@
       :close-on-click-modal="true"
       width="480px"
       :append-to-body="true"
-      :title-icon="WarningIcon"
+      :title-icon="IconWarning"
       :cancelButton="t('No cancellation')"
       :confirmButton="t('cancel room')"
       @confirm="handleCancelSchedule"
@@ -185,10 +185,7 @@
             style="min-width: 88px"
             >{{ t('cancel room') }}
           </TUIButton>
-          <TUIButton
-            @click="showRoomCancel = false"
-            style="min-width: 88px"
-          >
+          <TUIButton @click="showRoomCancel = false" style="min-width: 88px">
             {{ t('No cancellation') }}
           </TUIButton>
         </span>
@@ -206,7 +203,7 @@
       :close-on-click-modal="true"
       width="540px"
       :append-to-body="true"
-      :title-icon="SuccessIcon"
+      :title-icon="IconSuccess"
     >
       <InvitePanel :scheduleInviteList="scheduleInviteList" />
       <template #footer>
@@ -231,15 +228,16 @@ import {
 } from 'vue';
 import { roomService } from '../../services';
 import useRoomInfo from '../RoomHeader/RoomInfo/useRoomInfoHooks';
-import SvgIcon from '../common/base/SvgIcon.vue';
 import Dialog from '../common/base/Dialog';
-import EllipsisIcon from '../common/icons/EllipsisIcon.vue';
-import ChevronRight from '../common/icons/ChevronRight.vue';
-import ArrowDown from '../common/icons/ArrowDown.vue';
-import LinkIcon from '../common/icons/LinkIcon.vue';
-import SuccessIcon from '../common/icons/SuccessIcon.vue';
-import WarningIcon from '../common/icons/WarningIcon.vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  IconChevronRight,
+  IconSuccess,
+  IconWarning,
+  IconEllipsis,
+  IconLink,
+  IconArrowDown,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { useI18n } from '../../locales';
 import vClickOutside from '../../directives/vClickOutside';
 import ScheduleConferencePanel from './ScheduleConferencePanel';
@@ -741,9 +739,7 @@ async function handleFetchRoomInfo() {
 
   .ellipsis,
   .link {
-    width: 30px;
-    height: 30px;
-    margin-right: 6px;
+    margin-right: 20px;
     color: var(--text-color-link);
 
     &:hover {

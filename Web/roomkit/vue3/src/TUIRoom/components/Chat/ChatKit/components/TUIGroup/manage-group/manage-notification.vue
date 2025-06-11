@@ -1,14 +1,11 @@
 <template>
-  <main
-    v-if="!isUniFrameWork"
-    class="notification"
-  >
+  <main v-if="!isUniFrameWork" class="notification">
     <textarea
       v-if="isEdit"
       v-model="input"
       class="textarea"
       @keyup.enter="updateProfile"
-    />
+    ></textarea>
     <section v-else>
       <p v-if="!groupProfile.notification">
         {{ TUITranslateService.t(`TUIGroup.暂无公告`) }}
@@ -18,35 +15,21 @@
       </article>
     </section>
     <footer v-if="isAuthorNotification">
-      <button
-        v-if="isEdit"
-        class="btn"
-        @click="updateProfile"
-      >
+      <button v-if="isEdit" class="btn" @click="updateProfile">
         {{ TUITranslateService.t(`TUIGroup.发布`) }}
       </button>
-      <button
-        v-else
-        class="btn"
-        @click="isEdit = !isEdit"
-      >
+      <button v-else class="btn" @click="isEdit = !isEdit">
         {{ TUITranslateService.t(`TUIGroup.编辑`) }}
       </button>
     </footer>
   </main>
-  <div
-    v-else
-    class="edit-h5"
-  >
+  <div v-else class="edit-h5">
     <main class="edit-h5-main">
       <header class="edit-h5-header">
         <aside class="left">
           <h1>{{ TUITranslateService.t(`TUIGroup.群公告`) }}</h1>
         </aside>
-        <span
-          class="close"
-          @click="close('notification')"
-        >{{
+        <span class="close" @click="close('notification')">{{
           TUITranslateService.t(`关闭`)
         }}</span>
       </header>
@@ -56,37 +39,20 @@
           v-model="input"
           :class="[isUniFrameWork ? 'uni-height' : '', 'textarea']"
           @keyup.enter="updateProfile"
-        />
-        <section
-          v-else
-          class="row"
-        >
-          <p
-            v-if="!groupProfile.notification"
-            class="row-p"
-          >
+        ></textarea>
+        <section v-else class="row">
+          <p v-if="!groupProfile.notification" class="row-p">
             {{ TUITranslateService.t(`TUIGroup.暂无公告`) }}
           </p>
           <article v-else>
             {{ groupProfile.notification }}
           </article>
         </section>
-        <footer
-          v-if="isAuthorNotification"
-          class="footer"
-        >
-          <button
-            v-if="isEdit"
-            class="btn"
-            @click="updateProfile"
-          >
+        <footer v-if="isAuthorNotification" class="footer">
+          <button v-if="isEdit" class="btn" @click="updateProfile">
             {{ TUITranslateService.t(`TUIGroup.发布`) }}
           </button>
-          <button
-            v-else
-            class="btn"
-            @click="isEdit = !isEdit"
-          >
+          <button v-else class="btn" @click="isEdit = !isEdit">
             {{ TUITranslateService.t(`TUIGroup.编辑`) }}
           </button>
         </footer>
@@ -96,13 +62,15 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick } from '../../../adapter-vue';
+import { nextTick, watchEffect, ref } from '../../../adapter-vue';
 import {
   TUITranslateService,
   IGroupModel,
 } from '@tencentcloud/chat-uikit-engine';
-import { watchEffect, ref } from '../../../adapter-vue';
-import { Toast, TOAST_TYPE } from '../../common/Toast/index';
+import {
+  TUIToast,
+  TOAST_TYPE,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { isUniFrameWork } from '../../../utils/env';
 
 const props = defineProps({
@@ -131,8 +99,10 @@ const emits = defineEmits(['update', 'close']);
 
 const updateProfile = () => {
   if (input.value.length > 150) {
-    Toast({
-      message: TUITranslateService.t('TUIGroup.群公告字数超出限制，最大长度为150'),
+    TUIToast({
+      message: TUITranslateService.t(
+        'TUIGroup.群公告字数超出限制，最大长度为150'
+      ),
       type: TOAST_TYPE.ERROR,
     });
     return;
@@ -152,7 +122,7 @@ const close = (tabName: string) => {
 </script>
 
 <style lang="scss" scoped>
-@import "../../../assets/styles/common";
+@import '../../../assets/styles/common';
 
 .notification {
   flex: 1;

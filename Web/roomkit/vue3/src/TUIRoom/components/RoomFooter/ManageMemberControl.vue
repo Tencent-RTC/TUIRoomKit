@@ -6,16 +6,17 @@
     <icon-button
       :is-active="sidebarName === 'manage-member'"
       :title="memberTitle"
-      :icon="ManageMemberIcon"
       @click-icon="toggleMangeMemberSidebar"
-    />
+    >
+      <IconManageMember size="24" />
+    </icon-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { IconManageMember } from '@tencentcloud/uikit-base-component-vue3';
 import IconButton from '../common/base/IconButton.vue';
-import ManageMemberIcon from '../common/icons/ManageMemberIcon.vue';
 import { useBasicStore } from '../../stores/basic';
 import { useRoomStore } from '../../stores/room';
 import { useI18n } from '../../locales';

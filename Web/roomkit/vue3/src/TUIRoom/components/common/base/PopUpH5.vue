@@ -2,7 +2,7 @@
   <div class="popup-container">
     <div class="popup-main-header">
       <span v-tap="handleClose" class="icon-container">
-        <svg-icon class="close-icon" :icon="ArrowStrokeBackIcon" />
+        <IconArrowStrokeBack size="10" class="close-icon" />
       </span>
       <span class="sidebar-title">{{ title }}</span>
     </div>
@@ -16,9 +16,8 @@
 </template>
 <script setup lang="ts">
 import { defineProps } from 'vue';
-import SvgIcon from './SvgIcon.vue';
+import { IconArrowStrokeBack } from '@tencentcloud/uikit-base-component-vue3';
 import { useBasicStore } from '../../../stores/basic';
-import ArrowStrokeBackIcon from '../icons/ArrowStrokeBackIcon.vue';
 import vTap from '../../../directives/vTap';
 
 interface Props {
@@ -70,8 +69,6 @@ function handleClose() {
     }
 
     .close-icon {
-      width: 10px;
-      height: 18px;
       background-size: cover;
     }
   }

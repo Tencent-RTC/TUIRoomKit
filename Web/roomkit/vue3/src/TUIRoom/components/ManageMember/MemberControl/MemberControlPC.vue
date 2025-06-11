@@ -10,10 +10,9 @@
     <div ref="moreBtnRef" class="more-container">
       <TUIButton @click="toggleClickMoreBtn">
         {{ t('More') }}
-        <svg-icon
+        <IconArrowUp
           size="12"
           :class="['more-arrow', showMoreControl ? 'up' : 'down']"
-          :icon="ArrowUpIcon"
         />
       </TUIButton>
       <div
@@ -28,7 +27,7 @@
           class="user-operate-item"
           @click="item.func(props.userInfo)"
         >
-          <svg-icon :icon="item.icon" />
+          <TUIIcon v-if="item.icon" :icon="item.icon" />
           <span class="operate-text">{{ item.title }}</span>
         </div>
       </div>
@@ -72,11 +71,13 @@
 <script setup lang="ts">
 import { ref, watch, computed, nextTick, defineProps } from 'vue';
 import { useI18n } from '../../../locales';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
 import Dialog from '../../common/base/Dialog';
 import TuiInput from '../../common/base/Input';
-import SvgIcon from '../../common/base/SvgIcon.vue';
-import ArrowUpIcon from '../../common/icons/ArrowUpIcon.vue';
+import {
+  TUIButton,
+  IconArrowUp,
+  TUIIcon,
+} from '@tencentcloud/uikit-base-component-vue3';
 import useMemberControlHooks from './useMemberControlHooks';
 import useMemberItemHooks from '../MemberItem/useMemberItemHooks';
 import { UserInfo } from '../../../stores/room';
@@ -184,11 +185,11 @@ async function handleDropDownPosition() {
       z-index: 1;
       min-width: 160px;
       padding: 20px;
-      border-radius: 8px;
       background-color: var(--dropdown-color-default);
+      border-radius: 8px;
       box-shadow:
-        0px 3px 8px var(--uikit-color-black-8),
-        0px 6px 40px var(--uikit-color-black-8);
+        0 3px 8px var(--uikit-color-black-8),
+        0 6px 40px var(--uikit-color-black-8);
 
       &::before {
         position: absolute;
@@ -196,8 +197,8 @@ async function handleDropDownPosition() {
         content: '';
         border-top: 10px solid transparent;
         border-right: 10px solid transparent;
-        border-left: 10px solid transparent;
         border-bottom: 10px solid var(--dropdown-color-default);
+        border-left: 10px solid transparent;
       }
 
       &::after {
@@ -212,8 +213,8 @@ async function handleDropDownPosition() {
         display: flex;
         align-items: center;
         height: 20px;
-        cursor: pointer;
         color: var(--text-color-secondary);
+        cursor: pointer;
 
         .operate-text {
           margin-left: 10px;

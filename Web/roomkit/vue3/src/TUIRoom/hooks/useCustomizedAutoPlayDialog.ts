@@ -1,4 +1,4 @@
-import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, { TUIRoomEvents } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from './useRoomEngine';
 import TUIMessageBox from '../components/common/base/MessageBox';
 import { useI18n } from '../locales';
@@ -11,14 +11,7 @@ export default function () {
   const { t } = useI18n();
 
   TUIRoomEngine.once('ready', () => {
-    const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    trtcCloud.callExperimentalAPI(
-      JSON.stringify({
-        api: 'enableAutoPlayDialog',
-        params: { enable: 0 },
-      })
-    );
-    trtcCloud.on('onAutoPlayFailed', () => {
+    roomEngine.instance?.on(TUIRoomEvents.onAutoPlayFailed, () => {
       if (!isShowAutoPlayDialog) {
         isShowAutoPlayDialog = true;
         TUIMessageBox({

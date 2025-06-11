@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import TUIMessage from '../../common/base/Message/index';
+import { TUIToast, TOAST_TYPE } from '@tencentcloud/uikit-base-component-vue3';
 
 import { TencentCloudChat } from '@tencentcloud/tuiroom-engine-js';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
@@ -17,7 +17,7 @@ export default function useChatEditor() {
   const chatStore = useChatStore();
   const roomStore = useRoomStore();
 
-  const { roomId } = storeToRefs(basicStore);
+  const { roomId, isCheckMessageLimitLink } = storeToRefs(basicStore);
   const { isMessageDisabled } = storeToRefs(chatStore);
   const editorInputEle = ref();
   const sendMsg = ref('');
@@ -45,6 +45,9 @@ export default function useChatEditor() {
         payload: {
           text: result,
         },
+        cloudCustomData: isCheckMessageLimitLink
+          ? `${window.location.href}`
+          : '',
       });
       await tim.sendMessage(message);
       chatStore.updateMessageList({
@@ -65,7 +68,10 @@ export default function useChatEditor() {
       /**
        * Message delivery failure
        **/
-      TUIMessage({ type: 'error', message: t('Failed to send the message') });
+      TUIToast({
+        type: TOAST_TYPE.ERROR,
+        message: t('Failed to send the message'),
+      });
     }
   };
 

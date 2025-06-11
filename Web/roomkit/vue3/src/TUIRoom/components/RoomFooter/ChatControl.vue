@@ -7,17 +7,18 @@
     >
       <icon-button
         :title="t('Chat')"
-        :icon="ChatIcon"
         :is-active="sidebarName === 'chat'"
         @click-icon="toggleChatSidebar"
-      />
+      >
+        <IconChat size="24" />
+      </icon-button>
     </tui-badge>
   </div>
 </template>
 
 <script setup lang="ts">
 import IconButton from '../common/base/IconButton.vue';
-import ChatIcon from '../common/icons/ChatIcon.vue';
+import { IconChat } from '@tencentcloud/uikit-base-component-vue3';
 import { useBasicStore } from '../../stores/basic';
 import { useChatStore } from '../../stores/chat';
 import { storeToRefs } from 'pinia';

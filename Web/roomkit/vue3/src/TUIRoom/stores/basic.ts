@@ -51,6 +51,7 @@ interface BasicState {
   isRoomLinkVisible: boolean;
   isSchemeLinkVisible: boolean;
   isShowScreenShareAntiFraud: boolean;
+  isCheckMessageLimitLink: boolean;
   isExperiencedAI: boolean;
   scene: SceneType;
   componentConfig: {
@@ -109,6 +110,7 @@ export const useBasicStore = defineStore('basic', {
     isRoomLinkVisible: !isElectron && !isWeChat,
     isSchemeLinkVisible: !isMobile,
     isShowScreenShareAntiFraud: false,
+    isCheckMessageLimitLink: false,
     isExperiencedAI: false,
     componentConfig: {
       SwitchTheme: {
@@ -193,6 +195,9 @@ export const useBasicStore = defineStore('basic', {
     setIsExperiencedAI(isExperiencedAI: boolean) {
       this.isExperiencedAI = isExperiencedAI;
     },
+    setIsCheckMessageLimitLink(isCheckMessageLimitLink: boolean) {
+      this.isCheckMessageLimitLink = isCheckMessageLimitLink;
+    },
     setBasicInfo(infoObj: any) {
       if (!infoObj) {
         return;
@@ -262,6 +267,7 @@ export const useBasicStore = defineStore('basic', {
       this.shareLink = '';
       this.showRoomTool = false;
       this.isExperiencedAI = false;
+      this.isCheckMessageLimitLink = false;
     },
   },
 });

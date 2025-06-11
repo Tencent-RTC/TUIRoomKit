@@ -4,7 +4,7 @@
     :class="[showVoiceBorder ? 'border' : '']"
   >
     <div v-if="streamInfo.isLoading" class="loading-region">
-      <svg-icon :icon="LoadingIcon" class="loading" />
+      <IconLoading size="36" class="loading" />
     </div>
     <div v-if="!streamInfo.hasVideoStream" class="center-user-info-container">
       <Avatar class="avatar-region" :img-src="userInfo?.avatarUrl" />
@@ -14,7 +14,7 @@
         v-if="showIcon"
         :class="showMasterIcon ? 'master-icon' : 'admin-icon'"
       >
-        <user-icon />
+        <IconUser />
       </div>
       <audio-icon
         v-if="!isScreenStream"
@@ -23,11 +23,7 @@
         :is-muted="!streamInfo.hasAudioStream"
         size="small"
       />
-      <svg-icon
-        v-if="isScreenStream"
-        :icon="ScreenOpenIcon"
-        class="screen-icon"
-      />
+      <IconScreenOpen v-if="isScreenStream" size="20" class="screen-icon" />
       <span
         :class="['user-name', isPC ? 'is-pc' : 'is-mobile']"
         :title="displayName"
@@ -40,18 +36,19 @@
 
 <script setup lang="ts">
 import { computed, defineProps } from 'vue';
+import {
+  IconScreenOpen,
+  IconLoading,
+  IconUser,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { StreamInfo, useRoomStore } from '../../../../stores/room';
-import Avatar from '../../../common/Avatar.vue';
 import AudioIcon from '../../../common/AudioIcon.vue';
-import SvgIcon from '../../../common/base/SvgIcon.vue';
-import UserIcon from '../../../common/icons/UserIcon.vue';
+import Avatar from '../../../common/Avatar.vue';
 import { useI18n } from '../../../../locales';
 import { TUIRole, TUIVideoStreamType } from '@tencentcloud/tuiroom-engine-js';
 import { isInnerScene } from '../../../../utils/constants';
-import ScreenOpenIcon from '../../../common/icons/ScreenOpenIcon.vue';
 import { isPC, isMobile } from '../../../../utils/environment';
 import { storeToRefs } from 'pinia';
-import LoadingIcon from '../../../common/icons/LoadingIcon.vue';
 
 const roomStore = useRoomStore();
 

@@ -2,9 +2,9 @@
   <div>
     <div class="panel-container h5" v-if="panelVisible && isMobile">
       <div class="container-header">
-        <svg-icon
+        <IconArrowStrokeBack
           class="container-header-back"
-          :icon="ArrowStrokeBackIcon"
+          size="20"
           @click="closePanel"
         />
         <span class="container-header-title">
@@ -39,10 +39,9 @@
 </template>
 <script setup lang="ts">
 import { defineProps, defineEmits, ref, watch } from 'vue';
+import { IconArrowStrokeBack } from '@tencentcloud/uikit-base-component-vue3';
 import { isMobile } from '../../utils/environment';
-import SvgIcon from '../common/base/SvgIcon.vue';
 import TuiDialog from '../common/base/Dialog';
-import ArrowStrokeBackIcon from '../common/icons/ArrowStrokeBackIcon.vue';
 const emit = defineEmits(['input', 'edit']);
 const props = defineProps<{
   visible: boolean;

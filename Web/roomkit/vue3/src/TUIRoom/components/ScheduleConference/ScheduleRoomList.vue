@@ -8,7 +8,7 @@
     ]"
   >
     <div class="schedule-loading" v-if="isShowLoading">
-      <svg-icon :icon="LoadingScheduleIcon" class="loading" />
+      <IconLoadingSchedule class="loading" size="36" />
       <span class="text">{{ t('Schedule room loading') }}</span>
     </div>
     <template v-else>
@@ -18,7 +18,7 @@
           :key="item.basicRoomInfo.roomId"
         >
           <div v-if="item.showTimestamp" class="schedule-room-date">
-            <svg-icon class="date" :icon="CalendarIcon" />
+            <IconCalendar class="date" />
             <span>{{ getScheduleDate(item.scheduleStartTime) }}</span>
           </div>
           <ScheduleRoomControl
@@ -33,7 +33,7 @@
         </div>
       </div>
       <div v-else class="schedule-no-body">
-        <svg-icon :icon="ApplyStageLabelIcon" />
+        <IconApplyStageLabel size="48" />
         <span class="text">{{ t('No room available for booking') }}</span>
       </div>
     </template>
@@ -50,12 +50,13 @@ import {
   defineProps,
   withDefaults,
 } from 'vue';
+import {
+  IconLoadingSchedule,
+  IconCalendar,
+  IconApplyStageLabel,
+} from '@tencentcloud/uikit-base-component-vue3';
 import { EventType, roomService } from '../../services';
-import SvgIcon from '../common/base/SvgIcon.vue';
-import CalendarIcon from '../common/icons/CalendarIcon.vue';
-import ApplyStageLabelIcon from '../common/icons/ApplyStageLabelIcon.vue';
 import ScheduleRoomControl from './ScheduleRoomControl.vue';
-import LoadingScheduleIcon from '../common/icons/LoadingScheduleIcon.vue';
 import { useI18n } from '../../locales';
 import {
   TUIConferenceInfo,

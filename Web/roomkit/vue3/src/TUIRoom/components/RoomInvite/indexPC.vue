@@ -6,7 +6,7 @@
       class="invite-item"
       @click="item.function()"
     >
-      <svg-icon class="icon" :icon="item.icon" />
+      <TUIIcon size="16" :icon="item.icon" />
       <span class="invite-title">{{ t(item.text) }}</span>
     </div>
     <Contacts
@@ -26,7 +26,7 @@
       :close-on-click-modal="true"
       width="540px"
       :append-to-body="true"
-      :title-icon="SuccessIcon"
+      :title-icon="IconSuccess"
     >
       <div class="invite-member">
         <div
@@ -39,9 +39,8 @@
             <span class="invite-member-content" :title="item.content">
               {{ item.content }}
             </span>
-            <svg-icon
+            <IconCopy
               class="copy"
-              :icon="copyIcon"
               v-if="item.isShowCopyIcon"
               @click="onCopy(item.content)"
             />
@@ -65,11 +64,13 @@
 
 <script setup lang="ts">
 import useRoomInviteControl from './useRoomInviteHooks';
-import SvgIcon from '../common/base/SvgIcon.vue';
-import { TUIButton } from '@tencentcloud/uikit-base-component-vue3';
+import {
+  TUIButton,
+  TUIIcon,
+  IconSuccess,
+  IconCopy,
+} from '@tencentcloud/uikit-base-component-vue3';
 import Contacts from '../ScheduleConference/Contacts.vue';
-import SuccessIcon from '../common/icons/SuccessIcon.vue';
-import copyIcon from '../common/icons/CopyIcon.vue';
 import Dialog from '../common/base/Dialog';
 const {
   t,
@@ -107,12 +108,6 @@ const {
     align-items: center;
     margin-top: 5px;
     cursor: pointer;
-
-    .icon {
-      width: 16px;
-      height: 16px;
-    }
-
     .invite-title {
       padding-left: 5px;
       font-family: 'PingFang SC';
@@ -132,7 +127,7 @@ const {
 
   .invite-member-container {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     min-width: 400px;
     font-size: 14px;
     font-weight: 400;
@@ -152,8 +147,6 @@ const {
     }
 
     .copy {
-      width: 20px;
-      height: 20px;
       margin-left: 8px;
       cursor: pointer;
       color: var(--text-color-link);
