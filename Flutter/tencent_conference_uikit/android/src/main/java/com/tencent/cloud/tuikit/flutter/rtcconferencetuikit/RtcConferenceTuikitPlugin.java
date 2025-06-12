@@ -116,7 +116,6 @@ public class RtcConferenceTuikitPlugin implements FlutterPlugin, MethodCallHandl
         }
         intentLaunchMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intentLaunchMain);
-        Log.i(TAG, "launchMainActivity: is that ok?");
     }
 
     public void updateFloatWindowUserModel(MethodCall call, MethodChannel.Result result) {

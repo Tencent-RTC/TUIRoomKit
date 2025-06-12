@@ -68,6 +68,7 @@ class LoginController extends GetxController {
           ),
         ),
       ),
+      config: const TencentCloudChatConfig(brightness: Brightness.light),
       plugins: [
         TencentCloudChatPluginItem(
           name: "sticker",

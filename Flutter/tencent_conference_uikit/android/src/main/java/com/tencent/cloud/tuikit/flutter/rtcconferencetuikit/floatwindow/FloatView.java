@@ -46,7 +46,9 @@ public class FloatView extends FrameLayout {
         String name = userModel.userName;
         mUserNameTv.setText(TextUtils.isEmpty(name) ? userModel.userId : name);
         mUserVolumePromptView.enableVolumeEffect(userModel.hasAudioStream);
-        mUserVolumePromptView.updateVolumeEffect(userModel.volume);
+        if(userModel.hasAudioStream){
+            mUserVolumePromptView.updateVolumeEffect(userModel.volume);
+        }
         ImageLoader.load(mContext, mUserAvatarIv, userModel.userAvatarURL, R.drawable.float_view_head);
         mVideoView.setVisibility(userModel.hasVideoStream || userModel.hasScreenStream ? VISIBLE : GONE);
         mUserAvatarIv.setVisibility(userModel.hasVideoStream || userModel.hasScreenStream ? GONE : VISIBLE);

@@ -135,6 +135,14 @@ class FloatWindowStore extends GetxController {
             if (volume < _volumeFilterMinLimit) {
               return;
             }
+            if (userId == currentFloatWindowUserModel.value.userId.value) {
+              currentFloatWindowUserModel.value.volume.value =
+                  currentFloatWindowUserModel.value.hasAudioStream.value
+                      ? volume
+                      : 0;
+              RtcConferenceTuikitPlatform.instance.updateFloatWindowUserModel(
+                  currentFloatWindowUserModel.value);
+            }
             if (volume > maxVolume) {
               maxVolume = volume;
               _maxVolumeUserId.value = userId;
@@ -158,6 +166,23 @@ class FloatWindowStore extends GetxController {
       onRoomDismissed: (roomId, reason) {
         dismissFloatWindow();
         RoomStore.to.clearStore();
+      },
+      onUserAudioStateChanged: (userId, hasAudio, reason) {
+        if (userId != currentFloatWindowUserModel.value.userId.value) {
+          return;
+        }
+
+        currentFloatWindowUserModel.value.hasAudioStream.value = hasAudio;
+        RtcConferenceTuikitPlatform.instance
+            .updateFloatWindowUserModel(currentFloatWindowUserModel.value);
+      },
+      onUserVideoStateChanged: (userId, streamType, hasVideo, reason) {
+        if (userId != currentFloatWindowUserModel.value.userId.value) {
+          return;
+        }
+        currentFloatWindowUserModel.value.hasVideoStream.value = hasVideo;
+        RtcConferenceTuikitPlatform.instance
+            .updateFloatWindowUserModel(currentFloatWindowUserModel.value);
       },
     );
     RoomEngineManager().addObserver(_observer);

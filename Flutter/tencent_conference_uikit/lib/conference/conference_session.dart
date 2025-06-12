@@ -160,6 +160,7 @@ class ConferenceSession {
         _onActionError?.call(ConferenceError.errFailed,
             "You are currently in a conference,exit before joining a new one");
       }
+      return;
     }
     var result = await engineManger.enterRoom(
         roomId, openAudio, openVideo, isSoundOnSpeaker);

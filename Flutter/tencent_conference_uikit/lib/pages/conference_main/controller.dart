@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tencent_conference_uikit/common/index.dart';
 import 'package:tencent_conference_uikit/common/store/float_window_store.dart';
 import 'package:tencent_conference_uikit/conference/conference_error.dart';
@@ -37,7 +38,7 @@ class ConferenceMainController extends GetxController {
   RxBool areWidgetsVisible = true.obs;
   int _hideDuration = 6;
   RxBool isEnteredRoom = false.obs;
-  RxBool isFloatChatVisible = true.obs;
+
 
   showDialog() {
     showConferenceDialog(
@@ -170,18 +171,69 @@ class ConferenceMainController extends GetxController {
         }
       },
       onConfirm: () async {
-        var result = await RoomEngineManager()
+        bool isGranted = true;
+        switch (request.requestAction) {
+          case TUIRequestAction.requestToOpenRemoteCamera:
+            isGranted = await _requestCameraPermission();
+            break;
+          case TUIRequestAction.requestToOpenRemoteMicrophone:
+            isGranted = await _requestMicPermission();
+            break;
+          default:
+            break;
+        }
+
+        if (!isGranted) {
+          RoomEngineManager()
+              .getRoomEngine()
+              .responseRemoteRequest(request.requestId, false);
+          return;
+        }
+
+        final result = await RoomEngineManager()
             .getRoomEngine()
             .responseRemoteRequest(request.requestId, true);
         Get.back();
-        if (result.code == TUIError.errFailed) {
-          makeToast(msg: 'goOnStageTimeOut'.roomTr);
-        } else if (result.code == TUIError.errAllSeatOccupied) {
-          makeToast(msg: 'stageMemberReachedLimit'.roomTr);
+
+        final toastMessages = {
+          TUIError.errFailed: 'goOnStageTimeOut'.roomTr,
+          TUIError.errAllSeatOccupied: 'stageMemberReachedLimit'.roomTr,
+        };
+
+        if (toastMessages.containsKey(result.code)) {
+          makeToast(msg: toastMessages[result.code]!);
         }
       },
       barrierDismissible: false,
     );
+  }
+
+  Future<bool> _requestMicPermission() async {
+    var isGranted = await Permission.microphone.isGranted;
+    if (isGranted) {
+      return true;
+    }
+
+    var microphone = await Permission.microphone.request();
+    if (microphone.isGranted) {
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<bool> _requestCameraPermission() async {
+    var isGranted = await Permission.camera.isGranted;
+    if (isGranted) {
+      return true;
+    }
+
+    var cameraPermission = await Permission.camera.request();
+    if (cameraPermission.isGranted) {
+      return true;
+    }
+
+    return false;
   }
 
   void showExitRoomDialog(String title) {

@@ -35,7 +35,7 @@ class RoomInfoSheet extends GetView<TopViewController> {
                   ),
                 ),
               ),
-              SizedBox(height: 20.0.scale375()),
+              SizedBox(height: 20.0.scale375Height()),
               InfoItemWidget(
                 prefixText: 'host'.roomTr,
                 infoText: controller.roomInfo.ownerName ??
@@ -45,7 +45,7 @@ class RoomInfoSheet extends GetView<TopViewController> {
                 isLeftAlign: true,
                 endPadding: 60.0.scale375(),
               ),
-              SizedBox(height: 15.0.scale375()),
+              SizedBox(height: 15.0.scale375Height()),
               InfoItemWidget(
                 prefixText: 'roomType'.roomTr,
                 infoText: controller.roomInfo.isSeatEnabled == false &&
@@ -57,7 +57,7 @@ class RoomInfoSheet extends GetView<TopViewController> {
                 isLeftAlign: true,
                 endPadding: 60.0.scale375(),
               ),
-              SizedBox(height: 15.0.scale375()),
+              SizedBox(height: 15.0.scale375Height()),
               InfoItemWidget(
                 prefixText: 'roomId'.roomTr,
                 infoText: controller.roomInfo.roomId,

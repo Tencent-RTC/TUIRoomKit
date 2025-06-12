@@ -69,7 +69,7 @@ class InviteSheetWidget extends StatelessWidget {
                       ),
                 isLeftAlign: true,
                 child: CopyTextButton(
-                  infoText: RoomStore.to.roomInfo.roomId,
+                  infoText: roomId ?? RoomStore.to.roomInfo.roomId,
                   successToast: 'copyRoomIdSuccess'.roomTr,
                   backgroundColor: copyButtonColor,
                   textColor: copyButtonTextColor,

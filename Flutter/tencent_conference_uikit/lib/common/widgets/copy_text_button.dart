@@ -21,10 +21,10 @@ class CopyTextButton extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: backgroundColor ?? RoomColors.btnGrey,
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(5.0.scale375()),
       ),
       alignment: Alignment.center,
-      width: 60.0.scale375(),
+      width: 62.0.scale375(),
       height: 25.0.scale375(),
       child: GestureDetector(
         onTap: () => {copyAction(infoText, successToast)},
@@ -40,13 +40,15 @@ class CopyTextButton extends StatelessWidget {
             ),
             SizedBox(width: 1.0.scale375()),
             SizedBox(
-              width: 34.0.scale375(),
+              width: 36.0.scale375(),
               child: Text(
                 'copy'.roomTr,
                 style: textColor == null
                     ? RoomTheme.defaultTheme.textTheme.bodyMedium
                     : TextStyle(color: textColor, fontSize: 12),
                 textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ),
           ],

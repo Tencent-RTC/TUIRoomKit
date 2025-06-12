@@ -39,6 +39,7 @@ class FloatWindowWidget extends GetView<FloatWindowController> {
               child: GestureDetector(
                 onTap: () {
                   controller.onTap();
+                  Get.delete<FloatWindowController>();
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -70,9 +71,11 @@ class FloatWindowWidget extends GetView<FloatWindowController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(FloatWindowController(left, top, onFloatWindowTap),
+        permanent: true);
     return GetBuilder<FloatWindowController>(
       autoRemove: false,
-      init: FloatWindowController(left, top, onFloatWindowTap),
+      init: Get.find<FloatWindowController>(),
       builder: (_) {
         return _buildFloatWidget();
       },
