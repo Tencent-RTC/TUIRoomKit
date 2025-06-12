@@ -868,7 +868,7 @@
 					"-framework",
 					"\"tencent_trtc_cloud\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.roomFlutterExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.fx.rtmpdemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = abyWildcardDev;

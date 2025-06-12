@@ -16,7 +16,7 @@ class OtherSettingWidget extends GetView<SettingController> {
           child: Obx(
             () => SwitchWidget(
               value:
-                  controller.conferenceMainController.isFloatChatVisible.value,
+              RoomStore.to.isFloatChatVisible.value,
               onChanged: (value) {
                 controller.enableFloatingChat(value);
               },

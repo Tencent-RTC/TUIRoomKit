@@ -15,6 +15,7 @@ class RoomStore {
   TUIRoomInfo roomInfo = TUIRoomInfo(roomId: '');
   VideoModel videoSetting = VideoModel();
   AudioModel audioSetting = AudioModel();
+  final isFloatChatVisible = true.obs;
   int timeStampOnEnterRoom = 0;
   bool isEnteredRoom = false;
   final roomUserCount = 0.obs;
@@ -33,6 +34,7 @@ class RoomStore {
     roomInfo = TUIRoomInfo(roomId: '');
     videoSetting = VideoModel();
     audioSetting = AudioModel();
+    isFloatChatVisible.value = true;
     seatedUserList.clear();
     inviteSeatList.clear();
     inviteSeatMap.clear();
@@ -44,6 +46,7 @@ class RoomStore {
   }
 
   UserModel get screenShareUser => _screenShareUser;
+
   set screenShareUser(UserModel userModel) {
     _screenShareUser.userId = userModel.userId;
     _screenShareUser.userName = userModel.userName;
@@ -238,6 +241,9 @@ class RoomStore {
   }
 
   void addInviteSeatUser(UserModel userModel, TUIRequest request) {
+    if (inviteSeatMap.containsKey(request.userId)) {
+      return;
+    }
     inviteSeatList.add(userModel);
     inviteSeatMap[request.userId] = request.requestId;
   }

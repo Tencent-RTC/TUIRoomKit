@@ -47,7 +47,7 @@ class InfoItemWidget extends StatelessWidget {
                   const TextStyle(fontSize: 16, color: RoomColors.titleBlack),
             ),
           ),
-          const SizedBox(width: 20),
+          SizedBox(width: 20.0.scale375()),
           Expanded(
             flex: infoTextFlex,
             child: isTextField
@@ -75,9 +75,9 @@ class InfoItemWidget extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
           ),
-          SizedBox(width: endPadding != null ? endPadding! + 4 : 0),
+          SizedBox(width: endPadding != null ? endPadding! + 2 : 0),
           child != null
-              ? Row(children: [const SizedBox(width: 4), child!])
+              ? Row(children: [SizedBox(width: 4.0.scale375()), child!])
               : const SizedBox(),
         ],
       ),

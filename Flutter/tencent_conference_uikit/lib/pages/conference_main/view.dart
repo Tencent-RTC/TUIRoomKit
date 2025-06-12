@@ -121,7 +121,7 @@ class ConferenceMainPage extends GetView<ConferenceMainController> {
             ),
             Obx(
               () => Visibility(
-                visible: controller.isFloatChatVisible.value,
+                visible: RoomStore.to.isFloatChatVisible.value,
                 child: Positioned(
                   bottom: orientation == Orientation.portrait
                       ? 88.0.scale375()
@@ -162,7 +162,7 @@ class ConferenceMainPage extends GetView<ConferenceMainController> {
             ),
             Obx(
               () => Visibility(
-                visible: controller.isFloatChatVisible.value,
+                visible: RoomStore.to.isFloatChatVisible.value,
                 child: const InputWidget(),
               ),
             ),

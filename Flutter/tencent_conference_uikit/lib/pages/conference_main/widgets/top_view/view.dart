@@ -41,14 +41,14 @@ class TopViewWidget extends GetView<TopViewController> {
                     image: Image.asset(
                       AssetsImages.roomEarpiece,
                       package: 'tencent_conference_uikit',
-                      width: 20,
-                      height: 20,
+                      width: 20.0.scale375(),
+                      height: 20.0.scale375(),
                     ),
                     selectedImage: Image.asset(
                       AssetsImages.roomSpeakerphone,
                       package: 'tencent_conference_uikit',
-                      width: 20,
-                      height: 20,
+                      width: 20.0.scale375(),
+                      height: 20.0.scale375(),
                     ),
                     onPressed: () => {controller.switchSpeakerAction()},
                     isSelected: RoomStore.to.audioSetting.isSoundOnSpeaker),
@@ -58,8 +58,8 @@ class TopViewWidget extends GetView<TopViewController> {
                         image: Image.asset(
                           AssetsImages.roomSwitchCamera,
                           package: 'tencent_conference_uikit',
-                          width: 20,
-                          height: 20,
+                          width: 20.0.scale375(),
+                          height: 20.0.scale375(),
                         ),
                         onPressed: () => {controller.switchCameraAction()},
                         isSelected: false.obs,
@@ -73,8 +73,8 @@ class TopViewWidget extends GetView<TopViewController> {
                   image: Image.asset(
                     AssetsImages.roomExit,
                     package: 'tencent_conference_uikit',
-                    width: 20,
-                    height: 20,
+                    width: 20.0.scale375(),
+                    height: 20.0.scale375(),
                   ),
                   onPressed: () => {
                     showConferenceBottomSheet(const ExitWidget(),

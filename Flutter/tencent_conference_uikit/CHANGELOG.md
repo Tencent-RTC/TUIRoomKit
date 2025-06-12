@@ -1,5 +1,10 @@
 ## Changelog
 
+### 3.1.0(2025-06-10)
+- Fixed the issue where some UI effects on some Android phones displayed abnormally.
+- Fixed the issue that caused abnormality when repeatedly entering conference in floating window.
+- Upgraded rtc_room_engine dependencies.
+
 ### 3.0.9(2025-05-16)
 - Optimized cloud control delivery strategy, supported cloud control configuration to fetch the user list, the default is 50.
 - Adjusted the command word frequency limit for processing takeSeat application to 50 times in 5 seconds.

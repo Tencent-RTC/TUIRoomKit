@@ -13,6 +13,7 @@ class SettingController extends GetxController {
   final _resolutionName = ''.obs;
 
   String get resolutionName => _resolutionName.value;
+
   set resolutionName(String value) => _resolutionName.value = value;
 
   final conferenceMainController = Get.find<ConferenceMainController>();
@@ -52,7 +53,7 @@ class SettingController extends GetxController {
   }
 
   void enableFloatingChat(bool value) {
-    conferenceMainController.isFloatChatVisible.value = value;
+    RoomStore.to.isFloatChatVisible.value = value;
   }
 
   int getFpsDefaultIndex() {
