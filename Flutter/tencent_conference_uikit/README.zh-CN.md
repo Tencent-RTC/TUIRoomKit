@@ -141,7 +141,7 @@ _简体中文 | [English](README.md)_
   >   - `SDKAppID`设置错误，国内站的`SDKAppID`一般是以140开头的10位整数。
   >   - `UserSig`被错配成了加密密钥（`SDKSecretKey`），`UserSig`是用`SDKSecretKey`把`SDKAppID`、`UserID`以及过期时间等信息加密得来的，而不是直接把`SDKSecretKey`配置成`UserSig`。
   >   - `UserID`被设置成“1”、“123”、“111”等简单字符串，由于 **TUIRoomEngine不支持同一个 UserID 多端登录**，所以在多人协作开发时，形如 “1”、“123”、“111” 这样的`UserID`很容易被您的同事占用，导致登录失败，因此我们建议您在调试的时候设置一些辨识度高的`UserID`。
-  >   - `Github`中的[示例代码](https://github.com/tencentyun/TUIRoomKit/blob/main/Flutter/room_flutter_example/lib/debug/generate_test_user_sig.dart)使用了`genTestUserSig`函数在本地计算 UserSig 是为了更快地让您跑通当前的接入流程，但该方案会将您的 `SDKSecretKey`暴露在 App 的代码当中，这并不利于您后续升级和保护您的 SDKSecretKey，所以我们强烈建议您将`UserSig`的计算逻辑放在服务端进行，并由 App 在每次使用`TUIRoomKit`组件时向您的服务器请求实时计算出的 UserSig。
+  >   - `Github`中的[示例代码](https://github.com/Tencent-RTC/TUIRoomKit/blob/main/Flutter/tencent_conference_uikit/example/lib/debug/generate_test_user_sig.dart)使用了`genTestUserSig`函数在本地计算 UserSig 是为了更快地让您跑通当前的接入流程，但该方案会将您的 `SDKSecretKey`暴露在 App 的代码当中，这并不利于您后续升级和保护您的 SDKSecretKey，所以我们强烈建议您将`UserSig`的计算逻辑放在服务端进行，并由 App 在每次使用`TUIRoomKit`组件时向您的服务器请求实时计算出的 UserSig。
 
 
   **登录弹幕聊天（可选）**
@@ -236,7 +236,7 @@ _简体中文 | [English](README.md)_
 ## 快速访问
 
 - 如果你遇到了困难，可以先参阅 [常见问题](https://cloud.tencent.com/document/product/1690/90103)，这里整理开发者最常出现的问题，覆盖各个平台，希望可以帮助您快速解决问题
-- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](../../Web/)、[Android](../../Android/)、[iOS](../../iOS/)、[Electron](../../Electron/)、[Qt](../../Qt/)
+- 如果你想了解更多官方示例，可以参考各平台的示例 Demo：[Web](../../Web/)、[Android](../../Android/)、[iOS](../../iOS/)、[Electron](../../Electron/)、[MiniProgram](../../MiniProgram/)、[uni-app](../../uni-app/)。
 - 如果您想了解我们最新的一些产品特性，可以查看 [更新日志](https://cloud.tencent.com/document/product/1690/89361)，这里有 TUIRoomKit 最新的功能特性，以及历史版本功能迭代
 - 完整的 API 文档见 [多人音视频 SDK API 示例](https://cloud.tencent.com/document/product/1690/94557)：包含TUIRoomKit（含 UI）、TUIRoomEngine（无 UI）、以及事件回调等介绍。
 - 如果你想了解更多腾讯云音视频团队维护的项目，可以查看我们的 [产品官网](https://cloud.tencent.com/product/rtcube)、[Github Organizations](https://github.com/Tencent-RTC) 等
