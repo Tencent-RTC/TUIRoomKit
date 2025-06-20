@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@tencentcloud/roomkit-web-vue2.7": "~3.1.0",
-    "@tencentcloud/tuiroom-engine-js": "~3.1.1",
+    "@tencentcloud/tuiroom-engine-js": "~3.1.0",
     "@tencentcloud/uikit-base-component-vue2": "0.3.3",
     "core-js": "^3.8.3",
     "mitt": "^3.0.0",

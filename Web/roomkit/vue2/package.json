@@ -40,7 +40,7 @@
     "@tencentcloud/chat-uikit-engine": "~2.3.3",
     "@tencentcloud/chat-uikit-vue": "~2.3.3",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-js": "~3.1.1",
+    "@tencentcloud/tuiroom-engine-js": "~3.1.0",
     "@tencentcloud/uikit-base-component-vue2": "0.3.3",
     "@tencentcloud/universal-api": "^2.0.9",
     "@tiptap/core": "^2.6.6",
