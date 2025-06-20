@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
+    "dev:deep": "vue-cli-service serve",
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service serve",
+    "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "@tencentcloud/roomkit-web-vue2.7": "~3.1.0",
-    "@tencentcloud/tuiroom-engine-js": "~3.1.0",
+    "@tencentcloud/tuiroom-engine-js": "~3.1.1",
     "@tencentcloud/uikit-base-component-vue2": "0.3.3",
     "core-js": "^3.8.3",
     "mitt": "^3.0.0",
