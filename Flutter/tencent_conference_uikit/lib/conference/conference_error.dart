@@ -34,8 +34,8 @@ extension ConferenceErrorExt on ConferenceError {
 const _conferenceErrorEnumMap = {
   ConferenceError.success: 0,
   ConferenceError.errFailed: -1,
-  ConferenceError.errConferenceIdNotExist: -2100,
+  ConferenceError.errConferenceIdNotExist: 100004,
   ConferenceError.errConferenceIdInvalid: -2105,
-  ConferenceError.errConferenceIdOccupied: -2106,
+  ConferenceError.errConferenceIdOccupied: 100003,
   ConferenceError.errConferenceNameInvalid: -2107,
 };

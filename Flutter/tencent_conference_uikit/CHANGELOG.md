@@ -1,5 +1,10 @@
 ## Changelog
 
+### 3.1.1(2025-06-26)
+- Fixed the issue that errConferenceIdNotExist and errConferenceIdOccupied were not thrown normally in ConferenceError.
+- Fixed the issue of abnormal data reporting.
+- Upgraded rtc_room_engine dependencies.
+
 ### 3.1.0(2025-06-10)
 - Fixed the issue where some UI effects on some Android phones displayed abnormally.
 - Fixed the issue that caused abnormality when repeatedly entering conference in floating window.
