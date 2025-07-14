@@ -524,7 +524,11 @@ export default {
   'Custom Themes': '自定义主题',
   'Kicked out of the room on other devices': '在其它设备进入房间被踢出',
   'Network disconnection timeout, exiting room': '网络中断超时退房',
-  'You have been kicked out of a room or the room has been disbanded while you were offline': '您在离线期间被踢出房间或房间已被解散',
+  'You have been kicked out of a room or the room has been disbanded while you were offline':
+    '您在离线期间被踢出房间或房间已被解散',
   'The number of joined rooms has exceeded the limit':
     '超过单设备最大可同时加入的房间个数',
+  'userSig has expired': 'userSig 已过期',
+  'The system has detected that your account has been kicked offline':
+    '系统检测到您的帐户已被踢下线',
 };
