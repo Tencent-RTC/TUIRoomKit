@@ -28,12 +28,12 @@
         <IconCameraOff size="24" v-else />
       </template>
     </icon-button>
-    <video-setting-tab v-show="showVideoSettingTab" class="video-tab" />
+    <video-setting-tab v-if="showVideoSettingTab" class="video-tab" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, Ref, defineEmits, inject } from 'vue';
+import { ref, Ref, defineEmits, inject } from 'vue';
 import {
   IconCameraOn,
   IconCameraOff,
@@ -95,7 +95,7 @@ function handleHideVideoSettingTab() {
 </script>
 
 <style lang="scss" scoped>
-$videoTabWidth: 305px;
+$video-tab-width: 305px;
 
 .video-control-container {
   position: relative;
@@ -105,24 +105,24 @@ $videoTabWidth: 305px;
     position: absolute;
     bottom: calc(100% + 12px);
     left: -5px;
-    width: $videoTabWidth;
+    width: $video-tab-width;
     padding: 20px 20px 24px;
+    background-color: var(--bg-color-dialog);
+    border-radius: 8px;
     box-shadow:
       0 2px 4px -3px var(--uikit-color-black-8),
       0 6px 10px 1px var(--uikit-color-black-8),
       0 3px 14px 2px var(--uikit-color-black-8);
-    border-radius: 8px;
-    background-color: var(--bg-color-dialog);
 
     &::before {
       position: absolute;
       bottom: -10px;
       left: 30px;
       content: '';
+      border-top: 5px solid var(--bg-color-dialog);
       border-right: 5px solid transparent;
       border-bottom: 5px solid transparent;
       border-left: 5px solid transparent;
-      border-top: 5px solid var(--bg-color-dialog);
     }
   }
 }

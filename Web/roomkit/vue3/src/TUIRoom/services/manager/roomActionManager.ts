@@ -195,11 +195,17 @@ export class RoomActionManager {
       await this.getInvitationList(roomId);
       if (roomInfo.isSeatEnabled) {
         await this.getSeatList();
-        this.service.roomStore.isMaster &&
-          (await this.service.roomEngine.instance?.takeSeat({
+        if (this.service.roomStore.isMaster) {
+          await this.service.roomEngine.instance?.takeSeat({
             seatIndex: -1,
             timeout: 0,
-          }));
+          });
+          // fix: Fix the issue where onSeatListChanged was not updated timely after takeSeat success
+          this.service.roomStore.updateUserInfo({
+            userId: this.service.basicStore.userId,
+            onSeat: true,
+          });
+        }
       }
       this.setRoomParams(roomParam);
     } catch (error) {
@@ -247,7 +253,7 @@ export class RoomActionManager {
       }
     }
 
-    // 是否可以自动打开摄像头
+    // Whether camera can be opened automatically
     const isCanOpenCamera =
       isMaster || (!isCameraDisableForAllUser && isFreeSpeakMode);
     if (isCanOpenCamera && isOpenCamera) {

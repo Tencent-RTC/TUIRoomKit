@@ -1,17 +1,18 @@
 {
   "name": "@tencentcloud/room-uikit-vue",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "scripts": {
     "dev": "vite --force",
+    "dev:inner": "VITE_RUNTIME_SCENE=inner npm run dev",
     "dev:deep": "vite --force",
     "build": "vue-tsc --noEmit --skipLibCheck && vite build",
     "preview": "vite preview",
     "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "@tencentcloud/roomkit-web-vue3": "~3.1.0",
-    "@tencentcloud/tuiroom-engine-js": "~3.1.0",
-    "@tencentcloud/uikit-base-component-vue3": "0.3.3",
+    "@tencentcloud/roomkit-web-vue3": "~3.2.0",
+    "@tencentcloud/tuiroom-engine-js": "~3.2.0",
+    "@tencentcloud/uikit-base-component-vue3": "0.3.4",
     "@tencentcloud/uikit-base-widget-vue3": "0.0.1",
     "axios": "^0.27.2",
     "js-cookie": "^3.0.1",
