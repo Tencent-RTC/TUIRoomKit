@@ -388,6 +388,7 @@ export class ChatExtension {
       this.message = message;
       this.messagePayload = this.parseMessageData(message);
       await this.sendMessage(message);
+      await new Promise(resolve => setTimeout(resolve, 300));
       await this.modifyMessage(message.ID, {
         messageId: message.ID,
         roomState: RoomState.CREATED,
@@ -491,7 +492,7 @@ export class ChatExtension {
   }
   private async sendMessage(message: Message) {
     const { chat } = this.chatContext;
-    return chat.sendMessage(message);
+    return await chat.sendMessage(message);
   }
   private updateMessageList(message: Message) {
     TUICore.callService({

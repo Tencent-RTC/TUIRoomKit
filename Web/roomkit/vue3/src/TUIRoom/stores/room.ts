@@ -116,9 +116,9 @@ interface RoomState {
   roomName: string;
   isOnStateTabActive: boolean;
   isLocalUserSharing: boolean;
-  isWhiteboardVisiable: boolean;
+  isWhiteboardVisible: boolean;
   isSharingScreen: boolean;
-  isAnnotationVisiable: boolean;
+  isAnnotationVisible: boolean;
 }
 
 export const useRoomStore = defineStore('room', {
@@ -142,9 +142,9 @@ export const useRoomStore = defineStore('room', {
     roomName: '',
     isOnStateTabActive: true,
     isLocalUserSharing: false,
-    isWhiteboardVisiable: false,
+    isWhiteboardVisible: false,
     isSharingScreen: false,
-    isAnnotationVisiable: false,
+    isAnnotationVisible: false,
   }),
   getters: {
     localUser(state: RoomState): UserInfo {
@@ -562,9 +562,9 @@ export const useRoomStore = defineStore('room', {
       this.password = '';
       this.roomName = '';
       this.isLocalUserSharing = false;
-      this.isWhiteboardVisiable = false;
+      this.isWhiteboardVisible = false;
       this.isSharingScreen = false;
-      this.isAnnotationVisiable = false;
+      this.isAnnotationVisible = false;
     },
   },
 });

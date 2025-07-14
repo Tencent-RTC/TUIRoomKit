@@ -528,4 +528,7 @@ export default {
     '您在离线期间被踢出房间或房间已被解散',
   'The number of joined rooms has exceeded the limit':
     '超过单设备最大可同时加入的房间个数',
+  'userSig has expired': 'userSig 已过期',
+  'The system has detected that your account has been kicked offline':
+    '系统检测到您的帐户已被踢下线',
 };

@@ -28,6 +28,7 @@ const {
   isCameraTesting,
   isCameraTestLoading,
   localVideoQuality,
+  isLocalMirror,
 } = useVideoDeviceManagerState();
 
 class Camera {
@@ -62,13 +63,16 @@ class Camera {
   }
   public async switchMirror(options: { mirror: boolean }) {
     const trtcCloud = roomEngine.instance?.getTRTCCloud();
-    trtcCloud?.setLocalRenderParams({
+    await trtcCloud?.setLocalRenderParams({
       mirrorType: options.mirror
         ? TRTCVideoMirrorType.TRTCVideoMirrorType_Enable
         : TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
       rotation: TRTCVideoRotation.TRTCVideoRotation0,
       fillMode: TRTCVideoFillMode.TRTCVideoFillMode_Fill,
     });
+    if (isLocalMirror.value !== options.mirror) {
+      isLocalMirror.value = options.mirror;
+    }
   }
   public async updateVideoQuality(options: { quality: TUIVideoQuality }) {
     await roomEngine.instance?.updateVideoQuality(options);

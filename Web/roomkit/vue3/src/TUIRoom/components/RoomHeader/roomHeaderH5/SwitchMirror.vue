@@ -12,8 +12,8 @@ import vTap from '../../../directives/vTap';
 import { useVideoDeviceState } from '../../../core';
 const { isLocalMirror, camera } = useVideoDeviceState();
 
-function toggleMirrorStatus() {
-  camera.switchMirror({ mirror: !isLocalMirror });
+async function toggleMirrorStatus() {
+  await camera.switchMirror({ mirror: !isLocalMirror.value });
 }
 </script>
 <style lang="scss" scoped>

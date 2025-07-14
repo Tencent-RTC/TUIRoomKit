@@ -8,7 +8,6 @@
     >
       <span class="label"> {{ selectedLabel || props.value }}</span>
       <IconArrowStrokeSelectDown size="12" />
-      size=12
     </div>
 
     <ActionSheep :visible="drawerShow" @input="drawerShow = $event">
