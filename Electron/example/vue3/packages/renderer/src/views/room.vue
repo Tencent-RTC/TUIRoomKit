@@ -10,6 +10,9 @@ import {
   RoomEvent,
   LanguageOption,
   ThemeOption,
+  useAdvancedBeautyState,
+  AdvancedBeautyLicenseInfo,
+  AdvancedBeautyPanelLevel,
 } from '@tencentcloud/roomkit-electron-vue3';
 import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import router from '@/router';
@@ -28,6 +31,20 @@ conference.setLanguage(getLanguage() as LanguageOption);
 const roomId = String(route.query.roomId);
 let isMaster = false;
 let isExpectedJump = false;
+
+process.env.PUBLIC_PATH = `${process.cwd()}/packages/renderer/public/`;
+
+const { setAdvancedBeautyLicenseInfo, setVirtualBackgroundImages } =
+  useAdvancedBeautyState();
+
+const licenseInfo: AdvancedBeautyLicenseInfo = {
+  panelLevel: AdvancedBeautyPanelLevel.A1_00,
+  licenseUrl: '',
+  licenseKey: '',
+};
+
+setAdvancedBeautyLicenseInfo(licenseInfo);
+setVirtualBackgroundImages([]);
 
 if (!roomId) {
   router.push({ path: 'home' });

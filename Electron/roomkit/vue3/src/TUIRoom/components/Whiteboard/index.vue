@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="canvas-wrap" ref="canvasWrapRef">
-      <div class="tool-box-out" v-show="isControllerVisiable">
+      <div class="tool-box-out" v-show="isControllerVisible">
         <ToolBox
           @updateSetting="updateSetting"
           :step="step"
@@ -41,7 +41,7 @@ let historyManager: HistoryManager;
 
 provide('canvas', canvas);
 
-const isControllerVisiable = computed(
+const isControllerVisible = computed(
   () => !isAnnotationWin.value || isAnnotationStarted.value
 );
 

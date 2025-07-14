@@ -16,6 +16,14 @@
         from: "node_modules/trtc-electron-sdk/build/mac-framework/${arch}/",
         to: "./Frameworks",
       },
+      {
+        from: "node_modules/@tencentcloud/roomkit-electron-vue3/node_modules/trtc-electron-plugin-xmagic/plugin/XMagic/mac",
+        to: "./Resources/app/plugin/XMagic/mac/",
+      },
+      {
+        from: "node_modules/@tencentcloud/roomkit-electron-vue3/images",
+        to: "./Resources/plugin/XMagic/images/",
+      },
     ],
     target: ["dmg"],
   },
@@ -27,6 +35,24 @@
       },
     ],
     artifactName: "${productName}_${version}.${ext}",
+    extraFiles:[
+      {
+        from: "node_modules/@tencentcloud/roomkit-electron-vue3/node_modules/trtc-electron-plugin-xmagic/plugin/XMagic/win/x64/platforms/",
+        to: "./platforms",
+      },
+      {
+        from: "node_modules/@tencentcloud/roomkit-electron-vue3/node_modules/trtc-electron-plugin-xmagic/plugin/XMagic/win/x64",
+        to: "./resources/app/plugin/XMagic/win/x64/",
+      },
+      {
+        from: "node_modules/@tencentcloud/roomkit-electron-vue3/node_modules/trtc-electron-plugin-xmagic/plugin/XMagic/win/res",
+        to: "./resources/app/plugin/XMagic/win/res/",
+      },
+      {
+        from: "node_modules/@tencentcloud/roomkit-electron-vue3/images",
+        to: "./resources/plugin/XMagic/images/",
+      },
+    ],
   },
   nsis: {
     oneClick: false,

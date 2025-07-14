@@ -29,4 +29,7 @@ export default defineConfig({
       ],
     },
   },
-})
+  resolve: {
+    dedupe: ['vue'],
+  },
+});

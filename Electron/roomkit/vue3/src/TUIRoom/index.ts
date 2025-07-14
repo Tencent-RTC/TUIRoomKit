@@ -14,6 +14,7 @@ import { roomService } from './services';
 export * from './components/common/base/index';
 export * from './services/manager/scheduleConferenceManager';
 export * from './services/manager/configManager';
+export * from './core';
 export { createComparator, combineComparators } from './utils/utils';
 
 export {

@@ -12,6 +12,7 @@ export default defineConfig({
   root: __dirname,
   base: './',
   resolve: {
+    dedupe: ['vue'],
     alias: {
       '@': path.resolve(__dirname, 'src'),
       pinia: path.resolve(__dirname, '../../node_modules/pinia'),

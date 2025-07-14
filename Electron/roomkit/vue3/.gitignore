@@ -12,6 +12,7 @@ dist
 dist-ssr
 lib
 es
+images
 *.local
 
 # Editor directories and files

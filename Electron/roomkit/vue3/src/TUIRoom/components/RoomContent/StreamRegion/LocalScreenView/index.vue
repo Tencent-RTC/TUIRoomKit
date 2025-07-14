@@ -76,10 +76,10 @@ const roomStore = useRoomStore();
 const { t } = useI18n();
 const showStopShareRegion = ref(false);
 
-const { isAnnotationVisiable, isSharingScreen } = storeToRefs(roomStore);
+const { isAnnotationVisible, isSharingScreen } = storeToRefs(roomStore);
 
 const annotationSwitchLabel = computed(() => {
-  return isAnnotationVisiable.value
+  return isAnnotationVisible.value
     ? t('End annotating')
     : t('Start annotating');
 });
@@ -90,7 +90,7 @@ interface Props {
 defineProps<Props>();
 
 onMounted(() => {
-  isAnnotationVisiable.value = false;
+  isAnnotationVisible.value = false;
 });
 
 function openStopConfirmDialog() {
@@ -103,19 +103,19 @@ function stopScreenSharing() {
 }
 
 function toggleAnnotationWindow() {
-  if (isAnnotationVisiable.value) {
+  if (isAnnotationVisible.value) {
     ipcRenderer?.send('annotation:stop-annotating');
-    isAnnotationVisiable.value = false;
+    isAnnotationVisible.value = false;
     roomService.dataReportManager.reportCount(MetricsKey.stopAnnotating);
   } else {
     ipcRenderer?.send('annotation:start-annotating');
-    isAnnotationVisiable.value = true;
+    isAnnotationVisible.value = true;
     roomService.dataReportManager.reportCount(MetricsKey.startAnnotating);
   }
 }
 
 ipcRenderer?.on('annotation:stop-from-annotation-window', () => {
-  isAnnotationVisiable.value = false;
+  isAnnotationVisible.value = false;
   roomService.dataReportManager.reportCount(MetricsKey.stopAnnotating);
 });
 </script>

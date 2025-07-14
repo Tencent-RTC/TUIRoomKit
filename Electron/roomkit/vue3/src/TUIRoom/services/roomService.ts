@@ -281,11 +281,24 @@ export class RoomService implements IRoomService {
           notice = t('kicked out of the room by the host');
           break;
         case TUIKickedOutOfRoomReason.kKickedByLoggedOnOtherDevice:
-          notice = t('kicked out of the room');
+          notice = t('Kicked out of the room on other devices');
           break;
         case TUIKickedOutOfRoomReason.kKickedByServer:
           notice = t('kicked out of the room by serve');
           break;
+        case TUIKickedOutOfRoomReason.kNetworkDisconnected:
+          notice = t('Network disconnection timeout, exiting room');
+          break;
+        case TUIKickedOutOfRoomReason.kJoinRoomStatusInvalidDuringOffline:
+          notice = t(
+            'You have been kicked out of a room or the room has been disbanded while you were offline'
+          );
+          break;
+        case TUIKickedOutOfRoomReason.kCountOfJoinedRoomsExceedLimit:
+          notice = t('The number of joined rooms has exceeded the limit');
+          break;
+        default:
+          notice = t('kicked out of the room');
       }
       this.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
         title: t('Note'),

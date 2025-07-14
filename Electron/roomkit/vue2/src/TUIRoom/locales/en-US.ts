@@ -544,4 +544,15 @@ export default {
     'All beauty parameters will revert to default after reset',
   'Theme Colours': 'Theme Colours',
   'Custom Themes': 'Custom Themes',
+  'Kicked out of the room on other devices':
+    'Kicked out of the room on other devices',
+  'Network disconnection timeout, exiting room':
+    'Network disconnection timeout, exiting room',
+  'You have been kicked out of a room or the room has been disbanded while you were offline':
+    'You have been kicked out of a room or the room has been disbanded while you were offline',
+  'The number of joined rooms has exceeded the limit':
+    'The number of joined rooms has exceeded the limit',
+  'userSig has expired': 'userSig has expired',
+  'The system has detected that your account has been kicked offline':
+    'The system has detected that your account has been kicked offline',
 };

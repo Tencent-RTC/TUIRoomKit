@@ -170,6 +170,7 @@ async function toggleScreenShare() {
 
   if (!(window as any).isHasScreen && process.platform === 'darwin') {
     showPermissionVisible.value = true;
+    return;
   }
   if (!isSharing.value && !selectDialogVisible.value) {
     const screenCaptureList: any =

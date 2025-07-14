@@ -1,0 +1,27 @@
+{
+  "displayName":"虚拟背景",
+  "displayNameEn":"Virtual background",
+  "propertyList":[
+      {
+          "displayName":"无",
+          "displayNameEn":"None",
+          "effectName": "naught",
+          "icon":"beauty/none.png",
+          "resourcePath":"LightCore.bundle/template.json"
+      },
+      {
+          "displayName":"背景模糊-弱",
+          "displayNameEn":"Blur(weak)",
+          "effectName": "video_segmentation_blur",
+          "icon":"motions_icon/video_segmentation_blur_45.png",
+          "resourcePath":"segmentMotionRes.bundle/video_segmentation_blur/template.json"
+      },
+      {
+          "displayName":"背景模糊-强",
+          "displayNameEn":"Blur(strong)",
+          "effectName": "video_segmentation_blur_75",
+          "icon":"motions_icon/video_segmentation_blur_75.png",
+          "resourcePath":"segmentMotionRes.bundle/video_segmentation_blur_75/template.json"
+      }
+  ]
+}

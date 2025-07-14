@@ -62,6 +62,7 @@
       />
       <virtual-background class="center-container-item" />
       <basic-beauty v-if="!isElectron" class="center-container-item" />
+      <AdvancedBeauty class="center-container-item" />
     </div>
     <div class="right-container">
       <end-control />
@@ -90,6 +91,8 @@ import bus from '../../../hooks/useMitt';
 
 import useRoomFooter from './useRoomFooterHooks';
 import { isElectron } from '../../../utils/environment';
+import { AdvancedBeauty } from '../../../core';
+
 const { roomStore, isMaster, isAdmin, isAudience } = useRoomFooter();
 function handleControlClick(name: string) {
   bus.emit('experience-communication', name);

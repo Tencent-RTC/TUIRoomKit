@@ -38,28 +38,28 @@
               'color-block theme',
               { active: currentCustomTheme === 'theme' },
             ]"
-            @click="toggleCustomTheme('theme')"
+            @click="toggleCustomTheme('#1c66e5')"
           ></div>
           <div
             :class="[
               'color-block green',
               { active: currentCustomTheme === 'green' },
             ]"
-            @click="toggleCustomTheme('green')"
+            @click="toggleCustomTheme('#0abf77')"
           ></div>
           <div
             :class="[
               'color-block red',
               { active: currentCustomTheme === 'red' },
             ]"
-            @click="toggleCustomTheme('red')"
+            @click="toggleCustomTheme('#e54545')"
           ></div>
           <div
             :class="[
               'color-block orange',
               { active: currentCustomTheme === 'orange' },
             ]"
-            @click="toggleCustomTheme('orange')"
+            @click="toggleCustomTheme('#ff7200')"
           ></div>
         </div>
       </div>

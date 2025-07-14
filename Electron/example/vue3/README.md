@@ -68,7 +68,7 @@ This document mainly introduces how to quickly run through the TUIRoomKit Electr
    ```bash
    cd TUIRoomKit/Electron/vue3
    
-   npm install --legacy-peer-deps
+   npm install
    ```
 
     > **Note**
