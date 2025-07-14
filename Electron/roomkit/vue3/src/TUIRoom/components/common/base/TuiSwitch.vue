@@ -47,6 +47,7 @@ function toggleSwitch() {
 }
 
 .switch-container-active {
+  background-color: var(--switch-color-off);
   .switch-core {
     transform: translateX(0);
   }

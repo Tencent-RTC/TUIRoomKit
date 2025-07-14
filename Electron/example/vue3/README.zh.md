@@ -74,7 +74,7 @@
    ```bash
    cd TUIRoomKit/Electron/vue3
    
-   npm install --legacy-peer-deps
+   npm install
    ```
 
     > **注意**

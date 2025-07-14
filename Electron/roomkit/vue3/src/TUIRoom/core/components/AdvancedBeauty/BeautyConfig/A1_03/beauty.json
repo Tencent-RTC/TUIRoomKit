@@ -1,0 +1,233 @@
+{
+  "white":[
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png"
+    },
+    {
+      "displayName": "靓白",
+      "displayNameEn": "Bright White",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha0",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "自然",
+      "displayNameEn": "Natural",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "粉白",
+      "displayNameEn": "Pinkish White",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha2",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "冷白",
+      "displayNameEn": "Cool White",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha3",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "smooth":[
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png"
+    },
+    {
+      "displayName": "磨皮",
+      "displayNameEn": "Smoothskin",
+      "icon": "beauty/beauty_smooth.png",
+      "effectName": "smooth.smooth",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "rosy":[
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png"
+    },
+    {
+      "displayName": "红润",
+      "displayNameEn": "Rosyskin",
+      "icon": "beauty/beauty_ruddy.png",
+      "effectName": "smooth.rosy",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "face": [
+    {
+      "displayName": "自然",
+      "displayNameEn": "Natural",
+      "icon": "beauty/beauty_thin_face1.png",
+      "effectName": "basicV7.natureFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "女神",
+      "displayNameEn": "Woman",
+      "icon": "beauty/beauty_thin_face2.png",
+      "effectName": "basicV7.godnessFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "英俊",
+      "displayNameEn": "Man",
+      "icon": "beauty/beauty_thin_face3.png",
+      "effectName": "basicV7.maleGodFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "窄脸",
+      "displayNameEn": "Facewidth",
+      "icon": "beauty/beauty_narrow_face.png",
+      "effectName": "basicV7.thinFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "下巴",
+      "displayNameEn": "Chin",
+      "icon": "beauty/beauty_chin.png",
+      "effectName": "basicV7.chin",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "额头",
+      "displayNameEn": "Forehead",
+      "icon": "beauty/beauty_forehead.png",
+      "effectName": "basicV7.forehead",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "脸型",
+      "displayNameEn": "Faceshape",
+      "icon": "beauty/beauty_basic_face.png",
+      "effectName": "liquefaction.basic3",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "eye": [
+    {
+      "displayName": "大眼",
+      "displayNameEn": "Bigeyes",
+      "icon": "beauty/beauty_enlarge_eye.png",
+      "effectName": "basicV7.enlargeEye",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "imageQuality": [
+    {
+      "displayName": "对比度",
+      "displayNameEn": "Contrast",
+      "icon": "beauty/beauty_image_contrast.png",
+      "effectName": "beauty.imageContrastAlpha",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "饱和度",
+      "displayNameEn": "Saturation",
+      "icon": "beauty/beauty_image_saturation.png",
+      "effectName": "smooth.saturation",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "清晰度",
+      "displayNameEn": "Sharpness",
+      "icon": "beauty/beauty_image_sharpen.png",
+      "effectName": "beauty.lutClearAlpha",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "锐化",
+      "displayNameEn": "Sharpen",
+      "icon": "beauty/beauty_sharpen.png",
+      "effectName": "smooth.sharpen",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "亮度",
+      "displayNameEn": "Brightness",
+      "icon": "beauty/beauty_image_brightness.png",
+      "effectName": "beauty.imageBrightness",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "弱光降噪",
+      "displayNameEn": "Denoise",
+      "icon": "beauty/beauty_denoise.png",
+      "effectName": "postEffect.denoise",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "色温",
+      "displayNameEn": "Warmth",
+      "icon": "beauty/beauty_image_warmth.png",
+      "effectName": "beauty.imageWarmth",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "色调",
+      "displayNameEn": "Tint",
+      "icon": "beauty/beauty_image_tint.png",
+      "effectName": "beauty.imageTint",
+      "minValue": -100,
+      "maxValue": 100
+    }
+  ],
+  "nose": [
+    {
+      "displayName": "瘦鼻",
+      "displayNameEn": "Nosesize",
+      "icon": "beauty/beauty_thin_nose.png",
+      "effectName": "basicV7.thinNose",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "鼻子位置",
+      "displayNameEn": "Noseposition",
+      "icon": "beauty/beauty_nose_position.png",
+      "effectName": "basicV7.noseHeight",
+      "minValue": -100,
+      "maxValue": 100
+    }
+  ],
+  "mouse": [
+    {
+      "displayName": "嘴型",
+      "displayNameEn": "Lipshape",
+      "icon": "beauty/beauty_mouth_size.png",
+      "effectName": "basicV7.mouthSize",
+      "minValue": -100,
+      "maxValue": 100
+    }
+  ]
+}

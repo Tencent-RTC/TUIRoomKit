@@ -1,0 +1,1162 @@
+{
+  "white":[
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png"
+    },
+    {
+      "displayName": "靓白",
+      "displayNameEn": "Bright White",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha0",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "自然",
+      "displayNameEn": "Natural",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "粉白",
+      "displayNameEn": "Pinkish White",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha2",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "冷白",
+      "displayNameEn": "Cool White",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha3",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "smooth":[
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png"
+    },
+    {
+      "displayName": "磨皮",
+      "displayNameEn": "Smoothskin",
+      "icon": "beauty/beauty_smooth.png",
+      "effectName": "smooth.smooth",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "rosy":[
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png"
+    },
+    {
+      "displayName": "红润",
+      "displayNameEn": "Rosyskin",
+      "icon": "beauty/beauty_ruddy.png",
+      "effectName": "smooth.rosy",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "face": [
+    {
+      "displayName": "窄脸",
+      "displayNameEn": "Facewidth",
+      "icon": "beauty/beauty_narrow_face.png",
+      "effectName": "basicV7.thinFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "自然",
+      "displayNameEn": "Natural",
+      "icon": "beauty/beauty_thin_face1.png",
+      "effectName": "basicV7.natureFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "女神",
+      "displayNameEn": "Woman",
+      "icon": "beauty/beauty_thin_face2.png",
+      "effectName": "basicV7.godnessFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "英俊",
+      "displayNameEn": "Man",
+      "icon": "beauty/beauty_thin_face3.png",
+      "effectName": "basicV7.maleGodFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "V脸",
+      "displayNameEn": "Vshape",
+      "icon": "beauty/beauty_v_face.png",
+      "effectName": "basicV7.vFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "收下颌",
+      "displayNameEn": "Slimjaw",
+      "icon": "beauty/beauty_face_jaw.png",
+      "effectName": "basicV7.faceJaw",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "短脸",
+      "displayNameEn": "Facelength",
+      "icon": "beauty/beauty_short_face.png",
+      "effectName": "basicV7.shortFace",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "脸型",
+      "displayNameEn": "Faceshape",
+      "icon": "beauty/beauty_basic_face.png",
+      "effectName": "liquefaction.basic3",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "下巴",
+      "displayNameEn": "Chin",
+      "icon": "beauty/beauty_chin.png",
+      "effectName": "basicV7.chin",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "额头",
+      "displayNameEn": "Forehead",
+      "icon": "beauty/beauty_forehead.png",
+      "effectName": "basicV7.forehead",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "祛皱",
+      "displayNameEn": "Wrinkles",
+      "icon": "beauty/beauty_remove_pounch.png",
+      "effectName": "beauty.removeWrinkle",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "祛法令纹",
+      "displayNameEn": "Smilelines",
+      "icon": "beauty/beauty_wrinkle_smooth.png",
+      "effectName": "beauty.removeLawLine",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "瘦颧骨",
+      "displayNameEn": "Cheekbones",
+      "icon": "beauty/beauty_thin_cheek.png",
+      "effectName": "basicV7.cheekboneThin",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "eye": [
+    {
+      "displayName": "大眼",
+      "displayNameEn": "Bigeyes",
+      "icon": "beauty/beauty_enlarge_eye.png",
+      "effectName": "basicV7.enlargeEye",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "亮眼",
+      "displayNameEn": "Brighteyes",
+      "icon": "beauty/beauty_eye_lighten.png",
+      "effectName": "beauty.eyeLighten",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "外眼角",
+      "displayNameEn": "EyeOutCorner",
+      "icon": "beauty/beauty_eye_angle.png",
+      "effectName": "basicV7.eyeOutCorner",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "眼距",
+      "displayNameEn": "Eyedistance",
+      "icon": "beauty/beauty_eye_distance.png",
+      "effectName": "basicV7.eyeDistance",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "眼角",
+      "displayNameEn": "Eyecorners",
+      "icon": "beauty/beauty_eye_angle.png",
+      "effectName": "basicV7.eyeAngle",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "眼宽",
+      "displayNameEn": "Eyewidth",
+      "icon": "beauty/beauty_eye_width.png",
+      "effectName": "basicV7.eyeWidth",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "眼高",
+      "displayNameEn": "Eyeheight",
+      "icon": "beauty/beauty_eye_height.png",
+      "effectName": "basicV7.eyeHeight",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "祛眼袋",
+      "displayNameEn": "Eyebags",
+      "icon": "beauty/beauty_remove_eye_pouch.png",
+      "effectName": "beauty.removeEyeBags",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "eyebrow": [
+    {
+      "displayName": "眉毛角度",
+      "displayNameEn": "Eyebrowangle",
+      "icon": "beauty/beauty_eyebrow_angle.png",
+      "effectName": "basicV7.eyebrowAngle",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "眉毛距离",
+      "displayNameEn": "Eyebrowdistance",
+      "icon": "beauty/beauty_eyebrow_distance.png",
+      "effectName": "basicV7.eyebrowDistance",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "眉毛高度",
+      "displayNameEn": "Eyebrowheight",
+      "icon": "beauty/beauty_eyebrow_position.png",
+      "effectName": "basicV7.eyebrowHeight",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "眉毛长度",
+      "displayNameEn": "Eyebrowlength",
+      "icon": "beauty/beauty_eyebrow_length.png",
+      "effectName": "basicV7.eyebrowLength",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "眉毛粗细",
+      "displayNameEn": "Eyebrowthickness",
+      "icon": "beauty/beauty_eyebrow_thickness.png",
+      "effectName": "basicV7.eyebrowThickness",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "眉峰",
+      "displayNameEn": "Eyebrowridge",
+      "icon": "beauty/beauty_eyebrow_ridge.png",
+      "effectName": "basicV7.eyebrowRidge",
+      "minValue": -100,
+      "maxValue": 100
+    }
+  ],
+  "nose": [
+    {
+      "displayName": "瘦鼻",
+      "displayNameEn": "Nosesize",
+      "icon": "beauty/beauty_thin_nose.png",
+      "effectName": "basicV7.thinNose",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "鼻翼",
+      "displayNameEn": "Nosewings",
+      "icon": "beauty/beauty_nose_wing.png",
+      "effectName": "basicV7.noseWing",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "鼻子位置",
+      "displayNameEn": "Noseposition",
+      "icon": "beauty/beauty_nose_position.png",
+      "effectName": "basicV7.noseHeight",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "鼻梁",
+      "displayNameEn": "NoseBridgewidth",
+      "icon": "beauty/nose_bridge_width.png",
+      "effectName": "basicV7.noseBridgeWidth",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "山根",
+      "displayNameEn": "Nasion",
+      "icon": "beauty/nasion.png",
+      "effectName": "basicV7.nasion",
+      "minValue": -100,
+      "maxValue": 100
+    }
+  ],
+  "mouse": [
+    {
+      "displayName": "白牙",
+      "displayNameEn": "Whiteteeth",
+      "icon": "beauty/beauty_tooth_beauty.png",
+      "effectName": "beauty.toothWhiten",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "嘴型",
+      "displayNameEn": "Lipshape",
+      "icon": "beauty/beauty_mouth_size.png",
+      "effectName": "basicV7.mouthSize",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "嘴唇厚度",
+      "displayNameEn": "Lipheight",
+      "icon": "beauty/beauty_mouth_height.png",
+      "effectName": "basicV7.mouthHeight",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "嘴唇宽度",
+      "displayNameEn": "Lipwidth",
+      "icon": "beauty/beauty_mouth_width.png",
+      "effectName": "basicV7.mouthWidth",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "嘴唇位置",
+      "displayNameEn": "Lipposition",
+      "icon": "beauty/beauty_mouth_position.png",
+      "effectName": "basicV7.mouthPosition",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "微笑唇",
+      "displayNameEn": "Smileface",
+      "icon": "beauty/beauty_mouth_smile.png",
+      "effectName": "basicV7.smileFace",
+      "minValue": -100,
+      "maxValue": 100
+    }
+  ],
+  "lipstick": [
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png",
+      "effectName": "beauty.faceFeatureLipsLut"
+    },
+    {
+      "displayName": "复古红",
+      "displayNameEn": "Retrored",
+      "icon": "beauty/beauty_lips.png",
+      "effectName": "beauty.faceFeatureLipsLut",
+      "resourcePath": "images/beauty/lips_fuguhong.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "蜜桃色",
+      "displayNameEn": "Peachy",
+      "icon": "beauty/beauty_lips.png",
+      "effectName": "beauty.faceFeatureLipsLut",
+      "resourcePath": "images/beauty/lips_mitaose.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "珊瑚橘",
+      "displayNameEn": "Coral",
+      "icon": "beauty/beauty_lips.png",
+      "effectName": "beauty.faceFeatureLipsLut",
+      "resourcePath": "images/beauty/lips_shanhuju.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "温柔粉",
+      "displayNameEn": "Pink",
+      "icon": "beauty/beauty_lips.png",
+      "effectName": "beauty.faceFeatureLipsLut",
+      "resourcePath": "images/beauty/lips_wenroufen.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "活力橙",
+      "displayNameEn": "Orange",
+      "icon": "beauty/beauty_lips.png",
+      "effectName": "beauty.faceFeatureLipsLut",
+      "resourcePath": "images/beauty/lips_huolicheng.png",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "blush": [
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png",
+      "effectName": "beauty.faceFeatureRedCheek"
+    },
+    {
+      "displayName": "简约",
+      "displayNameEn": "Simple",
+      "icon": "beauty/saihong/saihong_jianyue.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_jianyue.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "盛夏",
+      "displayNameEn": "Summer",
+      "icon": "beauty/saihong/saihong_shengxia.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_shengxia.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "害羞",
+      "displayNameEn": "Shy",
+      "icon": "beauty/saihong/saihong_haixiu.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_haixiu.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "成熟",
+      "displayNameEn": "Mature",
+      "icon": "beauty/saihong/saihong_chengshu.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_chengshu.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "雀斑",
+      "displayNameEn": "Freckles",
+      "icon": "beauty/saihong/saihong_queban.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_queban.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "蜜桃",
+      "displayNameEn": "Peach",
+      "icon": "beauty/saihong/saihong_mitao.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_peach.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "甜莓",
+      "displayNameEn": "Sweetberry",
+      "icon": "beauty/saihong/saihong_tianmei.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_sweetberry.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "橘调",
+      "displayNameEn": "Orangetone",
+      "icon": "beauty/saihong/saihong_judiao.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_orange_tone.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "草莓",
+      "displayNameEn": "Strawberry",
+      "icon": "beauty/saihong/saihong_caomei.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_strawberry.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "杏子",
+      "displayNameEn": "Apricot",
+      "icon": "beauty/saihong/saihong_xingzi.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_apricot.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "玫瑰",
+      "displayNameEn": "Rose",
+      "icon": "beauty/saihong/saihong_meigui.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_rose.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "奶橘",
+      "displayNameEn": "Orange",
+      "icon": "beauty/saihong/saihong_naiju.png",
+      "effectName": "beauty.faceFeatureRedCheek",
+      "resourcePath": "images/beauty/saihong_orange.png",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "hair":[
+    {
+      "displayName":"无",
+      "displayNameEn":"None",
+      "icon":"beauty/none.png",
+      "effectName":"beauty.hairColorLut"
+    },
+    {
+      "displayName":"红色",
+      "displayNameEn":"red",
+      "icon":"beauty/hair_color_red.png",
+      "effectName":"beauty.hairColorLut",
+      "resourcePath":"images/hair_color/red.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName":"紫色",
+      "displayNameEn":"purple",
+      "icon":"beauty/hair_color_purple.png",
+      "effectName":"beauty.hairColorLut",
+      "resourcePath":"images/hair_color/purple.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName":"蓝色",
+      "displayNameEn":"blue",
+      "icon":"beauty/hair_color_blue.png",
+      "effectName":"beauty.hairColorLut",
+      "resourcePath":"images/hair_color/blue.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName":"黄色",
+      "displayNameEn":"yellow",
+      "icon":"beauty/hair_color_yellow.png",
+      "effectName":"beauty.hairColorLut",
+      "resourcePath":"images/hair_color/yellow.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName":"灰色",
+      "displayNameEn":"gray",
+      "icon":"beauty/hair_color_gray.png",
+      "effectName":"beauty.hairColorLut",
+      "resourcePath":"images/hair_color/gray.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName":"绿色",
+      "displayNameEn":"green",
+      "icon":"beauty/hair_color_green.png",
+      "effectName":"beauty.hairColorLut",
+      "resourcePath":"images/hair_color/green.png",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "eyeShadow": [
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow"
+    },
+    {
+      "displayName": "0",
+      "displayNameEn": "0",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_0-albatross.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_0-albatross.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "1",
+      "displayNameEn": "1",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_1-falcon.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_1-falcon.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "2",
+      "displayNameEn": "2",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_2-flamingo.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_2-flamingo.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "3",
+      "displayNameEn": "3",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_3-hawk.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_3-hawk.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "4",
+      "displayNameEn": "4",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_4-kingfisher.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_4-kingfisher.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "5",
+      "displayNameEn": "5",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_5-owl.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_5-owl.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "6",
+      "displayNameEn": "6",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_6-parrot.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_6-parrot.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "7",
+      "displayNameEn": "7",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_7-peacock.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_7-peacock.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "8",
+      "displayNameEn": "8",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_8-robin.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_8-robin.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "9",
+      "displayNameEn": "9",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_9-swan.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_9-swan.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "10",
+      "displayNameEn": "10",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_10-grapes.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_10-grapes.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "11",
+      "displayNameEn": "11",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_11-blossom.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_11-blossom.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "12",
+      "displayNameEn": "12",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_12-raised.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_12-raised.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "13",
+      "displayNameEn": "13",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_13-sunset.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_13-sunset.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "14",
+      "displayNameEn": "14",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_14-smudging.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_14-smudging.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "15",
+      "displayNameEn": "15",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_shadow_15-tipsy.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeShadow",
+      "resourcePath": "images/beauty/eyes_makeup_eye_shadow_15-tipsy.png",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "eyeLiner": [
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeLiner"
+    },
+    {
+      "displayName": "0",
+      "displayNameEn": "0",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_liner_0.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeLiner",
+      "resourcePath": "images/beauty/eyes_makeup_eye_liner_0.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "1",
+      "displayNameEn": "1",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_liner_1.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeLiner",
+      "resourcePath": "images/beauty/eyes_makeup_eye_liner_1.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "2",
+      "displayNameEn": "2",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eye_liner_2.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeLiner",
+      "resourcePath": "images/beauty/eyes_makeup_eye_liner_2.png",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "eyelash": [
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash"
+    },
+    {
+      "displayName": "0",
+      "displayNameEn": "0",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_0.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_0.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "1",
+      "displayNameEn": "1",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_1.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_1.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "2",
+      "displayNameEn": "2",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_2.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_2.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "3",
+      "displayNameEn": "3",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_3.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_3.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "4",
+      "displayNameEn": "4",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_4.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_4.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "5",
+      "displayNameEn": "5",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_5.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_5.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "6",
+      "displayNameEn": "6",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_6.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_6.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "7",
+      "displayNameEn": "7",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_7.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_7.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "8",
+      "displayNameEn": "8",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_8.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_8.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "9",
+      "displayNameEn": "9",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_9.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_9.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "10",
+      "displayNameEn": "10",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyelash_10.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyelash",
+      "resourcePath": "images/beauty/eyes_makeup_eyelash_10.png",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "eyeball": [
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball"
+    },
+    {
+      "displayName": "0",
+      "displayNameEn": "0",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_0.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_0.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "1",
+      "displayNameEn": "1",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_1.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_1.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "2",
+      "displayNameEn": "2",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_2.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_2.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "3",
+      "displayNameEn": "3",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_3.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_3.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "4",
+      "displayNameEn": "4",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_4.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_4.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "5",
+      "displayNameEn": "5",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_5.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_5.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "6",
+      "displayNameEn": "6",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_6.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_6.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "7",
+      "displayNameEn": "7",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_7.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_7.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "8",
+      "displayNameEn": "8",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_8.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_8.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "9",
+      "displayNameEn": "9",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyeball_9.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyeball",
+      "resourcePath": "images/beauty/eyes_makeup_eyeball_9.png",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "eyebrowShadow": [
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyebrow"
+    },
+    {
+      "displayName": "0",
+      "displayNameEn": "0",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyebrow_0.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyebrow",
+      "resourcePath": "images/beauty/eyes_makeup_eyebrow_0.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "1",
+      "displayNameEn": "1",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyebrow_1.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyebrow",
+      "resourcePath": "images/beauty/eyes_makeup_eyebrow_1.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "2",
+      "displayNameEn": "2",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyebrow_2.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyebrow",
+      "resourcePath": "images/beauty/eyes_makeup_eyebrow_2.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "3",
+      "displayNameEn": "3",
+      "icon": "beauty/eyes_makeup/eyes_makeup_eyebrow_3.png",
+      "effectName": "beauty.faceFeatureEyesMakeup.eyebrow",
+      "resourcePath": "images/beauty/eyes_makeup_eyebrow_3.png",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "contour": [
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png",
+      "effectName": "beauty.faceFeatureSoftlight"
+    },
+    {
+      "displayName": "自然",
+      "displayNameEn": "Natural",
+      "icon": "beauty/liti/liti_ziran.png",
+      "effectName": "beauty.faceFeatureSoftlight",
+      "resourcePath": "images/beauty/liti_ziran.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "俊朗",
+      "displayNameEn": "Smart",
+      "icon": "beauty/liti/liti_junlang.png",
+      "effectName": "beauty.faceFeatureSoftlight",
+      "resourcePath": "images/beauty/liti_junlang.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "光芒",
+      "displayNameEn": "Glow",
+      "icon": "beauty/liti/liti_guangmang.png",
+      "effectName": "beauty.faceFeatureSoftlight",
+      "resourcePath": "images/beauty/liti_guangmang.png",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "清新",
+      "displayNameEn": "Fresh",
+      "icon": "beauty/liti/liti_qingxin.png",
+      "effectName": "beauty.faceFeatureSoftlight",
+      "resourcePath": "images/beauty/liti_qingxin.png",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "imageQuality": [
+    {
+      "displayName": "对比度",
+      "displayNameEn": "Contrast",
+      "icon": "beauty/beauty_image_contrast.png",
+      "effectName": "beauty.imageContrastAlpha",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "饱和度",
+      "displayNameEn": "Saturation",
+      "icon": "beauty/beauty_image_saturation.png",
+      "effectName": "smooth.saturation",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "清晰度",
+      "displayNameEn": "Sharpness",
+      "icon": "beauty/beauty_image_sharpen.png",
+      "effectName": "beauty.lutClearAlpha",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "锐化",
+      "displayNameEn": "Sharpen",
+      "icon": "beauty/beauty_sharpen.png",
+      "effectName": "smooth.sharpen",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "亮度",
+      "displayNameEn": "Brightness",
+      "icon": "beauty/beauty_image_brightness.png",
+      "effectName": "beauty.imageBrightness",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "弱光降噪",
+      "displayNameEn": "Denoise",
+      "icon": "beauty/beauty_denoise.png",
+      "effectName": "postEffect.denoise",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "色温",
+      "displayNameEn": "Warmth",
+      "icon": "beauty/beauty_image_warmth.png",
+      "effectName": "beauty.imageWarmth",
+      "minValue": -100,
+      "maxValue": 100
+    },
+    {
+      "displayName": "色调",
+      "displayNameEn": "Tint",
+      "icon": "beauty/beauty_image_tint.png",
+      "effectName": "beauty.imageTint",
+      "minValue": -100,
+      "maxValue": 100
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "motions2D":[
+    {
+        "displayName":"无",
+        "displayNameEn":"None",
+        "effectName": "naught",
+        "icon":"beauty/none.png"
+    },
+    {
+        "displayName":"可爱涂鸦",
+        "displayNameEn":"Cute graffiti",
+        "effectName":"video_keaituya",
+        "icon":"motions_icon/video_keaituya.png",
+        "resourcePath":"2dMotionRes.bundle/video_keaituya/template.json"
+    },
+    {
+        "displayName":"兔兔酱",
+        "displayNameEn":"Bunny",
+        "effectName": "video_tutujiang",
+        "icon":"motions_icon/video_tutujiang.png",
+        "resourcePath":"2dMotionRes.bundle/video_tutujiang/template.json"
+    }
+  ],
+  "motions3D":[
+    {
+        "displayName":"知性玫瑰",
+        "displayNameEn":"Glasses",
+        "effectName":"video_zhixingmeigui",
+        "icon":"motions_icon/video_zhixingmeigui.png",
+        "resourcePath":"3dMotionRes.bundle/video_zhixingmeigui/template.json"
+    }
+  ],
+  "stickerhand":[
+    {
+        "displayName":"樱花女孩",
+        "displayNameEn":"Sakura",
+        "effectName":"video_sakuragirl",
+        "icon":"motions_icon/video_sakuragirl.png",
+        "resourcePath":"handMotionRes.bundle/video_sakuragirl/template.json"
+    },
+    {
+        "displayName":"童年泡泡糖",
+        "displayNameEn":"Bubble",
+        "effectName":"video_bubblegum",
+        "icon":"motions_icon/video_bubblegum.png",
+        "resourcePath":"ganMotionRes.bundle/video_bubblegum/template.json"
+    }
+  ],
+  "advancedMakeup":[
+    {
+        "displayName":"无",
+        "displayNameEn":"None",
+        "effectName":"None",
+        "icon":"beauty/none.png",
+        "uiState":0
+    },
+    {
+        "displayName":"桃花",
+        "displayNameEn":"Peach",
+        "effectName":"video_fenfenxia",
+        "icon":"makeup_icon/video_fenfenxia.png",
+        "resourcePath":"makeupMotionRes.bundle/video_fenfenxia/template.json",
+        "minValue":0,
+        "maxValue":100
+    }
+  ]
+}

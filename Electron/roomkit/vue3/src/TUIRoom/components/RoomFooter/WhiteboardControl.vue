@@ -1,12 +1,12 @@
 <template>
   <div class="whiteboard-control-container">
     <icon-button
-      :is-active="isWhiteboardVisiable"
+      :is-active="isWhiteboardVisible"
       :title="title"
       :disabled="whiteboardDisabled"
       @click-icon="handleWhiteboardDialog"
     >
-      <stop-screen-share-icon v-if="isWhiteboardVisiable" />
+      <stop-screen-share-icon v-if="isWhiteboardVisible" />
       <screen-share-icon v-else />
     </icon-button>
   </div>
@@ -39,19 +39,19 @@ const {
   isAudience,
   remoteScreenStream,
   isLocalUserSharing,
-  isWhiteboardVisiable,
-  isAnnotationVisiable,
+  isWhiteboardVisible,
+  isAnnotationVisible,
 } = storeToRefs(roomStore);
 
 const whiteboardDisabled = computed(
   () => isAudience.value || isLocalUserSharing.value
 );
 const title = computed(() =>
-  isWhiteboardVisiable.value ? t('Close whiteboard') : t('Open whiteboard')
+  isWhiteboardVisible.value ? t('Close whiteboard') : t('Open whiteboard')
 );
 
 function handleWhiteboardDialog() {
-  if (isWhiteboardVisiable.value) {
+  if (isWhiteboardVisible.value) {
     stopShareWhiteboard();
   } else {
     startShareWhiteboard();
@@ -59,7 +59,7 @@ function handleWhiteboardDialog() {
 }
 
 async function startShareWhiteboard() {
-  if (isWhiteboardVisiable.value) {
+  if (isWhiteboardVisible.value) {
     return;
   }
 
@@ -116,14 +116,14 @@ async function startShareWhiteboard() {
 
 function stopShareWhiteboard() {
   roomEngine.instance?.stopScreenSharing();
-  if (isWhiteboardVisiable.value) {
+  if (isWhiteboardVisible.value) {
     roomService.dataReportManager.reportCount(MetricsKey.stopSharingWhiteboard);
   }
-  if (isAnnotationVisiable.value) {
+  if (isAnnotationVisible.value) {
     roomService.dataReportManager.reportCount(MetricsKey.stopAnnotating);
   }
-  isWhiteboardVisiable.value = false;
-  isAnnotationVisiable.value = false;
+  isWhiteboardVisible.value = false;
+  isAnnotationVisible.value = false;
   hideAllWhiteboardWindow();
 }
 
@@ -133,7 +133,7 @@ function hideAllWhiteboardWindow() {
 }
 
 function showWhiteboardWindow() {
-  isWhiteboardVisiable.value = true;
+  isWhiteboardVisible.value = true;
   ipcRenderer.send('whiteboard:show-window');
   roomService.dataReportManager.reportCount(MetricsKey.startSharingWhiteboard);
 }

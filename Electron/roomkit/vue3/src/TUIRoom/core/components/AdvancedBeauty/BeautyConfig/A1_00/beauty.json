@@ -1,0 +1,71 @@
+{
+  "white":[
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png"
+    },
+    {
+      "displayName": "靓白",
+      "displayNameEn": "Bright White",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha0",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "自然",
+      "displayNameEn": "Natural",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "粉白",
+      "displayNameEn": "Pinkish White",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha2",
+      "minValue": 0,
+      "maxValue": 100
+    },
+    {
+      "displayName": "冷白",
+      "displayNameEn": "Cool White",
+      "icon": "beauty/beauty_whiten.png",
+      "effectName": "beauty.lutFoundationAlpha3",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "smooth":[
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png"
+    },
+    {
+      "displayName": "磨皮",
+      "displayNameEn": "Smoothskin",
+      "icon": "beauty/beauty_smooth.png",
+      "effectName": "smooth.smooth",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ],
+  "rosy":[
+    {
+      "displayName": "无",
+      "displayNameEn": "None",
+      "icon": "beauty/none.png"
+    },
+    {
+      "displayName": "红润",
+      "displayNameEn": "Rosyskin",
+      "icon": "beauty/beauty_ruddy.png",
+      "effectName": "smooth.rosy",
+      "minValue": 0,
+      "maxValue": 100
+    }
+  ]
+}

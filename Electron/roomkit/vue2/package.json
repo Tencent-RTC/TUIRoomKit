@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-electron-vue2.7",
-  "version": "3.0.0",
+  "version": "3.2.0",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -36,12 +36,12 @@
     "vue": "^2.7.16"
   },
   "dependencies": {
-    "@tencentcloud/chat": "^3.5.2",
+    "@tencentcloud/chat": "^3.5.5",
     "@tencentcloud/chat-uikit-engine": "~2.3.3",
     "@tencentcloud/chat-uikit-vue": "~2.3.3",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-electron": "~3.0.0",
-    "@tencentcloud/uikit-base-component-vue2": "0.3.2",
+    "@tencentcloud/tuiroom-engine-electron": "~3.2.0",
+    "@tencentcloud/uikit-base-component-vue2": "0.3.3",
     "@tencentcloud/universal-api": "^2.0.9",
     "@tiptap/core": "^2.6.6",
     "@tiptap/extension-document": "^2.6.6",

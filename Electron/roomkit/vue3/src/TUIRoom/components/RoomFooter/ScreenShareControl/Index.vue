@@ -114,7 +114,7 @@ const {
   remoteScreenStream,
   isGeneralUser,
   isScreenShareDisableForAllUser,
-  isWhiteboardVisiable,
+  isWhiteboardVisible,
   isSharingScreen,
   isLocalUserSharing,
 } = storeToRefs(roomStore);
@@ -128,7 +128,7 @@ const showPermissionVisible: Ref<boolean> = ref(false);
 const showStopShareRegion: Ref<boolean> = ref(false);
 
 const screenShareDisabled = computed(
-  () => isAudience.value || isWhiteboardVisiable.value
+  () => isAudience.value || isWhiteboardVisible.value
 );
 const title = computed(() =>
   isSharing.value ? t('End sharing') : t('Share screen')
@@ -164,7 +164,7 @@ async function toggleScreenShare() {
     return;
   }
 
-  if (isWhiteboardVisiable.value) {
+  if (isWhiteboardVisible.value) {
     TUIMessage({
       type: 'warning',
       message: t('You are sharing the whiteboard, please stop sharing first'),
@@ -186,6 +186,7 @@ async function toggleScreenShare() {
 
   if (!(window as any).isHasScreen && process.platform === 'darwin') {
     showPermissionVisible.value = true;
+    return;
   }
   if (!isSharing.value && !selectDialogVisible.value) {
     const screenCaptureList: any =
