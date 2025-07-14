@@ -552,4 +552,7 @@ export default {
     'You have been kicked out of a room or the room has been disbanded while you were offline',
   'The number of joined rooms has exceeded the limit':
     'The number of joined rooms has exceeded the limit',
+  'userSig has expired': 'userSig has expired',
+  'The system has detected that your account has been kicked offline':
+    'The system has detected that your account has been kicked offline',
 };

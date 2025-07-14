@@ -55,6 +55,9 @@ export class AITask {
   public transcribedMessageList: SubtitleMessage[] = [];
   private subtitleTimeout: { [key: string]: ReturnType<typeof setTimeout> } =
     {};
+  private transcriptionTimeout: {
+    [key: string]: ReturnType<typeof setTimeout>;
+  } = {};
 
   constructor(service: IRoomService) {
     this.service = service;
@@ -107,6 +110,16 @@ export class AITask {
   private handleUnmount() {
     this.subtitleMessages = {};
     this.transcribedMessageList = [];
+
+    Object.values(this.subtitleTimeout).forEach(timeout =>
+      clearTimeout(timeout)
+    );
+    Object.values(this.transcriptionTimeout).forEach(timeout =>
+      clearTimeout(timeout)
+    );
+    this.subtitleTimeout = {};
+    this.transcriptionTimeout = {};
+
     this.trtc?.off('custom-message', this.handleAIMessage);
   }
 
@@ -120,6 +133,28 @@ export class AITask {
       clearTimeout(this.subtitleTimeout[id]);
     }
     this.subtitleTimeout[id] = setTimeout(fn, 3000);
+  }
+
+  private resetTranscriptionTimeout(id: string, timeInterval = 3000) {
+    if (this.transcriptionTimeout[id]) {
+      clearTimeout(this.transcriptionTimeout[id]);
+    }
+    this.transcriptionTimeout[id] = setTimeout(() => {
+      const transcriptionIndex = findLastIndex(
+        this.transcribedMessageList,
+        msg => msg.sender === id && !msg.end
+      );
+
+      if (transcriptionIndex !== -1) {
+        this.transcribedMessageList[transcriptionIndex].end = true;
+        this.emit(AI_TASK.TRANSCRIPTION_TASK, {
+          subtitleMessages: this.subtitleMessages,
+          transcribedMessageList: this.transcribedMessageList,
+        });
+      }
+
+      delete this.transcriptionTimeout[id];
+    }, timeInterval);
   }
 
   private handleAIMessage(event: any) {
@@ -179,11 +214,21 @@ export class AITask {
       this.transcribedMessageList,
       msg => msg.sender === sender && !msg.end
     );
-
     if (transcriptionIndex !== -1) {
       updateMsg(this.transcribedMessageList[transcriptionIndex]);
+      if (!end) {
+        this.resetTranscriptionTimeout(sender);
+      } else {
+        if (this.transcriptionTimeout[sender]) {
+          clearTimeout(this.transcriptionTimeout[sender]);
+          delete this.transcriptionTimeout[sender];
+        }
+      }
     } else {
       appendMsg(createSubtitleMsg(), this.transcribedMessageList);
+      if (!end) {
+        this.resetTranscriptionTimeout(sender);
+      }
     }
 
     this.resetSubtitleTimeout(sender, () => {
