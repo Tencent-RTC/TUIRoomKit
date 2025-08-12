@@ -1,5 +1,10 @@
 ## Changelog
 
+### 3.1.3(2025-08-12)
+- Fixed the issue where multiple terminals of the same account would not enter the room after they kicked each other out.
+- Modify the dependency tencent_trtc_cloud to tencent_rtc_sdk.
+- Upgraded rtc_room_engine dependencies.
+
 ### 3.1.1(2025-06-26)
 - Fixed the issue that errConferenceIdNotExist and errConferenceIdOccupied were not thrown normally in ConferenceError.
 - Fixed the issue of abnormal data reporting.
