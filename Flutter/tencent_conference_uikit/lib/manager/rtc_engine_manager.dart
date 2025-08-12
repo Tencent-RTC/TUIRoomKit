@@ -6,7 +6,8 @@ import 'package:tencent_conference_uikit/common/index.dart';
 import 'package:tencent_conference_uikit/event/room_event_handler.dart';
 import 'package:tencent_conference_uikit/platform/rtc_conference_tuikit_platform_interface.dart';
 import 'package:rtc_room_engine/rtc_room_engine.dart';
-import 'package:tencent_trtc_cloud/trtc_cloud.dart';
+import 'package:tencent_rtc_sdk/trtc_cloud.dart';
+import 'package:tencent_rtc_sdk/trtc_cloud_def.dart';
 
 class RoomEngineManager {
   static const _seatIndex = -1;
@@ -284,13 +285,13 @@ class RoomEngineManager {
 
   void setAudioCaptureVolume(int volume) async {
     RoomStore.to.audioSetting.captureVolume = volume;
-    var trtcCloud = (await TRTCCloud.sharedInstance())!;
+    var trtcCloud = await TRTCCloud.sharedInstance();
     trtcCloud.setAudioCaptureVolume(volume);
   }
 
   void setAudioPlayVolume(int volume) async {
     RoomStore.to.audioSetting.playVolume = volume;
-    var trtcCloud = (await TRTCCloud.sharedInstance())!;
+    var trtcCloud = await TRTCCloud.sharedInstance();
     trtcCloud.setAudioPlayoutVolume(volume);
   }
 
@@ -445,7 +446,9 @@ class RoomEngineManager {
   }
 
   void _enableAudioVolumeEvaluation(bool enable) async {
-    var trtcCloud = (await TRTCCloud.sharedInstance())!;
-    trtcCloud.enableAudioVolumeEvaluation(enable ? 500 : 0);
+    var trtcCloud = await TRTCCloud.sharedInstance();
+    var params = TRTCAudioVolumeEvaluateParams();
+    params.interval = enable ? 500 : 0;
+    trtcCloud.enableAudioVolumeEvaluation(enable, params);
   }
 }
