@@ -194,8 +194,8 @@ class RoomEngineManager {
     return result;
   }
 
-  Future<TUIActionCallback> muteLocalAudio() {
-    return _roomEngine.muteLocalAudio();
+  void muteLocalAudio() {
+    _roomEngine.muteLocalAudio();
   }
 
   Future<TUIActionCallback> unMuteLocalAudio() async {
