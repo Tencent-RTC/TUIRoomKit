@@ -1,0 +1,33 @@
+{
+  "name": "@tencentcloud/room-uikit-vue3",
+  "version": "3.4.2",
+  "scripts": {
+    "dev": "vite --force",
+    "dev:deep": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
+  },
+  "dependencies": {
+    "@tencentcloud/tuiroom-engine-js": "~3.5.0",
+    "@tencentcloud/uikit-base-component-vue3": "1.3.0",
+    "tuikit-atomicx-vue3": "4.5.0",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14"
+  },
+  "devDependencies": {
+    "@tencentcloud/eslint-config-hybrid": "~0.0.1",
+    "@types/events": "^3.0.0",
+    "@types/node": "^18.19.31",
+    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/parser": "^5.19.0",
+    "@vitejs/plugin-legacy": "^5.4.3",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "sass": "^1.50.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.5.4",
+    "vite": "^5.2.8",
+    "vue-tsc": "^0.35.2"
+  }
+}
