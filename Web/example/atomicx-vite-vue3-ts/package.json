@@ -9,9 +9,9 @@
     "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-js": "~3.5.0",
-    "@tencentcloud/uikit-base-component-vue3": "1.3.0",
-    "tuikit-atomicx-vue3": "4.5.0",
+    "@tencentcloud/tuiroom-engine-js": "~3.5.1-beta.1",
+    "@tencentcloud/uikit-base-component-vue3": "1.3.1",
+    "tuikit-atomicx-vue3": "4.5.1",
     "vue": "^3.2.25",
     "vue-router": "^4.0.14"
   },
