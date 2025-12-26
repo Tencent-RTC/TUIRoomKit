@@ -50,12 +50,10 @@ const {
   microphoneLastError,
   isMicrophoneTesting,
   openLocalMicrophone,
-  muteLocalAudio,
-  unmuteLocalAudio,
   startMicrophoneTest,
   stopMicrophoneTest,
 } = useDeviceState();
-const { localParticipant } = useRoomParticipantState();
+const { localParticipant, muteMicrophone, unmuteMicrophone } = useRoomParticipantState();
 
 const showAudioSettingTab: Ref<boolean> = ref(false);
 
@@ -76,9 +74,7 @@ const isMuted = computed(() => {
   return microphoneStatus.value !== DeviceStatus.On;
 });
 
-const hasNotSupportError = computed(() => {
-  return [DeviceError.NoDeviceDetected, DeviceError.NoSystemPermission, DeviceError.NotSupportCapture, DeviceError.OccupiedError].includes(microphoneLastError.value);
-});
+const hasNotSupportError = computed(() => [DeviceError.NoDeviceDetected, DeviceError.NoSystemPermission, DeviceError.NotSupportCapture, DeviceError.OccupiedError].includes(microphoneLastError.value));
 
 async function handleClickIcon() {
   try {
@@ -97,10 +93,10 @@ async function handleClickIcon() {
       return;
     }
     if (microphoneStatus.value === DeviceStatus.On) {
-      await muteLocalAudio();
+      await muteMicrophone();
     } else {
       await openLocalMicrophone();
-      await unmuteLocalAudio();
+      await unmuteMicrophone();
     }
   } catch (error) {
     handleErrorWithModal(error);
