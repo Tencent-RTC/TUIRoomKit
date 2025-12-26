@@ -113,6 +113,7 @@ export const resource = {
   'Room.TransferAndLeave': 'Transfer and Leave',
   'Room.ConfirmLeaveTitle': 'Confirm Leave Room',
   'Room.ConfirmLeaveTip': 'You are currently the room host. Please select the appropriate action. If you select "End Room," the current room will be disbanded and all members will be removed. If you select "Leave Room," the current room will not be disbanded, and your host privileges will be transferred to another member.',
+  'Room.ConfirmLeavePage': 'Are you sure you want to leave this page? You will exit the current room',
   'Room.LeaveRoomTitle': 'Leave Room',
   'Room.LeaveRoomTip': 'You are currently the room host. Please select the appropriate action. If you select "End Room," the current room will be disbanded and all members will be removed.',
   'Room.EndRoom': 'End Room',

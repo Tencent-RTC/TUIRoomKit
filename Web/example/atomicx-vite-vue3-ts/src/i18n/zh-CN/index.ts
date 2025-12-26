@@ -114,6 +114,7 @@ export const resource = {
   'Room.TransferAndLeave': '移交并离开',
   'Room.ConfirmLeaveTitle': '是否要离开房间',
   'Room.ConfirmLeaveTip': '您当前是房间主持人，请选择相应操作。若选择"结束房间"，将解散当前房间并将全体成员移出。若选择"离开房间"，当前房间不会解散，您的主持人权限将移交给其他成员。',
+  'Room.ConfirmLeavePage': '您确定要离开当前页面么？离开后将会退出当前房间',
   'Room.LeaveRoomTitle': '离开房间',
   'Room.LeaveRoomTip': '您当前是房间主持人，请选择相应操作。若选择"结束房间"，将解散当前房间并将全体成员移出。',
   'Room.EndRoom': '结束房间',
