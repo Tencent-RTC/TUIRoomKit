@@ -1,6 +1,6 @@
 <template>
   <TUIDialog
-    :title="t('Settings')"
+    :title="t('Settings.Title')"
     :visible="visible"
     :customClasses="['custom-setting-dialog']"
     appendTo="#roomPage"
@@ -89,6 +89,7 @@ function handleUpdateActiveTab(tabTitle: string) {
   height: 100%;
 
   .setting-tabs {
+    text-align: initial;
     width: 170px;
     padding-top: 7px;
     border-bottom-left-radius: 10px;

@@ -23,7 +23,10 @@
         </div>
       </header>
 
-      <main class="room-main">
+      <main
+        class="room-main"
+        v-tui-loading="{ visible: isJoiningRoom, text: t('Room.EnteringRoom'), background: 'transparent' }"
+      >
         <TUIWatermark
           :font="{fontSize: 16}"
           :content="[loginUserInfo?.userName || '', loginUserInfo?.userId || '']"
@@ -57,7 +60,6 @@
           <LeaveRoomButton />
         </div>
       </footer>
-      <LoadingOverlay v-if="isJoiningRoom" />
       <PasswordDialog
         v-model="roomPasswordVisible"
         :room-id="(route.query.roomId as string)"
@@ -85,6 +87,7 @@ import {
   TUIWatermark,
   TUIToast,
   TUIMessageBox,
+  vTuiLoading,
 } from '@tencentcloud/uikit-base-component-vue3';
 import {
   RoomParticipantList,
@@ -117,7 +120,6 @@ import {
   RoomChat,
   VirtualBackgroundButton,
   BasicBeautyButton,
-  LoadingOverlay,
   PasswordDialog,
   LeaveRoomButton,
   ChatButton,
@@ -143,7 +145,8 @@ useRoomTips();
 const { loginUserInfo } = useLoginState();
 const { currentRoom, joinRoom, createAndJoinRoom, subscribeEvent: subscribeRoomEvent, unsubscribeEvent: unsubscribeRoomEvent } = useRoomState();
 const { getParticipantList, participantListCursor, subscribeEvent: subscribeRoomParticipantEvent, unsubscribeEvent: unsubscribeRoomParticipantEvent } = useRoomParticipantState();
-const { localVideoQuality, openLocalCamera, updateVideoQuality, openLocalMicrophone, muteLocalAudio, unmuteLocalAudio } = useDeviceState();
+const { localVideoQuality, openLocalCamera, updateVideoQuality, openLocalMicrophone } = useDeviceState();
+const { muteMicrophone, unmuteMicrophone } = useRoomParticipantState();
 
 const roomPasswordVisible = ref(false);
 const isJoiningRoom = ref(false);
@@ -254,13 +257,13 @@ async function handleOpenCamera() {
 async function handleOpenMicrophone() {
   const { openMicrophone } = route.query;
   try {
-    await muteLocalAudio();
+    await muteMicrophone();
     await openLocalMicrophone();
   } catch (error) {
     handleErrorWithModal(error);
   }
   if (openMicrophone === 'true') {
-    await unmuteLocalAudio();
+    await unmuteMicrophone();
   }
 }
 

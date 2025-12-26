@@ -1,7 +1,10 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
+import { TUIMessageBox, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { useRoomState } from 'tuikit-atomicx-vue3/room';
 import Login from '@/views/login.vue';
 import Home from '@/views/home.vue';
 import Room from '@/views/room.vue';
+
 const routes = [
   {
     path: '/',
@@ -41,7 +44,34 @@ router.beforeEach((to, from, next) => {
     return;
   }
 
+  // Room leave confirmation
+  if (from.path === '/room' && to.path !== '/room') {
+    const { currentRoom, leaveRoom } = useRoomState();
+    const { t } = useUIKit();
+
+    if (!currentRoom.value?.roomId) {
+      next();
+      return;
+    }
+
+    TUIMessageBox.confirm({
+      type: 'warning',
+      title: t('Room.LeaveRoomTitle'),
+      content: t('Room.ConfirmLeavePage'),
+      callback: async (action?: string) => {
+        if (action === 'confirm') {
+          await leaveRoom();
+          next();
+        } else {
+          next(false);
+        }
+      },
+    });
+    return;
+  }
+
   next();
 });
 
 export default router;
+
