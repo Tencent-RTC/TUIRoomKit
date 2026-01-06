@@ -119,7 +119,7 @@ export default function useRoomInvite() {
     },
     {
       title: 'Room Link',
-      content: getUrlWithRoomId(roomId.value),
+      content: inviteLink.value || getUrlWithRoomId(roomId.value),
       isShowCopyIcon: true,
       isVisible: isRoomLinkVisible.value && roomLinkConfig.visible,
     },
@@ -145,12 +145,13 @@ export default function useRoomInvite() {
       `${t('Room Type')}: ${t(getSeatModeDisplay(!!isSeatEnabled.value))}`,
       `${t('Room ID')}: ${roomId.value}`,
     ];
+    const roomLink = inviteLink.value || getUrlWithRoomId(roomId.value);
     if (isShowPassword.value) {
       invitationList.push(`${t('Room Password')}: ${password?.value}`);
     }
     if (isRoomLinkVisible.value && roomLinkConfig.visible) {
       invitationList.push(
-        `${t('Room Link')}: ${getUrlWithRoomId(roomId.value)}`
+        `${t('Room Link')}: ${roomLink}`
       );
     }
     if (isSchemeLinkVisible.value) {
