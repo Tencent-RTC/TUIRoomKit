@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-web-vue2.7",
-  "version": "3.2.0",
+  "version": "3.2.4",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -37,10 +37,10 @@
   },
   "dependencies": {
     "@tencentcloud/chat": "^3.5.5",
-    "@tencentcloud/chat-uikit-engine": "~2.3.3",
+    "@tencentcloud/chat-uikit-engine": "~2.5.5",
     "@tencentcloud/chat-uikit-vue": "~2.3.3",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-js": "~3.2.0",
+    "@tencentcloud/tuiroom-engine-js": "~3.2.4",
     "@tencentcloud/uikit-base-component-vue2": "0.3.3",
     "@tencentcloud/universal-api": "^2.0.9",
     "@tiptap/core": "^2.6.6",
