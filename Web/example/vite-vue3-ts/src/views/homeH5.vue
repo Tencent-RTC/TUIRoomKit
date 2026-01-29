@@ -1,5 +1,5 @@
 <template>
-  <PreConferenceView
+  <PreConferenceViewH5
     @logout="handleLogout"
     @create-room="handleCreateRoom"
     @join-room="handleJoinRoom"
@@ -9,13 +9,13 @@
 </template>
 
 <script setup lang="ts">
-import { PreConferenceView } from '@tencentcloud/roomkit-web-vue3';
+import { PreConferenceViewH5 } from '@tencentcloud/roomkit-web-vue3';
 import { useRouter } from 'vue-router';
 import { useMediaPreference } from '../hooks/useMediaPreference';
 
-const router = useRouter();
+const { setCameraPreference, setMicrophonePreference } = useMediaPreference();
 
-const { setMicrophonePreference, setCameraPreference } = useMediaPreference();
+const router = useRouter();
 
 const handleCameraPreferenceChange = (isOpen: boolean) => {
   setCameraPreference(isOpen);

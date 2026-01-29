@@ -21,15 +21,15 @@ This document describes how to quickly run the TUIRoomKit demo project to try ou
 ├── src
 │   ├── App.vue         -- Sample Project Main Page
 │   ├── config          -- User information configuration file and test userSig generation file
-│   ├── env.d.ts
-│   ├── locales         -- Local language, support English, Chinese
+│   ├── hooks           -- Vue composition API hooks
+│   ├── i18n            -- Internationalization, support English, Chinese
 │   ├── main.ts         -- Sample Project Entry File
 │   ├── router          -- Sample Project Routing Configuration
-│   ├── utils
-│   └── views           -- Sample project pages (including pre-conference preview pages and in-conference page)
+│   ├── styles          -- Global styles
+│   ├── utils           -- Utility functions
+│   └── views           -- Sample project pages (including home pages and conference pages for PC and H5)
 ├── tsconfig.json
 ├── tsconfig.node.json
-├── useRoomExtension.js
 └── vite.config.ts
 ```
 
@@ -37,7 +37,7 @@ This document describes how to quickly run the TUIRoomKit demo project to try ou
 1. Please refer to the official documentation at [Integration (TUIRoomKit)](https://trtc.io/document/54845) to obtain your own SDKAppID and SDKSecreKey.
 
 ### Step 2: Download the source code and configure the project
-1. Clone or download the source code in our repository (**You can start the repository to save it**).
+1. Clone or download the source code in our repository (**You can star the repository to save it**).
 2. Find and open `Web/example/vite-vue3-ts/src/config/basic-info-config.js`.
 3. Configure parameters in `basic-info-config.js`:
 
