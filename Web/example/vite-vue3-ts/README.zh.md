@@ -21,15 +21,15 @@
 ├── src
 │   ├── App.vue         -- 示例工程主页面
 │   ├── config          -- 用户信息配置文件及测试 userSig 生成文件
-│   ├── env.d.ts
-│   ├── locales         -- 本地语言，支持中文，英文
+│   ├── hooks           -- 业务公用逻辑
+│   ├── i18n            -- 国际化配置，支持中文、英文
 │   ├── main.ts         -- 示例工程入口文件
 │   ├── router          -- 示例工程路由配置
-│   ├── utils           -- 通用方法
-│   └── views           -- 示例工程页面（包括进会前预览页面及会议中页面）
+│   ├── styles          -- 全局样式
+│   ├── utils           -- 工具函数
+│   └── views           -- 示例工程页面（包括 PC 端和 H5 端的首页及会议页面）
 ├── tsconfig.json
 ├── tsconfig.node.json
-├── useRoomExtension.js
 └── vite.config.ts
 ```
 ### 第一步：开通服务
@@ -54,8 +54,8 @@
 2. 找到并打开 `Web/example/vite-vue3-ts/src/config/basic-info-config.js` 文件。
 3. 配置 `basic-info-config.js` 文件中的相关参数：
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/36fc2cb8a3cc8a90a02d1ab0d9e4ffb7.png" width="900">
-	- SDKAPPID：默认为 0，请设置为步第一步中记录下的 SDKAppID。
-	- SDKSECRETKEY：默认为 ''，请设置为步第一步中记录下的密钥信息。
+	- SDKAPPID：默认为 0，请设置为第一步中记录下的 SDKAppID。
+	- SDKSECRETKEY：默认为 ''，请设置为第一步中记录下的密钥信息。
 
 ### 第三步：运行示例
 

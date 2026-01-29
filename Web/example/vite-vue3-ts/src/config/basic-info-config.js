@@ -39,32 +39,8 @@ export const SDKSECRETKEY = '';
  */
 export const EXPIRETIME = 604800;
 
-/**
- * Set user information on the push side
- *
- */
-export const userInfo = {
-  // UserId
-  userId: `user_${Math.ceil(Math.random() * 100000)}`,
-  // UserName
-  userName: 'myName',
-  // UserAvatar
-  avatarUrl: '',
-};
+const generator = new LibGenerateTestUserSig(SDKAPPID, SDKSECRETKEY, EXPIRETIME);
 
-export function getBasicInfo() {
-  if (SDKAPPID === Number(0) || SDKSECRETKEY === String('')) {
-    alert('Please configure your SDKAPPID in config/basic-info-config.js');
-    return;
-  }
-  const generator = new LibGenerateTestUserSig(SDKAPPID, SDKSECRETKEY, EXPIRETIME);
-  const userSig = generator.genTestUserSig(userInfo.userId);
-  const { userId, userName, avatarUrl } = userInfo;
-  return {
-    sdkAppId: SDKAPPID,
-    userId,
-    userSig,
-    userName,
-    avatarUrl,
-  };
-};
+export function genTestUserSig(userId) {
+  return generator.genTestUserSig(userId);
+}

@@ -1,10 +1,10 @@
 <template>
-  <ConferenceMainView />
+  <ConferenceMainViewH5 />
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue';
-import { conference, ConferenceMainView, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
+import { conference, ConferenceMainViewH5, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
 import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
@@ -28,7 +28,6 @@ const { loginUserInfo } = useLoginState();
 const { currentRoom } = useRoomState();
 const { localVideoQuality, openLocalCamera, updateVideoQuality, openLocalMicrophone } = useDeviceState();
 const { muteMicrophone, unmuteMicrophone } = useRoomParticipantState();
-
 const { getMicrophonePreference, getCameraPreference } = useMediaPreference();
 
 watch(() => loginUserInfo.value?.userId, async (val) => {
@@ -120,8 +119,7 @@ onUnmounted(() => {
 
 .room-page {
   width: 100vw;
-  height: 100vh;
-  min-width: 1150px;
+  height: 100%;
   display: flex;
   flex-direction: row;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -134,48 +132,46 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &.has-side-panel {
-    width: calc(100% - 400px);
-  }
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 8px 16px;
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 10;
   width: 100%;
   height: 56px;
   box-sizing: border-box;
+  transition: opacity 0.3s;
   background-color: var(--bg-color-operate);
-  border-bottom: 1px solid var(--stroke-color-primary);
-  box-shadow: 0 1px 0 var(--uikit-color-black-8);
+  border-bottom: 1px solid var(--stroke-color-secondary);
+  background-color: var(--bg-color-bottombar);
 
   &-left {
-    display: flex;
-    gap: 24px;
     flex: 1;
+    display: flex;
+    gap: 12px;
     justify-content: flex-start;
   }
 
   &-center {
-    flex: 1;
+    flex: 2;
     text-align: center;
-    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   &-right {
+    flex: 1;
     display: flex;
     align-items: center;
-    gap: 16px;
-    flex: 1;
     justify-content: flex-end;
+    width: auto;
   }
 }
 
@@ -190,57 +186,14 @@ onUnmounted(() => {
   background-color: var(--bg-color-topbar);
 }
 
-.control-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-color-operate);
-  border-top: 1px solid var(--stroke-color-primary);
+.room-footer {
   position: absolute;
   box-sizing: border-box;
+  background-color: var(--bg-color-operate);
   width: 100%;
-  height: 72px;
+  height: 90px;
   bottom: 0;
   left: 0;
-  z-index: 1;
-  padding: 0px 10px;
-
-  .control-left {
-    flex: 1;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .control-center {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    align-items: center;
-    color: var(--text-color-primary);
-  }
-
-  .control-right {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
 }
 
-.side-panel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translateX(100%);
-  width: 400px;
-  height: 100%;
-  box-sizing: border-box;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &-visible {
-    transform: translateX(0);
-  }
-}
 </style>

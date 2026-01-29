@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
+import legacy from '@vitejs/plugin-legacy';
+
 const path = require('path');
 
 // https://vitejs.dev/config/
@@ -10,17 +12,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
-      pinia: path.resolve(__dirname, './node_modules/pinia'),
-      '@TUIRoom': path.resolve(__dirname, 'src/TUIRoom'),
     },
   },
   build: {
+    target: 'esnext',
     rollupOptions: {
       output: {
         // Custom Split Strategy
         manualChunks: {
           roomEngine: ['@tencentcloud/tuiroom-engine-js'],
-          roomkit: ['@tencentcloud/roomkit-web-vue3'],
         },
       },
     },
@@ -33,14 +33,15 @@ export default defineConfig({
     visualizer({
       // open: true,
     }),
+    legacy({
+      targets: ['ie >= 11'], // Specify the browser targets here
+      additionalLegacyPolyfills: ['regenerator-runtime/runtime'], // Optional polyfills
+    }),
   ],
   server: {
     open: true,
     // Solve the problem of infinite page refresh after whistle proxy
-    hmr: {
-      protocol: 'ws',
-      host: '127.0.0.1',
-    },
+    hmr: true,
     proxy: {
       '/api': {
         target: 'https://service.trtc.qcloud.com',
