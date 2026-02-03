@@ -6,10 +6,21 @@ function rsyncQTDependency() {
   let sourcePath = '';
   if (platform === 'win32') {
     // windows
-    sourcePath = path.resolve(
+    const pluginPath = path.resolve(
       __dirname,
-      `../node_modules/@tencentcloud/roomkit-electron-vue3/node_modules/trtc-electron-plugin-xmagic/plugin/XMagic/win/${arch}/platforms/qwindows.dll`
+      `../node_modules/@tencentcloud/roomkit-electron-vue3/node_modules`
     );
+    if(!fs.existsSync(pluginPath)) {
+      sourcePath = path.resolve(
+        __dirname,
+        `../node_modules/trtc-electron-plugin-xmagic/plugin/XMagic/win/${arch}/platforms/qwindows.dll`
+      );
+    } else {
+      sourcePath = path.resolve(
+        __dirname,
+        `../node_modules/@tencentcloud/roomkit-electron-vue3/node_modules/trtc-electron-plugin-xmagic/plugin/XMagic/win/${arch}/platforms/qwindows.dll`
+      );
+    }
     rsyncOnWindows(sourcePath);
   } else if (platform === 'darwin') {
     // mac os

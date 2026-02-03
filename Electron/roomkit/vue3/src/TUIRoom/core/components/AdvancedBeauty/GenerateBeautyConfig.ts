@@ -54,15 +54,11 @@ function checkPanelConfig(
 ) {
   const beauty = beautyPanelConfig.get(level);
   if (!beauty) {
-    logger.error(`beautyPanelConfig[${level}] is undefined`);
     return undefined;
   }
 
   const beautyItems = beauty.get(advancedBeautyType);
   if (!beautyItems) {
-    logger.error(
-      `beautyPanelConfig[${level}][${advancedBeautyType}] is undefined`
-    );
     return undefined;
   }
 
