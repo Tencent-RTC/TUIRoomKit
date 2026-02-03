@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-electron-vue3",
-  "version": "3.2.0",
+  "version": "3.2.4",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -23,10 +23,10 @@
   },
   "dependencies": {
     "@tencentcloud/chat": "^3.5.5",
-    "@tencentcloud/chat-uikit-engine": "~2.3.3",
+    "@tencentcloud/chat-uikit-engine": "~2.5.5",
     "@tencentcloud/chat-uikit-vue": "~2.3.3",
     "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-electron": "~3.2.0",
+    "@tencentcloud/tuiroom-engine-electron": "~3.2.4",
     "@tencentcloud/uikit-base-component-vue3": "0.3.4",
     "@tencentcloud/universal-api": "^2.0.9",
     "@tiptap/core": "^2.6.6",
@@ -42,7 +42,8 @@
     "fabric": "^5.3.0",
     "hotkeys-js": "^3.10.1",
     "interactjs": "^1.10.26",
-    "mitt": "^3.0.0"
+    "mitt": "^3.0.0",
+    "trtc-electron-plugin-xmagic": "^1.0.0"
   },
   "peerDependencies": {
     "electron": ">=4.0.0",
@@ -58,7 +59,6 @@
     "vite-plugin-css-injected-by-js": "^3.5.0",
     "vite-plugin-dts": "^3.7.3",
     "vue": "~3.3.13",
-    "vue-tsc": "^2.0.6",
-    "trtc-electron-plugin-xmagic": "1.0.0"
+    "vue-tsc": "^2.0.6"
   }
 }

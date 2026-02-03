@@ -55,7 +55,7 @@ This document mainly introduces how to quickly run through the TUIRoomKit Electr
 
 ### Step 2: Download the source code and configure the project
 1. Clone or download the repository source code directly，**Welcome Star**，Thanks~~
-2. Find and open ` Electron/vue3/packages/renderer/src/config/basic-info-config.js` file。
+2. Find and open ` Electron/example/vue3/packages/renderer/src/config/basic-info-config.js` file。
 3. Configure `basic-info-config.js` Relevant parameters in the document：
 	<img src="https://qcloudimg.tencent-cloud.cn/raw/36fc2cb8a3cc8a90a02d1ab0d9e4ffb7.png" width="900">
 	- SDKAPPID：The default is 0. Please set it to the SDKAppID recorded in step one.
@@ -66,9 +66,9 @@ This document mainly introduces how to quickly run through the TUIRoomKit Electr
 1. Installation of dependencies
 
    ```bash
-   cd TUIRoomKit/Electron/vue3
+   cd TUIRoomKit/Electron/example/vue3
    
-   npm install
+   npm install --legacy-peer-deps
    ```
 
     > **Note**
