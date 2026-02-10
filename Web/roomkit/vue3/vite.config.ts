@@ -4,47 +4,48 @@ import dts from 'vite-plugin-dts';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
 import { dependencies, peerDependencies } from './package.json';
-import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
     minify: false,
     rollupOptions: {
-      external: [
-        ...Object.keys(dependencies),
-        ...Object.keys(peerDependencies),
-      ],
-      input: ['src/TUIRoom/index.ts'],
+      // Support sub-path imports for dependencies and peer dependencies
+      external: (id: string) => {
+        const externalDeps = [
+          ...Object.keys(dependencies || {}),
+          ...Object.keys(peerDependencies || {}),
+        ];
+        return externalDeps.some(dep => id === dep || id.startsWith(`${dep}/`));
+      },
+      input: ['RoomKit/index.ts'],
       output: [
         {
           format: 'es',
           entryFileNames: '[name].mjs',
           preserveModules: true,
-          preserveModulesRoot: 'src/TUIRoom',
+          preserveModulesRoot: 'RoomKit',
           exports: 'named',
           dir: 'es',
           globals: {
             vue: 'Vue',
-            pinia: 'pinia',
           },
         },
         {
           format: 'cjs',
           entryFileNames: '[name].js',
           preserveModules: true,
-          preserveModulesRoot: 'src/TUIRoom',
+          preserveModulesRoot: 'RoomKit',
           exports: 'named',
           dir: 'lib',
           globals: {
             vue: 'Vue',
-            pinia: 'pinia',
           },
         },
       ],
     },
     lib: {
-      entry: './src/TUIRoom/index.ts',
+      entry: './RoomKit/index.ts',
       name: 'TUIRoomKit',
     },
   },
@@ -53,16 +54,9 @@ export default defineConfig({
     viteCommonjs(),
     cssInjectedByJsPlugin(),
     dts({
-      entryRoot: './src/TUIRoom',
+      entryRoot: './RoomKit',
       outDir: ['lib/', 'es/'],
     }),
   ],
-  resolve: {
-    alias: {
-      '@tencentcloud': path.resolve(__dirname, 'node_modules/@tencentcloud'),
-    },
-  },
-  optimizeDeps: {
-    include: ['dayjs'],
-  },
+  resolve: {},
 });
