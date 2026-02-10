@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-web-vue3",
-  "version": "3.2.4",
+  "version": "5.1.2",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -21,36 +21,13 @@
     "dev": "vite build --watch",
     "build": "vite build"
   },
-  "dependencies": {
-    "@tencentcloud/chat": "^3.5.5",
-    "@tencentcloud/chat-uikit-engine": "~2.5.5",
-    "@tencentcloud/chat-uikit-vue": "2.3.3",
-    "@tencentcloud/tui-core": "latest",
-    "@tencentcloud/tuiroom-engine-js": "~3.2.4",
-    "@tencentcloud/uikit-base-component-vue3": "0.3.4",
-    "@tencentcloud/universal-api": "^2.0.9",
-    "@tiptap/core": "^2.6.6",
-    "@tiptap/extension-document": "^2.6.6",
-    "@tiptap/extension-image": "^2.6.6",
-    "@tiptap/extension-mention": "^2.6.6",
-    "@tiptap/extension-paragraph": "^2.6.6",
-    "@tiptap/extension-placeholder": "^2.6.6",
-    "@tiptap/extension-text": "^2.6.6",
-    "@tiptap/pm": "^2.6.6",
-    "@tiptap/suggestion": "^2.6.6",
-    "dayjs": "^1.11.13",
-    "interactjs": "^1.10.26",
-    "mitt": "^3.0.0",
-    "rtc-detect": "^1.0.3"
-  },
   "peerDependencies": {
-    "pinia": "^2.1.7",
     "vue": "^3.4.21"
   },
   "devDependencies": {
+    "@tencentcloud/eslint-config-hybrid": "~0.0.1",
     "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@vitejs/plugin-vue": "^5.0.4",
-    "pinia": "^2.2.1",
     "sass": "^1.72.0",
     "typescript": "^5.5.4",
     "vite": "^5.2.0",
@@ -58,5 +35,11 @@
     "vite-plugin-dts": "^3.7.3",
     "vue": "^3.4.21",
     "vue-tsc": "^2.0.6"
+  },
+  "dependencies": {
+    "@tencentcloud/universal-api": "^2.4.0",
+    "@tencentcloud/uikit-base-component-vue3": "1.3.5",
+    "tuikit-atomicx-vue3": "5.1.2",
+    "@tencentcloud/tuiroom-engine-js": "~3.6.3"
   }
 }
