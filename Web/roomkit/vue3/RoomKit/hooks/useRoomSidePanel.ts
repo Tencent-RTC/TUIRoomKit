@@ -8,6 +8,7 @@ const { currentRoom } = useRoomState();
 
 export enum RoomTabKey {
   Chat = 'chat',
+  Barrage = 'barrage',
   ParticipantList = 'participantList',
   AIToolsRealtimeMessageList = 'aiToolsRealtimeMessageList',
 }
@@ -24,6 +25,7 @@ const sidePanelTitle = computed<string>(() => {
   switch (activeTab.value) {
     case RoomTabKey.ParticipantList:
       return `${t('Participant.Title', { count: currentRoom.value?.participantCount })}`;
+    case RoomTabKey.Barrage:
     case RoomTabKey.Chat:
       return t('Chat.Title');
     case RoomTabKey.AIToolsRealtimeMessageList:

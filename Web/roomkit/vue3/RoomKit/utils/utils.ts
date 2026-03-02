@@ -1,4 +1,5 @@
 import { getPlatform } from '@tencentcloud/universal-api';
+import { RoomType } from 'tuikit-atomicx-vue3/room';
 
 /**
  * deepClone
@@ -63,7 +64,7 @@ export function getUrlParams(): Record<string, string> {
  * @param password Optional room password
  * @returns Generated room link
  */
-export function generateRoomLink(roomId: string, password?: string): string {
+export function generateRoomLink(roomId: string, password?: string, roomType = RoomType.Standard): string {
   if (!roomId) {
     return '';
   }
@@ -77,8 +78,8 @@ export function generateRoomLink(roomId: string, password?: string): string {
 
   // Build room parameters
   const roomParams = password
-    ? `roomId=${roomId}&password=${password}`
-    : `roomId=${roomId}`;
+    ? `roomId=${roomId}&roomType=${roomType}&password=${password}`
+    : `roomId=${roomId}&roomType=${roomType}`;
 
   // Generate link based on router mode
   if (isHashRouter) {
@@ -119,11 +120,11 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-export function generateRoomSchemeLink(roomId: string, password?: string): string {
+export function generateRoomSchemeLink(roomId: string, password?: string, roomType = RoomType.Standard): string {
   if (!roomId) {
     return '';
   }
-  return `tuiroom://joinroom?roomId=${roomId}${password ? `&password=${password}` : ''}`;
+  return `tuiroom://joinroom?roomId=${roomId}&roomType=${roomType}${password ? `&password=${password}` : ''}`;
 }
 
 const platform = getPlatform();

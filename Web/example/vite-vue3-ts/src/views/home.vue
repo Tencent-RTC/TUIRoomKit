@@ -12,6 +12,7 @@
 import { PreConferenceView } from '@tencentcloud/roomkit-web-vue3';
 import { useRouter } from 'vue-router';
 import { useMediaPreference } from '../hooks/useMediaPreference';
+import type { TUIRoomType } from 'tuikit-atomicx-vue3/room';
 
 const router = useRouter();
 
@@ -29,19 +30,19 @@ const handleLogout = () => {
   router.push('/login');
 };
 
-const handleCreateRoom = async (roomId: string) => {
+const handleCreateRoom = async (roomId: string, roomType: TUIRoomType) => {
   sessionStorage.setItem(`room-${roomId}-isCreate`, 'true');
   router.push({
     path: '/room',
-    query: { roomId },
+    query: { roomId, roomType },
   });
 };
 
-const handleJoinRoom = async (roomId: string) => {
+const handleJoinRoom = async (roomId: string, roomType: TUIRoomType) => {
   sessionStorage.setItem(`room-${roomId}-isCreate`, 'false');
   router.push({
     path: '/room',
-    query: { roomId },
+    query: { roomId, roomType },
   });
 };
 </script>

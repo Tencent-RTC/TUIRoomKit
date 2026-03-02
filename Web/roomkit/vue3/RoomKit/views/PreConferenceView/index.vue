@@ -9,24 +9,25 @@
 </template>
 
 <script setup lang="ts">
+import { RoomType } from 'tuikit-atomicx-vue3/room';
 import PreviewView from './PreviewView.vue';
 
 interface Emits {
   (e: 'logout'): void;
-  (e: 'create-room', roomId: string): void;
-  (e: 'join-room', roomId: string): void;
+  (e: 'create-room', roomId: string, roomType: RoomType): void;
+  (e: 'join-room', roomId: string, roomType: RoomType): void;
   (e: 'camera-preference-change', isOpen: boolean): void;
   (e: 'microphone-preference-change', isOpen: boolean): void;
 }
 
 const emit = defineEmits<Emits>();
 
-const handleCreateRoom = (roomId: string) => {
-  emit('create-room', roomId);
+const handleCreateRoom = (roomId: string, roomType: RoomType) => {
+  emit('create-room', roomId, roomType);
 };
 
-const handleJoinRoom = (roomId: string) => {
-  emit('join-room', roomId);
+const handleJoinRoom = (roomId: string, roomType: RoomType) => {
+  emit('join-room', roomId, roomType);
 };
 
 const handleCameraPreferenceChange = (isOpen: boolean) => {

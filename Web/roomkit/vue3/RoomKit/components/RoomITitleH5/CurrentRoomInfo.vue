@@ -68,7 +68,7 @@ const roomLink = computed(() => {
     return '';
   }
 
-  return generateRoomLink(currentRoom.value.roomId, currentRoom.value.password);
+  return generateRoomLink(currentRoom.value.roomId, currentRoom.value.password, currentRoom.value.roomType);
 });
 
 </script>

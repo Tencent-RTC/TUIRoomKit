@@ -147,10 +147,12 @@ export const resource = {
   'Room.TransferAndLeave': '移交并离开',
   'Room.ConfirmLeaveTitle': '是否要离开房间',
   'Room.ConfirmLeaveTip': '您当前是房间主持人，请选择相应操作。若选择"结束房间"，将解散当前房间并将全体成员移出。若选择"离开房间"，当前房间不会解散，您的主持人权限将移交给其他成员。',
+  'Room.WebinarConfirmLeaveTip': '您当前是房间主持人，请选择相应操作。若选择"结束房间"，将解散当前房间并将全体成员移出。若选择"离开房间"，当前房间不会解散，并且您仍然是房间主持人。',
   'Room.ConfirmLeavePage': '您确定要离开当前页面么？离开后将会退出当前房间',
   'Room.ConfirmLeaveRoom': '您确定要离开当前房间么？',
   'Room.LeaveRoomTitle': '离开房间',
   'Room.LeaveRoomTip': '您当前是房间主持人，请选择相应操作。若选择"结束房间"，将解散当前房间并将全体成员移出。',
+  'Room.WebinarLeaveRoomTip': '您当前是房间主持人，请选择相应操作。若选择"结束房间"，将解散当前房间并将全体成员移出。',
   'Room.EndRoom': '结束房间',
   'Room.LeaveRoomFailed': '离开房间失败',
   'Room.EndRoomFailed': '结束房间失败',
@@ -185,6 +187,8 @@ export const resource = {
 
   // Button
   'Button.CreateRoom': '新建房间',
+  'Button.CreateConference': '会议房间',
+  'Button.CreateWebinar': '研讨会房间',
   'Button.JoinRoom': '加入房间',
   'Button.ScheduleRoom': '预定房间',
   'Button.EnterRoomId': '输入房间号',
@@ -209,9 +213,9 @@ export const resource = {
   // RoomNotifications
   'RoomNotifications': {
     // Role related
-    BecomeOwner: '您已被设为房主',
-    BecomeAdmin: '您已被设为管理员',
-    AdminRevoked: '您的管理员权限已被撤销',
+    BecomeOwner: '您已成为房主',
+    BecomeAdmin: '您已成为管理员',
+    AdminRevoked: '您的管理员身份被收回',
 
     // Kicked out of room
     KickedByAdmin: '您已被主持人移出房间',
@@ -228,8 +232,8 @@ export const resource = {
     ScreenShareClosed: '主持人已停止你的屏幕共享',
 
     // Message muted/unmuted
-    MessageMuted: '您已被主持人禁止文字聊天',
-    MessageUnmuted: '您的文字聊天权限已被主持人恢复',
+    MessageMuted: '您已被禁止文字聊天',
+    MessageUnmuted: '您已被允许文字聊天',
 
     // All devices control
     AllMicrophonesDisabled: '已静音所有成员，麦克风已禁用',
@@ -254,6 +258,17 @@ export const resource = {
     KeepOff: '保持关闭',
 
     AudioPlaybackFailed: '音频播放失败，点击“确认”继续播放',
+
+    AudiencePromotedToParticipant: '{{ userName }}已被设为嘉宾',
+    ParticipantDemotedToAudience: '{{ userName }}已被设为观众',
+    YouArePromotedToParticipant: '您已被设为嘉宾',
+    YouAreDemotedToAudience: '您已被设为观众',
+
+    Microphone: '麦克风',
+    Camera: '摄像头',
+    ScreenShare: '屏幕共享',
+    DeviceRequestRejected: '您的{{ deviceType }}请求已被拒绝',
+    RaiseHandsRequestRejected: '您的举手请求已被拒绝',
   },
   'AITools': {
     Title: 'AI 工具',
@@ -262,5 +277,21 @@ export const resource = {
     RealtimeMessageListOpen: '开启 AI 实时会议记录',
     SubtitlesClose: '关闭 AI 实时字幕',
     RealtimeMessageListClose: '关闭 AI 实时会议记录',
+  },
+
+  'RaiseHands': {
+    Raise: '举手',
+    Lower: '手放下',
+    Failed: '操作失败',
+    List: '举手列表',
+    Agree: '同意',
+    Reject: '拒绝',
+    Empty: '暂无举手请求',
+  },
+
+  'RoomBarrage': {
+    Host: '房主',
+    Admin: '管理员',
+    Participant: '嘉宾',
   },
 };

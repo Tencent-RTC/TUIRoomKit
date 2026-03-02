@@ -1,12 +1,12 @@
 import { onMounted, onUnmounted } from 'vue';
-import { TUIToast, useUIKit, TUIMessageBox } from '@tencentcloud/uikit-base-component-vue3';
-import { useRoomParticipantState, RoomParticipantEvent, KickedOutOfRoomReason, DeviceType, RoomEvent, useRoomState } from 'tuikit-atomicx-vue3/room';
+import { TUIToast, useUIKit, TUIMessageBox, TOAST_TYPE } from '@tencentcloud/uikit-base-component-vue3';
+import { useRoomParticipantState, RoomParticipantEvent, KickedOutOfRoomReason, DeviceType, RoomEvent, useRoomState, RoomType } from 'tuikit-atomicx-vue3/room';
 import type { MessageBoxHandle } from '@tencentcloud/uikit-base-component-vue3';
 import type { RoomUser, DeviceRequestInfo } from 'tuikit-atomicx-vue3/room';
 
 export function useRoomTips() {
   const { t } = useUIKit();
-  const { subscribeEvent: subscribeRoomEvent, unsubscribeEvent: unsubscribeRoomEvent } = useRoomState();
+  const { currentRoom, subscribeEvent: subscribeRoomEvent, unsubscribeEvent: unsubscribeRoomEvent } = useRoomState();
   const {
     localParticipant,
     muteParticipantMessage,
@@ -18,7 +18,7 @@ export function useRoomTips() {
 
   async function onOwnerChanged({ newOwner }: { newOwner: RoomUser }) {
     if (newOwner.userId === localParticipant.value?.userId) {
-      TUIToast.success({
+      TUIToast.info({
         message: t('RoomNotifications.BecomeOwner'),
       });
     }
@@ -32,7 +32,7 @@ export function useRoomTips() {
 
   async function onAdminSet({ userInfo }: { userInfo: RoomUser }) {
     if (userInfo.userId === localParticipant.value?.userId) {
-      TUIToast.success({
+      TUIToast.info({
         message: t('RoomNotifications.BecomeAdmin'),
       });
     }
@@ -40,7 +40,7 @@ export function useRoomTips() {
 
   function onAdminRevoked({ userInfo }: { userInfo: RoomUser }) {
     if (userInfo.userId === localParticipant.value?.userId) {
-      TUIToast.warning({
+      TUIToast.info({
         message: t('RoomNotifications.AdminRevoked'),
       });
     }
@@ -96,7 +96,8 @@ export function useRoomTips() {
   }
 
   function onParticipantMessageMuted({ muted }: { muted: boolean; operator: RoomUser }) {
-    TUIToast.warning({
+    TUIToast({
+      type: muted ? TOAST_TYPE.WARNING : TOAST_TYPE.INFO,
       message: muted
         ? t('RoomNotifications.MessageMuted')
         : t('RoomNotifications.MessageUnmuted'),
@@ -106,21 +107,24 @@ export function useRoomTips() {
   function onAllDevicesDisabled({ device, disable }: { device: DeviceType; disable: boolean; operator: RoomUser }) {
     switch (device) {
       case DeviceType.Microphone:
-        TUIToast.warning({
+        TUIToast({
+          type: disable ? TOAST_TYPE.WARNING : TOAST_TYPE.INFO,
           message: disable
             ? t('RoomNotifications.AllMicrophonesDisabled')
             : t('RoomNotifications.AllMicrophonesEnabled'),
         });
         break;
       case DeviceType.Camera:
-        TUIToast.warning({
+        TUIToast({
+          type: disable ? TOAST_TYPE.WARNING : TOAST_TYPE.INFO,
           message: disable
             ? t('RoomNotifications.AllCamerasDisabled')
             : t('RoomNotifications.AllCamerasEnabled'),
         });
         break;
       case DeviceType.ScreenShare:
-        TUIToast.warning({
+        TUIToast({
+          type: disable ? TOAST_TYPE.WARNING : TOAST_TYPE.INFO,
           message: disable
             ? t('RoomNotifications.AllScreenSharesDisabled')
             : t('RoomNotifications.AllScreenSharesEnabled'),
@@ -132,7 +136,8 @@ export function useRoomTips() {
   }
 
   function onAllMessagesDisabled({ disable }: { disable: boolean; operator: RoomUser }) {
-    TUIToast.warning({
+    TUIToast({
+      type: disable ? TOAST_TYPE.WARNING : TOAST_TYPE.INFO,
       message: disable
         ? t('RoomNotifications.AllMessagesDisabled')
         : t('RoomNotifications.AllMessagesEnabled'),
@@ -181,6 +186,35 @@ export function useRoomTips() {
     messageBoxMap.set(`${deviceType}-${senderUserId}`, messageBox);
   }
 
+  function onDeviceRequestRejected({ request }: { request: DeviceRequestInfo }) {
+    const { deviceType } = request;
+    if (currentRoom.value?.roomType === RoomType.Webinar) {
+      TUIToast.warning({
+        message: t('RoomNotifications.RaiseHandsRequestRejected'),
+      });
+      return;
+    }
+    switch (deviceType) {
+      case DeviceType.Microphone:
+        TUIToast.warning({
+          message: t('RoomNotifications.DeviceRequestRejected', { deviceType: t('RoomNotifications.Microphone') }),
+        });
+        break;
+      case DeviceType.Camera:
+        TUIToast.warning({
+          message: t('RoomNotifications.DeviceRequestRejected', { deviceType: t('RoomNotifications.Camera') }),
+        });
+        break;
+      case DeviceType.ScreenShare:
+        TUIToast.warning({
+          message: t('RoomNotifications.DeviceRequestRejected', { deviceType: t('RoomNotifications.ScreenShare') }),
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
   function onDeviceInvitationCancelled({ invitation }: { invitation: DeviceRequestInfo }) {
     const { deviceType, senderUserId } = invitation;
     const messageBox = messageBoxMap.get(`${deviceType}-${senderUserId}`);
@@ -197,6 +231,30 @@ export function useRoomTips() {
       messageBox.close();
       messageBoxMap.delete(`${deviceType}-${senderUserId}`);
     }
+  }
+
+  function onAudiencePromotedToParticipant({ userInfo }: { userInfo: RoomUser }) {
+    if (userInfo.userId === localParticipant.value?.userId) {
+      TUIToast.info({
+        message: t('RoomNotifications.YouArePromotedToParticipant'),
+      });
+      return;
+    }
+    TUIToast.info({
+      message: t('RoomNotifications.AudiencePromotedToParticipant', { userName: userInfo.userName || userInfo.userId }),
+    });
+  }
+
+  function onParticipantDemotedToAudience({ userInfo }: { userInfo: RoomUser }) {
+    // if (userInfo.userId === localParticipant.value?.userId) {
+    //   TUIToast.info({
+    //     message: t('RoomNotifications.YouAreDemotedToAudience'),
+    //   });
+    //   return;
+    // }
+    // TUIToast.info({
+    //   message: t('RoomNotifications.ParticipantDemotedToAudience', { userName: userInfo.userName || userInfo.userId }),
+    // });
   }
 
   function onRoomEnded() {
@@ -219,8 +277,11 @@ export function useRoomTips() {
     subscribeEvent(RoomParticipantEvent.onAllDevicesDisabled, onAllDevicesDisabled);
     subscribeEvent(RoomParticipantEvent.onAllMessagesDisabled, onAllMessagesDisabled);
     subscribeEvent(RoomParticipantEvent.onDeviceInvitationReceived, onDeviceInvitationReceived);
+    subscribeEvent(RoomParticipantEvent.onDeviceRequestRejected, onDeviceRequestRejected);
     subscribeEvent(RoomParticipantEvent.onDeviceInvitationCancelled, onDeviceInvitationCancelled);
     subscribeEvent(RoomParticipantEvent.onDeviceInvitationTimeout, onDeviceInvitationTimeout);
+    subscribeEvent(RoomParticipantEvent.onAudiencePromotedToParticipant, onAudiencePromotedToParticipant);
+    subscribeEvent(RoomParticipantEvent.onParticipantDemotedToAudience, onParticipantDemotedToAudience);
     subscribeRoomEvent(RoomEvent.onRoomEnded, onRoomEnded);
   });
 
@@ -234,8 +295,11 @@ export function useRoomTips() {
     unsubscribeEvent(RoomParticipantEvent.onAllDevicesDisabled, onAllDevicesDisabled);
     unsubscribeEvent(RoomParticipantEvent.onAllMessagesDisabled, onAllMessagesDisabled);
     unsubscribeEvent(RoomParticipantEvent.onDeviceInvitationReceived, onDeviceInvitationReceived);
+    unsubscribeEvent(RoomParticipantEvent.onDeviceRequestRejected, onDeviceRequestRejected);
     unsubscribeEvent(RoomParticipantEvent.onDeviceInvitationCancelled, onDeviceInvitationCancelled);
     unsubscribeEvent(RoomParticipantEvent.onDeviceInvitationTimeout, onDeviceInvitationTimeout);
+    unsubscribeEvent(RoomParticipantEvent.onAudiencePromotedToParticipant, onAudiencePromotedToParticipant);
+    unsubscribeEvent(RoomParticipantEvent.onParticipantDemotedToAudience, onParticipantDemotedToAudience);
     unsubscribeRoomEvent(RoomEvent.onRoomEnded, onRoomEnded);
   });
 }

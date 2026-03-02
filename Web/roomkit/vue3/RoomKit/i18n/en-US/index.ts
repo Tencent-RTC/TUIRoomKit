@@ -146,10 +146,12 @@ export const resource = {
   'Room.TransferAndLeave': 'Transfer and Leave',
   'Room.ConfirmLeaveTitle': 'Confirm Leave Room',
   'Room.ConfirmLeaveTip': 'You are currently the room host. Please select the appropriate action. If you select "End Room," the current room will be disbanded and all members will be removed. If you select "Leave Room," the current room will not be disbanded, and your host privileges will be transferred to another member.',
+  'Room.WebinarConfirmLeaveTip': 'You are currently the room host. Please select the appropriate action. If you select "End Room," the current room will be disbanded and all members will be removed. If you select "Leave Room," the current room will not be disbanded, and you will remain the room host.',
   'Room.ConfirmLeavePage': 'Are you sure you want to leave this page? You will exit the current room',
   'Room.ConfirmLeaveRoom': 'Are you sure you want to leave this room?',
   'Room.LeaveRoomTitle': 'Leave Room',
   'Room.LeaveRoomTip': 'You are currently the room host. Please select the appropriate action. If you select "End Room," the current room will be disbanded and all members will be removed.',
+  'Room.WebinarLeaveRoomTip': 'You are currently the room host. Please select the appropriate action. If you select "End Room," the current room will be disbanded and all members will be removed.',
   'Room.EndRoom': 'End Room',
   'Room.LeaveRoomFailed': 'Failed to leave room',
   'Room.EndRoomFailed': 'Failed to end room',
@@ -184,6 +186,8 @@ export const resource = {
 
   // Button
   'Button.CreateRoom': 'Create',
+  'Button.CreateConference': 'Conference',
+  'Button.CreateWebinar': 'Webinar',
   'Button.JoinRoom': 'Join',
   'Button.ScheduleRoom': 'Schedule',
   'Button.EnterRoomId': 'Enter room ID',
@@ -208,9 +212,9 @@ export const resource = {
   // RoomNotifications
   'RoomNotifications': {
     // Role related
-    BecomeOwner: 'You have been promoted to room owner',
-    BecomeAdmin: 'You have been promoted to administrator',
-    AdminRevoked: 'Your administrator privileges have been revoked',
+    BecomeOwner: 'You have become room owner',
+    BecomeAdmin: 'You have become administrator',
+    AdminRevoked: 'Your administrator status has been revoked',
 
     // Kicked out of room
     KickedByAdmin: 'You have been removed from the room by the host',
@@ -227,8 +231,8 @@ export const resource = {
     ScreenShareClosed: 'Your screen sharing has been stopped by the host',
 
     // Message muted/unmuted
-    MessageMuted: 'Your messaging has been disabled by the host',
-    MessageUnmuted: 'Your messaging has been enabled by the host',
+    MessageMuted: 'You have been disabled from text chatting',
+    MessageUnmuted: 'You have been allowed to text chat',
 
     // All devices control
     AllMicrophonesDisabled: 'Participants muted. Mic access disabled.',
@@ -253,6 +257,17 @@ export const resource = {
     KeepOff: 'Keep Off',
 
     AudioPlaybackFailed: 'Audio playback failed. Click the "Confirm" to resume playback',
+
+    AudiencePromotedToParticipant: '{{ userName }} has been promoted to participant',
+    ParticipantDemotedToAudience: '{{ userName }} has been demoted to audience',
+    YouArePromotedToParticipant: 'You have been promoted to participant',
+    YouAreDemotedToAudience: 'You have been demoted to audience',
+
+    Microphone: 'Microphone',
+    Camera: 'Camera',
+    ScreenShare: 'Screen Share',
+    DeviceRequestRejected: 'Your {{ deviceType }} request has been rejected',
+    RaiseHandsRequestRejected: 'Your raise hands request has been rejected',
   },
   'AITools': {
     Title: 'AI Tools',
@@ -261,5 +276,21 @@ export const resource = {
     RealtimeMessageListOpen: 'Open AI Real-time Meeting Minutes',
     SubtitlesClose: 'Close AI Real-time Subtitles',
     RealtimeMessageListClose: 'Close AI Real-time Meeting Minutes',
+  },
+
+  'RaiseHands': {
+    Raise: 'Raise Hand',
+    Lower: 'Lower Hand',
+    Failed: 'Operation failed.',
+    List: 'Raise Hand List',
+    Agree: 'Agree',
+    Reject: 'Reject',
+    Empty: 'No pending raise hand requests',
+  },
+
+  'RoomBarrage': {
+    Host: 'Host',
+    Admin: 'Admin',
+    Participant: 'Participant',
   },
 };

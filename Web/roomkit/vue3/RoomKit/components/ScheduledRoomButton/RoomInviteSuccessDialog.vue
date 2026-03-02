@@ -53,6 +53,7 @@ import { computed } from 'vue';
 import { TUIButton, TUIDialog, TUIToast, IconCopy, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useCopy } from '../../hooks/useCopy';
 import { generateRoomLink } from '../../utils/utils';
+import { RoomType } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 const { copy } = useCopy();
@@ -61,6 +62,7 @@ interface Props {
   visible: boolean;
   roomId: string;
   password?: string;
+  roomType: RoomType;
 }
 
 const props = defineProps<Props>();
@@ -78,7 +80,7 @@ const roomLink = computed(() => {
   if (!props.roomId) {
     return '';
   }
-  return generateRoomLink(props.roomId, props.password);
+  return generateRoomLink(props.roomId, props.password, props.roomType);
 });
 
 const copyRoomIdAndLink = async () => {

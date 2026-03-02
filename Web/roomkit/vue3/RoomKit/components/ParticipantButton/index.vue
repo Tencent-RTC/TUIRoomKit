@@ -17,6 +17,6 @@ const title = computed(() => {
   if (!currentRoom.value) {
     return t('Participant.Title');
   }
-  return t('Participant.Title') + `(${currentRoom.value?.participantCount})`;
+  return t('Participant.Title') + `(${(currentRoom.value?.participantCount || 0) + (currentRoom.value?.audienceCount || 0)})`;
 })
 </script>

@@ -101,7 +101,7 @@ const roomLink = computed(() => {
   if (!props.roomInfo?.roomId) {
     return '';
   }
-  return generateRoomLink(props.roomInfo.roomId, props.roomInfo.password);
+  return generateRoomLink(props.roomInfo.roomId, props.roomInfo.password, props.roomInfo.roomType);
 });
 
 const copyRoomInfoAndLink = async () => {
