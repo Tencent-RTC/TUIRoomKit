@@ -1,6 +1,6 @@
 {
   "name": "room-uikit-web-vue2",
-  "version": "3.2.4",
+  "version": "4.3.1",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
@@ -10,9 +10,9 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@tencentcloud/roomkit-web-vue2.7": "~3.2.4",
-    "@tencentcloud/tuiroom-engine-js": "~3.2.4",
-    "@tencentcloud/uikit-base-component-vue2": "0.3.3",
+    "@tencentcloud/roomkit-web-vue2.7": "~4.3.1",
+    "@tencentcloud/tuiroom-engine-js": "~4.0.0",
+    "@tencentcloud/uikit-base-component-vue2": "1.1.0",
     "core-js": "^3.8.3",
     "mitt": "^3.0.0",
     "pinia": "^2.1.7",
