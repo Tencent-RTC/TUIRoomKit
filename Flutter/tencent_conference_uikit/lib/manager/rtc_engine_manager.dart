@@ -191,6 +191,10 @@ class RoomEngineManager {
     if (result.code == TUIError.success) {
       RoomStore.to.audioSetting.isMicDeviceOpened = true;
     }
+
+    if (GetPlatform.isAndroid) {
+      RtcConferenceTuikitPlatform.instance.startForegroundService();
+    }
     return result;
   }
 

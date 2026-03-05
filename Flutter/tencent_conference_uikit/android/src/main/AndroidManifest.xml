@@ -11,6 +11,6 @@
             android:name=".service.ForegroundService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="mediaPlayback"/>
+            android:foregroundServiceType="mediaPlayback|microphone"/>
     </application>
 </manifest>

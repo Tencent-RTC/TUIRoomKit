@@ -49,7 +49,16 @@ public class ForegroundService extends Service {
             return START_NOT_STICKY;
         }
         Notification notification = createForegroundNotification(title, description);
-        startForeground(NOTIFICATION_ID, notification);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            int serviceType = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK;
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                    == PackageManager.PERMISSION_GRANTED) {
+                serviceType |= ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE;
+            }
+            startForeground(NOTIFICATION_ID, notification, serviceType);
+        } else {
+            startForeground(NOTIFICATION_ID, notification);
+        }
         return START_NOT_STICKY;
     }
 
