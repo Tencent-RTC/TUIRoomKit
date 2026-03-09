@@ -1,10 +1,20 @@
 <template>
-  <div id="roomPage" ref="roomPageRef" class="room-page">
+  <div
+    id="roomPage"
+    ref="roomPageRef"
+    v-tui-loading="{
+      visible: isJoiningRoom,
+      text: t('Room.EnteringRoom'),
+      background: 'var(--bg-color-topbar)',
+    }"
+    class="room-page"
+  >
     <div class="room-container" :class="{ 'has-side-panel': activeTab }">
       <header v-show="showToolbar" class="header">
         <div class="header-left">
           <ThemeButton />
           <LayoutButton
+            v-if="!isWebinar"
             :layout="participantViewLayout"
             @update:layout="handleLayoutUpdate"
           />
@@ -20,11 +30,7 @@
       </header>
 
       <main
-        v-tui-loading="{
-          visible: isJoiningRoom,
-          text: t('Room.EnteringRoom'),
-          background: 'transparent',
-        }"
+
         class="room-main"
       >
         <TUIWatermark
@@ -42,26 +48,38 @@
       </main>
 
       <footer v-show="showToolbar" class="control-bar">
-        <div class="control-left">
+        <div v-if="isWebinar" class="control-left">
+          <MicButton v-if="isGuest || isOwner" />
+          <CameraButton v-if="isOwner" />
+          <RaiseHandsButton v-if="isAudience" />
+        </div>
+        <div v-else class="control-left">
           <MicButton />
           <CameraButton />
         </div>
 
         <div class="control-center">
-          <ScreenShareButton />
-          <CallButton />
+          <ScreenShareButton v-if="!isWebinar || isOwner" />
+          <CallButton v-if="!isWebinar" />
+          <BarrageButton
+            v-if="isWebinar"
+            :is-chat-open="activeTab === RoomTabKey.Barrage"
+            @click="toggleSidePanel(RoomTabKey.Barrage)"
+          />
+          <RaiseHandsList v-if="isWebinar && isOwner" />
           <ChatButton
+            v-if="!isWebinar"
             :is-chat-open="activeTab === RoomTabKey.Chat"
             @click="toggleSidePanel(RoomTabKey.Chat)"
           />
           <ParticipantButton
             @click="toggleSidePanel(RoomTabKey.ParticipantList)"
           />
-          <MoreButton>
-            <VirtualBackgroundButton />
-            <BasicBeautyButton />
-            <AIToolsButton v-if="AIToolsButtonConfig?.visible" />
-            <SettingButton />
+          <MoreButton v-if="!isWebinar || isOwner">
+            <VirtualBackgroundButton v-if="!isWebinar" />
+            <BasicBeautyButton v-if="!isWebinar || isOwner" />
+            <AIToolsButton v-if="!isWebinar && AIToolsButtonConfig?.visible" />
+            <SettingButton v-if="!isWebinar || isOwner" />
           </MoreButton>
         </div>
 
@@ -83,7 +101,12 @@
       @close="closePanel"
     >
       <RoomParticipantList v-if="activeTab === RoomTabKey.ParticipantList" />
-      <RoomChat v-if="activeTab === RoomTabKey.Chat" />
+      <RoomChat
+        v-show="activeTab === RoomTabKey.Chat"
+        v-if="!isWebinar"
+        :is-chat-open="activeTab === RoomTabKey.Chat"
+      />
+      <RoomBarrage v-show="isWebinar && activeTab === RoomTabKey.Barrage" :is-chat-open="activeTab === RoomTabKey.Barrage" />
       <RealtimeMessageList
         v-if="activeTab === RoomTabKey.AIToolsRealtimeMessageList"
       />
@@ -93,6 +116,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
+import type { Ref } from 'vue';
 import {
   useUIKit,
   TUIWatermark,
@@ -108,8 +132,11 @@ import {
   RoomEvent,
   RoomParticipantEvent,
   KickedOutOfRoomReason,
+  RoomType,
+  RoomParticipantRole,
   useAITranscriberState,
 } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
 import { ComponentName, RoomEvent as ConferenceRoomEvent } from '../../adapter/type';
 import {
   ThemeButton,
@@ -133,23 +160,25 @@ import {
   LeaveRoomButton,
   ChatButton,
   RoomSidePanel,
+  BarrageButton,
+  RaiseHandsButton,
+  RaiseHandsList,
   AIToolsButton,
 } from '../../components';
+import RoomBarrage from '../../components/RoomBarrage/RoomBarrage.vue';
 import useCustomizedAutoPlayDialog from '../../hooks/useCustomizedAutoPlayDialog';
+import useRoomLifeCycle from '../../hooks/useRoomLifeCycle';
 import { useRoomSidePanel, RoomTabKey } from '../../hooks/useRoomSidePanel';
 import { useRoomTips } from '../../hooks/useRoomTips';
 import { useRoomToolbar } from '../../hooks/useRoomToolbar';
-import useRoomLifeCycle from '../../hooks/useRoomLifeCycle';
 import { eventCenter } from '../../utils/eventCenter';
-import { conference } from '../../adapter/conference';
 
 const AIToolsButtonConfig = conference.getComponentConfig(ComponentName.AIToolsButton);
 
 const { t } = useUIKit();
 const roomPageRef = ref<HTMLElement | null>(null);
 const { showToolbar } = useRoomToolbar(roomPageRef);
-const { activeTab, sidePanelTitle, toggleSidePanel, closePanel } =
-  useRoomSidePanel();
+const { activeTab, sidePanelTitle, toggleSidePanel, closePanel } = useRoomSidePanel();
 
 useCustomizedAutoPlayDialog();
 useRoomTips();
@@ -161,8 +190,12 @@ const {
   unsubscribeEvent: unsubscribeRoomEvent,
 } = useRoomState();
 const {
-  getParticipantList,
+  localParticipant,
+  participantList,
+  audienceListCursor,
   participantListCursor,
+  getParticipantList,
+  getAudienceList,
   subscribeEvent: subscribeRoomParticipantEvent,
   unsubscribeEvent: unsubscribeRoomParticipantEvent,
 } = useRoomParticipantState();
@@ -175,18 +208,30 @@ const {
   handleJoinRoomError,
 } = useRoomLifeCycle();
 
-const isOwner = computed(() => currentRoom.value?.roomOwner.userId === loginUserInfo.value?.userId);
-const participantViewLayout = ref(RoomLayoutTemplate.GridLayout);
+const isWebinar = computed(() => currentRoom.value?.roomType === RoomType.Webinar);
+const isOwner = computed(() => localParticipant.value?.role === RoomParticipantRole.Owner);
+const isGuest = computed(() => participantList.value.some(participant => participant.userId === localParticipant.value?.userId));
+const isAudience = computed(() => !participantList.value.some(participant => participant.userId === localParticipant.value?.userId));
+const participantViewLayout: Ref<RoomLayoutTemplate | undefined> = ref(undefined);
 function handleLayoutUpdate(layout: RoomLayoutTemplate) {
   participantViewLayout.value = layout;
 }
+
+watch(() => currentRoom.value?.roomType, (newRoomType) => {
+  if (newRoomType === RoomType.Webinar) {
+    participantViewLayout.value = undefined;
+  } else {
+    participantViewLayout.value = RoomLayoutTemplate.GridLayout;
+  }
+}, { immediate: true });
 
 watch(
   () => currentRoom.value?.roomId,
   async (roomId, oldRoomId) => {
     if (!oldRoomId && roomId) {
       await getParticipantList({ cursor: participantListCursor.value });
-      if(isOwner.value && AIToolsButtonConfig?.visible) {
+      await getAudienceList({ cursor: audienceListCursor.value });
+      if (isOwner.value && AIToolsButtonConfig?.visible) {
         await startRealtimeTranscriber({
           sourceLanguage: 'zh',
           translationLanguages: ['en'],
@@ -194,7 +239,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const handlePasswordCancel = () => {
@@ -214,14 +259,14 @@ const onKickedFromRoom = (eventInfo: {
   reason: KickedOutOfRoomReason;
   message: string;
 }) => {
-  eventCenter.emit(ConferenceRoomEvent.KICKED_OUT, {});
+  eventCenter.emit(ConferenceRoomEvent.KICKED_OUT, eventInfo);
 };
 
 onMounted(() => {
   subscribeRoomEvent(RoomEvent.onRoomEnded, onRoomEnded);
   subscribeRoomParticipantEvent(
     RoomParticipantEvent.onKickedFromRoom,
-    onKickedFromRoom
+    onKickedFromRoom,
   );
 });
 
@@ -229,29 +274,30 @@ onUnmounted(() => {
   unsubscribeRoomEvent(RoomEvent.onRoomEnded, onRoomEnded);
   unsubscribeRoomParticipantEvent(
     RoomParticipantEvent.onKickedFromRoom,
-    onKickedFromRoom
+    onKickedFromRoom,
   );
+  closePanel();
 });
 </script>
 
 <style lang="scss" scoped>
 .room-page {
-  width: 100vw;
-  height: 100vh;
-  min-width: 1150px;
+  position: relative;
   display: flex;
   flex-direction: row;
+  width: 100vw;
+  min-width: 1150px;
+  height: 100vh;
+  overflow: hidden;
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  position: relative;
-  overflow: hidden;
 }
 
 .room-container {
-  width: 100%;
+  position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
+  width: 100%;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.has-side-panel {
@@ -260,90 +306,90 @@ onUnmounted(() => {
 }
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   height: 56px;
-  box-sizing: border-box;
+  padding: 16px 20px;
   background-color: var(--bg-color-operate);
   border-bottom: 1px solid var(--stroke-color-primary);
   box-shadow: 0 1px 0 var(--uikit-color-black-8);
 
   &-left {
     display: flex;
-    gap: 24px;
     flex: 1;
+    gap: 24px;
     justify-content: flex-start;
   }
 
   &-center {
     flex: 1;
-    text-align: center;
     height: 100%;
+    text-align: center;
   }
 
   &-right {
     display: flex;
-    align-items: center;
-    gap: 16px;
     flex: 1;
+    gap: 16px;
+    align-items: center;
     justify-content: flex-end;
   }
 }
 
 .room-main {
-  min-height: 0;
+  position: absolute;
+  right: 0;
+  left: 0;
+  display: flex;
   width: 100%;
   height: 100%;
-  position: absolute;
-  left: 0;
-  right: 0;
-  display: flex;
+  min-height: 0;
   background-color: var(--bg-color-topbar);
 }
 
 .control-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-color-operate);
-  border-top: 1px solid var(--stroke-color-primary);
   position: absolute;
-  box-sizing: border-box;
-  width: 100%;
-  height: 72px;
   bottom: 0;
   left: 0;
   z-index: 1;
-  padding: 0px 10px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 72px;
+  padding: 0 10px;
+  background: var(--bg-color-operate);
+  border-top: 1px solid var(--stroke-color-primary);
 
   .control-left {
-    flex: 1;
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    flex: 1;
     gap: 16px;
+    align-items: center;
+    justify-content: flex-start;
   }
 
   .control-center {
     display: flex;
     gap: 16px;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     color: var(--text-color-primary);
   }
 
   .control-right {
-    flex: 1;
     display: flex;
-    justify-content: flex-end;
+    flex: 1;
     align-items: center;
+    justify-content: flex-end;
   }
 }
 
@@ -351,11 +397,11 @@ onUnmounted(() => {
   position: absolute;
   top: 0;
   right: 0;
-  transform: translateX(100%);
+  box-sizing: border-box;
   width: 400px;
   height: 100%;
-  box-sizing: border-box;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(100%);
 
   &-visible {
     transform: translateX(0);

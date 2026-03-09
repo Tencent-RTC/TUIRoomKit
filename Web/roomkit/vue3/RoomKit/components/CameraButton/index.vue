@@ -98,7 +98,7 @@ async function handleClickIcon() {
       }
       return;
     }
-    if (localParticipant.value?.cameraStatus === DeviceStatus.On) {
+    if (cameraStatus.value === DeviceStatus.On) {
       await closeLocalCamera();
     } else {
       await openLocalCamera();

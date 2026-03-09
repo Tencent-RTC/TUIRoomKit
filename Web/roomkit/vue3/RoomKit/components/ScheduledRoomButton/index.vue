@@ -24,6 +24,7 @@
       v-model:visible="showSuccessDialog"
       :room-id="scheduledRoomId"
       :password="scheduledPassword"
+      :room-type="scheduledRoomType"
     />
   </div>
 </template>
@@ -31,7 +32,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { IconScheduleRoom, TUIButton, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { ScheduleRoomPanel, useLoginState } from 'tuikit-atomicx-vue3/room';
+import { RoomType, ScheduleRoomPanel, useLoginState } from 'tuikit-atomicx-vue3/room';
 import RoomInviteSuccessDialog from './RoomInviteSuccessDialog.vue';
 import type { ScheduleRoomOptions } from 'tuikit-atomicx-vue3/types';
 
@@ -42,6 +43,7 @@ const showSchedulePanel = ref(false);
 const showSuccessDialog = ref(false);
 const scheduledRoomId = ref<string>('');
 const scheduledPassword = ref<string>('');
+const scheduledRoomType = ref<RoomType>(RoomType.Standard);
 
 const handleScheduleRoom = () => {
   if (!loginUserInfo.value?.userId) {

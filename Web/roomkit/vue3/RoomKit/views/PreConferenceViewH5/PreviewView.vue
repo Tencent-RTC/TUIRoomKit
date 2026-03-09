@@ -44,7 +44,7 @@
 
       <div class="action-buttons">
         <JoinRoomButtonH5 class="primary-button" @join-room="handleJoinRoom" />
-        <StartRoomButton
+        <StartRoomButtonH5
           class="primary-button"
           @start-room="handleCreateRoom"
         />
@@ -67,7 +67,7 @@ import JoinRoomButtonH5 from '../../components/JoinRoomButtonH5/index.vue';
 import LanguageButton from '../../components/LanguageButton/index.vue';
 import LoginUserInfoH5 from '../../components/LoginUserInfoH5/index.vue';
 import MicButtonH5 from '../../components/MicButtonH5/index.vue';
-import StartRoomButton from '../../components/StartRoomButton/index.vue';
+import StartRoomButtonH5 from '../../components/StartRoomButtonH5/index.vue';
 import SwitchCameraButtonH5 from '../../components/SwitchCameraButtonH5/index.vue';
 import ThemeButton from '../../components/ThemeButton/index.vue';
 

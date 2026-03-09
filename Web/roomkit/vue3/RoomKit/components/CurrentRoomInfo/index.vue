@@ -68,6 +68,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { TUIDropdown, IconCaretDownSmall, IconCopy, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
 import { useCopy } from '../../hooks/useCopy';
+import { generateRoomLink } from '../../utils/utils';
 
 const { t } = useUIKit();
 const { currentRoom } = useRoomState();
@@ -92,26 +93,7 @@ const roomLink = computed(() => {
   if (!currentRoom.value?.roomId) {
     return '';
   }
-
-  // 使用当前域名生成房间链接
-  const baseUrl = `${window.location.protocol}//${window.location.host}`;
-
-  // 检测当前是否使用 hash 路由
-  const isHashRouter = window.location.hash.includes('#');
-  const currentPath = window.location.pathname;
-
-  // 构建房间参数
-  const roomParams = currentRoom.value.password
-    ? `roomId=${currentRoom.value.roomId}&password=${currentRoom.value.password}`
-    : `roomId=${currentRoom.value.roomId}`;
-
-  // 根据路由模式生成链接
-  if (isHashRouter) {
-    // Hash 路由模式: http://localhost:5173/#/room?roomId=xxx
-    return `${baseUrl}${currentPath}#/room?${roomParams}`;
-  }
-  // History 路由模式: http://localhost:5173/room?roomId=xxx
-  return `${baseUrl}/room?${roomParams}`;
+  return generateRoomLink(currentRoom.value.roomId, currentRoom.value.password, currentRoom.value.roomType);
 });
 
 const durationTime = computed(() => {

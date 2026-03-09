@@ -97,7 +97,7 @@ const { t } = useUIKit();
 const { participantList } = useRoomParticipantState();
 
 interface Props {
-  layout: RoomLayoutTemplate;
+  layout?: RoomLayoutTemplate;
 }
 defineProps<Props>();
 

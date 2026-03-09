@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import {
   TUIToast,
@@ -5,9 +6,8 @@ import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomModal } from 'tuikit-atomicx-vue3/room';
-import { ref } from 'vue';
-import { eventCenter } from '../utils/eventCenter';
 import { RoomEvent } from '../adapter/type';
+import { eventCenter } from '../utils/eventCenter';
 
 const isJoiningRoom = ref(false);
 const joiningRoomId = ref('');

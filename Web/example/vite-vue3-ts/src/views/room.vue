@@ -15,11 +15,12 @@ import {
   VideoQuality,
   useRoomParticipantState,
   useRoomModal,
+  RoomType,
 } from 'tuikit-atomicx-vue3/room';
 import { useRoute, useRouter } from 'vue-router';
 import { useMediaPreference } from '../hooks/useMediaPreference';
 
-conference.setComponentConfig({componentName: ComponentName.AIToolsButton, visible: true});
+conference.setComponentConfig({ componentName: ComponentName.AIToolsButton, visible: true });
 
 const route = useRoute();
 const router = useRouter();
@@ -35,7 +36,7 @@ const { getMicrophonePreference, getCameraPreference } = useMediaPreference();
 
 watch(() => loginUserInfo.value?.userId, async (val) => {
   if (val) {
-    const { roomId, password } = route.query as { roomId: string; password?: string };
+    const { roomId, password, roomType } = route.query as { roomId: string; password?: string; roomType: string };
     if (!roomId) {
       router.replace('/home');
       return;
@@ -50,13 +51,20 @@ watch(() => loginUserInfo.value?.userId, async (val) => {
       }
 
       if (isCreate) {
-        await conference.start({ roomId,
+        const roomName = Number(roomType) === RoomType.Webinar
+          ? `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.Webinar')}`
+          : `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`;
+        await conference.start({
+          roomId,
+          roomType: Number(roomType),
           options: {
-            roomName: `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`,
+            roomName,
           },
         });
       } else {
-        await conference.join({ roomId,
+        await conference.join({
+          roomId,
+          roomType: Number(roomType),
           options: {
             password,
           },
@@ -68,6 +76,9 @@ watch(() => loginUserInfo.value?.userId, async (val) => {
 
 watch(() => currentRoom.value?.roomId, async (roomId, oldRoomId) => {
   if (!oldRoomId && roomId) {
+    if (currentRoom.value?.roomType === RoomType.Webinar && currentRoom.value?.roomOwner.userId !== loginUserInfo.value?.userId) {
+      return;
+    }
     handleOpenCamera();
     handleOpenMicrophone();
   }

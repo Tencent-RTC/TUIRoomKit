@@ -37,11 +37,7 @@ router.beforeEach((to, from, next) => {
   }
   const userInfo = localStorage.getItem('tuiRoom-userInfo');
   if (!userInfo) {
-    if (routes.some(route => route.path === from.path) && from.path !== '/login') {
-      next({ path: '/login', query: { from: to.path } });
-    } else {
-      next('/login');
-    }
+    next({ path: '/login', query: { redirect: to.fullPath } });
     return;
   }
 
@@ -49,7 +45,6 @@ router.beforeEach((to, from, next) => {
   if ((from.path === '/room') && (to.path !== '/room')) {
     const { currentRoom, leaveRoom } = useRoomState();
     const { t } = useUIKit();
-
     if (!currentRoom.value?.roomId) {
       next();
       return;
