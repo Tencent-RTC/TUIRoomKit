@@ -11,7 +11,7 @@ export function useCopy() {
   const copy = async (value: string) => {
     const success = await copyText(value);
     if (success) {
-      TUIToast.success({ message: t('Copy Success') });
+      TUIToast.info({ message: t('Copy Success') });
     } else {
       TUIToast.error({ message: t('Copy Failed') });
     }

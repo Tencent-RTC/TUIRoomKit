@@ -3,6 +3,7 @@ import {
   useRoomEngine,
   useRoomState,
   useDeviceState,
+  RoomType,
 } from 'tuikit-atomicx-vue3/room';
 import useRoomLifeCycle from '../hooks/useRoomLifeCycle';
 import { eventCenter } from '../utils/eventCenter';
@@ -47,7 +48,7 @@ class Conference implements IConference {
     eventCenter.off(eventType, callback);
   }
 
-  public async start({ roomId, options }: { roomId: string; options?: StartOptions }) {
+  public async start({ roomId, roomType, options }: { roomId: string; roomType?: RoomType; options?: StartOptions }) {
     const { createAndJoinRoom } = useRoomState();
     const {
       openLocalCamera,
@@ -72,6 +73,7 @@ class Conference implements IConference {
     try {
       await createAndJoinRoom({
         roomId,
+        roomType: roomType || RoomType.Standard,
         options: {
           roomName,
           password,
@@ -113,7 +115,7 @@ class Conference implements IConference {
     }
   }
 
-  public async join({ roomId, options }: { roomId: string; options?: JoinOptions }) {
+  public async join({ roomId, roomType, options }: { roomId: string; roomType?: RoomType; options?: JoinOptions }) {
     const { joinRoom } = useRoomState();
     const {
       openLocalCamera,
@@ -140,6 +142,7 @@ class Conference implements IConference {
     try {
       await joinRoom({
         roomId,
+        roomType: roomType || RoomType.Standard,
         password,
       });
     } catch (error) {

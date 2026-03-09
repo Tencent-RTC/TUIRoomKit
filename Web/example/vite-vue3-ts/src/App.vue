@@ -7,18 +7,20 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useRoomInvitation, useRoomInvitationH5 } from '@tencentcloud/roomkit-web-vue3';
-import { UIKitProvider } from '@tencentcloud/uikit-base-component-vue3';
-import { useLoginState, useRoomModal } from 'tuikit-atomicx-vue3/room';
-import { useRouter } from 'vue-router';
+import { TUIMessageBox, UIKitProvider, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { useLoginState, useRoomModal, LoginEvent } from 'tuikit-atomicx-vue3/room';
+import { useRoute, useRouter } from 'vue-router';
 import { isPC } from './utils/utils';
 
+const { t } = useUIKit();
 const initialTheme = ref(localStorage.getItem('tuiRoom-theme') || 'light');
 const initialLanguage = ref(localStorage.getItem('tuiRoom-language') || '');
 
 const router = useRouter();
-const { login } = useLoginState();
+const route = useRoute();
+const { login, subscribeEvent, unSubscribeEvent } = useLoginState();
 const { handleErrorWithModal } = useRoomModal();
 
 useRoomInvitation({
@@ -50,7 +52,35 @@ if (!isPC) {
   });
 }
 
+const onLoginExpired = () => {
+  TUIMessageBox.alert({
+    title: t('Login.Expired'),
+    content: t('Login.ExpiredDescription'),
+  });
+  router.replace({ path: '/login' });
+};
+const onKickedOffline = () => {
+  TUIMessageBox.alert({
+    title: t('Login.KickedOffline'),
+    content: t('Login.KickedOfflineDescription'),
+  });
+  router.replace({ path: '/login' });
+};
+const bindEvent = () => {
+  subscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
+  subscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
+};
+const unbindEvent = () => {
+  unSubscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
+  unSubscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
+};
+
 onMounted(async () => {
+  bindEvent();
+  await router.isReady();
+  if (route.path === '/login') {
+    return;
+  }
   const storedData = localStorage.getItem('tuiRoom-userInfo') || '{}';
   const userInfo = JSON.parse(storedData);
   try {
@@ -63,8 +93,12 @@ onMounted(async () => {
     console.error('Login failed:', error);
     handleErrorWithModal(error);
     localStorage.removeItem('tuiRoom-userInfo');
-    router.replace({ path: '/login' });
+    router.replace({ path: '/login', query: { redirect: route.fullPath } });
   }
+});
+
+onUnmounted(() => {
+  unbindEvent();
 });
 
 </script>

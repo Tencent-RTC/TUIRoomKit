@@ -12,17 +12,17 @@
 
     <main class="main">
       <div class="title">
-        <div :class="['logo', language]"></div>
+        <div :class="['logo', language]" />
       </div>
       <div class="main-container">
         <div class="room-preview-container">
           <div class="camera-preview-area">
-            <div id="room-preview-video" class="video-preview"></div>
+            <div id="room-preview-video" class="video-preview" />
             <div class="attention-info">
               <span
                 v-if="!isCameraTesting && !isCameraTestLoading"
                 class="off-camera-info"
-                >{{ t('Off Camera') }}</span>
+              >{{ t('Off Camera') }}</span>
               <IconLoading
                 v-if="isCameraTestLoading"
                 size="36"
@@ -66,7 +66,7 @@ import {
   TUIMessageBox,
   TUIToast,
 } from '@tencentcloud/uikit-base-component-vue3';
-import {
+import { RoomType,
   ScheduledRoomList,
   useDeviceState,
   useRoomState,
@@ -82,10 +82,11 @@ import StartRoomButton from '../../components/StartRoomButton/index.vue';
 import ThemeButton from '../../components/ThemeButton/index.vue';
 
 interface Emits {
-  (e: 'create-room', roomId: string): void;
-  (e: 'join-room', roomId: string): void;
+  (e: 'create-room', roomId: string, roomType: RoomType): void;
+  (e: 'join-room', roomId: string, roomType: RoomType): void;
   (e: 'camera-preference-change', isOpen: boolean): void;
   (e: 'microphone-preference-change', isOpen: boolean): void;
+  (e: 'logout'): void;
 }
 const emit = defineEmits<Emits>();
 const { t, theme, language } = useUIKit();
@@ -102,12 +103,12 @@ const {
 } = useDeviceState();
 const { handleErrorWithModal } = useRoomModal();
 
-watch(isMicrophoneTesting, newVal => {
-  emit('microphone-preference-change', newVal);
+watch(isMicrophoneTesting, () => {
+  emit('microphone-preference-change', isMicrophoneTesting.value);
 });
 
-watch(isCameraTesting, newVal => {
-  emit('camera-preference-change', newVal);
+watch(isCameraTesting, () => {
+  emit('camera-preference-change', isCameraTesting.value);
 });
 
 const checkRoomExist = async (roomId: string) => {
@@ -121,18 +122,24 @@ const checkRoomExist = async (roomId: string) => {
   return true;
 };
 
-const generateRoomId = async (): Promise<string> => {
+const MAX_ROOM_ID_RETRIES = 5;
+
+const generateRoomId = async (roomType: RoomType, retriesLeft = MAX_ROOM_ID_RETRIES): Promise<string> => {
   const roomId = String(Math.floor(Math.random() * 900000) + 100000);
-  if (await checkRoomExist(roomId)) {
-    return generateRoomId();
+  if (!(await checkRoomExist(roomId))) {
+    return roomType === RoomType.Standard ? roomId : `webinar_${roomId}`;
   }
-  return roomId;
+  if (retriesLeft <= 1) {
+    const fallbackId = `${Math.floor(Math.random() * 900000) + 100000}_${Date.now()}`;
+    return roomType === RoomType.Standard ? fallbackId : `webinar_${fallbackId}`;
+  }
+  return generateRoomId(roomType, retriesLeft - 1);
 };
 
-const handleStartRoom = async () => {
-  const roomId = await generateRoomId();
+const handleStartRoom = async (roomType: RoomType) => {
+  const roomId = await generateRoomId(roomType);
   sessionStorage.setItem(`room-${roomId}-isCreate`, 'true');
-  emit('create-room', roomId);
+  emit('create-room', roomId, roomType);
 };
 
 const handleJoinRoom = async (roomId: string) => {
@@ -141,7 +148,8 @@ const handleJoinRoom = async (roomId: string) => {
     return;
   }
   if (await checkRoomExist(roomId)) {
-    emit('join-room', roomId);
+    const isWebinar = roomId.startsWith('webinar_');
+    emit('join-room', roomId, isWebinar ? RoomType.Webinar : RoomType.Standard);
   } else {
     TUIMessageBox.alert({
       type: 'error',

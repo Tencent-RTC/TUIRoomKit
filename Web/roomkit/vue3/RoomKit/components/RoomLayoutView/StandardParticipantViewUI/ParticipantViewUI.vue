@@ -3,7 +3,7 @@
     <div
       v-if="
         streamType === VideoStreamType.Camera &&
-        participant.cameraStatus === DeviceStatus.Off
+          participant.cameraStatus === DeviceStatus.Off
       "
       class="center-user-info-container"
     >
@@ -23,16 +23,24 @@
       </div>
       <div v-if="!isScreenStream" :class="['audio-icon-container']">
         <div class="audio-level-container">
-          <div class="audio-level" :style="audioLevelStyle"></div>
+          <div class="audio-level" :style="audioLevelStyle" />
         </div>
         <IconMicOff
           v-if="participant.microphoneStatus === DeviceStatus.Off"
           class="audio-icon"
           size="20"
         />
-        <IconMicOn v-else class="audio-icon" size="20" />
+        <IconMicOn
+          v-else
+          class="audio-icon"
+          size="20"
+        />
       </div>
-      <IconScreenOpen v-if="isScreenStream" class="screen-icon" size="18" />
+      <IconScreenOpen
+        v-if="isScreenStream"
+        class="screen-icon"
+        size="18"
+      />
       <span :class="['user-name', 'is-pc']" :title="displayName">
         {{ displayName }}
       </span>
@@ -73,7 +81,7 @@ const { speakingUsers } = useRoomParticipantState();
 
 const activeSpeaking = computed(() => {
   const currentSpeakingVolume = speakingUsers.value.get(
-    props.participant.userId
+    props.participant.userId,
   );
   if (!currentSpeakingVolume) {
     return false;
@@ -82,13 +90,13 @@ const activeSpeaking = computed(() => {
 });
 
 const speakingAudioVolume = computed(
-  () => speakingUsers.value.get(props.participant.userId) || 0
+  () => speakingUsers.value.get(props.participant.userId) || 0,
 );
 
 const audioLevelStyle = computed(() => {
   if (
-    props.participant.microphoneStatus === DeviceStatus.Off ||
-    !activeSpeaking.value
+    props.participant.microphoneStatus === DeviceStatus.Off
+    || !activeSpeaking.value
   ) {
     return '';
   }
@@ -97,30 +105,30 @@ const audioLevelStyle = computed(() => {
 
 const displayName = computed(
   () =>
-    props.participant.nameCard ||
-    props.participant.userName ||
-    props.participant.userId
+    props.participant.nameCard
+    || props.participant.userName
+    || props.participant.userId,
 );
 
 const showMasterIcon = computed(() => {
   const { role } = props.participant;
   return (
-    role === RoomParticipantRole.Owner &&
-    props.streamType === VideoStreamType.Camera
+    role === RoomParticipantRole.Owner
+    && props.streamType === VideoStreamType.Camera
   );
 });
 
 const showAdminIcon = computed(() => {
   const { role } = props.participant;
   return (
-    role === RoomParticipantRole.Admin &&
-    props.streamType === VideoStreamType.Camera
+    role === RoomParticipantRole.Admin
+    && props.streamType === VideoStreamType.Camera
   );
 });
 
 const showIcon = computed(() => showMasterIcon.value || showAdminIcon.value);
 const isScreenStream = computed(
-  () => props.streamType === VideoStreamType.Screen
+  () => props.streamType === VideoStreamType.Screen,
 );
 </script>
 

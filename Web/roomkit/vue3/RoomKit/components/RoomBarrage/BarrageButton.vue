@@ -13,7 +13,7 @@ import {
   useUIKit,
   Badge,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useConversationListState, useMessageListState } from 'tuikit-atomicx-vue3/chat';
+import { useBarrageState } from 'tuikit-atomicx-vue3/live';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
 import IconButton from '../base/IconButton.vue';
 
@@ -29,16 +29,15 @@ const emit = defineEmits(['click-icon']);
 
 const { t } = useUIKit();
 
-const { setActiveConversation } = useConversationListState();
 const { currentRoom } = useRoomState();
-const { messageList } = useMessageListState();
+const { messageList } = useBarrageState();
 
 const unreadCount = ref(0);
 
 // Watch message list changes only when chat is not open
 watch(
   () => messageList.value?.length,
-  (newLength, oldLength = 0) => {
+  (newLength, oldLength) => {
     if (!newLength || newLength === 0) {
       return;
     }
@@ -66,15 +65,12 @@ watch(
     if (!roomId) {
       return;
     }
-    setActiveConversation(`GROUP${roomId}`);
     // Reset unread count when room changes
     unreadCount.value = 0;
   },
-  { immediate: true },
 );
 
 onUnmounted(() => {
-  setActiveConversation('');
 });
 
 const handleClick = () => {

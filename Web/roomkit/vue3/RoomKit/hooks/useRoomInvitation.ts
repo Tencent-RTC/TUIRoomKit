@@ -1,6 +1,6 @@
 import { onMounted } from 'vue';
 import { TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { RoomEvent, useRoomState, CallRejectReason } from 'tuikit-atomicx-vue3/room';
+import { RoomEvent, useRoomState, CallRejectReason, RoomType } from 'tuikit-atomicx-vue3/room';
 import { hideRoomInvitation, showRoomInvitation } from '../components';
 import type { RoomCall, RoomInfo } from 'tuikit-atomicx-vue3/room';
 
@@ -10,7 +10,7 @@ import type { RoomCall, RoomInfo } from 'tuikit-atomicx-vue3/room';
 export interface AcceptCallParams {
   roomId: string;
   password?: string;
-  [key: string]: string | undefined;
+  roomType: RoomType;
 }
 
 /**
@@ -57,6 +57,7 @@ export function useRoomInvitation(options?: UseRoomInvitationOptions) {
           options.onAcceptCall({
             roomId: roomInfo.roomId,
             password: roomInfo.password || '',
+            roomType: roomInfo.roomType,
           });
         }
       },

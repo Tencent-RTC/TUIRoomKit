@@ -47,7 +47,8 @@ watch(() => loginUserInfo.value?.userId, async (val) => {
       }
 
       if (isCreate) {
-        await conference.start({ roomId,
+        await conference.start({
+          roomId,
           options: {
             roomName: `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`,
           },

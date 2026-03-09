@@ -1,11 +1,15 @@
 <template>
-  <div class="local-screen-container" ref="localScreenContainerRef">
+  <div ref="localScreenContainerRef" class="local-screen-container">
     <div :class="['local-screen-control-container', { mini: isMiniRegion }]">
       <div class="local-screen-info">
         <IconScreenSharing size="44" />
         <span class="text">{{ t('RoomView.YouAreSharingTheScreen') }}</span>
       </div>
-      <TUIButton color="red" @click="handleStopSharing" type="primary">
+      <TUIButton
+        color="red"
+        type="primary"
+        @click="handleStopSharing"
+      >
         {{ t('RoomView.EndSharing') }}
       </TUIButton>
     </div>
@@ -29,14 +33,14 @@ const isMiniRegion = ref(false);
 
 function handleStopSharing() {
   TUIMessageBox.confirm({
-      title: t('ScreenShare.EndSharing'),
-      content: t('ScreenShare.StopSharingConfirm'),
-      callback: async (action: string) => {
-        if (action === 'confirm') {
-          await stopScreenShare();
-        }
-      },
-    });
+    title: t('ScreenShare.EndSharing'),
+    content: t('ScreenShare.StopSharingConfirm'),
+    callback: async (action: string) => {
+      if (action === 'confirm') {
+        await stopScreenShare();
+      }
+    },
+  });
 }
 
 const resizeObserver = new ResizeObserver(() => {
