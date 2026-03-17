@@ -54,23 +54,51 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { IconInvite, IconShare, TUIButton, TUIToast, TUIPopup, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useContactListState } from 'tuikit-atomicx-vue3/chat';
 import { useRoomParticipantState, RoomParticipantStatus, UserPicker, useRoomState } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
 import IconButtonH5 from '../base/IconButtonH5.vue';
 import PopUpArrowDown from '../base/PopUpArrowDown.vue';
 import RoomShare from './RoomShare.vue';
+import type { RoomUser } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 const { currentRoom, callUserToRoom } = useRoomState();
 const { participantList, pendingParticipantList } = useRoomParticipantState();
-const { friendList } = useContactListState();
+const { friendList: defaultFriendList } = useContactListState();
 
 const isVisible = ref(false);
 const userPickerRef = ref();
 const userPickerVisible = ref(false);
 const roomShareVisible = ref(false);
+const customContactList = ref<RoomUser[]>([]);
+
+const contactListProvider = computed(() => conference.getFeatureConfig('contactList'));
+
+watch(contactListProvider, async (provider) => {
+  if (provider) {
+    try {
+      customContactList.value = await provider();
+    } catch (error) {
+      console.warn('Failed to load custom contact list:', error);
+    }
+  } else {
+    customContactList.value = [];
+  }
+}, { immediate: true });
+
+const friendList = computed(() => {
+  if (contactListProvider.value) {
+    return customContactList.value.map(item => ({
+      userID: item.userId,
+      nick: item.userName || '',
+      avatar: item.avatarUrl || '',
+    }));
+  }
+  return defaultFriendList.value;
+});
 
 const userPickerData = computed(() => friendList.value
   .filter(item => !participantList.value.some(participant => participant.userId === item.userID))

@@ -21,6 +21,8 @@
 import { computed } from 'vue';
 import { IconScreenShare, IconStopScreenShare, TUIMessageBox, TUIToast, useUIKit, IconUnSupport } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState, DeviceStatus, useRoomState, useRoomParticipantState, RoomParticipantRole, DeviceError } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
+import { InterceptorAction } from '../../adapter/type';
 import IconButton from '../base/IconButton.vue';
 
 const { currentRoom } = useRoomState();
@@ -59,14 +61,16 @@ async function handleStartScreenShare() {
 
 async function handleScreenShare() {
   if (screenStatus.value === DeviceStatus.On) {
-    TUIMessageBox.confirm({
-      title: t('ScreenShare.EndSharing'),
-      content: t('ScreenShare.StopSharingConfirm'),
-      callback: async (action: string) => {
-        if (action === 'confirm') {
-          await stopScreenShare();
-        }
-      },
+    conference.executeInterceptor(InterceptorAction.StopScreenShare, () => {
+      TUIMessageBox.confirm({
+        title: t('ScreenShare.EndSharing'),
+        content: t('ScreenShare.StopSharingConfirm'),
+        callback: async (action) => {
+          if (action === 'confirm') {
+            await stopScreenShare();
+          }
+        },
+      });
     });
   } else {
     if (isScreenShareDisabled.value) {
@@ -87,14 +91,16 @@ async function handleScreenShare() {
       });
       return;
     }
-    TUIMessageBox.confirm({
-      title: t('ScreenShare.StartSharing'),
-      content: t('ScreenShare.StartSharingConfirm'),
-      callback: async (action: string) => {
-        if (action === 'confirm') {
-          await handleStartScreenShare();
-        }
-      },
+    conference.executeInterceptor(InterceptorAction.StartScreenShare, () => {
+      TUIMessageBox.confirm({
+        title: t('ScreenShare.StartSharing'),
+        content: t('ScreenShare.StartSharingConfirm'),
+        callback: async (action) => {
+          if (action === 'confirm') {
+            await handleStartScreenShare();
+          }
+        },
+      });
     });
   }
 }

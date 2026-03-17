@@ -18,14 +18,14 @@ import { useRoomState } from 'tuikit-atomicx-vue3/room';
 import IconButton from '../base/IconButton.vue';
 
 interface Props {
-  isChatOpen?: boolean;
+  isActive?: boolean;
+  togglePanel?: () => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isChatOpen: false,
+  isActive: false,
+  togglePanel: undefined,
 });
-
-const emit = defineEmits(['click-icon']);
 
 const { t } = useUIKit();
 
@@ -43,7 +43,7 @@ watch(
     }
 
     // Only increment unread count when chat window is closed
-    if (!props.isChatOpen && newLength > oldLength) {
+    if (!props.isActive && newLength > oldLength) {
       unreadCount.value += newLength - oldLength;
     }
   },
@@ -51,7 +51,7 @@ watch(
 
 // Clear unread count when chat window opens
 watch(
-  () => props.isChatOpen,
+  () => props.isActive,
   (isOpen) => {
     if (isOpen) {
       unreadCount.value = 0;
@@ -75,6 +75,6 @@ onUnmounted(() => {
 
 const handleClick = () => {
   unreadCount.value = 0;
-  emit('click-icon');
+  props.togglePanel?.();
 };
 </script>

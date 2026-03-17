@@ -2,9 +2,7 @@ import { TUIMessageBox, useUIKit } from '@tencentcloud/uikit-base-component-vue3
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { isPC } from '../utils/utils';
-import HomeH5 from '@/views/homeH5.vue';
 import Login from '@/views/login.vue';
-import RoomH5 from '@/views/roomH5.vue';
 
 const routes = [
   {
@@ -17,11 +15,11 @@ const routes = [
   },
   {
     path: '/home',
-    component: isPC ? () => import('@/views/home.vue') : HomeH5,
+    component: isPC ? () => import('@/views/home.vue') : () => import('@/views/homeH5.vue'),
   },
   {
     path: '/room',
-    component: isPC ? () => import('@/views/room.vue') : RoomH5,
+    component: isPC ? () => import('@/views/room.vue') : () => import('@/views/roomH5.vue'),
   },
 ];
 

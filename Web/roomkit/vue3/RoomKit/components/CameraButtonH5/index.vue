@@ -43,6 +43,8 @@ import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState, useRoomState, DeviceStatus, useRoomParticipantState, DeviceError, RoomParticipantRole, useRoomModal } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
+import { InterceptorAction } from '../../adapter/type';
 import IconButtonH5 from '../base/IconButtonH5.vue';
 import vClickOutside from '../base/vClickOutside';
 
@@ -105,9 +107,13 @@ async function handleClickIcon() {
       return;
     }
     if (localParticipant.value?.cameraStatus === DeviceStatus.On) {
-      await closeLocalCamera();
+      conference.executeInterceptor(InterceptorAction.CloseCamera, async () => {
+        await closeLocalCamera();
+      });
     } else {
-      await openLocalCamera();
+      conference.executeInterceptor(InterceptorAction.OpenCamera, async () => {
+        await openLocalCamera();
+      });
     }
   } catch (error: any) {
     handleErrorWithModal(error);

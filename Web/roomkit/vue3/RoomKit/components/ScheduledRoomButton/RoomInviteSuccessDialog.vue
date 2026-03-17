@@ -51,9 +51,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { TUIButton, TUIDialog, TUIToast, IconCopy, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { RoomType } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
 import { useCopy } from '../../hooks/useCopy';
 import { generateRoomLink } from '../../utils/utils';
-import { RoomType } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 const { copy } = useCopy();
@@ -77,6 +78,10 @@ const visible = computed({
 });
 
 const roomLink = computed(() => {
+  const customLink = conference.getFeatureConfig('shareLink');
+  if (customLink) {
+    return customLink;
+  }
   if (!props.roomId) {
     return '';
   }

@@ -34,48 +34,22 @@ const { muteMicrophone, unmuteMicrophone } = useRoomParticipantState();
 
 const { getMicrophonePreference, getCameraPreference } = useMediaPreference();
 
-watch(() => loginUserInfo.value?.userId, async (val) => {
-  if (val) {
-    const { roomId, password, roomType } = route.query as { roomId: string; password?: string; roomType: string };
-    if (!roomId) {
-      router.replace('/home');
-      return;
-    }
+const { roomId, password, roomType: roomTypeString } = route.query as { roomId: string; password?: string; roomType: string };
+const roomType = Number(roomTypeString) as RoomType;
 
-    if (!currentRoom.value?.roomId) {
-      const isCreateKey = `room-${roomId}-isCreate`;
-      const isCreate = sessionStorage.getItem(isCreateKey) === 'true';
+if (!roomId) {
+  router.replace('/home');
+}
 
-      if (isCreate) {
-        sessionStorage.removeItem(isCreateKey);
-      }
-
-      if (isCreate) {
-        const roomName = Number(roomType) === RoomType.Webinar
-          ? `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.Webinar')}`
-          : `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`;
-        await conference.start({
-          roomId,
-          roomType: Number(roomType),
-          options: {
-            roomName,
-          },
-        });
-      } else {
-        await conference.join({
-          roomId,
-          roomType: Number(roomType),
-          options: {
-            password,
-          },
-        });
-      }
-    }
+watch(() => loginUserInfo.value?.userId, async (userId) => {
+  if (!userId || !roomId || currentRoom.value?.roomId) {
+    return;
   }
+  await handleEnterRoom();
 }, { immediate: true });
 
-watch(() => currentRoom.value?.roomId, async (roomId, oldRoomId) => {
-  if (!oldRoomId && roomId) {
+watch(() => currentRoom.value?.roomId, async (currentRoomId, prevRoomId) => {
+  if (!prevRoomId && currentRoomId) {
     if (currentRoom.value?.roomType === RoomType.Webinar && currentRoom.value?.roomOwner.userId !== loginUserInfo.value?.userId) {
       return;
     }
@@ -83,6 +57,41 @@ watch(() => currentRoom.value?.roomId, async (roomId, oldRoomId) => {
     handleOpenMicrophone();
   }
 }, { immediate: true });
+
+async function handleEnterRoom() {
+  const isCreateKey = `room-${roomId}-isCreate`;
+  const isCreate = sessionStorage.getItem(isCreateKey) === 'true';
+  sessionStorage.removeItem(isCreateKey);
+  try {
+    if (isCreate) {
+      await handleStartConference();
+    } else {
+      await handleJoinConference();
+    }
+  } catch (error) {
+    handleErrorWithModal(error);
+    router.replace('/home');
+  }
+}
+
+async function handleStartConference() {
+  const roomName = roomType === RoomType.Webinar
+    ? `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.Webinar')}`
+    : `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`;
+  await conference.start({
+    roomId,
+    roomType,
+    options: { roomName },
+  });
+}
+
+async function handleJoinConference() {
+  await conference.join({
+    roomId,
+    roomType,
+    options: { password },
+  });
+}
 
 async function handleOpenCamera() {
   if (!localVideoQuality.value) {

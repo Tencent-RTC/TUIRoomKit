@@ -38,6 +38,8 @@ import type { Ref } from 'vue';
 import { ref, computed } from 'vue';
 import { useUIKit, TUIToast, IconUnSupport } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState, useRoomState, useRoomParticipantState, RoomParticipantRole, DeviceStatus, AudioSettingPanel, DeviceError, useRoomModal } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
+import { InterceptorAction } from '../../adapter/type';
 import IconButton from '../base/IconButton.vue';
 import vClickOutside from '../base/vClickOutside';
 import AudioIcon from './AudioIcon.vue';
@@ -95,10 +97,14 @@ async function handleClickIcon() {
       return;
     }
     if (microphoneStatus.value === DeviceStatus.On) {
-      await muteMicrophone();
+      conference.executeInterceptor(InterceptorAction.CloseMicrophone, async () => {
+        await muteMicrophone();
+      });
     } else {
-      await openLocalMicrophone();
-      await unmuteMicrophone();
+      conference.executeInterceptor(InterceptorAction.OpenMicrophone, async () => {
+        await openLocalMicrophone();
+        await unmuteMicrophone();
+      });
     }
   } catch (error) {
     handleErrorWithModal(error);

@@ -14,7 +14,10 @@
       :custom-classes="['virtual-background-dialog']"
       appendTo="#roomPage"
     >
-      <VirtualBackgroundPanel @close="virtualBackgroundVisible = false" />
+      <VirtualBackgroundPanel
+        :custom-images="customImages"
+        @close="virtualBackgroundVisible = false"
+      />
       <template #footer>
         <div />
       </template>
@@ -23,9 +26,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { IconVirtualBackground, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState, useVirtualBackgroundState, VirtualBackgroundPanel } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
 import IconButton from '../base/IconButton.vue';
 
 const { t } = useUIKit();
@@ -34,6 +38,10 @@ const virtualBackgroundVisible = ref(false);
 
 const { isSupported } = useVirtualBackgroundState();
 const { cameraList } = useDeviceState();
+
+const customImages = computed(
+  () => conference.getFeatureConfig('virtualBackground')?.customImages ?? [],
+);
 
 const handleClick = () => {
   if (cameraList.value.length === 0) {

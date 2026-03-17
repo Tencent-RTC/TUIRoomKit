@@ -65,8 +65,9 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { TUIDropdown, IconCaretDownSmall, IconCopy, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { TUIDropdown, IconCaretDownSmall, IconCopy, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
 import { useCopy } from '../../hooks/useCopy';
 import { generateRoomLink } from '../../utils/utils';
 
@@ -90,6 +91,10 @@ onUnmounted(() => {
 });
 
 const roomLink = computed(() => {
+  const customLink = conference.getFeatureConfig('shareLink');
+  if (customLink) {
+    return customLink;
+  }
   if (!currentRoom.value?.roomId) {
     return '';
   }

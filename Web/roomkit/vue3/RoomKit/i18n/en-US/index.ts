@@ -77,10 +77,6 @@ export const resource = {
 
   // VirtualBackground
   'VirtualBackground.Title': 'Virtual Background',
-  'VirtualBackground.Close': 'Close',
-  'VirtualBackground.Blurred': 'Blurred',
-  'VirtualBackground.Save': 'Save',
-  'VirtualBackground.Cancel': 'Cancel',
   'VirtualBackground.NotSupported': 'Virtual background is not supported in current browser',
   'VirtualBackground.NoCamera': 'No camera detected',
 
@@ -157,6 +153,7 @@ export const resource = {
   'Room.RoomOccupied': 'Room already exists, cannot be created again',
   'Room.RoomId': 'Room ID',
   'Room.EnterRoomId': 'Please enter room ID',
+  'Room.H5NotSupportWebinar': 'Webinar rooms are not supported on H5 yet',
   'Room.OpenMicrophone': 'Open Microphone',
   'Room.OpenSpeaker': 'Open Speaker',
   'Room.OpenCamera': 'Open Camera',
