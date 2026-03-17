@@ -25,6 +25,8 @@ import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../../adapter/conference';
+import { InterceptorAction } from '../../../adapter/type';
 
 const { t } = useUIKit();
 const { stopScreenShare } = useDeviceState();
@@ -32,14 +34,16 @@ const localScreenContainerRef = ref();
 const isMiniRegion = ref(false);
 
 function handleStopSharing() {
-  TUIMessageBox.confirm({
-    title: t('ScreenShare.EndSharing'),
-    content: t('ScreenShare.StopSharingConfirm'),
-    callback: async (action: string) => {
-      if (action === 'confirm') {
-        await stopScreenShare();
-      }
-    },
+  conference.executeInterceptor(InterceptorAction.StopScreenShare, () => {
+    TUIMessageBox.confirm({
+      title: t('ScreenShare.EndSharing'),
+      content: t('ScreenShare.StopSharingConfirm'),
+      callback: async (action) => {
+        if (action === 'confirm') {
+          await stopScreenShare();
+        }
+      },
+    });
   });
 }
 

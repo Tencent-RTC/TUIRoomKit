@@ -1,4 +1,5 @@
 import AIToolsButton from './AIToolsButton/index.vue';
+import AIToolsButtonH5 from './AIToolsButtonH5/index.vue';
 import BasicBeautyButton from './BasicBeautyButton/index.vue';
 import CallButton from './CallButton/index.vue';
 import CallButtonH5 from './CallButtonH5/index.vue';
@@ -45,6 +46,41 @@ import SwitchCameraButtonH5 from './SwitchCameraButtonH5/index.vue';
 import ThemeButton from './ThemeButton/index.vue';
 import VirtualBackgroundButton from './VirtualBackgroundButton/index.vue';
 import RaiseHandsList from './RaiseHandsList/index.vue';
+import CustomWidgetRenderer from './CustomWidgetRenderer/index.vue';
+
+// Registrar components (PC)
+import ThemeRegistrar from './ThemeButton/ThemeRegistrar.vue';
+import LayoutRegistrar from './LayoutButton/LayoutRegistrar.vue';
+import LocalNetworkInfoRegistrar from './LocalNetworkInfo/LocalNetworkInfoRegistrar.vue';
+import CurrentRoomInfoRegistrar from './CurrentRoomInfo/CurrentRoomInfoRegistrar.vue';
+import LanguageRegistrar from './LanguageButton/LanguageRegistrar.vue';
+import LoginUserInfoRegistrar from './LoginUserInfo/LoginUserInfoRegistrar.vue';
+import MicRegistrar from './MicButton/MicRegistrar.vue';
+import CameraRegistrar from './CameraButton/CameraRegistrar.vue';
+import ScreenShareRegistrar from './ScreenShareButton/ScreenShareRegistrar.vue';
+import InviteRegistrar from './CallButton/InviteRegistrar.vue';
+import ChatRegistrar from './RoomChat/ChatRegistrar.vue';
+import MemberRegistrar from './ParticipantButton/MemberRegistrar.vue';
+import VirtualBackgroundRegistrar from './VirtualBackgroundButton/VirtualBackgroundRegistrar.vue';
+import BasicBeautyRegistrar from './BasicBeautyButton/BasicBeautyRegistrar.vue';
+import AIToolsRegistrar from './AIToolsButton/AIToolsRegistrar.vue';
+import SettingsRegistrar from './SettingButton/SettingsRegistrar.vue';
+import LeaveRoomRegistrar from './LeaveRoomButton/LeaveRoomRegistrar.vue';
+import BarrageRegistrar from './RoomBarrage/BarrageRegistrar.vue';
+import RaiseHandsRegistrar from './RaiseHandsButton/RaiseHandsRegistrar.vue';
+import RaiseHandsListRegistrar from './RaiseHandsList/RaiseHandsListRegistrar.vue';
+
+// Registrar components (H5)
+import SwitchCameraRegistrarH5 from './SwitchCameraButtonH5/SwitchCameraRegistrarH5.vue';
+import CurrentRoomInfoRegistrarH5 from './RoomITitleH5/CurrentRoomInfoRegistrarH5.vue';
+import LeaveRoomRegistrarH5 from './LeaveRoomButtonH5/LeaveRoomRegistrarH5.vue';
+import MemberRegistrarH5 from './ParticipantButtonH5/MemberRegistrarH5.vue';
+import MicRegistrarH5 from './MicButtonH5/MicRegistrarH5.vue';
+import CameraRegistrarH5 from './CameraButtonH5/CameraRegistrarH5.vue';
+import InviteRegistrarH5 from './CallButtonH5/InviteRegistrarH5.vue';
+import ChatRegistrarH5 from './RoomChatH5/ChatRegistrarH5.vue';
+import SettingsRegistrarH5 from './SettingButtonH5/SettingsRegistrarH5.vue';
+import AIToolsRegistrarH5 from './AIToolsButtonH5/AIToolsRegistrarH5.vue';
 
 export {
   CameraButton,
@@ -81,6 +117,7 @@ export {
   RoomBarrage,
   RaiseHandsButton,
   RaiseHandsList,
+  CustomWidgetRenderer,
   // h5
   MicButtonH5,
   CameraButtonH5,
@@ -95,6 +132,39 @@ export {
   SwitchCameraButtonH5,
   PasswordDialogH5,
   LoginUserInfoH5,
+  AIToolsButtonH5,
   showRoomInvitationH5,
   hideRoomInvitationH5,
+  // Registrar components (PC)
+  ThemeRegistrar,
+  LayoutRegistrar,
+  LocalNetworkInfoRegistrar,
+  CurrentRoomInfoRegistrar,
+  LanguageRegistrar,
+  LoginUserInfoRegistrar,
+  MicRegistrar,
+  CameraRegistrar,
+  ScreenShareRegistrar,
+  InviteRegistrar,
+  ChatRegistrar,
+  MemberRegistrar,
+  VirtualBackgroundRegistrar,
+  BasicBeautyRegistrar,
+  AIToolsRegistrar,
+  SettingsRegistrar,
+  LeaveRoomRegistrar,
+  BarrageRegistrar,
+  RaiseHandsRegistrar,
+  RaiseHandsListRegistrar,
+  // Registrar components (H5)
+  SwitchCameraRegistrarH5,
+  CurrentRoomInfoRegistrarH5,
+  LeaveRoomRegistrarH5,
+  MemberRegistrarH5,
+  MicRegistrarH5,
+  CameraRegistrarH5,
+  InviteRegistrarH5,
+  ChatRegistrarH5,
+  SettingsRegistrarH5,
+  AIToolsRegistrarH5,
 };

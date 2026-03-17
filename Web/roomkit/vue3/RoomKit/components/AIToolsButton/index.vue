@@ -3,27 +3,27 @@
     <Dropdown
       trigger="click"
       placement="top"
-      :teleported="false"
+      :teleported="true"
     >
       <IconButton :title="t('AITools.Title')">
         <IconAIIcon :size="24" />
       </IconButton>
       <template #dropdown>
         <div class="operate-list">
-          <div class="operate-item" @click="subtitlesVisible = !subtitlesVisible">
+          <div class="operate-item" @click="isSubtitlesVisible = !isSubtitlesVisible">
             <IconAISubtitles :size="18" />
-            <span class="operate-item-text">{{ subtitlesVisible ? t('AITools.SubtitlesClose') : t('AITools.SubtitlesOpen') }}</span>
+            <span class="operate-item-text">{{ isSubtitlesVisible ? t('AITools.SubtitlesClose') : t('AITools.SubtitlesOpen') }}</span>
           </div>
-          <div class="operate-item" @click="toggleSidePanel(RoomTabKey.AIToolsRealtimeMessageList)">
+          <div class="operate-item" @click="props.togglePanel?.()">
             <IconAITranscription :size="18" />
-            <span class="operate-item-text">{{ activeTab === RoomTabKey.AIToolsRealtimeMessageList ? t('AITools.RealtimeMessageListClose') : t('AITools.RealtimeMessageListOpen') }}</span>
+            <span class="operate-item-text">{{ activeWidgetId === BuiltinWidget.AIToolsWidget ? t('AITools.RealtimeMessageListClose') : t('AITools.RealtimeMessageListOpen') }}</span>
           </div>
         </div>
       </template>
     </Dropdown>
   </div>
   <Teleport to="body">
-    <Subtitle v-if="subtitlesVisible" />
+    <Subtitle v-if="isSubtitlesVisible" />
   </Teleport>
 </template>
 
@@ -31,13 +31,22 @@
 import { ref } from 'vue';
 import { Dropdown, IconAIIcon, IconAISubtitles, IconAITranscription, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { Subtitle } from 'tuikit-atomicx-vue3/room';
-import { RoomTabKey, useRoomSidePanel } from '../../hooks/useRoomSidePanel';
+import { BuiltinWidget } from '../../adapter/type';
+import { useRoomSidePanel } from '../../hooks/useRoomSidePanel';
 import IconButton from '../base/IconButton.vue';
 
-const { t } = useUIKit();
-const { activeTab, toggleSidePanel } = useRoomSidePanel();
+interface Props {
+  togglePanel?: () => void;
+}
 
-const subtitlesVisible = ref(false);
+const props = withDefaults(defineProps<Props>(), {
+  togglePanel: undefined,
+});
+
+const { t } = useUIKit();
+const { activeWidgetId } = useRoomSidePanel();
+
+const isSubtitlesVisible = ref(false);
 </script>
 
 <style lang="scss" scoped>

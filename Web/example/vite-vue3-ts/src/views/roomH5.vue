@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue';
-import { conference, ConferenceMainViewH5, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
+import { ComponentName, conference, ConferenceMainViewH5, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
 import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
@@ -19,6 +19,8 @@ import {
 import { useRoute, useRouter } from 'vue-router';
 import { useMediaPreference } from '../hooks/useMediaPreference';
 
+conference.setComponentConfig({ componentName: ComponentName.AIToolsButton, visible: true });
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useUIKit();
@@ -30,46 +32,57 @@ const { localVideoQuality, openLocalCamera, updateVideoQuality, openLocalMicroph
 const { muteMicrophone, unmuteMicrophone } = useRoomParticipantState();
 const { getMicrophonePreference, getCameraPreference } = useMediaPreference();
 
-watch(() => loginUserInfo.value?.userId, async (val) => {
-  if (val) {
-    const { roomId, password } = route.query as { roomId: string; password?: string };
-    if (!roomId) {
-      router.replace('/home');
-      return;
-    }
+const { roomId, password } = route.query as { roomId: string; password?: string };
 
-    if (!currentRoom.value?.roomId) {
-      const isCreateKey = `room-${roomId}-isCreate`;
-      const isCreate = sessionStorage.getItem(isCreateKey) === 'true';
+if (!roomId) {
+  router.replace('/home');
+}
 
-      if (isCreate) {
-        sessionStorage.removeItem(isCreateKey);
-      }
-
-      if (isCreate) {
-        await conference.start({
-          roomId,
-          options: {
-            roomName: `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`,
-          },
-        });
-      } else {
-        await conference.join({ roomId,
-          options: {
-            password,
-          },
-        });
-      }
-    }
+watch(() => loginUserInfo.value?.userId, async (userId) => {
+  if (!userId || !roomId || currentRoom.value?.roomId) {
+    return;
   }
+  await handleEnterRoom();
 }, { immediate: true });
 
-watch(() => currentRoom.value?.roomId, async (roomId, oldRoomId) => {
-  if (!oldRoomId && roomId) {
+watch(() => currentRoom.value?.roomId, async (currentRoomId, prevRoomId) => {
+  if (!prevRoomId && currentRoomId) {
     handleOpenCamera();
     handleOpenMicrophone();
   }
 }, { immediate: true });
+
+async function handleEnterRoom() {
+  const isCreateKey = `room-${roomId}-isCreate`;
+  const isCreate = sessionStorage.getItem(isCreateKey) === 'true';
+  sessionStorage.removeItem(isCreateKey);
+  try {
+    if (isCreate) {
+      await handleStartConference();
+    } else {
+      await handleJoinConference();
+    }
+  } catch (error) {
+    handleErrorWithModal(error);
+    router.replace('/home');
+  }
+}
+
+async function handleStartConference() {
+  await conference.start({
+    roomId,
+    options: {
+      roomName: `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`,
+    },
+  });
+}
+
+async function handleJoinConference() {
+  await conference.join({
+    roomId,
+    options: { password },
+  });
+}
 
 async function handleOpenCamera() {
   if (!localVideoQuality.value) {

@@ -1,6 +1,7 @@
 <template>
   <div>
     <Dropdown
+      ref="dropdownRef"
       trigger="click"
       placement="top"
       :teleported="false"
@@ -11,11 +12,11 @@
       </IconButton>
       <template #dropdown>
         <div class="operate-list">
-          <div class="operate-item" @click="userPickerVisible = true">
+          <div class="operate-item" @click="handleOpenUserPicker">
             <IconInvite :size="18" />
             <span class="operate-item-text">{{ t('Invite.AddMember') }}</span>
           </div>
-          <div class="operate-item" @click="roomShareVisible = true">
+          <div class="operate-item" @click="handleOpenRoomShare">
             <IconShare :size="18" />
             <span class="operate-item-text">{{ t('Invite.ShareRoom') }}</span>
           </div>
@@ -25,10 +26,11 @@
 
     <TUIDialog
       v-model:visible="userPickerVisible"
-      append-to="body"
+      appendTo="#roomPage"
       :title="`${t('Contacts')} (${userPickerData.length})`"
     >
       <UserPicker
+        v-if="userPickerVisible"
         ref="userPickerRef"
         class="room-user-picker"
         :data-source="userPickerData"
@@ -48,7 +50,7 @@
 
     <TUIDialog
       v-model:visible="roomShareVisible"
-      append-to="body"
+      appendTo="#roomPage"
       :title="t('Room.InviteToMeeting', { userName: loginUserInfo?.userName || loginUserInfo?.userId })"
       :custom-classes="['room-share-dialog']"
     >
@@ -61,22 +63,51 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { Dropdown, IconInvite, IconShare, TUIButton, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useContactListState } from 'tuikit-atomicx-vue3/chat';
 import { UserPicker, useLoginState, useRoomParticipantState, useRoomState, RoomParticipantStatus } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
 import IconButton from '../base/IconButton.vue';
 import RoomShare from './RoomShare.vue';
+import type { RoomUser } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 const { loginUserInfo } = useLoginState();
 const { currentRoom, callUserToRoom } = useRoomState();
 const { participantList, pendingParticipantList } = useRoomParticipantState();
-const { friendList } = useContactListState();
+const { friendList: defaultFriendList } = useContactListState();
 
+const dropdownRef = ref<{ closeDropdown?: () => void }>();
 const userPickerRef = ref();
 const userPickerVisible = ref(false);
 const roomShareVisible = ref(false);
+const customContactList = ref<RoomUser[]>([]);
+
+const contactListProvider = computed(() => conference.getFeatureConfig('contactList'));
+
+watch(contactListProvider, async (provider) => {
+  if (provider) {
+    try {
+      customContactList.value = await provider();
+    } catch (error) {
+      console.warn('Failed to load custom contact list:', error);
+    }
+  } else {
+    customContactList.value = [];
+  }
+}, { immediate: true });
+
+const friendList = computed(() => {
+  if (contactListProvider.value) {
+    return customContactList.value.map(item => ({
+      userID: item.userId,
+      nick: item.userName || '',
+      avatar: item.avatarUrl || '',
+    }));
+  }
+  return defaultFriendList.value;
+});
 
 const userPickerData = computed(() => friendList.value
   .filter(item => !participantList.value.some(participant => participant.userId === item.userID))
@@ -87,6 +118,24 @@ const userPickerData = computed(() => friendList.value
     avatarUrl: item.avatar,
     extraData: item,
   })));
+
+const openDialogAfterCloseDropdown = async (dialog: 'userPicker' | 'roomShare') => {
+  dropdownRef.value?.closeDropdown?.();
+  await nextTick();
+  if (dialog === 'userPicker') {
+    userPickerVisible.value = true;
+    return;
+  }
+  roomShareVisible.value = true;
+};
+
+const handleOpenUserPicker = async () => {
+  await openDialogAfterCloseDropdown('userPicker');
+};
+
+const handleOpenRoomShare = async () => {
+  await openDialogAfterCloseDropdown('roomShare');
+};
 
 const handleUserPickerConfirm = async () => {
   try {

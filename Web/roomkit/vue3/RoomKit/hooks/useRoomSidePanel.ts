@@ -1,57 +1,65 @@
 import { ref, computed } from 'vue';
 import type { Ref, ComputedRef } from 'vue';
-import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { useRoomState } from 'tuikit-atomicx-vue3/room';
-
-const { t } = useUIKit();
-const { currentRoom } = useRoomState();
-
-export enum RoomTabKey {
-  Chat = 'chat',
-  Barrage = 'barrage',
-  ParticipantList = 'participantList',
-  AIToolsRealtimeMessageList = 'aiToolsRealtimeMessageList',
-}
+import { conference } from '../adapter/conference';
+import type { WidgetConfig } from '../adapter/type';
 
 interface UseRoomSidePanelReturn {
-  activeTab: Ref<RoomTabKey | null>;
+  activeWidgetId: Ref<string | null>;
   sidePanelTitle: ComputedRef<string>;
-  toggleSidePanel: (tab: RoomTabKey) => void;
+  panelWidgets: ComputedRef<WidgetConfig[]>;
+  toggleWidgetPanel: (widgetId: string) => void;
   closePanel: () => void;
 }
 
-const activeTab = ref<RoomTabKey | null>(null);
+const activeWidgetId = ref<string | null>(null);
+
+/**
+ * Title of the currently active side panel.
+ * Resolved from the widget's panel.title (supports both string and function).
+ */
 const sidePanelTitle = computed<string>(() => {
-  switch (activeTab.value) {
-    case RoomTabKey.ParticipantList:
-      return `${t('Participant.Title', { count: currentRoom.value?.participantCount })}`;
-    case RoomTabKey.Barrage:
-    case RoomTabKey.Chat:
-      return t('Chat.Title');
-    case RoomTabKey.AIToolsRealtimeMessageList:
-      return t('AITools.RealtimeMessageList');
-    default:
-      return '';
+  if (!activeWidgetId.value) {
+    return '';
   }
+  const widget = conference.getRegisteredWidgets()
+    .find(w => w.id === activeWidgetId.value && w.panel);
+  if (!widget?.panel) {
+    return '';
+  }
+  return typeof widget.panel.title === 'function'
+    ? widget.panel.title()
+    : widget.panel.title;
 });
 
-const toggleSidePanel = (tab: RoomTabKey) => {
-  if (activeTab.value === tab) {
-    activeTab.value = null;
-  } else {
-    activeTab.value = tab;
-  }
+/**
+ * All registered widgets that have panel config.
+ * Used for rendering in RoomSidePanel (keepAlive widgets need to stay mounted).
+ */
+const panelWidgets = computed(() =>
+  conference.getRegisteredWidgets().filter(w => w.panel),
+);
+
+/**
+ * Toggle side panel by widget id.
+ * If the panel is already open for this widget, close it; otherwise open it.
+ */
+const toggleWidgetPanel = (widgetId: string) => {
+  activeWidgetId.value = activeWidgetId.value === widgetId ? null : widgetId;
 };
 
+/**
+ * Close the currently active side panel.
+ */
 const closePanel = () => {
-  activeTab.value = null;
+  activeWidgetId.value = null;
 };
 
 export function useRoomSidePanel(): UseRoomSidePanelReturn {
   return {
-    activeTab,
+    activeWidgetId,
     sidePanelTitle,
-    toggleSidePanel,
+    panelWidgets,
+    toggleWidgetPanel,
     closePanel,
   };
 }

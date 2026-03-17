@@ -79,6 +79,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { IconCopy, TUIButton, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { conference } from '../../adapter/conference';
 import { useCopy } from '../../hooks/useCopy';
 import { generateRoomLink, generateRoomSchemeLink } from '../../utils/utils';
 import type { RoomInfo } from 'tuikit-atomicx-vue3/room';
@@ -108,6 +109,10 @@ const formatDateTime = (timestamp?: number): string => {
 };
 
 const roomLink = computed(() => {
+  const customLink = conference.getFeatureConfig('shareLink');
+  if (customLink) {
+    return customLink;
+  }
   if (!props.roomInfo?.roomId) {
     return '';
   }

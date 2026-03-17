@@ -13,8 +13,16 @@ watch(microphoneStatus, (newVal) => {
   sessionStorage.setItem(STORAGE_KEY_MICROPHONE_STATUS, newVal === DeviceStatus.On ? 'true' : 'false');
 });
 
-const getMicrophonePreference = () => sessionStorage.getItem(STORAGE_KEY_MICROPHONE_STATUS) === 'true';
-const getCameraPreference = () => sessionStorage.getItem(STORAGE_KEY_CAMERA_STATUS) === 'true';
+function getStoredBooleanPreference(key: string, defaultValue = true) {
+  const value = sessionStorage.getItem(key);
+  if (value === null) {
+    return defaultValue;
+  }
+  return value === 'true';
+}
+
+const getMicrophonePreference = () => getStoredBooleanPreference(STORAGE_KEY_MICROPHONE_STATUS);
+const getCameraPreference = () => getStoredBooleanPreference(STORAGE_KEY_CAMERA_STATUS);
 
 const setMicrophonePreference = (isOpen: boolean) => {
   sessionStorage.setItem(STORAGE_KEY_MICROPHONE_STATUS, isOpen ? 'true' : 'false');

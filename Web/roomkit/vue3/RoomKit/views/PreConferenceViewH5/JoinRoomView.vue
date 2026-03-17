@@ -1,11 +1,15 @@
 <template>
   <div :class="['join-room-container-h5', theme]">
     <header class="header-h5">
-      <IconBack size="22" class="back-button" @click="handleGoBack" />
+      <IconBack
+        size="22"
+        class="back-button"
+        @click="handleGoBack"
+      />
       <h1 class="title">
         {{ t('Button.JoinRoom') }}
       </h1>
-      <div class="header-placeholder"></div>
+      <div class="header-placeholder" />
     </header>
 
     <main class="main-h5">
@@ -16,7 +20,7 @@
             :label="t('Room.RoomId')"
             class="form-input"
             :placeholder="t('Room.EnterRoomId')"
-            max-length="6"
+            max-length="20"
           />
         </div>
 
@@ -65,7 +69,7 @@ import {
   TUIButton,
   TUIInput,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useRoomState, useLoginState } from 'tuikit-atomicx-vue3/room';
+import { useRoomState, useLoginState, RoomType } from 'tuikit-atomicx-vue3/room';
 
 interface Emits {
   (e: 'join-room', roomId: string): void;
@@ -93,11 +97,11 @@ const openMicrophone = ref(props.microphonePreference);
 const openCamera = ref(props.cameraPreference);
 const loading = ref(false);
 
-watch(openMicrophone, newVal => {
+watch(openMicrophone, (newVal) => {
   emit('microphone-preference-change', newVal);
 });
 
-watch(openCamera, newVal => {
+watch(openCamera, (newVal) => {
   emit('camera-preference-change', newVal);
 });
 
@@ -112,20 +116,20 @@ const handleGoBack = () => {
   emit('back');
 };
 
-const checkRoomExist = async (id: string) => {
+const getTargetRoomInfo = async (id: string) => {
   try {
-    await getRoomInfo({ roomId: id });
+    return await getRoomInfo({ roomId: id });
   } catch (error: unknown) {
     if (
-      error &&
-      typeof error === 'object' &&
-      'code' in error &&
-      error.code === TUIErrorCode.ERR_ROOM_ID_NOT_EXIST
+      error
+      && typeof error === 'object'
+      && 'code' in error
+      && error.code === TUIErrorCode.ERR_ROOM_ID_NOT_EXIST
     ) {
-      return false;
+      return null;
     }
+    throw error;
   }
-  return true;
 };
 
 const handleJoinRoom = async () => {
@@ -136,9 +140,10 @@ const handleJoinRoom = async () => {
   }
 
   try {
-    const exists = await checkRoomExist(roomId.value.trim());
+    const normalizedRoomId = roomId.value.trim();
+    const roomInfo = await getTargetRoomInfo(normalizedRoomId);
 
-    if (!exists) {
+    if (!roomInfo) {
       TUIMessageBox.alert({
         type: 'error',
         modal: false,
@@ -149,10 +154,22 @@ const handleJoinRoom = async () => {
       return;
     }
 
-    emit('join-room', roomId.value.trim());
+    const isWebinarRoom = roomInfo.roomType === RoomType.Webinar;
+    if (isWebinarRoom) {
+      TUIMessageBox.alert({
+        type: 'error',
+        modal: false,
+        showClose: false,
+        title: t('Room.Alert'),
+        content: t('Room.H5NotSupportWebinar'),
+      });
+      return;
+    }
+
+    emit('join-room', normalizedRoomId);
   } catch (error: unknown) {
-    const errorMessage =
-      error && typeof error === 'object' && 'message' in error
+    const errorMessage
+      = error && typeof error === 'object' && 'message' in error
         ? String(error.message)
         : t('Room.JoinRoomError');
     TUIToast.error({ message: errorMessage });

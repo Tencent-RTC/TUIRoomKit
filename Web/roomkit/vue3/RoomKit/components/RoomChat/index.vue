@@ -27,11 +27,11 @@ import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
 import CustomMessage from './CustomMessage.vue';
 
 interface Props {
-  isChatOpen?: boolean;
+  isActive?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isChatOpen: false,
+  isActive: false,
 });
 
 const messageListRef = ref<InstanceType<typeof MessageList> | null>(null);
@@ -44,7 +44,7 @@ const placeholder = computed(() =>
 );
 const messageActionList = useMessageActions(['copy', 'recall', 'delete']);
 
-watch(() => props.isChatOpen, (newVal, oldVal) => {
+watch(() => props.isActive, (newVal, oldVal) => {
   if (newVal && !oldVal && messageListRef.value) {
     messageListRef.value?.scrollToBottom({ behavior: 'instant' });
   }

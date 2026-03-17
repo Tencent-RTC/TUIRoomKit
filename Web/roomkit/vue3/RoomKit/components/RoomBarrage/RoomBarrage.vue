@@ -24,11 +24,11 @@ import { BarrageInput, BarrageList } from 'tuikit-atomicx-vue3/live';
 import { useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
 
 interface Props {
-  isChatOpen?: boolean;
+  isActive?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isChatOpen: false,
+  isActive: false,
 });
 
 const barrageListRef = ref<InstanceType<typeof BarrageList> | null>(null);
@@ -71,7 +71,7 @@ const placeholder = computed(() =>
     : t('RoomChat.input_placeholder'),
 );
 
-watch(() => props.isChatOpen, (newVal, oldVal) => {
+watch(() => props.isActive, (newVal, oldVal) => {
   if (newVal && !oldVal && barrageListRef.value) {
     barrageListRef.value?.scrollToBottom({ behavior: 'smooth' });
   }

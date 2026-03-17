@@ -1,9 +1,16 @@
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { conference } from '../adapter/conference';
+
+const showToolbar = ref(true);
 
 export function useRoomToolbarH5() {
-  const showToolbar = ref(true);
+  const toolbarConfig = computed(() => conference.getFeatureConfig('toolbar'));
+  const alwaysShow = computed(() => toolbarConfig.value?.alwaysShow === true);
 
   function toggleToolbar(event: MouseEvent | TouchEvent) {
+    if (alwaysShow.value) {
+      return;
+    }
     const target = event.target as HTMLElement;
     // Toggle toolbar when clicking on the main area or video area
     // But exclude interactive elements like buttons

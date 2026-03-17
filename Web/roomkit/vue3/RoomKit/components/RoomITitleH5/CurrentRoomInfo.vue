@@ -56,6 +56,7 @@
 import { computed } from 'vue';
 import { IconCopy, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
 import { useCopy } from '../../hooks/useCopy';
 import { generateRoomLink } from '../../utils/utils';
 
@@ -64,6 +65,10 @@ const { currentRoom } = useRoomState();
 const { copy } = useCopy();
 
 const roomLink = computed(() => {
+  const customLink = conference.getFeatureConfig('shareLink');
+  if (customLink) {
+    return customLink;
+  }
   if (!currentRoom.value?.roomId) {
     return '';
   }

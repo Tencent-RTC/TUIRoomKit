@@ -19,9 +19,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Custom Split Strategy
-        manualChunks: {
-          roomEngine: ['@tencentcloud/tuiroom-engine-js'],
-        },
       },
     },
   },
@@ -38,16 +35,4 @@ export default defineConfig({
       additionalLegacyPolyfills: ['regenerator-runtime/runtime'], // Optional polyfills
     }),
   ],
-  server: {
-    open: true,
-    // Solve the problem of infinite page refresh after whistle proxy
-    hmr: true,
-    proxy: {
-      '/api': {
-        target: 'https://service.trtc.qcloud.com',
-        changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, ''),
-      },
-    },
-  },
 });

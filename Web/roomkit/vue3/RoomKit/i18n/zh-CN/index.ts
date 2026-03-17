@@ -77,10 +77,6 @@ export const resource = {
 
   // VirtualBackground
   'VirtualBackground.Title': '虚拟背景',
-  'VirtualBackground.Close': '关闭',
-  'VirtualBackground.Blurred': '模糊',
-  'VirtualBackground.Save': '保存',
-  'VirtualBackground.Cancel': '取消',
   'VirtualBackground.NotSupported': '当前浏览器不支持虚拟背景功能',
   'VirtualBackground.NoCamera': '未检测到摄像头',
 
@@ -157,6 +153,7 @@ export const resource = {
   'Room.RoomOccupied': '房间已存在，无法再次创建',
   'Room.RoomId': '房间号',
   'Room.EnterRoomId': '请输入房间号',
+  'Room.H5NotSupportWebinar': 'H5 暂不支持进入研讨会',
   'Room.OpenMicrophone': '开启麦克风',
   'Room.OpenSpeaker': '开启扬声器',
   'Room.OpenCamera': '开启视频',

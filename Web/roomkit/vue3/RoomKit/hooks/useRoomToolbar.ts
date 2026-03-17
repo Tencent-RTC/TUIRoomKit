@@ -1,11 +1,18 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
 import type { Ref } from 'vue';
+import { conference } from '../adapter/conference';
+
+const DEFAULT_AUTO_HIDE_DELAY = 5000;
+const TOOLBAR_SAFE_LAYER_SELECTOR = '[class*="emoji-picker__list"]';
 
 export function useRoomToolbar(
   containerRef: Ref<HTMLElement | null>,
-  autoHideDelay = 5000,
   mouseMoveThrottle = 1000,
 ) {
+  const toolbarConfig = computed(() => conference.getFeatureConfig('toolbar'));
+  const alwaysShow = computed(() => toolbarConfig.value?.alwaysShow === true);
+  const autoHideDelay = computed(() => toolbarConfig.value?.autoHideDelay ?? DEFAULT_AUTO_HIDE_DELAY);
+
   const showToolbar = ref(true);
   const hideToolTimer = ref<number | null>(null);
   const throttleTimer = ref<number | null>(null);
@@ -25,11 +32,21 @@ export function useRoomToolbar(
     }
   };
 
+  const isToolbarSafeLayerElement = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) {
+      return false;
+    }
+    return Boolean(target.closest(TOOLBAR_SAFE_LAYER_SELECTOR));
+  };
+
   const setHideTimer = () => {
+    if (alwaysShow.value) {
+      return;
+    }
     clearHideTimer();
     hideToolTimer.value = window.setTimeout(() => {
       showToolbar.value = false;
-    }, autoHideDelay);
+    }, autoHideDelay.value);
   };
 
   const handleMouseEnter = () => {
@@ -51,7 +68,13 @@ export function useRoomToolbar(
     }, mouseMoveThrottle);
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (event: MouseEvent) => {
+    if (alwaysShow.value) {
+      return;
+    }
+    if (isToolbarSafeLayerElement(event.relatedTarget)) {
+      return;
+    }
     clearHideTimer();
     clearThrottleTimer();
     isThrottled.value = false;
@@ -80,9 +103,22 @@ export function useRoomToolbar(
     container.removeEventListener('mouseleave', handleMouseLeave);
   };
 
+  // Watch alwaysShow changes: when switching to always-show, clear timers and show toolbar
+  watch(alwaysShow, (newVal) => {
+    if (newVal) {
+      clearHideTimer();
+      clearThrottleTimer();
+      showToolbar.value = true;
+    } else {
+      setHideTimer();
+    }
+  });
+
   onMounted(() => {
     addEventListeners();
-    setHideTimer();
+    if (!alwaysShow.value) {
+      setHideTimer();
+    }
   });
 
   onUnmounted(() => {
