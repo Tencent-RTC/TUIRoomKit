@@ -6,9 +6,9 @@
   >
     <icon-button
       layout="horizontal"
-      :icon="currentNetworkState.icon"
       @click-icon="toggleNetworkPanel"
     >
+      <component :is="currentNetworkState.icon" size="20" />
       <template #title>
         <span :class="['network-title', `status-${currentNetworkState.type}`]">
           {{ currentNetworkState.title }}

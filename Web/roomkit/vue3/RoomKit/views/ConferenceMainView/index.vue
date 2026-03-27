@@ -312,7 +312,6 @@ onUnmounted(() => {
   display: flex;
   flex-direction: row;
   width: 100vw;
-  min-width: 1150px;
   height: 100vh;
   overflow: hidden;
   font-family:
@@ -351,8 +350,9 @@ onUnmounted(() => {
   &-left {
     display: flex;
     flex: 1;
-    gap: 24px;
+    gap: 12px;
     justify-content: flex-start;
+    align-items: center;
   }
 
   &-center {

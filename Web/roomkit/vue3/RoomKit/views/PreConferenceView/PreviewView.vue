@@ -1,6 +1,6 @@
 <template>
   <div :class="['home-container', theme]">
-    <header class="header">
+    <header v-if="mergedUiOptions.showHeader" class="header">
       <div class="header-left">
         <ThemeButton />
       </div>
@@ -11,7 +11,7 @@
     </header>
 
     <main class="main">
-      <div class="title">
+      <div v-if="mergedUiOptions.showLogo" class="title">
         <div :class="['logo', language]" />
       </div>
       <div class="main-container">
@@ -40,16 +40,17 @@
                 class="button-item"
                 @start-room="handleStartRoom"
               />
-              <JoinRoomButton class="button-item" @join-room="handleJoinRoom" />
+              <JoinRoomButton
+                class="button-item"
+                @join-room="handleJoinRoom"
+              />
               <ScheduledRoomButton class="button-item" />
             </div>
           </div>
         </div>
         <div class="schedule-list">
           <ScheduledRoomList
-            @join-room="
-              (roomInfo: { roomId: string }) => handleJoinRoom(roomInfo.roomId)
-            "
+            @join-room="handleScheduleJoinRoom"
           />
         </div>
       </div>
@@ -58,7 +59,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, watch } from 'vue';
+import {
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  watch,
+} from 'vue';
 import TUIRoomEngine, { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import {
   useUIKit,
@@ -88,8 +94,25 @@ interface Emits {
   (e: 'microphone-preference-change', isOpen: boolean): void;
   (e: 'logout'): void;
 }
+
+interface Props {
+  uiOptions?: {
+    showHeader?: boolean;
+    showLogo?: boolean;
+  };
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  uiOptions: () => ({}),
+});
+
 const emit = defineEmits<Emits>();
 const { t, theme, language } = useUIKit();
+const mergedUiOptions = computed(() => ({
+  showHeader: true,
+  showLogo: true,
+  ...props.uiOptions,
+}));
 
 const { getRoomInfo } = useRoomState();
 const {
@@ -159,6 +182,10 @@ const handleJoinRoom = async (roomId: string) => {
       content: t('Room.RoomNotFound'),
     });
   }
+};
+
+const handleScheduleJoinRoom = (roomInfo: { roomId: string }) => {
+  handleJoinRoom(roomInfo.roomId);
 };
 
 function handleLogout() {

@@ -1,5 +1,6 @@
 <template>
   <PreviewView
+    :ui-options="props.uiOptions"
     @logout="handleLogout"
     @create-room="handleCreateRoom"
     @join-room="handleJoinRoom"
@@ -12,6 +13,13 @@
 import { RoomType } from 'tuikit-atomicx-vue3/room';
 import PreviewView from './PreviewView.vue';
 
+interface Props {
+  uiOptions?: {
+    showHeader?: boolean;
+    showLogo?: boolean;
+  };
+}
+
 interface Emits {
   (e: 'logout'): void;
   (e: 'create-room', roomId: string, roomType: RoomType): void;
@@ -19,6 +27,10 @@ interface Emits {
   (e: 'camera-preference-change', isOpen: boolean): void;
   (e: 'microphone-preference-change', isOpen: boolean): void;
 }
+
+const props = withDefaults(defineProps<Props>(), {
+  uiOptions: () => ({}),
+});
 
 const emit = defineEmits<Emits>();
 

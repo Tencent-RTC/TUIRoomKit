@@ -4,8 +4,7 @@
       v-bind="$attrs"
       :nick="userName"
       :message="message"
-      :is-hidden-message-avatar="true"
-      :is-hidden-message-meta="props.message.flow !== 'out'"
+      :removeAvatar="true"
     />
   </div>
 </template>
@@ -51,11 +50,5 @@ const userName = computed(() => {
   .self {
     text-align: right;
   }
-}
-</style>
-
-<style lang="scss">
-.message-layout__wrapper--left {
-  padding-left: 0 !important;
 }
 </style>

@@ -63,7 +63,7 @@
     so we can measure their actual pixel widths for overflow calculation.
   -->
   <div
-    v-if="props.platform === 'pc'"
+    v-if="enableOverflow"
     ref="measureContainerRef"
     class="measure-container"
     aria-hidden="true"
@@ -180,6 +180,7 @@ provide(widgetDeclarationOrderContextKey, {
 });
 
 const sortedWidgets = computed(() => conference.getRegisteredWidgets(props.zone, props.platform));
+const enableOverflow = computed(() => props.platform === 'pc' && props.zone === 'bottom-center');
 
 /** Number of items that fit within the container before overflow occurs */
 const visibleCount = ref(Infinity);
@@ -192,7 +193,7 @@ const measureContainerRef = ref<HTMLElement | null>(null);
  * On PC, only the first `visibleCount` items are shown.
  */
 const visibleWidgets = computed(() => {
-  if (props.platform === 'h5') {
+  if (!enableOverflow.value) {
     return sortedWidgets.value;
   }
   return sortedWidgets.value.slice(0, visibleCount.value);
@@ -202,7 +203,7 @@ const visibleWidgets = computed(() => {
  * Widgets that overflow into the MoreButton dropdown (PC only).
  */
 const overflowWidgets = computed(() => {
-  if (props.platform === 'h5') {
+  if (!enableOverflow.value) {
     return [];
   }
   if (visibleCount.value >= sortedWidgets.value.length) {
@@ -219,7 +220,7 @@ const MORE_BUTTON_WIDTH = 56;
  * compute how many widgets fit within the parent container's width.
  */
 function recalculate() {
-  if (props.platform === 'h5') {
+  if (!enableOverflow.value) {
     visibleCount.value = Infinity;
     return;
   }

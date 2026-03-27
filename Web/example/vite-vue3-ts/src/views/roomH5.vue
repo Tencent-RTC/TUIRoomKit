@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue';
-import { ComponentName, conference, ConferenceMainViewH5, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
+import { conference, ConferenceMainViewH5, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
 import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
@@ -19,7 +19,9 @@ import {
 import { useRoute, useRouter } from 'vue-router';
 import { useMediaPreference } from '../hooks/useMediaPreference';
 
-conference.setComponentConfig({ componentName: ComponentName.AIToolsButton, visible: true });
+conference.setFeatureConfig({
+  aiTools: { enable: true },
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -69,7 +71,7 @@ async function handleEnterRoom() {
 }
 
 async function handleStartConference() {
-  await conference.start({
+  await conference.createAndJoinRoom({
     roomId,
     options: {
       roomName: `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`,
@@ -78,9 +80,9 @@ async function handleStartConference() {
 }
 
 async function handleJoinConference() {
-  await conference.join({
+  await conference.joinRoom({
     roomId,
-    options: { password },
+    password,
   });
 }
 
@@ -130,84 +132,5 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-
-.room-page {
-  width: 100vw;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  position: relative;
-  overflow: hidden;
-}
-
-.room-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 16px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  width: 100%;
-  height: 56px;
-  box-sizing: border-box;
-  transition: opacity 0.3s;
-  background-color: var(--bg-color-operate);
-  border-bottom: 1px solid var(--stroke-color-secondary);
-  background-color: var(--bg-color-bottombar);
-
-  &-left {
-    flex: 1;
-    display: flex;
-    gap: 12px;
-    justify-content: flex-start;
-  }
-
-  &-center {
-    flex: 2;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  &-right {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    width: auto;
-  }
-}
-
-.room-main {
-  min-height: 0;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  left: 0;
-  right: 0;
-  display: flex;
-  background-color: var(--bg-color-topbar);
-}
-
-.room-footer {
-  position: absolute;
-  box-sizing: border-box;
-  background-color: var(--bg-color-operate);
-  width: 100%;
-  height: 90px;
-  bottom: 0;
-  left: 0;
-}
 
 </style>
