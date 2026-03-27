@@ -1,28 +1,42 @@
+import { getCurrentInstance, inject, reactive, shallowReactive, markRaw } from 'vue';
+import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import {
   useLoginState,
   useRoomEngine,
   useRoomState,
-  useDeviceState,
   RoomType,
   LoginEvent,
 } from 'tuikit-atomicx-vue3/room';
-import { getCurrentInstance, inject, reactive, shallowReactive, markRaw } from 'vue';
-import useRoomLifeCycle from '../hooks/useRoomLifeCycle';
-import { eventCenter } from '../utils/eventCenter';
 import { widgetDeclarationOrderContextKey } from '../components/CustomWidgetRenderer/context';
-import { RoomEvent, StartOptions, JoinOptions, IConference, ComponentName, ComponentConfig, BuiltinWidget, WidgetConfig, WidgetZone, WidgetZoneConfig, WidgetPlatform, InterceptorAction, InterceptorHandler, FeatureConfig } from './type';
-import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
+import useRoomLifeCycle from '../hooks/useRoomLifeCycle';
 import { dataReport, MetricsKey } from '../report';
+import { eventCenter } from '../utils/eventCenter';
+import { ConferenceDeprecated } from './conferenceDeprecated';
+import {
+  RoomEvent,
+  BuiltinWidget,
+  WidgetConfig,
+  WidgetZone,
+  WidgetZoneConfig,
+  WidgetPlatform,
+  InterceptorAction,
+  InterceptorHandler,
+  FeatureConfig,
+  IConference,
+} from './type';
+import type { CreateRoomOptions } from 'tuikit-atomicx-vue3/room';
 
-class Conference implements IConference {
-  private componentConfig: ComponentConfig[] = [];
+class Conference extends ConferenceDeprecated implements IConference {
   private widgetVisibility = reactive<Record<string, boolean>>({});
   private registeredWidgets = shallowReactive<WidgetConfig[]>([]);
   private widgetRegistrationIndex = 0;
   private interceptorHandlers = new Map<InterceptorAction, Set<InterceptorHandler>>();
-  private featureConfig = reactive<FeatureConfig>({});
+  private featureConfig = reactive<FeatureConfig>({
+    aiTools: { enable: false },
+  });
 
   constructor() {
+    super();
     this.initLoginEventListeners();
   }
 
@@ -36,18 +50,22 @@ class Conference implements IConference {
     });
   }
 
-  public login(params: {
+  public async login(params: {
     sdkAppId: number;
     userId: string;
     userSig: string;
-    tim?: any;
   }) {
     const { login } = useLoginState();
-    return login({
+    await login({
       userId: params.userId,
       userSig: params.userSig,
       sdkAppId: params.sdkAppId,
     });
+  }
+
+  public setSelfInfo(options: { userName: string; avatarUrl: string }) {
+    const { setSelfInfo } = useLoginState();
+    return setSelfInfo(options);
   }
 
   public async logout() {
@@ -56,7 +74,7 @@ class Conference implements IConference {
   }
 
   public getRoomEngine() {
-    const roomEngine = useRoomEngine() as { instance: TUIRoomEngine } | null ;
+    const roomEngine = useRoomEngine() as { instance: TUIRoomEngine } | null;
     if (!roomEngine) {
       console.warn('getRoomEngine failed, roomEngine is not exist');
     }
@@ -71,36 +89,15 @@ class Conference implements IConference {
     eventCenter.off(eventType, callback);
   }
 
-  public async start({ roomId, roomType, options }: { roomId: string; roomType?: RoomType; options?: StartOptions }) {
+  public async createAndJoinRoom({ roomId, roomType, options }: { roomId: string; roomType?: RoomType; options?: CreateRoomOptions }) {
     const { createAndJoinRoom } = useRoomState();
-    const {
-      openLocalCamera,
-      openLocalMicrophone,
-      setCurrentCamera,
-      setCurrentMicrophone,
-      setCurrentSpeaker,
-    } = useDeviceState();
-
-    const {
-      roomName,
-      isOpenCamera = false,
-      isOpenMicrophone = false,
-      defaultCameraId,
-      defaultMicrophoneId,
-      defaultSpeakerId,
-      password,
-    } = options || {};
-
     const { isJoiningRoom, handleJoinRoomError } = useRoomLifeCycle();
     isJoiningRoom.value = true;
     try {
       await createAndJoinRoom({
         roomId,
-        roomType: roomType || RoomType.Standard,
-        options: {
-          roomName,
-          password,
-        },
+        roomType,
+        options: options ?? {},
       });
     } catch (error) {
       isJoiningRoom.value = false;
@@ -108,58 +105,11 @@ class Conference implements IConference {
       throw error;
     }
     isJoiningRoom.value = false;
-
-    // Set default device before opening
-    if (defaultCameraId) {
-      await setCurrentCamera({ deviceId: defaultCameraId });
-    }
-    if (defaultMicrophoneId) {
-      await setCurrentMicrophone({ deviceId: defaultMicrophoneId });
-    }
-    if (defaultSpeakerId) {
-      await setCurrentSpeaker({ deviceId: defaultSpeakerId });
-    }
-
-    // Open device based on parameters
-    if (isOpenCamera) {
-      try {
-        await openLocalCamera();
-      } catch (error) {
-        console.warn('Failed to open camera:', error);
-      }
-    }
-
-    if (isOpenMicrophone) {
-      try {
-        await openLocalMicrophone();
-      } catch (error) {
-        console.warn('Failed to open microphone:', error);
-      }
-    }
   }
 
-  public async join({ roomId, roomType, options }: { roomId: string; roomType?: RoomType; options?: JoinOptions }) {
+  public async joinRoom({ roomId, roomType, password }: { roomId: string; roomType?: RoomType; password?: string }) {
     const { joinRoom } = useRoomState();
-    const {
-      openLocalCamera,
-      openLocalMicrophone,
-      setCurrentCamera,
-      setCurrentMicrophone,
-      setCurrentSpeaker,
-    } = useDeviceState();
-
-    const {
-      isOpenCamera = false,
-      isOpenMicrophone = false,
-      defaultCameraId,
-      defaultMicrophoneId,
-      defaultSpeakerId,
-      password,
-    } = options || {};
-
-    // Join existing room with atomicx API
-    const { isJoiningRoom, joiningRoomId, handleJoinRoomError }
-      = useRoomLifeCycle();
+    const { isJoiningRoom, joiningRoomId, handleJoinRoomError } = useRoomLifeCycle();
     isJoiningRoom.value = true;
     joiningRoomId.value = roomId;
     try {
@@ -175,61 +125,16 @@ class Conference implements IConference {
     }
     isJoiningRoom.value = false;
     joiningRoomId.value = '';
-    // Set default device before opening
-    if (defaultCameraId) {
-      await setCurrentCamera({ deviceId: defaultCameraId });
-    }
-    if (defaultMicrophoneId) {
-      await setCurrentMicrophone({ deviceId: defaultMicrophoneId });
-    }
-    if (defaultSpeakerId) {
-      await setCurrentSpeaker({ deviceId: defaultSpeakerId });
-    }
-
-    // Open device based on parameters
-    if (isOpenCamera) {
-      try {
-        await openLocalCamera();
-      } catch (error) {
-        console.warn('Failed to open camera:', error);
-      }
-    }
-
-    if (isOpenMicrophone) {
-      try {
-        await openLocalMicrophone();
-      } catch (error) {
-        console.warn('Failed to open microphone:', error);
-      }
-    }
   }
 
-  public async leave() {
+  public async leaveRoom() {
     const { leaveRoom } = useRoomState();
     await leaveRoom();
   }
 
-  public async dismiss() {
+  public async endRoom() {
     const { endRoom } = useRoomState();
     await endRoom();
-  }
-
-  public setSelfInfo(options: { userName: string; avatarUrl: string }) {
-    const { setSelfInfo } = useLoginState();
-    return setSelfInfo(options);
-  }
-
-  public setComponentConfig(config: ComponentConfig) {
-    const index = this.componentConfig.findIndex(item => item.componentName === config.componentName);
-    if (index !== -1) {
-      this.componentConfig[index] = config;
-    } else {
-      this.componentConfig.push(config);
-    }
-  }
-
-  public getComponentConfig(name: ComponentName) {
-    return this.componentConfig.find(item => item.componentName === name);
   }
 
   public setWidgetVisible(config: Partial<Record<BuiltinWidget, boolean>>) {
@@ -301,17 +206,25 @@ class Conference implements IConference {
     zoneA: WidgetZoneConfig | undefined,
     zoneB: WidgetZoneConfig | undefined,
   ): boolean {
-    if (zoneA === undefined || zoneB === undefined) return false;
+    if (zoneA === undefined || zoneB === undefined) {
+      return false;
+    }
     const zonesA = this.getZoneValues(zoneA);
     const zonesB = this.getZoneValues(zoneB);
     return zonesA.some(z => zonesB.includes(z));
   }
 
   private getZoneValues(zoneConfig: WidgetZoneConfig): WidgetZone[] {
-    if (typeof zoneConfig === 'string') return [zoneConfig];
+    if (typeof zoneConfig === 'string') {
+      return [zoneConfig];
+    }
     const zones: WidgetZone[] = [];
-    if (zoneConfig.pc) zones.push(zoneConfig.pc);
-    if (zoneConfig.h5) zones.push(zoneConfig.h5);
+    if (zoneConfig.pc) {
+      zones.push(zoneConfig.pc);
+    }
+    if (zoneConfig.h5) {
+      zones.push(zoneConfig.h5);
+    }
     return zones;
   }
 
@@ -416,7 +329,24 @@ class Conference implements IConference {
     dataReport.reportCount(MetricsKey.T_METRICS_STATE_API_SET_FEATURE_CONFIG_COUNT);
     Object.keys(config).forEach((key) => {
       const k = key as keyof FeatureConfig;
-      (this.featureConfig as any)[k] = config[k];
+      const newValue = config[k];
+      const existingValue = (this.featureConfig as any)[k];
+      // Deep merge for plain object values to preserve previously set fields
+      if (
+        newValue !== null
+        && typeof newValue === 'object'
+        && !Array.isArray(newValue)
+        && typeof newValue !== 'function'
+        && existingValue !== null
+        && typeof existingValue === 'object'
+        && !Array.isArray(existingValue)
+        && typeof existingValue !== 'function'
+      ) {
+        // In-place merge to preserve the reactive proxy reference
+        Object.assign(existingValue, newValue);
+      } else {
+        (this.featureConfig as any)[k] = newValue;
+      }
     });
   }
 

@@ -1,7 +1,12 @@
 import type { Component } from 'vue';
 import { RoomLayoutTemplate, RoomUser } from 'tuikit-atomicx-vue3';
+import { RoomType } from 'tuikit-atomicx-vue3/room';
 import type TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
+import type { CreateRoomOptions } from 'tuikit-atomicx-vue3/room';
 
+export type { CreateRoomOptions };
+
+/** @deprecated v5.7.0 */
 export interface StartOptions {
   roomName?: string;
   password?: string;
@@ -12,6 +17,7 @@ export interface StartOptions {
   defaultSpeakerId?: string;
 }
 
+/** @deprecated v5.7.0 */
 export interface JoinOptions {
   password?: string;
   isOpenCamera?: boolean;
@@ -40,10 +46,12 @@ export enum FeatureButton {
 }
 export type ThemeOption = 'LIGHT' | 'DARK';
 
+/** @deprecated v5.7.0 */
 export enum ComponentName {
   AIToolsButton = 'AIToolsButton',
 }
 
+/** @deprecated v5.7.0 */
 export interface ComponentConfig {
   componentName: ComponentName;
   visible: boolean;
@@ -170,52 +178,48 @@ export interface FeatureConfig {
 }
 
 export interface IConference {
+  // Auth
+  login: (params: { sdkAppId: number; userId: string; userSig: string }) => Promise<void>;
+  logout: () => Promise<void>;
+  setSelfInfo: (options: { userName: string; avatarUrl: string }) => Promise<void>;
 
-  getRoomEngine(): { instance: TUIRoomEngine } | null;
+  // Room engine
+  getRoomEngine: () => { instance: TUIRoomEngine } | null;
 
+  // Events
   on: (eventType: RoomEvent, callback: (data?: any) => void) => void;
-
   off: (eventType: RoomEvent, callback: (data?: any) => void) => void;
 
-  login: (params: {
-    sdkAppId: number;
-    userId: string;
-    userSig: string;
-    tim?: any;
-  }) => Promise<void>;
+  // New canonical room lifecycle methods
+  createAndJoinRoom: (params: { roomId: string; roomType?: RoomType; options?: CreateRoomOptions }) => Promise<void>;
+  joinRoom: (params: { roomId: string; roomType?: RoomType; password?: string }) => Promise<void>;
+  leaveRoom: () => Promise<void>;
+  endRoom: () => Promise<void>;
 
-  logout: () => Promise<void>;
-
-  start: ({ roomId, options }: { roomId: string; options?: StartOptions }) => Promise<void>;
-
-  join: ({ roomId, options }: { roomId: string; options?: JoinOptions }) => Promise<void>;
-
+  // Deprecated room lifecycle methods (kept for backward compatibility)
+  /** @deprecated v5.7.0 use createAndJoinRoom */
+  start: (params: { roomId: string; roomType?: RoomType; options?: StartOptions }) => Promise<void>;
+  /** @deprecated v5.7.0 use joinRoom */
+  join: (params: { roomId: string; roomType?: RoomType; options?: JoinOptions }) => Promise<void>;
+  /** @deprecated v5.7.0 use leaveRoom */
   leave: () => Promise<void>;
-
+  /** @deprecated v5.7.0 use endRoom */
   dismiss: () => Promise<void>;
-
-  setSelfInfo: (options: {
-    userName: string;
-    avatarUrl: string;
-  }) => Promise<void>;
-
+  /** @deprecated v5.7.0 use setWidgetVisible */
   setComponentConfig: (config: ComponentConfig) => void;
-
+  /** @deprecated v5.7.0 use getWidgetVisible */
   getComponentConfig: (name: ComponentName) => ComponentConfig | undefined;
 
   setWidgetVisible: (config: Partial<Record<BuiltinWidget, boolean>>) => void;
-
   getWidgetVisible: (name: BuiltinWidget) => boolean;
-
   registerWidget: (config: WidgetConfig) => () => void;
-
   getRegisteredWidgets: (zone?: WidgetZone, platform?: WidgetPlatform) => WidgetConfig[];
 
+  // Interceptors
   onWill: (action: InterceptorAction, handler: InterceptorHandler) => () => void;
-
   executeInterceptor: (action: InterceptorAction, proceed: () => void | Promise<void>, abort?: () => void) => Promise<void>;
 
+  // Feature configuration
   setFeatureConfig: (config: Partial<FeatureConfig>) => void;
-
   getFeatureConfig: <K extends keyof FeatureConfig>(key: K) => FeatureConfig[K] | undefined;
 }

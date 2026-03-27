@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue';
-import { ComponentName, conference, ConferenceMainView, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
+import { conference, ConferenceMainView, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
 import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
@@ -20,7 +20,9 @@ import {
 import { useRoute, useRouter } from 'vue-router';
 import { useMediaPreference } from '../hooks/useMediaPreference';
 
-conference.setComponentConfig({ componentName: ComponentName.AIToolsButton, visible: true });
+conference.setFeatureConfig({
+  aiTools: { enable: true },
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -78,7 +80,7 @@ async function handleStartConference() {
   const roomName = roomType === RoomType.Webinar
     ? `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.Webinar')}`
     : `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`;
-  await conference.start({
+  await conference.createAndJoinRoom({
     roomId,
     roomType,
     options: { roomName },
@@ -86,10 +88,10 @@ async function handleStartConference() {
 }
 
 async function handleJoinConference() {
-  await conference.join({
+  await conference.joinRoom({
     roomId,
     roomType,
-    options: { password },
+    password,
   });
 }
 
@@ -139,130 +141,4 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-
-.room-page {
-  width: 100vw;
-  height: 100vh;
-  min-width: 1150px;
-  display: flex;
-  flex-direction: row;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  position: relative;
-  overflow: hidden;
-}
-
-.room-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &.has-side-panel {
-    width: calc(100% - 400px);
-  }
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  width: 100%;
-  height: 56px;
-  box-sizing: border-box;
-  background-color: var(--bg-color-operate);
-  border-bottom: 1px solid var(--stroke-color-primary);
-  box-shadow: 0 1px 0 var(--uikit-color-black-8);
-
-  &-left {
-    display: flex;
-    gap: 24px;
-    flex: 1;
-    justify-content: flex-start;
-  }
-
-  &-center {
-    flex: 1;
-    text-align: center;
-    height: 100%;
-  }
-
-  &-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-    justify-content: flex-end;
-  }
-}
-
-.room-main {
-  min-height: 0;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  left: 0;
-  right: 0;
-  display: flex;
-  background-color: var(--bg-color-topbar);
-}
-
-.control-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-color-operate);
-  border-top: 1px solid var(--stroke-color-primary);
-  position: absolute;
-  box-sizing: border-box;
-  width: 100%;
-  height: 72px;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-  padding: 0px 10px;
-
-  .control-left {
-    flex: 1;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .control-center {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    align-items: center;
-    color: var(--text-color-primary);
-  }
-
-  .control-right {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
-}
-
-.side-panel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translateX(100%);
-  width: 400px;
-  height: 100%;
-  box-sizing: border-box;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &-visible {
-    transform: translateX(0);
-  }
-}
 </style>

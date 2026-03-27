@@ -3,7 +3,7 @@
   * @param title String required
   * @param hasMore Boolean
   * @param hideHoverEffect Boolean
-  * @param layout IconButtonLayout.VERTICAl | IconButtonLayout.HORIZONTAL
+  * @param layout IconButtonLayout
   * Usage:
   * Use <icon-button :icon="chatIcon"><icon-button> in template
 -->
@@ -52,10 +52,7 @@ import {
 // import vTap from '../../../directives/vTap';
 const isMobile = false;
 
-enum IconButtonLayout {
-  VERTICAl = 'vertical',
-  HORIZONTAL = 'horizontal',
-}
+type IconButtonLayout = 'horizontal' | 'vertical';
 
 interface Props {
   title?: string;
@@ -76,14 +73,14 @@ const props = withDefaults(defineProps<Props>(), {
   hideHoverEffect: false,
   disabled: false,
   isActive: false,
-  layout: IconButtonLayout.VERTICAl,
+  layout: 'vertical',
   isNotSupport: false,
   badgeCount: 0,
 });
 const emit = defineEmits(['click-icon', 'click-more']);
 
 const iconContentClass = computed(() => {
-  if (props.layout === IconButtonLayout.HORIZONTAL) {
+  if (props.layout === 'horizontal') {
     return 'icon-content-horizontal';
   }
   return 'icon-content-vertical';

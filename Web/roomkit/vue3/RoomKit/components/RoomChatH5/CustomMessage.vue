@@ -4,16 +4,15 @@
       v-bind="$attrs"
       :nick="userName"
       :message="message"
-      :is-hidden-message-avatar="true"
-      :is-hidden-message-meta="props.message.flow !== 'out'"
+      :removeAvatar="true"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
 import { Message } from 'tuikit-atomicx-vue3/chat';
+import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
 import type { MessageModel } from 'tuikit-atomicx-vue3/chat';
 
 interface Props {
@@ -24,14 +23,14 @@ const props = defineProps<Props>();
 const { participantList } = useRoomParticipantState();
 const userName = computed(() => {
   const participant = participantList.value.find(
-    p => p.userId === props.message.from
+    p => p.userId === props.message.from,
   );
   return (
-    participant?.nameCard ||
-    participant?.userName ||
-    participant?.userId ||
-    props.message.nick ||
-    props.message.from
+    participant?.nameCard
+    || participant?.userName
+    || participant?.userId
+    || props.message.nick
+    || props.message.from
   );
 });
 </script>
@@ -51,11 +50,5 @@ const userName = computed(() => {
   .self {
     text-align: right;
   }
-}
-</style>
-
-<style lang="scss">
-.message-layout__wrapper--left {
-  padding-left: 0 !important;
 }
 </style>

@@ -33,3 +33,15 @@ export { useRoomInvitationH5 } from './hooks/useRoomInvitationH5';
 };
 
 export default ConferenceMainView;
+
+TUIRoomEngine.once('ready', () => {
+  TUIRoomEngine.callExperimentalAPI(
+    JSON.stringify({
+      api: 'setFramework',
+      params: {
+        component: 'TUIRoomKit',
+        language: 'vue3',
+      },
+    }),
+  );
+});
