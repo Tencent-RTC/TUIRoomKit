@@ -2,7 +2,8 @@
   <div class="room-layout-view-h5">
     <RoomView :layout-template="RoomLayoutTemplate.MobileLayout">
       <template #participantViewUI="{ participant, streamType }">
-        <ParticipantViewUI :participant="participant" :stream-type="streamType" />
+        <slot v-if="$slots['participantViewUI']" name="participantViewUI" :participant="participant" :stream-type="streamType" />
+        <ParticipantViewUI v-else :participant="participant" :stream-type="streamType" />
       </template>
     </RoomView>
   </div>

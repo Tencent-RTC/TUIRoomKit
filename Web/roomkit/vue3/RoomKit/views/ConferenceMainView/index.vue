@@ -47,13 +47,21 @@
           <RoomLayoutView
             :layout-template="participantViewLayout"
             @update:layout-template="handleLayoutUpdate"
-          />
+          >
+            <template v-if="$slots['participantViewUI']" #participantViewUI="slotProps">
+              <slot name="participantViewUI" v-bind="slotProps" />
+            </template>
+          </RoomLayoutView>
         </TUIWatermark>
         <RoomLayoutView
           v-else
           :layout-template="participantViewLayout"
           @update:layout-template="handleLayoutUpdate"
-        />
+        >
+          <template v-if="$slots['participantViewUI']" #participantViewUI="slotProps">
+            <slot name="participantViewUI" v-bind="slotProps" />
+          </template>
+        </RoomLayoutView>
       </main>
 
       <footer :class="['control-bar', { 'toolbar-hidden': !showToolbar } ]">
@@ -228,14 +236,22 @@ function handleLayoutUpdate(layout: RoomLayoutTemplate) {
   participantViewLayout.value = layout;
 }
 
+// Cache roomInfo before leave/dismiss since SDK may clear currentRoom after the operation
+let cachedRoomInfo: any = null;
+watch(() => currentRoom.value, (newRoom) => {
+  if (newRoom?.roomId) {
+    cachedRoomInfo = { ...newRoom };
+  }
+}, { immediate: true, deep: true });
+
 const handlePasswordCancel = () => {
   eventCenter.emit(ConferenceRoomEvent.ROOM_ERROR);
 };
 const handleLeaveRoom = () => {
-  eventCenter.emit(ConferenceRoomEvent.ROOM_LEAVE);
+  eventCenter.emit(ConferenceRoomEvent.ROOM_LEAVE, { roomInfo: cachedRoomInfo || currentRoom.value });
 };
 const handleEndRoom = () => {
-  eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS);
+  eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS, { roomInfo: cachedRoomInfo || currentRoom.value });
 };
 
 const notWebinar = () => !isWebinar.value;
@@ -251,7 +267,10 @@ const watermarkContent = computed(() =>
 );
 const watermarkFont = computed(() => watermarkConfig.value?.font ?? { fontSize: 16 });
 
-watch(() => currentRoom.value?.roomType, (newRoomType) => {
+watch(() => currentRoom.value?.roomType, (newRoomType, oldRoomType) => {
+  if (oldRoomType !== undefined && oldRoomType === newRoomType) {
+    return;
+  }
   if (newRoomType === RoomType.Webinar) {
     participantViewLayout.value = undefined;
   } else {
@@ -259,6 +278,12 @@ watch(() => currentRoom.value?.roomType, (newRoomType) => {
     participantViewLayout.value = configuredLayout ?? RoomLayoutTemplate.GridLayout;
   }
 }, { immediate: true });
+
+watch(() => conference.getFeatureConfig('layoutTemplate'), (newVal) => {
+  if (currentRoom.value?.roomType !== RoomType.Webinar) {
+    participantViewLayout.value = newVal ?? RoomLayoutTemplate.GridLayout;
+  }
+});
 
 watch(
   () => currentRoom.value?.roomId,
@@ -278,7 +303,7 @@ watch(
 );
 
 const onRoomEnded = () => {
-  eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS, {});
+  eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS, { roomInfo: cachedRoomInfo || currentRoom.value });
 };
 
 const onKickedFromRoom = (eventInfo: {

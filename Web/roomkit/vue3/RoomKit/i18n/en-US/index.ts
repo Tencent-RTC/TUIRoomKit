@@ -28,8 +28,8 @@ export const resource = {
   'Microphone.NoDeviceDetected': 'No microphone detected.',
   'Microphone.UnknownError': 'Microphone failed. Please check and refresh.',
 
-  'Camera.Start': 'Start video',
-  'Camera.Stop': 'Stop video',
+  'Camera.Start': 'Start Video',
+  'Camera.Stop': 'Stop Video',
   'Camera.Disabled': 'Video disabled. Cannot start video.',
   'Camera.NotSupportCapture': 'Browser doesn\'t support camera. Try another browser.',
   'Camera.NoSystemPermission': 'Camera access denied. Please grant permission.',
@@ -37,12 +37,12 @@ export const resource = {
   'Camera.NoDeviceDetected': 'No camera detected.',
   'Camera.UnknownError': 'Camera failed. Please check and refresh.',
 
-  'ScreenShare.Title': 'Screen share',
-  'ScreenShare.EndSharing': 'End sharing',
-  'ScreenShare.StartSharing': 'Start sharing',
+  'ScreenShare.Title': 'Share Screen',
+  'ScreenShare.EndSharing': 'End Sharing',
+  'ScreenShare.StartSharing': 'Start Sharing',
   'ScreenShare.StopSharingConfirm': 'Others will no longer see your screen after you stop sharing. Are you sure you want to stop?',
   'ScreenShare.StartSharingConfirm': 'Sharing screens may lead to the leakage of private information such as SMS verification codes and passwords, resulting in financial losses. Please be vigilant against various forms of fraud.',
-  'ScreenShare.NotAllowedToShareScreen': 'Currently only host/admin can share screen.',
+  'ScreenShare.NotAllowedToShareScreen': 'Currently only host/admins can share screen.',
   'ScreenShare.AnotherIsSharingTheScreen': 'Another user is sharing the screen.',
   'ScreenShare.BrowserDoesNotSupportScreenSharing': 'The current browser does not support screen sharing',
   'ScreenShare.SystemProhibitsAccessScreenContent': 'The system prohibits the current browser from accessing the screen content, please enable the screen sharing privilege.',
@@ -51,9 +51,9 @@ export const resource = {
 
   'Participant.Title': 'People',
 
-  'Setting.Title': 'Setting',
-  'Setting.AudioSetting': 'Audio setting',
-  'Setting.VideoSetting': 'Video setting',
+  'Setting.Title': 'Settings',
+  'Setting.AudioSetting': 'Audio Setting',
+  'Setting.VideoSetting': 'Video Setting',
   'Setting.OtherSetting': 'Other Setting',
   'Setting.Resolution': 'Resolution',
   'Setting.LocalMirror': 'Local Mirror',
@@ -67,12 +67,12 @@ export const resource = {
   'Setting.CancelMirrorSuccess': 'Cancel mirror success',
 
   // RoomInvitation
-  'RoomInvitation.InviteText': '{{name}} invites you to join the meeting',
+  'RoomInvitation.InviteText': '{{name}} invites you to join the room',
   'RoomInvitation.Host': 'Host: ',
   'RoomInvitation.Participants': 'Participants: ',
   'RoomInvitation.ParticipantsUnit': 'people',
   'RoomInvitation.NotJoin': 'Not Join',
-  'RoomInvitation.JoinMeeting': 'Join Meeting',
+  'RoomInvitation.JoinMeeting': 'Join Room',
   'RoomInvitation.HandleByOtherDevice': 'Invitation has been received by other device',
 
   // VirtualBackground
@@ -116,7 +116,7 @@ export const resource = {
   // Room
   'Room.LeaveRoom': 'Leave Room',
   'Room.End': 'End',
-  'Room.InviteToMeeting': '{{userName}} invites you to join the meeting',
+  'Room.InviteToMeeting': '{{userName}} invites you to join the room',
   'Room.PasswordRequired': 'Password required',
   'Room.EnterPassword': 'Please enter room password',
   'Room.EnterPasswordPlaceholder': 'Please enter room password',
@@ -146,9 +146,9 @@ export const resource = {
   'Room.EndRoomFailed': 'Failed to end room',
   'Room.TransferAndLeaveFailed': 'Failed to transfer host and leave',
   'Room.TransferSuccessAndLeave': 'Host transferred to {{name}}',
-  'Room.RoomEnded': 'The host has ended the meeting and the room has been disbanded',
+  'Room.RoomEnded': 'The host has ended the room and the room has been disbanded',
   'Room.Notify': 'Notify',
-  'Room.TemporaryMeeting': '\'s temporary meeting',
+  'Room.TemporaryMeeting': '\'s temporary room',
   'Room.RoomIdRequired': 'Room ID is required',
   'Room.RoomOccupied': 'Room already exists, cannot be created again',
   'Room.RoomId': 'Room ID',
@@ -167,7 +167,7 @@ export const resource = {
   'RoomShare.RoomLink': 'Room Link',
   'RoomShare.RoomSchemeLink': 'Scheme Link',
   'RoomShare.RoomIdNotFound': 'Room ID not found',
-  'RoomShare.CopyMeetingIdAndLink': 'Copy Meeting ID and Link',
+  'RoomShare.CopyMeetingIdAndLink': 'Copy Room ID and Link',
   'RoomShare.BookingSuccess': 'Booking successful, invite members to join',
   'RoomShare.InviteByRoomNumber': 'Invite by room number',
   'RoomShare.InviteByRoomLink': 'Invite by room link',
@@ -181,12 +181,12 @@ export const resource = {
   'Button.JoinRoom': 'Join',
   'Button.ScheduleRoom': 'Schedule',
   'Button.EnterRoomId': 'Enter room ID',
-  'Button.ScheduleMeeting': 'Schedule Meeting',
+  'Button.ScheduleMeeting': 'Schedule Room',
   'Button.PleaseLoginFirst': 'Please login first',
 
   // RoomChat
   'RoomChat.disabled_placeholder': 'You have been muted',
-  'RoomChat.input_placeholder': 'Please enter a message...',
+  'RoomChat.input_placeholder': 'Type a message...',
 
   'Settings.Title': 'Settings',
   'Off Camera': 'Off Camera',
@@ -250,9 +250,9 @@ export const resource = {
   // AITools
   'AITools.Title': 'AI Tools',
   'AITools.RealtimeMessageList': 'AI Real-time Meeting Minutes',
-  'AITools.SubtitlesOpen': 'Open AI Real-time Subtitles',
+  'AITools.SubtitlesOpen': 'Enable Real-time Subtitles',
   'AITools.RealtimeMessageListOpen': 'Open AI Real-time Meeting Minutes',
-  'AITools.SubtitlesClose': 'Close AI Real-time Subtitles',
+  'AITools.SubtitlesClose': 'Disable Real-time Subtitles',
   'AITools.RealtimeMessageListClose': 'Close AI Real-time Meeting Minutes',
 
   // RaiseHands

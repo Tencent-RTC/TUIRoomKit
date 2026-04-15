@@ -7,6 +7,9 @@ import ConferenceMainViewH5 from './views/ConferenceMainViewH5/index.vue';
 import PreConferenceView from './views/PreConferenceView/index.vue';
 import PreConferenceViewH5 from './views/PreConferenceViewH5/index.vue';
 
+import './adapter/chatCombine';
+import './adapter/quickConferenceMessageSync';
+
 export * from './adapter/type';
 
 export const addI18n = (lng: string, resource: any, deep = true, overwrite = false) => {

@@ -67,12 +67,12 @@ export const resource = {
   'Setting.CancelMirrorSuccess': '镜像已关闭',
 
   // RoomInvitation
-  'RoomInvitation.InviteText': '{{name}}邀请你加入会议',
+  'RoomInvitation.InviteText': '{{name}}邀请你加入房间',
   'RoomInvitation.Host': '房主：',
-  'RoomInvitation.Participants': '参会人：',
+  'RoomInvitation.Participants': '房间成员：',
   'RoomInvitation.ParticipantsUnit': '人',
   'RoomInvitation.NotJoin': '暂不加入',
-  'RoomInvitation.JoinMeeting': '加入会议',
+  'RoomInvitation.JoinMeeting': '加入房间',
   'RoomInvitation.HandleByOtherDevice': '邀请已被其他设备接收',
 
   // VirtualBackground
@@ -116,10 +116,10 @@ export const resource = {
   // Room
   'Room.LeaveRoom': '离开房间',
   'Room.End': '结束',
-  'Room.InviteToMeeting': '{{userName}} 邀请您加入会议',
+  'Room.InviteToMeeting': '{{userName}} 邀请您加入房间',
   'Room.PasswordRequired': '需要进房密码',
   'Room.EnterPassword': '请输入房间密码',
-  'Room.EnterPasswordPlaceholder': '请输入入会密码',
+  'Room.EnterPasswordPlaceholder': '请输入房间密码',
   'Room.JoinFailed': '加入房间失败',
   'Room.InvalidPassword': '密码错误',
   'Room.RoomNotFound': '房间不存在，请确认房间号或创建房间！',
@@ -146,7 +146,7 @@ export const resource = {
   'Room.EndRoomFailed': '结束房间失败',
   'Room.TransferAndLeaveFailed': '转移主持人并离开失败',
   'Room.TransferSuccessAndLeave': '已将主持人转移给 {{name}}',
-  'Room.RoomEnded': '主持人结束会议，已解散房间',
+  'Room.RoomEnded': '主持人结束房间，已解散房间',
   'Room.Notify': '通知',
   'Room.TemporaryMeeting': '的临时房间',
   'Room.RoomIdRequired': '房间号不能为空',
@@ -167,7 +167,7 @@ export const resource = {
   'RoomShare.RoomLink': '房间链接',
   'RoomShare.RoomSchemeLink': 'Scheme链接',
   'RoomShare.RoomIdNotFound': '未找到房间号',
-  'RoomShare.CopyMeetingIdAndLink': '复制会议号与链接',
+  'RoomShare.CopyMeetingIdAndLink': '复制房间号与链接',
   'RoomShare.BookingSuccess': '预订成功, 邀请成员加入',
   'RoomShare.InviteByRoomNumber': '通过房间号邀请',
   'RoomShare.InviteByRoomLink': '通过房间链接邀请',
@@ -181,7 +181,7 @@ export const resource = {
   'Button.JoinRoom': '加入房间',
   'Button.ScheduleRoom': '预定房间',
   'Button.EnterRoomId': '输入房间号',
-  'Button.ScheduleMeeting': '预约会议',
+  'Button.ScheduleMeeting': '预约房间',
   'Button.PleaseLoginFirst': '请先登录',
 
   // RoomChat

@@ -58,13 +58,13 @@ import {
 } from '@tencentcloud/uikit-base-component-vue3';
 import { Subtitle, RealtimeMessageList } from 'tuikit-atomicx-vue3/room';
 import { useRoomToolbarH5 } from '../../hooks/useRoomToolbarH5';
+import { useSubtitlesState } from '../../hooks/useSubtitlesState';
 import IconButtonH5 from '../base/IconButtonH5.vue';
 import PopUpArrowDown from '../base/PopUpArrowDown.vue';
 
 const { t } = useUIKit();
 const { showToolbar } = useRoomToolbarH5();
-
-const isSubtitlesVisible = ref(false);
+const { isSubtitlesVisible } = useSubtitlesState();
 const isAIToolsPanelVisible = ref(false);
 const isTranscriptionPanelVisible = ref(false);
 

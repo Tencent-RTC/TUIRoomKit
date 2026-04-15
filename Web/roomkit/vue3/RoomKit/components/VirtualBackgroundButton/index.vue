@@ -36,8 +36,9 @@ const { t } = useUIKit();
 
 const virtualBackgroundVisible = ref(false);
 
-const { isSupported } = useVirtualBackgroundState();
+const { isSupported, initVirtualBackground } = useVirtualBackgroundState();
 const { cameraList } = useDeviceState();
+initVirtualBackground({ assetsPath: 'https://web.sdk.qcloud.com/hybrid/trtc-sdk-v5/assets' });
 
 const customImages = computed(
   () => conference.getFeatureConfig('virtualBackground')?.customImages ?? [],

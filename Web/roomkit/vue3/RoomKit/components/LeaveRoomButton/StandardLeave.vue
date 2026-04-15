@@ -11,6 +11,7 @@
   <TUIDialog
     v-model:visible="showConfirmDialog"
     :title="t('Room.ConfirmLeaveTitle')"
+    appendTo="#roomPage"
   >
     <div class="dialog-message">
       {{ dialogMessage }}
@@ -44,6 +45,7 @@
   <TUIDialog
     v-model:visible="showTransferDialog"
     :title="t('Room.SelectNewHost')"
+    appendTo="#roomPage"
   >
     <TUISelect
       v-model="selectedUserId"
@@ -53,7 +55,7 @@
       <TUIOption
         v-for="participant in otherParticipants"
         :key="participant.userId"
-        :label="participant.userName || participant.userId"
+        :label="participant.nameCard || participant.userName || participant.userId"
         :value="participant.userId"
       />
     </TUISelect>
@@ -94,6 +96,8 @@ import {
   useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
+import { RoomEvent as ConferenceRoomEvent } from '../../adapter/type';
+import { eventCenter } from '../../utils/eventCenter';
 
 const { t } = useUIKit();
 interface Props {
@@ -171,8 +175,12 @@ const handleEndRoom = async () => {
 
   try {
     isEnding.value = true;
+    const roomInfo = currentRoom.value ? { ...currentRoom.value } : null;
     await endRoom();
     showConfirmDialog.value = false;
+    if (roomInfo?.roomId) {
+      eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS, { roomInfo });
+    }
     props.emitFunction('end');
   } catch (_error) {
     TUIToast.error({ message: t('Room.EndRoomFailed') });

@@ -5,7 +5,6 @@ import {
   TUIMessageBox,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useRoomModal } from 'tuikit-atomicx-vue3/room';
 import { RoomEvent } from '../adapter/type';
 import { eventCenter } from '../utils/eventCenter';
 
@@ -14,12 +13,9 @@ const joiningRoomId = ref('');
 const roomPasswordVisible = ref(false);
 const { t } = useUIKit();
 
-const { handleErrorWithModal } = useRoomModal();
-
 const handleJoinRoomError = (error: any) => {
   let errorMessage = '';
   let useAlert = false;
-  handleErrorWithModal(error);
 
   switch (error.code) {
     case TUIErrorCode.ERR_NEED_PASSWORD:

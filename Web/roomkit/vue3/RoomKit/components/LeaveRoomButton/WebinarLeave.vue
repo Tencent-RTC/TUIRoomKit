@@ -11,6 +11,7 @@
   <TUIDialog
     v-model:visible="showConfirmDialog"
     :title="t('Room.ConfirmLeaveTitle')"
+    appendTo="#roomPage"
   >
     <div class="dialog-message">
       {{ dialogMessage }}

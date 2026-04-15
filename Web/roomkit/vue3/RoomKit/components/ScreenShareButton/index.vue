@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { IconScreenShare, IconStopScreenShare, TUIMessageBox, TUIToast, useUIKit, IconUnSupport } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, DeviceStatus, useRoomState, useRoomParticipantState, RoomParticipantRole, DeviceError } from 'tuikit-atomicx-vue3/room';
+import { useDeviceState, DeviceStatus, useRoomState, useRoomParticipantState, RoomParticipantRole, DeviceError, TUIErrorCode } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
 import { InterceptorAction } from '../../adapter/type';
 import IconButton from '../base/IconButton.vue';
@@ -36,22 +36,23 @@ const isScreenShareDisabled = computed(() => currentRoom.value?.isAllScreenShare
 async function handleStartScreenShare() {
   try {
     await startScreenShare({ screenAudio: true });
-  } catch (error: any) {
-    let message = '';
-    switch (error.name) {
+  } catch (error: unknown) {
+    const err = error as { code?: number; name?: string; message?: string };
+    let message = t('ScreenShare.UnknownErrorOccurredWhileSharing');
+    switch (err.name) {
       case 'NotReadableError':
         message = t('ScreenShare.SystemProhibitsAccessScreenContent');
         break;
       case 'NotAllowedError':
-        if (error.message.includes('Permission denied by system')) {
+        if (err.message?.includes('Permission denied by system')) {
           message = t('ScreenShare.SystemProhibitsAccessScreenContent');
         } else {
           message = t('ScreenShare.UserCanceledScreenSharing');
         }
         break;
-      default:
-        message = t('ScreenShare.UnknownErrorOccurredWhileSharing');
-        break;
+    }
+    if (err.code === TUIErrorCode.ERR_OPEN_SCREEN_SHARE_NEED_PERMISSION_FROM_ADMIN) {
+      message = t('ScreenShare.NotAllowedToShareScreen');
     }
     TUIToast.warning({
       message,

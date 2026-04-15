@@ -121,7 +121,7 @@ class Conference extends ConferenceDeprecated implements IConference {
     } catch (error) {
       isJoiningRoom.value = false;
       handleJoinRoomError(error);
-      return;
+      throw error;
     }
     isJoiningRoom.value = false;
     joiningRoomId.value = '';
@@ -130,6 +130,7 @@ class Conference extends ConferenceDeprecated implements IConference {
   public async leaveRoom() {
     const { leaveRoom } = useRoomState();
     await leaveRoom();
+    eventCenter.emit(RoomEvent.ROOM_LEAVE);
   }
 
   public async endRoom() {

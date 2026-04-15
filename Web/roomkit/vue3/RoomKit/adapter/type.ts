@@ -4,7 +4,7 @@ import { RoomType } from 'tuikit-atomicx-vue3/room';
 import type TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import type { CreateRoomOptions } from 'tuikit-atomicx-vue3/room';
 
-export type { CreateRoomOptions };
+export type { CreateRoomOptions, RoomLayoutTemplate };
 
 /** @deprecated v5.7.0 */
 export interface StartOptions {

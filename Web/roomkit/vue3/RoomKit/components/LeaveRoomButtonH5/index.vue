@@ -56,7 +56,7 @@
           >
             <Avatar :src="participant.avatarUrl" :size="40" />
             <div class="user-info">
-              <span>{{ participant.userName || participant.userId }}</span>
+              <span>{{ participant.nameCard || participant.userName || participant.userId }}</span>
               <div
                 v-if="selectedUserId === participant.userId"
                 class="selected-indicator"
@@ -101,6 +101,8 @@ import {
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
 import PopUpArrowDown from '../base/PopUpArrowDown.vue';
+import { eventCenter } from '../../utils/eventCenter';
+import { RoomEvent as ConferenceRoomEvent } from '../../adapter/type';
 
 const { t } = useUIKit();
 const emit = defineEmits(['leave', 'end']);
@@ -175,8 +177,12 @@ const handleEndRoom = async () => {
 
   try {
     isEnding.value = true;
+    const roomInfo = currentRoom.value ? { ...currentRoom.value } : null;
     await endRoom();
     showConfirmDialog.value = false;
+    if (roomInfo?.roomId) {
+      eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS, { roomInfo });
+    }
     emit('end');
   } catch (_error) {
     TUIToast.error({ message: t('Room.EndRoomFailed') });

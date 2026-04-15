@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-web-vue3",
-  "version": "5.8.1",
+  "version": "5.8.2",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
@@ -23,9 +23,10 @@
   },
   "peerDependencies": {
     "vue": "^3.4.21",
-    "tuikit-atomicx-vue3": "^5.8.1",
-    "@tencentcloud/uikit-base-component-vue3": "^1.4.0",
-    "@tencentcloud/tuiroom-engine-js": "^4.0.3",
+    "tuikit-atomicx-vue3": "^5.8.2",
+    "@tencentcloud/tui-core-lite": "^1.0.1",
+    "@tencentcloud/uikit-base-component-vue3": "^1.4.1",
+    "@tencentcloud/tuiroom-engine-js": "^4.0.4",
     "@tencentcloud/universal-api": "^2.4.1"
   },
   "devDependencies": {
@@ -39,9 +40,10 @@
     "vite-plugin-dts": "^3.7.3",
     "vue": "^3.4.21",
     "vue-tsc": "^2.0.6",
-    "tuikit-atomicx-vue3": "^5.8.1",
-    "@tencentcloud/uikit-base-component-vue3": "^1.4.0",
-    "@tencentcloud/tuiroom-engine-js": "^4.0.3",
+    "tuikit-atomicx-vue3": "^5.8.2",
+    "@tencentcloud/tui-core-lite": "^1.0.1",
+    "@tencentcloud/uikit-base-component-vue3": "^1.4.1",
+    "@tencentcloud/tuiroom-engine-js": "^4.0.4",
     "@tencentcloud/universal-api": "^2.4.1"
   },
   "dependencies": {}

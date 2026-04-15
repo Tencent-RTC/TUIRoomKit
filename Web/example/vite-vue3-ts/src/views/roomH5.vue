@@ -30,7 +30,7 @@ const { handleErrorWithModal } = useRoomModal();
 
 const { loginUserInfo } = useLoginState();
 const { currentRoom } = useRoomState();
-const { localVideoQuality, openLocalCamera, updateVideoQuality, openLocalMicrophone } = useDeviceState();
+const { localVideoQuality, openLocalCamera, updateVideoQuality, openLocalMicrophone, closeLocalMicrophone } = useDeviceState();
 const { muteMicrophone, unmuteMicrophone } = useRoomParticipantState();
 const { getMicrophonePreference, getCameraPreference } = useMediaPreference();
 
@@ -50,7 +50,6 @@ watch(() => loginUserInfo.value?.userId, async (userId) => {
 watch(() => currentRoom.value?.roomId, async (currentRoomId, prevRoomId) => {
   if (!prevRoomId && currentRoomId) {
     handleOpenCamera();
-    handleOpenMicrophone();
   }
 }, { immediate: true });
 
@@ -71,19 +70,29 @@ async function handleEnterRoom() {
 }
 
 async function handleStartConference() {
-  await conference.createAndJoinRoom({
-    roomId,
-    options: {
-      roomName: `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`,
-    },
-  });
+  await handleOpenMicrophone();
+  try {
+    await conference.createAndJoinRoom({
+      roomId,
+      options: {
+        roomName: `${loginUserInfo.value?.userName || loginUserInfo.value?.userId}${t('Room.TemporaryMeeting')}`,
+      },
+    });
+  } catch (error: unknown) {
+    await closeLocalMicrophone();
+  }
 }
 
 async function handleJoinConference() {
-  await conference.joinRoom({
-    roomId,
-    password,
-  });
+  await handleOpenMicrophone();
+  try {
+    await conference.joinRoom({
+      roomId,
+      password,
+    });
+  } catch (error: unknown) {
+    await closeLocalMicrophone();
+  }
 }
 
 async function handleOpenCamera() {

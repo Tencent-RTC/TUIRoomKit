@@ -3,16 +3,19 @@
     :layout-template="layoutTemplate"
   >
     <template #participantViewUI="{ participant, streamType }">
-      <StandardParticipantViewUI
-        v-if="currentRoom?.roomType === RoomType.Standard"
-        :participant="participant"
-        :stream-type="streamType"
-      />
-      <WebinarParticipantViewUI
-        v-if="currentRoom?.roomType === RoomType.Webinar"
-        :participant="participant"
-        :stream-type="streamType"
-      />
+      <slot v-if="$slots['participantViewUI']" name="participantViewUI" :participant="participant" :stream-type="streamType" />
+      <template v-else>
+        <StandardParticipantViewUI
+          v-if="currentRoom?.roomType === RoomType.Standard"
+          :participant="participant"
+          :stream-type="streamType"
+        />
+        <WebinarParticipantViewUI
+          v-if="currentRoom?.roomType === RoomType.Webinar"
+          :participant="participant"
+          :stream-type="streamType"
+        />
+      </template>
     </template>
   </RoomView>
 </template>

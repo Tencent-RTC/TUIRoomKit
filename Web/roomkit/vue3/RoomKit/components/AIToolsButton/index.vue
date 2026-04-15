@@ -28,11 +28,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
 import { Dropdown, IconAIIcon, IconAISubtitles, IconAITranscription, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { Subtitle } from 'tuikit-atomicx-vue3/room';
 import { BuiltinWidget } from '../../adapter/type';
 import { useRoomSidePanel } from '../../hooks/useRoomSidePanel';
+import { useSubtitlesState } from '../../hooks/useSubtitlesState';
 import IconButton from '../base/IconButton.vue';
 
 interface Props {
@@ -45,8 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { t } = useUIKit();
 const { activeWidgetId } = useRoomSidePanel();
-
-const isSubtitlesVisible = ref(false);
+const { isSubtitlesVisible } = useSubtitlesState();
 </script>
 
 <style lang="scss" scoped>

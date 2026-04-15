@@ -38,9 +38,17 @@
           :content="watermarkContent"
           :gap="watermarkGap"
         >
-          <RoomLayoutViewH5 />
+          <RoomLayoutViewH5>
+            <template v-if="$slots['participantViewUI']" #participantViewUI="slotProps">
+              <slot name="participantViewUI" v-bind="slotProps" />
+            </template>
+          </RoomLayoutViewH5>
         </TUIWatermark>
-        <RoomLayoutViewH5 v-else />
+        <RoomLayoutViewH5 v-else>
+          <template v-if="$slots['participantViewUI']" #participantViewUI="slotProps">
+            <slot name="participantViewUI" v-bind="slotProps" />
+          </template>
+        </RoomLayoutViewH5>
       </main>
 
       <footer v-show="showToolbar" class="room-footer">
@@ -156,14 +164,22 @@ const {
   handleJoinRoomError,
 } = useRoomLifeCycle();
 
+// Cache roomInfo before leave/dismiss since SDK may clear currentRoom after the operation
+let cachedRoomInfo: any = null;
+watch(() => currentRoom.value, (newRoom) => {
+  if (newRoom?.roomId) {
+    cachedRoomInfo = { ...newRoom };
+  }
+}, { immediate: true, deep: true });
+
 const handlePasswordCancel = () => {
   eventCenter.emit(ConferenceRoomEvent.ROOM_ERROR);
 };
 const handleLeaveRoom = () => {
-  eventCenter.emit(ConferenceRoomEvent.ROOM_LEAVE);
+  eventCenter.emit(ConferenceRoomEvent.ROOM_LEAVE, { roomInfo: cachedRoomInfo || currentRoom.value });
 };
 const handleEndRoom = () => {
-  eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS);
+  eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS, { roomInfo: cachedRoomInfo || currentRoom.value });
 };
 
 watch(
@@ -183,7 +199,7 @@ watch(
 );
 
 const onRoomEnded = () => {
-  eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS, {});
+  eventCenter.emit(ConferenceRoomEvent.ROOM_DISMISS, { roomInfo: cachedRoomInfo || currentRoom.value });
 };
 const onKickedFromRoom = (eventInfo: {
   reason: KickedOutOfRoomReason;

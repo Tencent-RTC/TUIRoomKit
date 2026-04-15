@@ -163,6 +163,7 @@ const copyRoomInfoAndLink = async () => {
       display: flex;
       margin-bottom: 16px;
       align-items: flex-start;
+      column-gap: 12px;
 
       .share-label {
         min-width: 100px;

@@ -1,6 +1,6 @@
 export const resource = {
   // Room
-  'Room.TemporaryMeeting': '\'s temporary meeting',
+  'Room.TemporaryMeeting': '\'s temporary room',
   'Room.Webinar': '\'s webinar',
   'Room.LeaveRoomTitle': 'Leave Room',
   'Room.ConfirmLeavePage': 'Are you sure you want to leave this page? You will exit the current room',

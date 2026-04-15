@@ -1,5 +1,5 @@
 <template>
-  <div class="login-container">
+  <div :class="['login-container', theme]">
     <Login
       class="login-widget"
       v-bind="{
@@ -12,12 +12,14 @@
 </template>
 
 <script setup lang="ts">
+import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useLoginState, useRoomModal } from 'tuikit-atomicx-vue3/room';
 import { useRouter, useRoute } from 'vue-router';
 import Login from '../components/LoginUserID/index.vue';
 import { SDKAPPID, genTestUserSig } from '../config/basic-info-config';
 import { deepClone } from '../utils/utils';
 
+const { theme = 'light' } = useUIKit();
 const { login } = useLoginState();
 const { handleErrorWithModal } = useRoomModal();
 
@@ -53,8 +55,9 @@ const handleLogin = async (userInfo: {
   align-items: center;
   width: 100%;
   height: 100%;
-  background: url('../assets/background-black.png') no-repeat center center;
-  background-color: black;
+  background-color: var(--bg-color-dialog);
+  background-position: center;
+  background-repeat: no-repeat;
   background-size: cover;
 
   @media screen and (orientation: portrait), (orientation: landscape) {
@@ -62,5 +65,13 @@ const handleLogin = async (userInfo: {
       min-width: 30px;
     }
   }
+}
+
+.login-container.dark {
+  background-image: url('../assets/background-black.png');
+}
+
+.login-container.light {
+  background-image: url('../assets/background-white.png');
 }
 </style>

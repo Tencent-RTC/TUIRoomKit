@@ -14,7 +14,7 @@ import {
   Badge,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useConversationListState, useMessageListState } from 'tuikit-atomicx-vue3/chat';
-import { useRoomState } from 'tuikit-atomicx-vue3/room';
+import { useLoginState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import IconButton from '../base/IconButton.vue';
 
 interface Props {
@@ -31,26 +31,45 @@ const { t } = useUIKit();
 
 const { setActiveConversation } = useConversationListState();
 const { currentRoom } = useRoomState();
+const { loginUserInfo } = useLoginState();
 const { messageList } = useMessageListState();
 
 const unreadCount = ref(0);
+const hasInitializedMessageList = ref(false);
 
-// Watch message list changes only when chat is not open
+const resetUnreadTracking = () => {
+  unreadCount.value = 0;
+  hasInitializedMessageList.value = false;
+};
+
 watch(
-  () => messageList.value?.length,
-  (newLength, oldLength = 0) => {
-    if (!newLength || newLength === 0) {
+  messageList,
+  (newMessageList, oldMessageList) => {
+    const currentMessageList = newMessageList || [];
+
+    if (!hasInitializedMessageList.value) {
+      hasInitializedMessageList.value = true;
       return;
     }
 
-    // Only increment unread count when chat window is closed
-    if (!props.isActive && newLength > oldLength) {
-      unreadCount.value += newLength - oldLength;
+    if (props.isActive) {
+      return;
     }
+
+    const previousLength = oldMessageList?.length || 0;
+    if (currentMessageList.length <= previousLength) {
+      return;
+    }
+
+    const unreadMessages = currentMessageList
+      .slice(previousLength)
+      .filter(message => message?.from !== loginUserInfo.value?.userId);
+
+    unreadCount.value += unreadMessages.length;
   },
+  { deep: false },
 );
 
-// Clear unread count when chat window opens
 watch(
   () => props.isActive,
   (isOpen) => {
@@ -63,12 +82,12 @@ watch(
 watch(
   () => currentRoom.value?.roomId,
   (roomId) => {
+    resetUnreadTracking();
     if (!roomId) {
+      setActiveConversation('');
       return;
     }
     setActiveConversation(`GROUP${roomId}`);
-    // Reset unread count when room changes
-    unreadCount.value = 0;
   },
   { immediate: true },
 );

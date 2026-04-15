@@ -178,7 +178,7 @@ const submitForm = (): void => {
   max-width: 480px;
   margin: 2rem auto;
   padding: 30px 15px;
-  background-color: #1c1c1c;
+  background-color: var(--bg-color-dialog);
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
