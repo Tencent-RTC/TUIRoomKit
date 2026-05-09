@@ -181,7 +181,12 @@ public class UserRecyclerViewStateHolder extends StateHolder {
 
     private void notifySeatUserInserted(String userId) {
         if (mSelectedUserListType == ON_SEAT) {
-            mSelectedUserList.insert(mUserState.allUsers.find(new UserState.UserInfo(userId)), mUserListComparator);
+            UserState.UserInfo user = mUserState.allUsers.find(new UserState.UserInfo(userId));
+            if (user == null) {
+                Log.w(TAG, "notifySeatUserInserted ON_SEAT user not found in allUsers, userId=" + userId);
+                return;
+            }
+            mSelectedUserList.insert(user, mUserListComparator);
             return;
         }
         if (mSelectedUserListType == OFF_SEAT) {
@@ -195,7 +200,12 @@ public class UserRecyclerViewStateHolder extends StateHolder {
             return;
         }
         if (mSelectedUserListType == OFF_SEAT) {
-            mSelectedUserList.insert(mUserState.allUsers.find(new UserState.UserInfo(userId)), mUserListComparator);
+            UserState.UserInfo user = mUserState.allUsers.find(new UserState.UserInfo(userId));
+            if (user == null) {
+                Log.w(TAG, "notifySeatUserRemoved OFF_SEAT user not found in allUsers, userId=" + userId);
+                return;
+            }
+            mSelectedUserList.insert(user, mUserListComparator);
         }
     }
 
@@ -218,6 +228,10 @@ public class UserRecyclerViewStateHolder extends StateHolder {
             return;
         }
         UserState.UserInfo user = mUserState.allUsers.find(new UserState.UserInfo(userId));
+        if (user == null) {
+            Log.w(TAG, "notifyUserMediaStateChanged user not found in allUsers, userId=" + userId);
+            return;
+        }
         mSelectedUserList.move(user, mUserListComparator);
     }
 
@@ -289,6 +303,9 @@ public class UserRecyclerViewStateHolder extends StateHolder {
         List<UserState.UserInfo> userList = new LinkedList<>();
         List<InvitationState.Invitation> invitationList = mInvitationState.invitationList.getList();
         for (InvitationState.Invitation invitation : invitationList) {
+            if (invitation == null || invitation.invitee == null) {
+                continue;
+            }
             if (!isContainsSearchWord(invitation.invitee.userName)) {
                 continue;
             }
