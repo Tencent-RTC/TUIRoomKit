@@ -1,0 +1,28 @@
+{
+  "name": "@tencentcloud/room-uikit-medical-vue3",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit --skipLibCheck && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide-vue-next": "^1.0.0",
+    "tw-animate-css": "1.3.8",
+    "vue": "^3.4.0",
+    "vue-router": "^4.4.3",
+    "@tencentcloud/uikit-base-component-vue3": "1.4.3",
+    "tuikit-atomicx-vue3": "^5.9.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/node": "^18.19.31",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "sass": "^1.77.8",
+    "tailwindcss": "4.1.12",
+    "typescript": "^5.5.4",
+    "vite": "^5.2.8",
+    "vue-tsc": "^2.0.6"
+  }
+}

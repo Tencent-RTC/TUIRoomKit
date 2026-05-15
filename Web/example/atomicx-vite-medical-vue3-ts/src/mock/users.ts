@@ -1,0 +1,67 @@
+import type { MedicalUser } from '@/services/adapters/types';
+
+export const mockDoctorUsers: MedicalUser[] = [
+  {
+    userId: 'doctor_li',
+    userName: '李医生',
+    avatarUrl: '',
+    role: 'doctor',
+    title: '主任医师',
+    department: '心内科',
+    hospital: '示例三甲医院',
+    experience: '20年',
+    rating: '98.5',
+    consultations: '3248',
+    price: '50',
+    tags: ['高血压', '冠心病', '心律失常'],
+    specialty: '复诊问诊与慢病管理',
+    status: 'online',
+  },
+  {
+    userId: 'doctor_wang',
+    userName: '王医生',
+    avatarUrl: '',
+    role: 'doctor',
+    title: '副主任医师',
+    department: '呼吸内科',
+    hospital: '示例互联网医院',
+    experience: '15年',
+    rating: '97.2',
+    consultations: '2156',
+    price: '40',
+    tags: ['咳嗽', '哮喘', '肺炎'],
+    specialty: '呼吸系统在线复诊',
+    status: 'online',
+  },
+  {
+    userId: 'doctor_zhang',
+    userName: '张医生',
+    avatarUrl: '',
+    role: 'doctor',
+    title: '主治医师',
+    department: '消化内科',
+    hospital: '示例专科医院',
+    experience: '10年',
+    rating: '96.8',
+    consultations: '1892',
+    price: '30',
+    tags: ['胃炎', '胃溃疡', '消化不良'],
+    specialty: '胃肠健康随访',
+    status: 'busy',
+  },
+];
+
+export const mockPatientUsers: MedicalUser[] = [
+  {
+    userId: 'patient_zhang',
+    userName: '张晓明',
+    avatarUrl: '',
+    role: 'patient',
+  },
+  {
+    userId: 'patient_li',
+    userName: '李美华',
+    avatarUrl: '',
+    role: 'patient',
+  },
+];

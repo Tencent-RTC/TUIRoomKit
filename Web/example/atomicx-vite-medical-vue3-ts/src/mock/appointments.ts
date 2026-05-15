@@ -1,0 +1,96 @@
+import type { MedicalAppointment } from '@/services/adapters/types';
+
+const now = new Date();
+
+function atToday(hours: number, minutes: number) {
+  const value = new Date(now);
+  value.setHours(hours, minutes, 0, 0);
+  return Math.floor(value.getTime() / 1000);
+}
+
+export const mockAppointments: MedicalAppointment[] = [
+  {
+    id: 'APT001',
+    roomId: 'med-room-001',
+    doctorId: 'doctor_li',
+    patientId: 'patient_zhang',
+    scheduleStartTime: atToday(9, 30),
+    scheduleEndTime: atToday(10, 0),
+    chiefComplaint: '持续咳嗽、低热 3 天',
+    allergyHistory: '青霉素过敏',
+    medicalHistory: '无重大疾病史',
+    patientAge: 35,
+    patientGender: '男',
+    patientPhone: '138****5678',
+  },
+  {
+    id: 'APT002',
+    roomId: 'med-room-002',
+    doctorId: 'doctor_wang',
+    patientId: 'patient_zhang',
+    scheduleStartTime: atToday(10, 10),
+    scheduleEndTime: atToday(10, 40),
+    chiefComplaint: '夜间咳嗽、轻微气喘',
+    allergyHistory: '无',
+    medicalHistory: '过敏性鼻炎',
+    patientAge: 35,
+    patientGender: '男',
+    patientPhone: '138****5678',
+  },
+  {
+    id: 'APT003',
+    roomId: 'med-room-003',
+    doctorId: 'doctor_zhang',
+    patientId: 'patient_zhang',
+    scheduleStartTime: atToday(11, 0),
+    scheduleEndTime: atToday(11, 30),
+    chiefComplaint: '饭后胃胀、反酸',
+    allergyHistory: '无',
+    medicalHistory: '慢性胃炎',
+    patientAge: 35,
+    patientGender: '男',
+    patientPhone: '138****5678',
+  },
+  {
+    id: 'APT004',
+    roomId: 'med-room-004',
+    doctorId: 'doctor_li',
+    patientId: 'patient_li',
+    scheduleStartTime: atToday(14, 0),
+    scheduleEndTime: atToday(14, 30),
+    chiefComplaint: '头晕、心悸',
+    allergyHistory: '无',
+    medicalHistory: '甲状腺结节',
+    patientAge: 28,
+    patientGender: '女',
+    patientPhone: '186****2211',
+  },
+  {
+    id: 'APT005',
+    roomId: 'med-room-005',
+    doctorId: 'doctor_wang',
+    patientId: 'patient_li',
+    scheduleStartTime: atToday(15, 0),
+    scheduleEndTime: atToday(15, 30),
+    chiefComplaint: '反复咽痒、清晨咳嗽',
+    allergyHistory: '花粉过敏',
+    medicalHistory: '轻度哮喘',
+    patientAge: 28,
+    patientGender: '女',
+    patientPhone: '186****2211',
+  },
+  {
+    id: 'APT006',
+    roomId: 'med-room-006',
+    doctorId: 'doctor_zhang',
+    patientId: 'patient_li',
+    scheduleStartTime: atToday(16, 0),
+    scheduleEndTime: atToday(16, 30),
+    chiefComplaint: '腹部隐痛、食欲下降',
+    allergyHistory: '无',
+    medicalHistory: '无重大疾病史',
+    patientAge: 28,
+    patientGender: '女',
+    patientPhone: '186****2211',
+  },
+];
