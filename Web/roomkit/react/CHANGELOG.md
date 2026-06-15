@@ -4,6 +4,12 @@
 
 ---
 
+## [6.0.2] - 2026-06-12
+
+* Room: Added `renderParticipantView` prop to `ConferenceMainView`. Fixed an issue where custom overlays configured via `renderParticipantView` failed to reflect participant device status changes immediately.
+
+### 
+
 ## [6.0.1] - 2026-06-05
 
 ### Added

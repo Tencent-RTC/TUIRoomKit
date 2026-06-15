@@ -29,13 +29,13 @@ export interface RoomLayoutViewProps {
    * Custom render prop for each participant tile. When omitted, the default
    * `StandardParticipantViewUI` is rendered for `Standard` rooms.
    */
-  participantViewUI?: (props: ParticipantViewSlotProps) => ReactNode;
+  renderParticipantView?: (props: ParticipantViewSlotProps) => ReactNode;
 }
 
 export function RoomLayoutView({
   layoutTemplate,
   onLayoutTemplateChange,
-  participantViewUI,
+  renderParticipantView,
 }: RoomLayoutViewProps) {
   const { currentRoom } = useRoomState();
   const { participantList, participantWithScreen } = useRoomParticipantState();
@@ -97,8 +97,8 @@ export function RoomLayoutView({
     participant,
     streamType,
   }: ParticipantViewSlotProps): ReactNode => {
-    if (participantViewUI) {
-      return participantViewUI({ participant, streamType });
+    if (renderParticipantView) {
+      return renderParticipantView({ participant, streamType });
     }
     if (currentRoom?.roomType === RoomType.Standard) {
       return (
@@ -114,7 +114,7 @@ export function RoomLayoutView({
   return (
     <RoomView
       layoutTemplate={layoutTemplate}
-      participantViewUI={renderTile}
+      renderParticipantView={renderTile}
     />
   );
 }

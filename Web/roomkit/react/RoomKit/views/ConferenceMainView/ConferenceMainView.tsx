@@ -57,11 +57,11 @@ export interface ConferenceMainViewProps {
    * Custom renderer for each participant tile, forwarded to the underlying
    * `RoomLayoutView`. When omitted the layout falls back to its default tile.
    */
-  participantViewUI?: (props: ParticipantViewSlotProps) => ReactNode;
+  renderParticipantView?: (props: ParticipantViewSlotProps) => ReactNode;
 }
 
 export function ConferenceMainView(props: ConferenceMainViewProps) {
-  const { participantViewUI } = props;
+  const { renderParticipantView } = props;
 
   const { t } = useUIKit();
   const roomPageRef = useRef<HTMLDivElement | null>(null);
@@ -214,7 +214,7 @@ export function ConferenceMainView(props: ConferenceMainViewProps) {
     <RoomLayoutView
       layoutTemplate={participantViewLayout}
       onLayoutTemplateChange={handleLayoutUpdate}
-      participantViewUI={participantViewUI}
+      renderParticipantView={renderParticipantView}
     />
   );
 

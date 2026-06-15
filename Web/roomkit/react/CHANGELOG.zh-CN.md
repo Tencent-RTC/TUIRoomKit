@@ -4,6 +4,12 @@
 
 ---
 
+## [6.0.2] - 2026-06-12
+
+* Room: `ConferenceMainView` 新增 `renderParticipantView` 属性。修复通过 `renderParticipantView` 配置自定义覆盖层后，参与者设备状态变化无法立即更新到覆盖层的问题。
+
+### 
+
 ## [6.0.1] - 2026-06-05
 
 ### 新增
