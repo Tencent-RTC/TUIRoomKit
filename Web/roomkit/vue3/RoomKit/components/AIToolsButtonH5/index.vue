@@ -85,13 +85,12 @@ import {
   TUIPopup,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { RoomParticipantRole } from 'tuikit-atomicx-vue3';
 import {
-  Subtitle,
-  RealtimeMessageList,
+  RoomParticipantRole,
   useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
+import { Subtitle, RealtimeMessageList } from '../ASRTools';
 import { useASRToolsState } from '../../hooks/useASRToolsState';
 import { useRoomToolbarH5 } from '../../hooks/useRoomToolbarH5';
 import { useSubtitlesState } from '../../hooks/useSubtitlesState';

@@ -32,7 +32,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { IconScheduleRoom, TUIButton, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { RoomType, ScheduleRoomPanel, useLoginState } from 'tuikit-atomicx-vue3/room';
+import { RoomType, useLoginState } from 'tuikit-atomicx-vue3/room';
+import { ScheduleRoomPanel } from '../ScheduleRoomPanel';
 import RoomInviteSuccessDialog from './RoomInviteSuccessDialog.vue';
 import type { ScheduleRoomOptions } from 'tuikit-atomicx-vue3/types';
 

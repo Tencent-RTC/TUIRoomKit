@@ -1,27 +1,32 @@
 <template>
   <div class="room-chat">
-    <MessageList
-      ref="messageListRef"
-      class="room-message-list"
-      :messageActionList="messageActionList"
-      :Message="CustomMessage"
-      @click="handleMessageListClick"
-    />
-    <MessageInputH5
-      ref="messageInputRef"
-      class="room-message-input"
-      :placeholder="placeholder"
-      :disabled="localParticipant?.isMessageDisabled"
-      @input-area-expand="handleInputAreaExpand"
-    />
+    <template v-if="canUseChatContext">
+      <MessageList
+        ref="messageListRef"
+        class="room-message-list"
+        :channel="CHAT_CHANNEL"
+        :messageActionList="messageActionList"
+        :Message="CustomMessage"
+        @click="handleMessageListClick"
+      />
+      <MessageInputH5
+        :key="CHAT_CHANNEL"
+        ref="messageInputRef"
+        class="room-message-input"
+        :channel="CHAT_CHANNEL"
+        :placeholder="placeholder"
+        :disabled="localParticipant?.isMessageDisabled"
+        @input-area-expand="handleInputAreaExpand"
+      />
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, provide, ref } from 'vue';
 import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { MessageList, MessageInputH5, useMessageActions } from 'tuikit-atomicx-vue3/chat';
-import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
+import { useLoginState, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import CustomMessage from './CustomMessage.vue';
 
 const messageListRef = ref<InstanceType<typeof MessageList> | null>(null);
@@ -29,15 +34,20 @@ const messageInputRef = ref<InstanceType<typeof MessageInputH5> | null>(null);
 
 const { t } = useUIKit();
 const { localParticipant } = useRoomParticipantState();
+const { currentRoom } = useRoomState();
+const { loginUserInfo } = useLoginState();
+const CHAT_CHANNEL = computed(() => currentRoom.value?.roomId || '');
+provide('channel', currentRoom.value?.roomId || 'default');
+const canUseChatContext = computed(() => Boolean(currentRoom.value?.roomId && loginUserInfo.value?.userId));
 const placeholder = computed(() =>
   localParticipant.value?.isMessageDisabled
     ? t('RoomChat.disabled_placeholder')
     : t('RoomChat.input_placeholder'),
 );
-const messageActionList = useMessageActions(['copy', 'recall', 'delete']);
+const messageActionList = computed(() => useMessageActions(['copy', 'recall', 'delete'], CHAT_CHANNEL.value));
 
 function handleInputAreaExpand() {
-  messageListRef.value?.scrollToBottom({ behavior: 'instant' });
+  messageListRef.value?.scrollToBottom('instant');
 }
 
 function handleMessageListClick(event: MouseEvent) {

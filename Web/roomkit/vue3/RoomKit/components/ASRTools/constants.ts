@@ -1,0 +1,1 @@
+export const SUBTITLE_CLEAR_DELAY_MS = 5000;

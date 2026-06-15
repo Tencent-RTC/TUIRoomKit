@@ -1,6 +1,5 @@
 import type { Component } from 'vue';
-import { RoomLayoutTemplate, RoomUser } from 'tuikit-atomicx-vue3';
-import { RoomType } from 'tuikit-atomicx-vue3/room';
+import { RoomLayoutTemplate, RoomUser, RoomType } from 'tuikit-atomicx-vue3/room';
 import type TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import type { CreateRoomOptions } from 'tuikit-atomicx-vue3/room';
 

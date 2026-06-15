@@ -42,7 +42,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useUIKit, TUIDialog } from '@tencentcloud/uikit-base-component-vue3';
-import { AudioSettingPanel, VideoSettingPanel } from 'tuikit-atomicx-vue3/room';
+import { VideoSettingPanel } from '../VideoSettingPanel';
+import { AudioSettingPanel } from '../AudioSettingPanel';
 
 defineProps<{
   visible: boolean;

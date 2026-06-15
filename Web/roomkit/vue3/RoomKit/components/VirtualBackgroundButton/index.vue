@@ -28,7 +28,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { IconVirtualBackground, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, useVirtualBackgroundState, VirtualBackgroundPanel } from 'tuikit-atomicx-vue3/room';
+import { useDeviceState, useVirtualBackgroundState } from 'tuikit-atomicx-vue3/room';
+import { VirtualBackgroundPanel } from '../VirtualBackgroundPanel';
 import { conference } from '../../adapter/conference';
 import IconButton from '../base/IconButton.vue';
 

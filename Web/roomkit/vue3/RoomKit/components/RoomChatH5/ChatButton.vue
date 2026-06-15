@@ -14,65 +14,37 @@
       <RoomChatH5 v-if="isPopupVisible" />
     </div>
   </TUIPopup>
+  <ChatContextSync
+    v-if="CHAT_CHANNEL"
+    :key="CHAT_CHANNEL"
+    :channel="CHAT_CHANNEL"
+    :is-active="isPopupVisible"
+    @unread-change="unreadCount = $event"
+  />
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
   IconChat,
   useUIKit,
   Badge,
   TUIPopup,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useConversationListState, useMessageListState } from 'tuikit-atomicx-vue3/chat';
 import { useLoginState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import IconButtonH5 from '../base/IconButtonH5.vue';
 import PopUpArrowDown from '../base/PopUpArrowDown.vue';
+import ChatContextSync from './ChatContextSync.vue';
 import RoomChatH5 from './RoomChat.vue';
 
 const { t } = useUIKit();
 
 const isPopupVisible = ref(false);
-const { setActiveConversation } = useConversationListState();
 const { currentRoom } = useRoomState();
 const { loginUserInfo } = useLoginState();
-const { messageList } = useMessageListState();
 
 const unreadCount = ref(0);
-const hasInitializedMessageList = ref(false);
-
-const resetUnreadTracking = () => {
-  unreadCount.value = 0;
-  hasInitializedMessageList.value = false;
-};
-
-watch(
-  messageList,
-  (newMessageList, oldMessageList) => {
-    const currentMessageList = newMessageList || [];
-
-    if (!hasInitializedMessageList.value) {
-      hasInitializedMessageList.value = true;
-      return;
-    }
-
-    if (isPopupVisible.value) {
-      return;
-    }
-
-    const previousLength = oldMessageList?.length || 0;
-    if (currentMessageList.length <= previousLength) {
-      return;
-    }
-
-    const unreadMessages = currentMessageList
-      .slice(previousLength)
-      .filter(message => message?.from !== loginUserInfo.value?.userId);
-
-    unreadCount.value += unreadMessages.length;
-  },
-  { deep: false },
-);
+const CHAT_CHANNEL = computed(() => (currentRoom.value?.roomId && loginUserInfo.value?.userId) ? currentRoom.value.roomId : '');
 
 watch(
   () => isPopupVisible.value,
@@ -84,24 +56,11 @@ watch(
 );
 
 watch(
-  () => currentRoom.value?.roomId,
-  (roomId) => {
-    resetUnreadTracking();
-    if (!loginUserInfo.value?.userId) {
-      return;
-    }
-    if (!roomId) {
-      setActiveConversation('');
-      return;
-    }
-    setActiveConversation(`GROUP${roomId}`);
+  CHAT_CHANNEL,
+  () => {
+    unreadCount.value = 0;
   },
-  { immediate: true },
 );
-
-onUnmounted(() => {
-  setActiveConversation('');
-});
 
 const handleClick = () => {
   unreadCount.value = 0;

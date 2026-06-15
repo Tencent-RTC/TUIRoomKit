@@ -73,12 +73,12 @@ import {
   TUIToast,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { RoomType,
-  ScheduledRoomList,
   useDeviceState,
   useRoomState,
   useRoomModal,
 } from 'tuikit-atomicx-vue3/room';
-import CameraButton from '../../components/CameraButton/index.vue';
+import { ScheduledRoomList } from '../../components/ScheduleRoomPanel';
+import CameraButton from '../../components/CameraButton/index.vue'; 
 import JoinRoomButton from '../../components/JoinRoomButton/index.vue';
 import LanguageButton from '../../components/LanguageButton/index.vue';
 import LoginUserInfo from '../../components/LoginUserInfo/index.vue';

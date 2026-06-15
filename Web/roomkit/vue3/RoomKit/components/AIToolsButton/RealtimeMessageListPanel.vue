@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { RealtimeMessageList } from 'tuikit-atomicx-vue3/room';
+import { RealtimeMessageList } from '../ASRTools';
 import { useASRToolsState } from '../../hooks/useASRToolsState';
 
 const {

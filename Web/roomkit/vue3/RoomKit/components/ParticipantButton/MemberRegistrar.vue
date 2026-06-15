@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
 import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { RoomParticipantList, useRoomState } from 'tuikit-atomicx-vue3/room';
+import { useRoomState } from 'tuikit-atomicx-vue3/room';
+import { RoomParticipantList } from '../RoomParticipantList';
 import { conference } from '../../adapter/conference';
 import { BuiltinWidget } from '../../adapter/type';
 import ParticipantButton from './index.vue';

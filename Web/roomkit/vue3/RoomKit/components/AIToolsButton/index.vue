@@ -50,10 +50,10 @@ import { computed, ref, watch } from 'vue';
 import { Dropdown, IconAIIcon, IconAISubtitles, IconAITranscription, IconSettings, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import {
   RoomParticipantRole,
-  Subtitle,
   useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
+import { Subtitle } from '../ASRTools';
 import { BuiltinWidget } from '../../adapter/type';
 import { useASRToolsState } from '../../hooks/useASRToolsState';
 import { useRoomSidePanel } from '../../hooks/useRoomSidePanel';

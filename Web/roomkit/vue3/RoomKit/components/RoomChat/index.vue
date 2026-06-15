@@ -1,17 +1,22 @@
 <template>
   <div class="room-chat">
-    <MessageList
-      ref="messageListRef"
-      class="room-message-list"
-      :messageActionList="messageActionList"
-      :Message="CustomMessage"
-    />
-    <MessageInput
-      class="room-message-input"
-      hideSendButton
-      :placeholder="placeholder"
-      :disabled="localParticipant?.isMessageDisabled"
-    />
+    <template v-if="canUseChatContext">
+      <MessageList
+        ref="messageListRef"
+        class="room-message-list"
+        :channel="CHAT_CHANNEL"
+        :messageActionList="messageActionList"
+        :Message="CustomMessage"
+      />
+      <MessageInput
+        class="room-message-input"
+        :channel="CHAT_CHANNEL"
+        hideSendButton
+        :actions="['EmojiPicker','ImagePicker','FilePicker','VideoPicker']"
+        :placeholder="placeholder"
+        :disabled="localParticipant?.isMessageDisabled"
+      />
+    </template>
   </div>
 </template>
 
@@ -23,7 +28,7 @@ import {
   MessageList,
   useMessageActions,
 } from 'tuikit-atomicx-vue3/chat';
-import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
+import { useLoginState, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import CustomMessage from './CustomMessage.vue';
 
 interface Props {
@@ -37,16 +42,20 @@ const props = withDefaults(defineProps<Props>(), {
 const messageListRef = ref<InstanceType<typeof MessageList> | null>(null);
 const { t } = useUIKit();
 const { localParticipant } = useRoomParticipantState();
+const { currentRoom } = useRoomState();
+const { loginUserInfo } = useLoginState();
+const CHAT_CHANNEL = computed(() => currentRoom.value?.roomId || '');
+const canUseChatContext = computed(() => Boolean(currentRoom.value?.roomId && loginUserInfo.value?.userId));
 const placeholder = computed(() =>
   localParticipant.value?.isMessageDisabled
     ? t('RoomChat.disabled_placeholder')
     : t('RoomChat.input_placeholder'),
 );
-const messageActionList = useMessageActions(['copy', 'recall', 'delete']);
+const messageActionList = computed(() => useMessageActions(['copy', 'recall', 'delete'], CHAT_CHANNEL.value));
 
 watch(() => props.isActive, (newVal, oldVal) => {
   if (newVal && !oldVal && messageListRef.value) {
-    messageListRef.value?.scrollToBottom({ behavior: 'instant' });
+    messageListRef.value?.scrollToBottom('instant');
   }
 });
 </script>

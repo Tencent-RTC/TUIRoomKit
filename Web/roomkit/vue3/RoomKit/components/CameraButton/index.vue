@@ -49,7 +49,8 @@ import {
   IconUnSupport,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, useRoomState, DeviceStatus, VideoSettingPanel, useRoomParticipantState, DeviceError, RoomParticipantRole, useRoomModal, RoomType } from 'tuikit-atomicx-vue3/room';
+import { useDeviceState, useRoomState, DeviceStatus, useRoomParticipantState, DeviceError, RoomParticipantRole, useRoomModal, RoomType } from 'tuikit-atomicx-vue3/room';
+import { VideoSettingPanel } from '../VideoSettingPanel';
 import { conference } from '../../adapter/conference';
 import { InterceptorAction } from '../../adapter/type';
 import IconButton from '../base/IconButton.vue';

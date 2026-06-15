@@ -25,7 +25,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { IconBasicBeauty, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, FreeBeautyPanel } from 'tuikit-atomicx-vue3/room';
+import { useDeviceState } from 'tuikit-atomicx-vue3/room';
+import { FreeBeautyPanel } from '../FreeBeautyPanel';
 import IconButton from '../base/IconButton.vue';
 
 const { t } = useUIKit();

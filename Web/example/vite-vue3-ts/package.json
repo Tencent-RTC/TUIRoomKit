@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-web-vue3-sample",
-  "version": "5.9.0",
+  "version": "6.0.0",
   "scripts": {
     "dev": "vite --force",
     "dev:deep": "vite",
@@ -9,10 +9,10 @@
     "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "@tencentcloud/roomkit-web-vue3": "5.9.0",
-    "@tencentcloud/uikit-base-component-vue3": "1.4.3",
+    "@tencentcloud/roomkit-web-vue3": "6.0.0",
+    "@tencentcloud/uikit-base-component-vue3": "1.4.4",
     "@tencentcloud/universal-api": "^2.4.0",
-    "tuikit-atomicx-vue3": "5.9.1",
+    "tuikit-atomicx-vue3": "6.2.2",
     "vue": "^3.2.25",
     "vue-router": "^4.0.14"
   },
