@@ -6,7 +6,11 @@
     @join-room="handleJoinRoom"
     @camera-preference-change="handleCameraPreferenceChange"
     @microphone-preference-change="handleMicrophonePreferenceChange"
-  />
+  >
+    <template v-if="$slots['create-room-addon']" #create-room-addon>
+      <slot name="create-room-addon" />
+    </template>
+  </PreviewView>
 </template>
 
 <script setup lang="ts">

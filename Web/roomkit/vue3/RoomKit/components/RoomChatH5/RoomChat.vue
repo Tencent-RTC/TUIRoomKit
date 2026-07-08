@@ -9,13 +9,14 @@
         :Message="CustomMessage"
         @click="handleMessageListClick"
       />
-      <MessageInputH5
+      <MessageInputH5Legacy
         :key="CHAT_CHANNEL"
         ref="messageInputRef"
         class="room-message-input"
         :channel="CHAT_CHANNEL"
         :placeholder="placeholder"
         :disabled="localParticipant?.isMessageDisabled"
+        :actions="['EmojiPicker', 'ImagePicker', 'VideoPicker', 'FilePicker']"
         @input-area-expand="handleInputAreaExpand"
       />
     </template>
@@ -25,12 +26,12 @@
 <script lang="ts" setup>
 import { computed, provide, ref } from 'vue';
 import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { MessageList, MessageInputH5, useMessageActions } from 'tuikit-atomicx-vue3/chat';
+import { MessageList, MessageInputH5Legacy, useMessageActions } from 'tuikit-atomicx-vue3/chat';
 import { useLoginState, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import CustomMessage from './CustomMessage.vue';
 
 const messageListRef = ref<InstanceType<typeof MessageList> | null>(null);
-const messageInputRef = ref<InstanceType<typeof MessageInputH5> | null>(null);
+const messageInputRef = ref<InstanceType<typeof MessageInputH5Legacy> | null>(null);
 
 const { t } = useUIKit();
 const { localParticipant } = useRoomParticipantState();

@@ -36,10 +36,13 @@
               <CameraButton cameraTestContainer="room-preview-video" />
             </div>
             <div class="room-control-region">
-              <StartRoomButton
-                class="button-item"
-                @start-room="handleStartRoom"
-              />
+              <div class="start-room-button-wrapper">
+                <StartRoomButton
+                  class="button-item"
+                  @start-room="handleStartRoom"
+                />
+                <slot name="create-room-addon" />
+              </div>
               <JoinRoomButton
                 class="button-item"
                 @join-room="handleJoinRoom"
@@ -77,13 +80,13 @@ import { RoomType,
   useRoomState,
   useRoomModal,
 } from 'tuikit-atomicx-vue3/room';
-import { ScheduledRoomList } from '../../components/ScheduleRoomPanel';
-import CameraButton from '../../components/CameraButton/index.vue'; 
+import CameraButton from '../../components/CameraButton/index.vue';
 import JoinRoomButton from '../../components/JoinRoomButton/index.vue';
 import LanguageButton from '../../components/LanguageButton/index.vue';
 import LoginUserInfo from '../../components/LoginUserInfo/index.vue';
 import MicButton from '../../components/MicButton/index.vue';
 import ScheduledRoomButton from '../../components/ScheduledRoomButton/index.vue';
+import { ScheduledRoomList } from '../../components/ScheduleRoomPanel';
 import StartRoomButton from '../../components/StartRoomButton/index.vue';
 import ThemeButton from '../../components/ThemeButton/index.vue';
 
@@ -346,6 +349,11 @@ onBeforeUnmount(() => {
         flex-direction: row;
         justify-content: space-between;
         gap: 16px;
+
+        .start-room-button-wrapper {
+          position: relative;
+          display: inline-flex;
+        }
       }
     }
   }
