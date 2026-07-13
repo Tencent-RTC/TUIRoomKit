@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this -- */
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
+import { callExperimentalAPI as atomicxCallExperimentalAPI } from 'tuikit-atomicx-react';
 import {
   LoginEvent,
   RoomType,
@@ -48,11 +49,15 @@ class Conference {
     sdkAppId: number;
     userId: string;
     userSig: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
   }) {
+    const { sdkAppId, userId, userSig, ...rest } = params;
     await loginClient.login({
-      userId: params.userId,
-      userSig: params.userSig,
-      sdkAppId: params.sdkAppId,
+      userId,
+      userSig,
+      sdkAppId,
+      ...rest,
     });
   }
 
@@ -225,6 +230,17 @@ class Conference {
     key: K,
   ): FeatureConfig[K] | undefined {
     return featureConfigStore.getState()[key];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public callExperimentalAPI<T extends string>({
+    api,
+    params,
+  }: {
+    api: T;
+    params?: Record<string, any>;
+  }): void {
+    atomicxCallExperimentalAPI({ api, params });
   }
 }
 

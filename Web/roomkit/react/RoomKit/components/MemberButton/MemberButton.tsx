@@ -15,7 +15,7 @@ export function MemberButton() {
   const participantCount = currentRoom?.participantCount || 0;
   const audienceCount = (currentRoom as { audienceCount?: number } | null)?.audienceCount || 0;
   const totalCount = participantCount + audienceCount;
-  const title = currentRoom
+  const title = (currentRoom?.roomId && totalCount > 0)
     ? `${t('Participant.Title')}(${totalCount})`
     : t('Participant.Title');
 

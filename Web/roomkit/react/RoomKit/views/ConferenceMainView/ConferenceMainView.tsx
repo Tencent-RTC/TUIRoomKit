@@ -20,6 +20,8 @@ import {
 import {
   CameraButton,
   ChatRegistrar,
+  CloudRecordingButton,
+  CloudRecordingStatus,
   CurrentRoomInfo,
   InviteButton,
   LanguageButton,
@@ -103,6 +105,7 @@ export function ConferenceMainView(props: ConferenceMainViewProps) {
   // Role / room-type derivations mirror the Vue `computed()` block 1:1.
   const isWebinar = currentRoom?.roomType === RoomType.Webinar;
   const isOwner = localParticipant?.role === RoomParticipantRole.Owner;
+  const isAdmin = localParticipant?.role === RoomParticipantRole.Admin;
   const isParticipant = participantList.some(
     participant => participant.userId === localParticipant?.userId,
   );
@@ -263,6 +266,13 @@ export function ConferenceMainView(props: ConferenceMainViewProps) {
         </header>
 
         <main className={styles.roomMain}>
+          <div
+            className={classNames(styles.recordingStatusAnchor, {
+              [styles.toolbarVisible]: showToolbar,
+            })}
+          >
+            <CloudRecordingStatus />
+          </div>
           {watermarkEnabled
             ? (
               <Watermark font={watermarkFont} content={watermarkContent}>
@@ -286,6 +296,7 @@ export function ConferenceMainView(props: ConferenceMainViewProps) {
 
           <OverflowBar className={styles.controlCenter}>
             {ownerOrNotWebinar && <ScreenShareButton />}
+            {(isOwner || isAdmin) && <CloudRecordingButton />}
             {notWebinar && <InviteButton />}
             {notWebinar && <ChatRegistrar />}
             <MemberRegistrar />

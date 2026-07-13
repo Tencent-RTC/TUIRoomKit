@@ -137,6 +137,8 @@ export function PreviewView(props: PreviewViewProps) {
       if (err.code === TUIErrorCode.ERR_ROOM_ID_NOT_EXIST) {
         return false;
       }
+      // Treat any unexpected error (e.g. network) as "room exists" so that
+      // generateRoomId retries with a different candidate instead of propagating.
     }
     return true;
   };
@@ -163,13 +165,14 @@ export function PreviewView(props: PreviewViewProps) {
   };
 
   const handleJoinRoom = async (roomId: string) => {
-    if (!roomId) {
+    const normalizedRoomId = roomId.trim();
+    if (!normalizedRoomId) {
       Toast.error({ message: t('Room.RoomIdRequired') });
       return;
     }
-    if (await checkRoomExist(roomId)) {
-      const isWebinar = roomId.startsWith('webinar_');
-      onJoinRoom?.(roomId, isWebinar ? RoomType.Webinar : RoomType.Standard);
+    if (await checkRoomExist(normalizedRoomId)) {
+      const isWebinar = normalizedRoomId.startsWith('webinar_');
+      onJoinRoom?.(normalizedRoomId, isWebinar ? RoomType.Webinar : RoomType.Standard);
     } else {
       MessageBox.alert({
         type: 'error',
@@ -182,7 +185,8 @@ export function PreviewView(props: PreviewViewProps) {
   };
 
   const handleScheduleJoinRoom = (roomInfo: RoomInfo) => {
-    handleJoinRoom(roomInfo.roomId);
+    // RoomInfo is already available; call onJoinRoom directly to avoid a redundant API request.
+    onJoinRoom?.(roomInfo.roomId, roomInfo.roomType);
   };
 
   const isDarkTheme = theme === 'dark';

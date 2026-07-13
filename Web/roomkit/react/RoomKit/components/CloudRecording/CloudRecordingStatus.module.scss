@@ -1,0 +1,74 @@
+.cloudRecordingStatus {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: 34px;
+  padding: 0 10px;
+  overflow: hidden;
+  background: var(--bg-color-input);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 16%);
+  cursor: default;
+  user-select: none;
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.recordingDot {
+  width: 8px;
+  height: 8px;
+  background: var(--text-color-error);
+  border-radius: 50%;
+  animation: pulse 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.recordingLabel {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color-primary);
+  white-space: nowrap;
+}
+
+.stopBtn {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 13px;
+  color: var(--text-color-primary);
+  cursor: pointer;
+  background: var(--bg-color-topbar);
+  border: none;
+  border-radius: 14px;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.chevron {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-color-primary);
+  transition: transform 0.2s ease;
+}
+
+.chevronExpanded {
+  transform: rotate(180deg);
+}

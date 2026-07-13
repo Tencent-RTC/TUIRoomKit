@@ -5,6 +5,7 @@ export const resource = {
   'Room.LeaveRoomTitle': 'Leave Room',
   'Room.ConfirmLeavePage':
     'Are you sure you want to leave this page? You will exit the current room',
+  'Room.NotSupportWebinar': 'Not supported to join webinar',
 
   // login
   'Login.Expired': 'Login expired',
@@ -15,4 +16,8 @@ export const resource = {
     'Your account just logged in on another device. If it is not you, please check your account security as soon as possible!',
   'Login.PhoneLogin': 'Phone Login',
   'Login.UserIDLogin': 'UserID Login',
+  'Login.Failed': 'Login failed',
+  'Login.Error': 'Error',
+  'Login.PleaseConfigureSDKAPPID':
+    'Please configure SDKAPPID and SDKSECRETKEY in src/config/basic-info-config.ts',
 };

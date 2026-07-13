@@ -116,9 +116,18 @@ export function useRoomToolbar(
       setShowToolbar(false);
     };
 
+    const handleClick = () => {
+      if (alwaysShowRef.current) {
+        return;
+      }
+      setShowToolbar(true);
+      setHideTimer();
+    };
+
     container.addEventListener('mouseenter', handleMouseEnter);
     container.addEventListener('mousemove', handleMouseMoveThrottled);
     container.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('click', handleClick);
 
     if (!alwaysShowRef.current) {
       setHideTimer();
@@ -130,6 +139,7 @@ export function useRoomToolbar(
       container.removeEventListener('mouseenter', handleMouseEnter);
       container.removeEventListener('mousemove', handleMouseMoveThrottled);
       container.removeEventListener('mouseleave', handleMouseLeave);
+      container.removeEventListener('click', handleClick);
     };
   }, [
     containerRef,

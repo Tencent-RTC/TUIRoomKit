@@ -3,7 +3,7 @@ import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-react';
 import { Login, LoginModel } from '@tencentcloud/uikit-base-widget-react';
-import { useLoginState } from 'tuikit-atomicx-react/room';
+import { conference } from '@tencentcloud/roomkit-web-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SDKAPPID, genTestUserSig } from '../config/basic-info-config';
 import './login.scss';
@@ -16,13 +16,19 @@ interface LoginCallbackInfo {
 
 export default function LoginView() {
   const { theme = 'light', t } = useUIKit();
-  const { login } = useLoginState();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const handleLogin = async (userInfo: LoginCallbackInfo) => {
+    if (!SDKAPPID) {
+      TUIMessageBox.alert({
+        title: t('Login.Error'),
+        content: t('Login.PleaseConfigureSDKAPPID'),
+      });
+      return;
+    }
     try {
-      await login({
+      await conference.login({
         userId: userInfo.userID,
         userSig: userInfo.userSig,
         sdkAppId: userInfo.SDKAppID,
@@ -45,11 +51,6 @@ export default function LoginView() {
       });
     } catch (error: any) {
       console.error('Login failed:', error?.code);
-      TUIMessageBox.alert({
-        type: 'error',
-        title: t('Login.Failed') || 'Login failed',
-        content: error?.message || String(error),
-      });
     }
   };
 

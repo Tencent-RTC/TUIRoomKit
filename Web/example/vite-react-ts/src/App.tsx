@@ -5,32 +5,20 @@ import {
   UIKitProvider,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-react';
-import { useRoomInvitation } from '@tencentcloud/roomkit-web-react';
 import {
-  LoginEvent,
-  useLoginState,
-  useRoomModal,
-} from 'tuikit-atomicx-react/room';
+  RoomEvent,
+  conference,
+  useRoomInvitation,
+} from '@tencentcloud/roomkit-web-react';
 import AppRouter from '@/router';
-import { getUrlParam } from '@/utils/utils';
-import '@/utils/vConsoleExportLog';
 import '@/styles/base.scss';
 
 const InnerApp = () => {
   const { t } = useUIKit();
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, subscribeEvent, unsubscribeEvent } = useLoginState();
-  const { handleErrorWithModal } = useRoomModal();
   const bootstrappedRef = useRef(false);
 
-  // Subscribe to incoming room calls. The React RoomKit currently only ships
-  // a single `useRoomInvitation` (no separate H5 variant), so both PC and H5
-  // share the same hook; route to /room when the call is accepted.
-  //
-  // The hook returns a React node that renders the invitation toast via a
-  // portal. Rendering it inside this component keeps it within the host app's
-  // React tree, so the invitation inherits `UIKitProvider` and friends.
   const roomInvitation = useRoomInvitation({
     onAcceptCall: ({ roomId, password, roomType }) => {
       const search = new URLSearchParams();
@@ -43,13 +31,6 @@ const InnerApp = () => {
     },
   });
 
-  // Subscribe to login expired / kicked offline events so the user is
-  // notified and redirected to /login when their session becomes invalid.
-  // NOTE: do NOT clear `tuiRoom-userInfo` from localStorage here. localStorage
-  // is shared across all tabs of the same origin, so removing it would also
-  // log out unrelated tabs (e.g. the tab that just "won" the kick race). The
-  // per-tab auth source of truth lives in the in-memory login store (see
-  // `useLoginState` usage in `RequireAuth`), which is naturally tab-scoped.
   useEffect(() => {
     const onLoginExpired = () => {
       TUIMessageBox.alert({
@@ -65,13 +46,13 @@ const InnerApp = () => {
       });
       navigate('/login', { replace: true });
     };
-    subscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
-    subscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
+    conference.on(RoomEvent.USER_SIG_EXPIRED, onLoginExpired);
+    conference.on(RoomEvent.KICKED_OFFLINE, onKickedOffline);
     return () => {
-      unsubscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
-      unsubscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
+      conference.off(RoomEvent.USER_SIG_EXPIRED, onLoginExpired);
+      conference.off(RoomEvent.KICKED_OFFLINE, onKickedOffline);
     };
-  }, [subscribeEvent, unsubscribeEvent, navigate, t]);
+  }, [navigate, t]);
 
   useEffect(() => {
     if (bootstrappedRef.current) return;
@@ -83,20 +64,20 @@ const InnerApp = () => {
     const userInfo = JSON.parse(storedData);
     if (!userInfo?.userID) return;
 
-    login({
-      userId: userInfo.userID,
-      userSig: userInfo.userSig,
-      sdkAppId: userInfo.SDKAppID,
-      testEnv: Boolean(getUrlParam('testEnv')),
-    }).catch((error: any) => {
-      console.error('Login failed:', error);
-      handleErrorWithModal(error);
-      localStorage.removeItem('tuiRoom-userInfo');
-      const redirect = encodeURIComponent(
-        `${location.pathname}${location.search}`
-      );
-      navigate(`/login?redirect=${redirect}`, { replace: true });
-    });
+    conference
+      .login({
+        userId: userInfo.userID,
+        userSig: userInfo.userSig,
+        sdkAppId: userInfo.SDKAppID,
+      })
+      .catch((error: any) => {
+        console.error('Login failed:', error);
+        localStorage.removeItem('tuiRoom-userInfo');
+        const redirect = encodeURIComponent(
+          `${location.pathname}${location.search}`
+        );
+        navigate(`/login?redirect=${redirect}`, { replace: true });
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

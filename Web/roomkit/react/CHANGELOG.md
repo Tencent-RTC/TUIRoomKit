@@ -4,6 +4,17 @@
 
 ---
 
+## [6.1.0] - 2026-07-13
+
+### Added
+
+- Added cloud recording support.
+
+### Fixed
+
+- Fixed an issue where the AI noise suppression plugin could not be enabled before the microphone was turned on.
+- Fixed RTC disconnection after the app remains idle for an extended period.
+
 ## [6.0.2] - 2026-06-12
 
 * Room: Added `renderParticipantView` prop to `ConferenceMainView`. Fixed an issue where custom overlays configured via `renderParticipantView` failed to reflect participant device status changes immediately.

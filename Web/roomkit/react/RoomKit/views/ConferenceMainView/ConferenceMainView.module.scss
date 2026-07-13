@@ -124,6 +124,19 @@
   background-color: var(--bg-color-topbar);
 }
 
+.recordingStatusAnchor {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  transform: translateY(0);
+  transition: transform 0.2s ease;
+
+  &.toolbarVisible {
+    transform: translateY(56px);
+  }
+}
+
 .controlBar {
   position: absolute;
   bottom: 0;
