@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue';
-import { conference, ConferenceMainViewH5, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
+import { conference, ConferenceMainViewH5, RoomEvent as ConferenceRoomEvent, BuiltinWidget } from '@tencentcloud/roomkit-web-vue3';
 import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
@@ -18,10 +18,6 @@ import {
 } from 'tuikit-atomicx-vue3/room';
 import { useRoute, useRouter } from 'vue-router';
 import { useMediaPreference } from '../hooks/useMediaPreference';
-
-conference.setFeatureConfig({
-  aiTools: { enable: true },
-});
 
 const route = useRoute();
 const router = useRouter();

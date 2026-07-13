@@ -2,13 +2,13 @@
 import { onUnmounted } from 'vue';
 import { conference } from '../../adapter/conference';
 import { BuiltinWidget } from '../../adapter/type';
-import AIToolsButtonH5 from './index.vue';
+import CloudRecordingButtonH5 from './CloudRecordingButtonH5.vue';
 
 const unregister = conference.registerWidget({
-  id: BuiltinWidget.AIToolsWidget,
+  id: BuiltinWidget.RecordingWidget,
   zone: { h5: 'bottom-center' },
-  order: 6,
-  component: AIToolsButtonH5,
+  order: 5,
+  component: CloudRecordingButtonH5,
 });
 
 onUnmounted(() => unregister());

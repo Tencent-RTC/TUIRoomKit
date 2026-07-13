@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue';
-import { conference, ConferenceMainView, RoomEvent as ConferenceRoomEvent } from '@tencentcloud/roomkit-web-vue3';
+import { conference, ConferenceMainView, RoomEvent as ConferenceRoomEvent, BuiltinWidget } from '@tencentcloud/roomkit-web-vue3';
 import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
@@ -19,10 +19,6 @@ import {
 } from 'tuikit-atomicx-vue3/room';
 import { useRoute, useRouter } from 'vue-router';
 import { useMediaPreference } from '../hooks/useMediaPreference';
-
-conference.setFeatureConfig({
-  aiTools: { enable: true },
-});
 
 const route = useRoute();
 const router = useRouter();
@@ -43,11 +39,10 @@ if (!roomId) {
   router.replace('/home');
 }
 
-watch(() => loginUserInfo.value?.userId, async (userId) => {
-  if (!userId || !roomId || currentRoom.value?.roomId) {
-    return;
+watch(() => loginUserInfo.value?.userId, async (userId, oldUserId) => {
+  if (!oldUserId && userId) {
+    await handleEnterRoom();
   }
-  await handleEnterRoom();
 }, { immediate: true });
 
 watch(() => currentRoom.value?.roomId, async (currentRoomId, prevRoomId) => {

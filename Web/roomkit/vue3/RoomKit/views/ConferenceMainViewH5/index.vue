@@ -1,7 +1,7 @@
 <template>
   <div id="roomPage" class="room-page">
     <div class="room-container">
-      <header v-show="showToolbar" class="header">
+      <header :class="['header', { 'toolbar-hidden': !showToolbar }]">
         <div class="header-left">
           <CustomWidgetRenderer zone="top-left" platform="h5">
             <SwitchCameraRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.SwitchCameraWidget)" />
@@ -32,6 +32,13 @@
         class="room-main"
         @click="toggleToolbar"
       >
+        <div
+          v-if="conference.getWidgetVisible(BuiltinWidget.RecordingWidget)"
+          class="recording-status-anchor"
+          :class="{ 'toolbar-visible': showToolbar }"
+        >
+          <CloudRecordingStatusH5 />
+        </div>
         <TUIWatermark
           v-if="watermarkEnabled"
           :font="watermarkFont"
@@ -51,7 +58,7 @@
         </RoomLayoutViewH5>
       </main>
 
-      <footer v-show="showToolbar" class="room-footer">
+      <footer :class="['room-footer', { 'toolbar-hidden': !showToolbar }]">
         <ExpandFooterH5>
           <CustomWidgetRenderer zone="bottom-center" platform="h5">
             <MemberRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.MemberWidget)" />
@@ -59,7 +66,8 @@
             <CameraRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.CameraWidget)" />
             <InviteRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.InviteWidget) && notWebinar()" />
             <ChatRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.RoomChatWidget) && notWebinar()" />
-            <AIToolsRegistrarH5 v-if="(conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) || !!AIToolsButtonConfig?.visible) && notWebinar() && aiToolsEnabled" />
+            <CloudRecordingRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.RecordingWidget) && (isOwner || isAdmin)" />
+            <AIToolsRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) && notWebinar()" />
             <SettingsRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.SettingsWidget) && ownerOrNotWebinar()" />
           </CustomWidgetRenderer>
         </ExpandFooterH5>
@@ -92,12 +100,13 @@ import {
   RoomType,
 } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
-import { RoomEvent as ConferenceRoomEvent, BuiltinWidget, ComponentName } from '../../adapter/type';
+import { RoomEvent as ConferenceRoomEvent, BuiltinWidget } from '../../adapter/type';
 import {
   PasswordDialogH5,
   RoomLayoutViewH5,
   ExpandFooterH5,
   CustomWidgetRenderer,
+  CloudRecordingStatusH5,
   // Registrar components (H5)
   SwitchCameraRegistrarH5,
   CurrentRoomInfoRegistrarH5,
@@ -109,6 +118,7 @@ import {
   ChatRegistrarH5,
   SettingsRegistrarH5,
   AIToolsRegistrarH5,
+  CloudRecordingRegistrarH5,
 } from '../../components';
 import useCustomizedAutoPlayDialog from '../../hooks/useCustomizedAutoPlayDialog';
 import useRoomLifeCycle from '../../hooks/useRoomLifeCycle';
@@ -118,8 +128,6 @@ import { useRoomToolbarH5 } from '../../hooks/useRoomToolbarH5';
 import { eventCenter } from '../../utils/eventCenter';
 
 const { t } = useUIKit();
-const AIToolsButtonConfig = conference.getComponentConfig(ComponentName.AIToolsButton);
-const aiToolsEnabled = computed(() => conference.getFeatureConfig('aiTools')?.enable !== false);
 const { showToolbar, toggleToolbar } = useRoomToolbarH5();
 
 useCustomizedAutoPlayDialog();
@@ -148,6 +156,7 @@ const {
   unsubscribeEvent: unsubscribeRoomParticipantEvent,
 } = useRoomParticipantState();
 const isOwner = computed(() => localParticipant.value?.role === RoomParticipantRole.Owner);
+const isAdmin = computed(() => localParticipant.value?.role === RoomParticipantRole.Admin);
 const notWebinar = () => !isWebinar.value;
 const ownerOrNotWebinar = () => !isWebinar.value || isOwner.value;
 const {
@@ -226,6 +235,10 @@ onUnmounted(() => {
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   position: relative;
   overflow: hidden;
+
+  :deep {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 .room-container {
@@ -247,7 +260,7 @@ onUnmounted(() => {
   width: 100%;
   height: 56px;
   box-sizing: border-box;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s, visibility 0.3s;
   background-color: var(--bg-color-bottombar);
   border-bottom: 1px solid var(--stroke-color-secondary);
 
@@ -275,6 +288,19 @@ onUnmounted(() => {
   }
 }
 
+.recording-status-anchor {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  transform: translateY(0);
+  transition: transform 0.3s; // matches header transition
+
+  &.toolbar-visible {
+    transform: translateY(56px); // header height
+  }
+}
+
 .room-main {
   min-height: 0;
   width: 100%;
@@ -284,6 +310,13 @@ onUnmounted(() => {
   right: 0;
   display: flex;
   background-color: var(--bg-color-topbar);
+  user-select: none;
+
+  input,
+  textarea,
+  [contenteditable='true'] {
+    user-select: text;
+  }
 }
 
 .room-footer {
@@ -294,5 +327,12 @@ onUnmounted(() => {
   height: 90px;
   bottom: 0;
   left: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.toolbar-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 </style>

@@ -30,10 +30,11 @@ const handleLogout = () => {
 };
 
 const handleCreateRoom = async (roomId: string) => {
-  sessionStorage.setItem(`room-${roomId}-isCreate`, 'true');
+  const targetRoomId = sessionStorage.getItem('manualRoomId') || roomId;
+  sessionStorage.setItem(`room-${targetRoomId}-isCreate`, 'true');
   router.push({
     path: '/room',
-    query: { roomId },
+    query: { roomId: targetRoomId },
   });
 };
 

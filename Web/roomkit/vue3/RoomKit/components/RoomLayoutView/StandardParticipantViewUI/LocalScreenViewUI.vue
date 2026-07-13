@@ -1,60 +1,162 @@
 <template>
   <div ref="localScreenContainerRef" class="local-screen-container">
-    <div :class="['local-screen-control-container', { mini: isMiniRegion }]">
-      <div class="local-screen-info">
-        <IconScreenSharing size="44" />
-        <span class="text">{{ t('RoomView.YouAreSharingTheScreen') }}</span>
+    <div
+      id="screen-share-view"
+      ref="screenShareViewRef"
+      :class="['screen-share-view', { 'whiteboard-view': isStandaloneWhiteboard }]"
+      :style="whiteboardCursor ? { cursor: whiteboardCursor } : undefined"
+    />
+    <div v-if="shouldShowPreviewWarning" class="screen-preview-warning">
+      <div class="screen-preview-warning-title">
+        {{ t('ScreenShare.LocalPreviewWarningTitle') }}
       </div>
-      <TUIButton
-        color="red"
-        type="primary"
-        @click="handleStopSharing"
-      >
-        {{ t('RoomView.EndSharing') }}
-      </TUIButton>
+      <div class="screen-preview-warning-content">
+        {{ t('ScreenShare.LocalPreviewWarningContent') }}
+      </div>
+      <div class="screen-preview-warning-actions">
+        <TUIButton type="primary" @click="handleContinuePreview">
+          {{ t('ScreenShare.ContinueLocalPreview') }}
+        </TUIButton>
+        <TUIButton type="default" @click="handleStopPreview">
+          {{ t('ScreenShare.StopPresenting') }}
+        </TUIButton>
+      </div>
     </div>
+    <WhiteboardDock
+      v-if="showAnnotationDock"
+      :container-el="localScreenContainerRef"
+      :view-el="screenShareViewRef"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import {
   TUIButton,
-  IconScreenSharing,
-  TUIMessageBox,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState } from 'tuikit-atomicx-vue3/room';
+import { DeviceStatus, useDeviceState, useWhiteboardState, WhiteboardStatus, WhiteboardTool } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../../adapter/conference';
-import { InterceptorAction } from '../../../adapter/type';
+import {
+  clearLocalScreenSharePreviewConfirmation,
+  confirmLocalScreenSharePreview,
+  getLocalScreenShareSurface,
+  isLocalScreenSharePreviewConfirmed,
+  updateLocalScreenShareView,
+} from '../../../adapter/screenSharePreview';
+import { BuiltinWidget } from '../../../adapter/type';
+import { WHITEBOARD_TOOL_CURSORS } from '../../Whiteboard/constants';
+import { useWhiteboardToolbar } from '../../Whiteboard/useWhiteboardToolbar';
+import WhiteboardDock from '../../Whiteboard/WhiteboardDock.vue';
+
+const MINI_REGION_MAX_HEIGHT = 200;
 
 const { t } = useUIKit();
-const { stopScreenShare } = useDeviceState();
-const localScreenContainerRef = ref();
+const { screenStatus, stopScreenShare } = useDeviceState();
+const {
+  whiteboardStatus,
+  currentToolConfig,
+  updateWhiteboard,
+  setToolConfig,
+} = useWhiteboardState();
+const { isStandaloneWhiteboard } = useWhiteboardToolbar();
+const localScreenContainerRef = ref<HTMLElement>();
+const screenShareViewRef = ref<HTMLElement>();
+// The tile is too small to host the annotation dock; unmount it while mini.
 const isMiniRegion = ref(false);
+const showPreviewWarning = ref(false);
+const shouldShowPreviewWarning = computed(() =>
+  showPreviewWarning.value
+  && screenStatus.value === DeviceStatus.On
+  && whiteboardStatus.value !== WhiteboardStatus.On,
+);
+const showAnnotationDock = computed(() =>
+  !isMiniRegion.value
+  && !shouldShowPreviewWarning.value
+  && conference.getWidgetVisible(BuiltinWidget.AnnotationWidget),
+);
+const whiteboardCursor = computed(() =>
+  whiteboardStatus.value === WhiteboardStatus.On
+    ? WHITEBOARD_TOOL_CURSORS[currentToolConfig.value.tool] ?? 'default'
+    : '',
+);
 
-function handleStopSharing() {
-  conference.executeInterceptor(InterceptorAction.StopScreenShare, () => {
-    TUIMessageBox.confirm({
-      title: t('ScreenShare.EndSharing'),
-      content: t('ScreenShare.StopSharingConfirm'),
-      callback: async (action) => {
-        if (action === 'confirm') {
-          await stopScreenShare();
-        }
-      },
-    });
-  });
+async function bindScreenSharePreview() {
+  if (
+    screenStatus.value !== DeviceStatus.On
+    || whiteboardStatus.value === WhiteboardStatus.On
+    || !screenShareViewRef.value
+  ) {
+    return;
+  }
+  try {
+    await updateLocalScreenShareView(screenShareViewRef.value);
+    if (!isLocalScreenSharePreviewConfirmed()) {
+      const displaySurface = await getLocalScreenShareSurface();
+      if (displaySurface === 'browser') {
+        confirmLocalScreenSharePreview();
+        showPreviewWarning.value = false;
+      } else {
+        showPreviewWarning.value = true;
+      }
+    }
+  } catch (error) {
+    console.error('[LocalScreenViewUI] update screen share preview failed:', error);
+  }
 }
 
-const resizeObserver = new ResizeObserver(() => {
-  isMiniRegion.value = localScreenContainerRef.value?.offsetHeight <= 200;
+async function handleContinuePreview() {
+  confirmLocalScreenSharePreview();
+  showPreviewWarning.value = false;
+}
+
+async function handleStopPreview() {
+  clearLocalScreenSharePreviewConfirmation();
+  await stopScreenShare();
+}
+
+watch(
+  [screenStatus, whiteboardStatus],
+  ([status]) => {
+    if (status === DeviceStatus.Off) {
+      clearLocalScreenSharePreviewConfirmation();
+      showPreviewWarning.value = false;
+    }
+    bindScreenSharePreview();
+  },
+  { flush: 'post' },
+);
+
+// While the tile is mini the annotation dock unmounts, so also drop drawing mode
+// to avoid stray strokes on the thumbnail.
+watch(isMiniRegion, (mini) => {
+  if (
+    mini
+    && whiteboardStatus.value === WhiteboardStatus.On
+    && currentToolConfig.value.tool !== WhiteboardTool.None
+  ) {
+    void setToolConfig({ tool: WhiteboardTool.None });
+  }
 });
+
+const resizeObserver = new ResizeObserver(() => {
+  isMiniRegion.value = (localScreenContainerRef.value?.offsetHeight ?? 0) <= MINI_REGION_MAX_HEIGHT;
+});
+
 onMounted(() => {
-  resizeObserver.observe(localScreenContainerRef.value);
+  if (localScreenContainerRef.value) {
+    resizeObserver.observe(localScreenContainerRef.value);
+  }
+  if (screenShareViewRef.value) {
+    updateWhiteboard({ view: screenShareViewRef.value });
+  }
+  bindScreenSharePreview();
 });
 onBeforeUnmount(() => {
-  resizeObserver.unobserve(localScreenContainerRef.value);
+  if (screenStatus.value === DeviceStatus.Off) {
+    clearLocalScreenSharePreviewConfirmation();
+  }
   resizeObserver.disconnect();
 });
 </script>
@@ -66,7 +168,8 @@ onBeforeUnmount(() => {
   justify-content: center;
   width: 100%;
   height: 100%;
-  position: absolute;
+  // The TRTC preview injects inline `position: relative`; keep this tile anchored.
+  position: absolute !important;
   top: 0;
   left: 0;
   background-color: var(--bg-color-bubble-reciprocal);
@@ -78,34 +181,57 @@ onBeforeUnmount(() => {
     background-color: var(--bg-color-bubble-reciprocal);
   }
 
-  .local-screen-control-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transform: translate(-50%, -50%);
-    color: var(--text-color-tertiary);
+  .screen-share-view {
+    position: absolute !important;
+    inset: 0;
+    width: 100%;
+    height: 100%;
 
-    &.mini {
-      transform: translate(-50%, -50%) scale(0.7);
-    }
-
-    .local-screen-info {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 20px;
-
-      .text {
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 24px;
-        white-space: nowrap;
+    &.whiteboard-view {
+      :deep(video) {
+        background-color: #fff !important;
+        height: auto !important;
       }
     }
   }
+
+  .screen-preview-warning {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #fff;
+    text-align: center;
+    background-color: rgba(0, 0, 0, .62);
+    user-select: none;
+    font-size: 16px;
+
+  }
+
+  .screen-preview-warning-title {
+    margin-bottom: 20px;
+    font-size: 26px;
+    line-height: 1.4;
+  }
+
+  .screen-preview-warning-content {
+    max-width: 1000px;
+    margin-bottom: 40px;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.25rem;
+  }
+
+  .screen-preview-warning-actions {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+  }
+
 }
 </style>

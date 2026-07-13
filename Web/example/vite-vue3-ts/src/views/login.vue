@@ -2,47 +2,48 @@
   <div :class="['login-container', theme]">
     <Login
       class="login-widget"
-      v-bind="{
-        SDKAppID: SDKAPPID,
-        generatorUserSig: genTestUserSig,
-        onLoginCallback: handleLogin
-      }"
+      :SDKAppID="SDKAPPID"
+      :model="LoginModel.userID"
+      :generatorUserSig="genTestUserSig"
+      :onLoginCallback="handleLogin"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { useLoginState, useRoomModal } from 'tuikit-atomicx-vue3/room';
+import { conference } from '@tencentcloud/roomkit-web-vue3';
+import { useUIKit, TUIMessageBox } from '@tencentcloud/uikit-base-component-vue3';
+import { Login, LoginModel } from '@tencentcloud/uikit-base-widget-vue3';
 import { useRouter, useRoute } from 'vue-router';
-import Login from '../components/LoginUserID/index.vue';
 import { SDKAPPID, genTestUserSig } from '../config/basic-info-config';
-import { deepClone } from '../utils/utils';
 
-const { theme = 'light' } = useUIKit();
-const { login } = useLoginState();
-const { handleErrorWithModal } = useRoomModal();
-
+const { theme = 'light', t } = useUIKit();
 const router = useRouter();
 const route = useRoute();
 
-const handleLogin = async (userInfo: {
-  SDKAppID: number;
-  userID: string;
-  userSig: string;
-}) => {
+const handleLogin = async (userInfo: { SDKAppID: number; userID: string; userSig: string }) => {
+  if (!SDKAPPID) {
+    TUIMessageBox.alert({
+      title: t('Login.Error'),
+      content: t('Login.PleaseConfigureSDKAPPID'),
+    });
+  }
   try {
-    await login({
+    await conference.login({
       userId: userInfo.userID,
       userSig: userInfo.userSig,
       sdkAppId: userInfo.SDKAppID,
     });
     localStorage.setItem('tuiRoom-userInfo', JSON.stringify(userInfo));
-    const currentQuery = deepClone(route.query);
-    router.push({ path: route.query.from as string || '/home', query: currentQuery });
+    const redirect = route.query.redirect as string | undefined;
+    if (redirect) {
+      router.push(redirect);
+    } else {
+      const { from, ...query } = route.query;
+      router.push({ path: (from as string) || '/home', query });
+    }
   } catch (error: any) {
-    console.error('Login failed:', error.code);
-    handleErrorWithModal(error);
+    console.error('Login failed:', error?.code);
   }
 };
 </script>

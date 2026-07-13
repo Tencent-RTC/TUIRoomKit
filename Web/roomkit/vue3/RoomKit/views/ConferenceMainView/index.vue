@@ -35,10 +35,14 @@
         </div>
       </header>
 
-      <main
-
-        class="room-main"
-      >
+      <main class="room-main">
+        <div
+          v-if="conference.getWidgetVisible(BuiltinWidget.RecordingWidget)"
+          class="recording-status-anchor"
+          :class="{ 'toolbar-visible': showToolbar }"
+        >
+          <CloudRecordingStatus />
+        </div>
         <TUIWatermark
           v-if="watermarkEnabled"
           :font="watermarkFont"
@@ -76,6 +80,7 @@
         <div class="control-center">
           <CustomWidgetRenderer zone="bottom-center" platform="pc">
             <ScreenShareRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.ScreenShareWidget) && ownerOrNotWebinar" />
+            <CloudRecordingRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.RecordingWidget) && !isWebinar && (isOwner || isAdmin)" />
             <RaiseHandsListRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.RaiseHandsListWidget) && isWebinar && (isOwner || isAdmin)" />
             <InviteRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.InviteWidget) && notWebinar" />
             <ChatRegistrar
@@ -84,7 +89,7 @@
             <MemberRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.MemberWidget)" />
             <VirtualBackgroundRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.VirtualBackgroundWidget) && notWebinar" />
             <BasicBeautyRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.BasicBeautyWidget) && ownerOrNotWebinar" />
-            <AIToolsRegistrar v-if="(conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) || !!AIToolsButtonConfig?.visible) && notWebinar && aiToolsEnabled" />
+            <AIToolsRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) && notWebinar" />
             <SettingsRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.SettingsWidget) && ownerOrNotWebinar" />
             <BarrageRegistrar
               v-if="conference.getWidgetVisible(BuiltinWidget.BarrageWidget) && isWebinar"
@@ -148,13 +153,15 @@ import {
   RoomParticipantRole,
 } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
-import { ComponentName, RoomEvent as ConferenceRoomEvent, BuiltinWidget } from '../../adapter/type';
+import { RoomEvent as ConferenceRoomEvent, BuiltinWidget } from '../../adapter/type';
 import {
   RoomLayoutView,
   PasswordDialog,
   RoomSidePanel,
   CustomWidgetRenderer,
   // Registrar components (PC)
+  CloudRecordingRegistrar,
+  CloudRecordingStatus,
   ThemeRegistrar,
   LayoutRegistrar,
   LocalNetworkInfoRegistrar,
@@ -183,9 +190,6 @@ import { useRoomTips } from '../../hooks/useRoomTips';
 import { useRoomToolbar } from '../../hooks/useRoomToolbar';
 import { eventCenter } from '../../utils/eventCenter';
 import type { WidgetConfig } from '../../adapter/type';
-
-const AIToolsButtonConfig = conference.getComponentConfig(ComponentName.AIToolsButton);
-const aiToolsEnabled = computed(() => conference.getFeatureConfig('aiTools')?.enable !== false);
 
 const { t } = useUIKit();
 const roomPageRef = ref<HTMLElement | null>(null);
@@ -395,6 +399,19 @@ onUnmounted(() => {
   opacity: 0;
 }
 
+.recording-status-anchor {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  transform: translateY(0);
+  transition: transform 0.2s ease; // matches header transition
+
+  &.toolbar-visible {
+    transform: translateY(56px); // header height
+  }
+  z-index: 2;
+}
+
 .room-main {
   position: absolute;
   right: 0;
@@ -404,6 +421,13 @@ onUnmounted(() => {
   height: 100%;
   min-height: 0;
   background-color: var(--bg-color-topbar);
+  user-select: none;
+
+  input,
+  textarea,
+  [contenteditable='true'] {
+    user-select: text;
+  }
 }
 
 .control-bar {

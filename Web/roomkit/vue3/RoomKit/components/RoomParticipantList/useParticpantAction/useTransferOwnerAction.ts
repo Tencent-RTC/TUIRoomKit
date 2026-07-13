@@ -1,14 +1,14 @@
 import type { Component } from 'vue';
 import { reactive, markRaw, computed, ref } from 'vue';
 import { TUIToast, TOAST_TYPE, IconTransferOwner, TUIMessageBox, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { useAITranscriberState, useDeviceState, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
-import { DeviceStatus, RealtimeTranscriberEvent, RoomParticipantRole } from 'tuikit-atomicx-vue3';
-import type { RealtimeTranscriberEventInfoMap, RoomParticipant } from 'tuikit-atomicx-vue3';
+import { DeviceStatus, RealtimeTranscriberEvent, RoomParticipantRole, useAITranscriberState, useDeviceState, useRoomParticipantState, useRoomState, useWhiteboardState, WhiteboardStatus } from 'tuikit-atomicx-vue3/room';
+import type { RealtimeTranscriberEventInfoMap, RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 const { currentRoom } = useRoomState();
 const { t } = useUIKit();
 const { localParticipant, transferOwner } = useRoomParticipantState();
-const { stopScreenShare } = useDeviceState();
+const { screenStatus, stopScreenShare } = useDeviceState();
+const { whiteboardStatus, stopWhiteboard } = useWhiteboardState();
 const { subscribeEvent, stopRealtimeTranscriber } = useAITranscriberState();
 const hasStartedAsr = ref(false);
 let asrEventBound = false;
@@ -61,33 +61,43 @@ export function useTransferOwnerAction(
   }
 
   async function handleTransferOwner(options?: { shouldStopAsr?: boolean }) {
-    if (localParticipant.value?.role === RoomParticipantRole.Owner) {
-      try {
-        // todo: 测试这里的开着屏幕分享转交房主，是否停止屏幕分享
-        if (
-          localParticipant.value?.screenShareStatus === DeviceStatus.On
-          && currentRoom.value?.isAllScreenShareDisabled
-        ) {
-          stopScreenShare();
-        }
-        if (options?.shouldStopAsr && hasStartedAsr.value) {
-          await stopRealtimeTranscriber();
-        }
-        await transferOwner({
-          userId: targetParticipant.userId,
-        });
-        TUIToast({
-          type: TOAST_TYPE.SUCCESS,
-          message: t('ParticipantList.TransferHostSuccess', {
-            name: displayName.value,
-          }),
-        });
-      } catch (error: any) {
-        TUIToast({
-          type: TOAST_TYPE.ERROR,
-          message: t('ParticipantList.TransferHostFailed'),
-        });
+    if (localParticipant.value?.role !== RoomParticipantRole.Owner) {
+      return;
+    }
+
+    // Under host/admin-only sharing, the outgoing owner becomes a general user who
+    // is no longer allowed to present, so end whatever it is presenting. A standalone
+    // whiteboard has no real screen capture (screenStatus Off) and is published as a
+    // screen-share stream, so it must be closed via stopWhiteboard; stopScreenShare
+    // would be a no-op. A real screen share (with or without annotation) is closed via
+    // stopScreenShare, which also tears down the annotation whiteboard.
+    if (currentRoom.value?.isAllScreenShareDisabled) {
+      if (whiteboardStatus.value === WhiteboardStatus.On && screenStatus.value === DeviceStatus.Off) {
+        await stopWhiteboard().catch(() => {});
+      } else if (localParticipant.value?.screenShareStatus === DeviceStatus.On) {
+        await stopScreenShare().catch(() => {});
       }
+    }
+
+    if (options?.shouldStopAsr && hasStartedAsr.value) {
+      await stopRealtimeTranscriber().catch(() => {});
+    }
+
+    try {
+      await transferOwner({
+        userId: targetParticipant.userId,
+      });
+      TUIToast({
+        type: TOAST_TYPE.SUCCESS,
+        message: t('ParticipantList.TransferHostSuccess', {
+          name: displayName.value,
+        }),
+      });
+    } catch (error: any) {
+      TUIToast({
+        type: TOAST_TYPE.ERROR,
+        message: t('ParticipantList.TransferHostFailed'),
+      });
     }
   }
 

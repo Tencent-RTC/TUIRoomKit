@@ -7,6 +7,7 @@ import SettingButtonH5 from './index.vue';
 const unregister = conference.registerWidget({
   id: BuiltinWidget.SettingsWidget,
   zone: { h5: 'bottom-center' },
+  order: 7,
   component: SettingButtonH5,
 });
 

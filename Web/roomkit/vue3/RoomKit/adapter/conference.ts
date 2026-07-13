@@ -1,5 +1,6 @@
 import { getCurrentInstance, inject, reactive, shallowReactive, markRaw } from 'vue';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
+import { callExperimentalAPI as atomicxCallExperimentalAPI } from 'tuikit-atomicx-vue3';
 import {
   useLoginState,
   useRoomEngine,
@@ -27,13 +28,13 @@ import {
 import type { CreateRoomOptions } from 'tuikit-atomicx-vue3/room';
 
 class Conference extends ConferenceDeprecated implements IConference {
-  private widgetVisibility = reactive<Record<string, boolean>>({});
+  private widgetVisibility = reactive<Record<string, boolean>>({
+  });
+
   private registeredWidgets = shallowReactive<WidgetConfig[]>([]);
   private widgetRegistrationIndex = 0;
   private interceptorHandlers = new Map<InterceptorAction, Set<InterceptorHandler>>();
-  private featureConfig = reactive<FeatureConfig>({
-    aiTools: { enable: false },
-  });
+  private featureConfig = reactive<FeatureConfig>({});
 
   constructor() {
     super();
@@ -54,12 +55,15 @@ class Conference extends ConferenceDeprecated implements IConference {
     sdkAppId: number;
     userId: string;
     userSig: string;
+    [key: string]: any;
   }) {
     const { login } = useLoginState();
+    const { sdkAppId, userId, userSig, ...rest } = params;
     await login({
-      userId: params.userId,
-      userSig: params.userSig,
-      sdkAppId: params.sdkAppId,
+      userId,
+      userSig,
+      sdkAppId,
+      ...rest,
     });
   }
 
@@ -355,6 +359,16 @@ class Conference extends ConferenceDeprecated implements IConference {
 
   public getFeatureConfig<K extends keyof FeatureConfig>(key: K): FeatureConfig[K] | undefined {
     return this.featureConfig[key];
+  }
+
+  public callExperimentalAPI<T extends string>({
+    api,
+    params,
+  }: {
+    api: T;
+    params?: Record<string, any>;
+  }): void {
+    atomicxCallExperimentalAPI({ api, params });
   }
 }
 

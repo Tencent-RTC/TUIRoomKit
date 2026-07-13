@@ -8,9 +8,8 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
-import { useRoomInvitation, useRoomInvitationH5 } from '@tencentcloud/roomkit-web-vue3';
+import { conference, useRoomInvitation, useRoomInvitationH5, RoomEvent } from '@tencentcloud/roomkit-web-vue3';
 import { TUIMessageBox, UIKitProvider, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { useLoginState, useRoomModal, LoginEvent } from 'tuikit-atomicx-vue3/room';
 import { useRoute, useRouter } from 'vue-router';
 import { isPC } from './utils/utils';
 
@@ -20,17 +19,6 @@ const initialLanguage = ref(localStorage.getItem('tuiRoom-language') || '');
 
 const router = useRouter();
 const route = useRoute();
-const { login, subscribeEvent, unSubscribeEvent } = useLoginState();
-const { handleErrorWithModal } = useRoomModal();
-
-useRoomInvitation({
-  onAcceptCall: (params) => {
-    router.push({
-      path: '/room',
-      query: params,
-    });
-  },
-});
 
 if (!isPC) {
   useRoomInvitationH5({
@@ -67,12 +55,12 @@ const onKickedOffline = () => {
   router.replace({ path: '/login' });
 };
 const bindEvent = () => {
-  subscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
-  subscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
+  conference.on(RoomEvent.USER_SIG_EXPIRED, onLoginExpired);
+  conference.on(RoomEvent.KICKED_OFFLINE, onKickedOffline);
 };
 const unbindEvent = () => {
-  unSubscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
-  unSubscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
+  conference.off(RoomEvent.USER_SIG_EXPIRED, onLoginExpired);
+  conference.off(RoomEvent.KICKED_OFFLINE, onKickedOffline);
 };
 
 onMounted(async () => {
@@ -84,14 +72,13 @@ onMounted(async () => {
   const storedData = localStorage.getItem('tuiRoom-userInfo') || '{}';
   const userInfo = JSON.parse(storedData);
   try {
-    await login({
+    await conference.login({
       userId: userInfo.userID,
       userSig: userInfo.userSig,
       sdkAppId: userInfo.SDKAppID,
     });
   } catch (error: any) {
     console.error('Login failed:', error);
-    handleErrorWithModal(error);
     localStorage.removeItem('tuiRoom-userInfo');
     router.replace({ path: '/login', query: { redirect: route.fullPath } });
   }

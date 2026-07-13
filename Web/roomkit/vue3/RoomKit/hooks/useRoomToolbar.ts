@@ -68,6 +68,14 @@ export function useRoomToolbar(
     }, mouseMoveThrottle);
   };
 
+  const handleClick = () => {
+    if (alwaysShow.value) {
+      return;
+    }
+    showToolbar.value = true;
+    setHideTimer();
+  };
+
   const handleMouseLeave = (event: MouseEvent) => {
     if (alwaysShow.value) {
       return;
@@ -90,6 +98,7 @@ export function useRoomToolbar(
     container.addEventListener('mouseenter', handleMouseEnter);
     container.addEventListener('mousemove', handleMouseMoveThrottled);
     container.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('click', handleClick);
   };
 
   const removeEventListeners = () => {
@@ -101,6 +110,7 @@ export function useRoomToolbar(
     container.removeEventListener('mouseenter', handleMouseEnter);
     container.removeEventListener('mousemove', handleMouseMoveThrottled);
     container.removeEventListener('mouseleave', handleMouseLeave);
+    container.removeEventListener('click', handleClick);
   };
 
   // Watch alwaysShow changes: when switching to always-show, clear timers and show toolbar

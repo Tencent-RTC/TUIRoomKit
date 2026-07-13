@@ -1,4 +1,8 @@
 import AIToolsButton from './AIToolsButton/index.vue';
+import CloudRecordingButton from './CloudRecording/CloudRecordingButton.vue';
+import CloudRecordingButtonH5 from './CloudRecording/CloudRecordingButtonH5.vue';
+import CloudRecordingStatus from './CloudRecording/CloudRecordingStatus.vue';
+import CloudRecordingStatusH5 from './CloudRecording/CloudRecordingStatusH5.vue';
 import AIToolsButtonH5 from './AIToolsButtonH5/index.vue';
 import BasicBeautyButton from './BasicBeautyButton/index.vue';
 import CallButton from './CallButton/index.vue';
@@ -49,6 +53,10 @@ import RaiseHandsList from './RaiseHandsList/index.vue';
 import CustomWidgetRenderer from './CustomWidgetRenderer/index.vue';
 
 // Registrar components (PC)
+import CloudRecordingRegistrar from './CloudRecording/CloudRecordingRegistrar.vue';
+
+// Registrar components (H5) - CloudRecording
+import CloudRecordingRegistrarH5 from './CloudRecording/CloudRecordingRegistrarH5.vue';
 import ThemeRegistrar from './ThemeButton/ThemeRegistrar.vue';
 import LayoutRegistrar from './LayoutButton/LayoutRegistrar.vue';
 import LocalNetworkInfoRegistrar from './LocalNetworkInfo/LocalNetworkInfoRegistrar.vue';
@@ -83,6 +91,10 @@ import SettingsRegistrarH5 from './SettingButtonH5/SettingsRegistrarH5.vue';
 import AIToolsRegistrarH5 from './AIToolsButtonH5/AIToolsRegistrarH5.vue';
 
 export {
+  CloudRecordingButton,
+  CloudRecordingButtonH5,
+  CloudRecordingStatus,
+  CloudRecordingStatusH5,
   CameraButton,
   CurrentRoomInfo,
   LanguageButton,
@@ -136,6 +148,7 @@ export {
   showRoomInvitationH5,
   hideRoomInvitationH5,
   // Registrar components (PC)
+  CloudRecordingRegistrar,
   ThemeRegistrar,
   LayoutRegistrar,
   LocalNetworkInfoRegistrar,
@@ -167,4 +180,5 @@ export {
   ChatRegistrarH5,
   SettingsRegistrarH5,
   AIToolsRegistrarH5,
+  CloudRecordingRegistrarH5,
 };

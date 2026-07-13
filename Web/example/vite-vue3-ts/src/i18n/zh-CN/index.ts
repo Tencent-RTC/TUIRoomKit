@@ -10,4 +10,9 @@ export const resource = {
   'Login.ExpiredDescription': '您的登录状态已过期，为了保障账号安全，请重新登录。',
   'Login.KickedOffline': '被踢下线',
   'Login.KickedOfflineDescription': '您的账号刚刚在其他设备登录，当前设备已下线。若非本人操作，请尽快检查您的账号安全！',
+  'Login.Failed': '登录失败',
+  'Login.PhoneLogin': '手机号登录',
+  'Login.UserIDLogin': '用户 ID 登录',
+  'Login.Error': '错误',
+  'Login.PleaseConfigureSDKAPPID': '请在 basic-info-config.js 文件中配置 SDKAPPID 和 SDKSECRETKEY',
 };

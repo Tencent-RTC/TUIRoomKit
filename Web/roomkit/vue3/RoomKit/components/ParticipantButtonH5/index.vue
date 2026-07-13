@@ -27,10 +27,14 @@ const { currentRoom } = useRoomState();
 
 const isPopupVisible = ref(false);
 const title = computed(() => {
-  if (!currentRoom.value) {
+  if (!currentRoom.value || !currentRoom.value?.roomId) {
     return t('Participant.Title');
   }
-  return `${t('Participant.Title')}(${currentRoom.value?.participantCount})`;
+  const memberCount = (currentRoom.value?.participantCount || 0) + (currentRoom.value?.audienceCount || 0);
+  if (memberCount === 0) {
+    return t('Participant.Title');
+  }
+  return `${t('Participant.Title')}(${memberCount})`;
 });
 </script>
 

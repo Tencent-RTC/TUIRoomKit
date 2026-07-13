@@ -2,6 +2,9 @@ import type { Component } from 'vue';
 import { RoomLayoutTemplate, RoomUser, RoomType } from 'tuikit-atomicx-vue3/room';
 import type TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import type { CreateRoomOptions } from 'tuikit-atomicx-vue3/room';
+import type { ExperimentalAPIParamsMap, CallExperimentalAPI } from 'tuikit-atomicx-vue3/types';
+
+export type { ExperimentalAPIParamsMap, CallExperimentalAPI };
 
 export type { CreateRoomOptions, RoomLayoutTemplate };
 
@@ -60,6 +63,8 @@ export enum BuiltinWidget {
   MicWidget = 'MicWidget',
   CameraWidget = 'CameraWidget',
   ScreenShareWidget = 'ScreenShareWidget',
+  WhiteboardWidget = 'WhiteboardWidget',
+  AnnotationWidget = 'AnnotationWidget',
   RoomChatWidget = 'RoomChatWidget',
   MemberWidget = 'MemberWidget',
   InviteWidget = 'InviteWidget',
@@ -78,6 +83,7 @@ export enum BuiltinWidget {
   BarrageWidget = 'BarrageWidget',
   RaiseHandsWidget = 'RaiseHandsWidget',
   RaiseHandsListWidget = 'RaiseHandsListWidget',
+  RecordingWidget = 'RecordingWidget',
 }
 
 export type WidgetZone =
@@ -155,10 +161,6 @@ export interface VirtualBackgroundFeatureConfig {
   customImages?: VirtualBackgroundImage[];
 }
 
-export interface AIToolsConfig {
-  enable?: boolean;
-}
-
 export interface ToolbarConfig {
   /** Whether to always show the header and footer (disable auto-hide). Default: false */
   alwaysShow?: boolean;
@@ -171,14 +173,13 @@ export interface FeatureConfig {
   shareLink?: string;
   contactList?: ContactListProvider;
   virtualBackground?: VirtualBackgroundFeatureConfig;
-  aiTools?: AIToolsConfig;
   layoutTemplate?: RoomLayoutTemplate;
   toolbar?: ToolbarConfig;
 }
 
 export interface IConference {
   // Auth
-  login: (params: { sdkAppId: number; userId: string; userSig: string }) => Promise<void>;
+  login: (params: { sdkAppId: number; userId: string; userSig: string; [key: string]: any }) => Promise<void>;
   logout: () => Promise<void>;
   setSelfInfo: (options: { userName: string; avatarUrl: string }) => Promise<void>;
 
@@ -221,4 +222,7 @@ export interface IConference {
   // Feature configuration
   setFeatureConfig: (config: Partial<FeatureConfig>) => void;
   getFeatureConfig: <K extends keyof FeatureConfig>(key: K) => FeatureConfig[K] | undefined;
+
+  // Experimental API gateway
+  callExperimentalAPI: CallExperimentalAPI;
 }
