@@ -34,7 +34,7 @@ const handleLogin = async (userInfo: { SDKAppID: number; userID: string; userSig
       userSig: userInfo.userSig,
       sdkAppId: userInfo.SDKAppID,
     });
-    localStorage.setItem('tuiRoom-userInfo', JSON.stringify(userInfo));
+    sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(userInfo));
     const redirect = route.query.redirect as string | undefined;
     if (redirect) {
       router.push(redirect);

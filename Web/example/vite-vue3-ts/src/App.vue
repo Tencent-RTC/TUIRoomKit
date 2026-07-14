@@ -69,7 +69,7 @@ onMounted(async () => {
   if (route.path === '/login') {
     return;
   }
-  const storedData = localStorage.getItem('tuiRoom-userInfo') || '{}';
+  const storedData = sessionStorage.getItem('tuiRoom-userInfo') || '{}';
   const userInfo = JSON.parse(storedData);
   try {
     await conference.login({
@@ -79,7 +79,7 @@ onMounted(async () => {
     });
   } catch (error: any) {
     console.error('Login failed:', error);
-    localStorage.removeItem('tuiRoom-userInfo');
+    sessionStorage.removeItem('tuiRoom-userInfo');
     router.replace({ path: '/login', query: { redirect: route.fullPath } });
   }
 });
