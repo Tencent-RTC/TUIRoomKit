@@ -58,20 +58,6 @@ const useLeaveRoomGuard = () => {
   }, [location.pathname]);
 };
 
-// Auth gate: any non-/login path requires an active login session.
-//
-// We intentionally rely on the in-memory login store (`useLoginState`) here
-// rather than `localStorage.tuiRoom-userInfo`. localStorage is shared across
-// tabs of the same origin, so using it as the auth source-of-truth caused a
-// cross-tab leak: when one tab was kicked offline and cleared the stored
-// credential, every other tab's `RequireAuth` would re-read localStorage on
-// its next render and incorrectly redirect to /login. The login store is
-// per-tab, so each tab now owns its own auth state.
-//
-// `localStorage.tuiRoom-userInfo` is still used by `App.tsx`'s bootstrap
-// effect as the auto-login credential; we peek at it below only to avoid
-// flashing /login during the brief window between the initial render and the
-// bootstrap `login()` call.
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
   const location = useLocation();
   const { loginUserInfo, status } = useLoginState();
@@ -80,7 +66,7 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
     return children;
   }
 
-  const hasBootstrapCredential = !!localStorage.getItem('tuiRoom-userInfo');
+  const hasBootstrapCredential = !!sessionStorage.getItem('tuiRoom-userInfo');
   if (
     status === LoginStatus.LOADING ||
     (status === LoginStatus.IDLE && hasBootstrapCredential)

@@ -33,7 +33,7 @@ export default function LoginView() {
         userSig: userInfo.userSig,
         sdkAppId: userInfo.SDKAppID,
       });
-      localStorage.setItem('tuiRoom-userInfo', JSON.stringify(userInfo));
+      sessionStorage.setItem('tuiRoom-userInfo', JSON.stringify(userInfo));
 
       const redirect = searchParams.get('redirect');
       if (redirect) {

@@ -60,7 +60,7 @@ const InnerApp = () => {
 
     if (location.pathname === '/login') return;
 
-    const storedData = localStorage.getItem('tuiRoom-userInfo') || '{}';
+    const storedData = sessionStorage.getItem('tuiRoom-userInfo') || '{}';
     const userInfo = JSON.parse(storedData);
     if (!userInfo?.userID) return;
 
@@ -72,7 +72,7 @@ const InnerApp = () => {
       })
       .catch((error: any) => {
         console.error('Login failed:', error);
-        localStorage.removeItem('tuiRoom-userInfo');
+        sessionStorage.removeItem('tuiRoom-userInfo');
         const redirect = encodeURIComponent(
           `${location.pathname}${location.search}`
         );
