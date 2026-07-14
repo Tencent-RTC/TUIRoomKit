@@ -33,7 +33,7 @@ router.beforeEach((to, from, next) => {
     next();
     return;
   }
-  const userInfo = localStorage.getItem('tuiRoom-userInfo');
+  const userInfo = sessionStorage.getItem('tuiRoom-userInfo');
   if (!userInfo) {
     next({ path: '/login', query: { redirect: to.fullPath } });
     return;
