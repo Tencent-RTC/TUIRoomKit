@@ -83,11 +83,30 @@ yarn add @tencentcloud/roomkit-web-vue3 tuikit-atomicx-vue3 @tencentcloud/uikit-
 
 ### 步骤2：引用会议组件
 
+`ConferenceMainView` / `ConferenceMainViewH5` / `PreConferenceView` 会填满父容器（`width/height: 100%`）。请由宿主提供定高容器；全屏场景可使用 `100vh`，或给页面根节点设置宽高并去掉默认边距。
+
+Vite 默认脚手架的 `#app` 常带有 `padding` / `max-width`，接入时请覆盖，例如：
+
+```css
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+```
+
 ```vue
 <template>
   <UIKitProvider theme="light" language="zh-CN">
-    <ConferenceMainView v-if="isPC" />
-    <ConferenceMainViewH5 v-else />
+    <!-- Fullscreen: size the host; RoomKit fills the parent -->
+    <div class="roomkit-host">
+      <ConferenceMainView v-if="isPC" />
+      <ConferenceMainViewH5 v-else />
+    </div>
   </UIKitProvider>
 </template>
 
@@ -99,6 +118,13 @@ import { getPlatform } from '@tencentcloud/universal-api';
 
 const isPC = ref(getPlatform() === 'pc');
 </script>
+
+<style>
+.roomkit-host {
+  width: 100%;
+  height: 100vh;
+}
+</style>
 ```
 
 ---

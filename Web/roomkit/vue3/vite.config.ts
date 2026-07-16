@@ -18,7 +18,8 @@ export default defineConfig({
         ];
         return externalDeps.some(dep => id === dep || id.startsWith(`${dep}/`));
       },
-      input: ['RoomKit/index.ts'],
+      // Main kit entry + isolated debug subpath (UserSig helper for quickstart only)
+      input: ['RoomKit/index.ts', 'RoomKit/debug/index.ts'],
       output: [
         {
           format: 'es',
@@ -45,7 +46,10 @@ export default defineConfig({
       ],
     },
     lib: {
-      entry: './RoomKit/index.ts',
+      entry: {
+        index: './RoomKit/index.ts',
+        'debug/index': './RoomKit/debug/index.ts',
+      },
       name: 'TUIRoomKit',
     },
   },
