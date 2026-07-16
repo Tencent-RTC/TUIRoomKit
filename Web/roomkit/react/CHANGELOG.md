@@ -4,6 +4,12 @@
 
 ---
 
+## [6.1.2] - 2026-07-17
+
+### Fixed
+
+- Fixed missing styles in the published build where components such as `ConferenceMainView` and `PreConferenceView` rendered unstyled (CSS was not injected into the main entry during build).
+
 ## [6.1.1] - 2026-07-16
 
 ### Added

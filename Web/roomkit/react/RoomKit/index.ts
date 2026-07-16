@@ -38,6 +38,14 @@ export {
   useRoomInvitation,
 };
 
+// Debug-only helper for local development / quickstart.
+// Do not use secretKey-based UserSig generation in production clients.
+export { genTestUserSig } from './debug/genTestUserSig';
+export type {
+  GenTestUserSigParams,
+  GenTestUserSigResult,
+} from './debug/genTestUserSig';
+
 TUIRoomEngine.once('ready', () => {
   TUIRoomEngine.callExperimentalAPI(
     JSON.stringify({

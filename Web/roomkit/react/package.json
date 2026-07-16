@@ -1,6 +1,6 @@
 {
   "name": "@tencentcloud/roomkit-web-react",
-  "version": "6.1.1",
+  "version": "6.1.2",
   "main": "./lib/index.js",
   "module": "./es/index.mjs",
   "types": "./es/index.d.ts",
