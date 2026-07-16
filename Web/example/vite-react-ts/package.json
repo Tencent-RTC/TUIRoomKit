@@ -10,7 +10,7 @@
     "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "@tencentcloud/roomkit-web-react": "6.1.0",
+    "@tencentcloud/roomkit-web-react": "6.1.1",
     "@tencentcloud/uikit-base-component-react": "1.4.1",
     "@tencentcloud/uikit-base-widget-react": "1.2.2",
     "@tencentcloud/universal-api": "^2.4.0",

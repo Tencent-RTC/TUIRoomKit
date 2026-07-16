@@ -4,6 +4,16 @@
 
 ---
 
+## [6.1.1] - 2026-07-16
+
+### Added
+
+- Exported the `genTestUserSig` helper to align packages and simplify integration and debugging.
+
+### Changed
+
+- `ConferenceMainView` and `PreConferenceView` now fill their parent container (100% width/height) by default instead of the full viewport.
+
 ## [6.1.0] - 2026-07-13
 
 ### Added

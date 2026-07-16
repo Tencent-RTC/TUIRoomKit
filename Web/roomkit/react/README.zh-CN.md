@@ -81,6 +81,22 @@ yarn add @tencentcloud/roomkit-web-react tuikit-atomicx-react @tencentcloud/uiki
 
 ### 步骤2：引用会议组件
 
+`ConferenceMainView` / `PreConferenceView` 会填满父容器（`width/height: 100%`）。请由宿主提供定高容器；全屏场景可使用 `100vh`，或给页面根节点设置宽高并去掉默认边距。
+
+Vite / CRA 脚手架的 `#root` / `#app` 常带有 `padding` / `max-width`，接入时请覆盖，例如：
+
+```css
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+```
+
 ```tsx
 import { UIKitProvider } from '@tencentcloud/uikit-base-component-react';
 import { ConferenceMainView } from '@tencentcloud/roomkit-web-react';
@@ -88,9 +104,19 @@ import { ConferenceMainView } from '@tencentcloud/roomkit-web-react';
 export default function App() {
   return (
     <UIKitProvider theme="light" language="zh-CN">
-      <ConferenceMainView />
+      {/* Fullscreen: size the host; RoomKit fills the parent */}
+      <div className="roomkit-host">
+        <ConferenceMainView />
+      </div>
     </UIKitProvider>
   );
+}
+```
+
+```css
+.roomkit-host {
+  width: 100%;
+  height: 100vh;
 }
 ```
 
