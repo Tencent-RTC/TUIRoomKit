@@ -83,11 +83,30 @@ yarn add @tencentcloud/roomkit-web-vue3 tuikit-atomicx-vue3 @tencentcloud/uikit-
 
 ### Step 2: Import TUIRoomKit Components
 
+`ConferenceMainView` / `ConferenceMainViewH5` / `PreConferenceView` fill their parent (`width/height: 100%`). Provide a sized host container; for fullscreen use `100vh`, or set root width/height and clear default page margins.
+
+Vite scaffolds often style `#app` with `padding` / `max-width`. Override them when integrating, for example:
+
+```css
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+```
+
 ```vue
 <template>
   <UIKitProvider theme="light" language="en-US">
-    <ConferenceMainView v-if="isPC" />
-    <ConferenceMainViewH5 v-else />
+    <!-- Fullscreen: size the host; RoomKit fills the parent -->
+    <div class="roomkit-host">
+      <ConferenceMainView v-if="isPC" />
+      <ConferenceMainViewH5 v-else />
+    </div>
   </UIKitProvider>
 </template>
 
@@ -99,6 +118,13 @@ import { getPlatform } from '@tencentcloud/universal-api';
 
 const isPC = ref(getPlatform() === 'pc');
 </script>
+
+<style>
+.roomkit-host {
+  width: 100%;
+  height: 100vh;
+}
+</style>
 ```
 
 ---
@@ -125,7 +151,7 @@ onMounted(async () => {
 });
 ```
 
-> **Note**: In production, generate UserSig on your server and fetch it dynamically on the client. See [How to calculate UserSig for production](https://trtc.io/document/35166?product=conference&menulabel=uikit&platform=web).
+> **Note**: In production, generate UserSig on your server and fetch it dynamically on the client. See [How to calculate UserSig for production](https://trtc.io/document/35166?product=conference&menulabel=uikit&platform=web).  
 
 **When authentication and Enter Room pages are on different routes**, monitor `loginUserInfo` to detect when login is complete:
 

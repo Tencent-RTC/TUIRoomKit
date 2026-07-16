@@ -227,14 +227,14 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .room-page {
-  width: 100vw;
+  position: relative;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: row;
+  overflow: hidden;
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  position: relative;
-  overflow: hidden;
 
   :deep {
     -webkit-tap-highlight-color: transparent;
