@@ -81,6 +81,22 @@ yarn add @tencentcloud/roomkit-web-react tuikit-atomicx-react @tencentcloud/uiki
 
 ### Step 2: Import TUIRoomKit Components
 
+`ConferenceMainView` / `PreConferenceView` fill their parent (`width/height: 100%`). Provide a sized host container; for fullscreen use `100vh`, or set root width/height and clear default page margins.
+
+Vite / CRA scaffolds often style `#root` / `#app` with `padding` / `max-width`. Override them when integrating, for example:
+
+```css
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+```
+
 ```tsx
 import { UIKitProvider } from '@tencentcloud/uikit-base-component-react';
 import { ConferenceMainView } from '@tencentcloud/roomkit-web-react';
@@ -88,9 +104,19 @@ import { ConferenceMainView } from '@tencentcloud/roomkit-web-react';
 export default function App() {
   return (
     <UIKitProvider theme="light" language="en-US">
-      <ConferenceMainView />
+      {/* Fullscreen: size the host; RoomKit fills the parent */}
+      <div className="roomkit-host">
+        <ConferenceMainView />
+      </div>
     </UIKitProvider>
   );
+}
+```
+
+```css
+.roomkit-host {
+  width: 100%;
+  height: 100vh;
 }
 ```
 

@@ -1,7 +1,9 @@
 .homeContainer {
+  position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  width: 100%;
+  height: 100%;
   background-color: var(--bg-color-default);
   background-repeat: no-repeat;
   background-size: cover;
