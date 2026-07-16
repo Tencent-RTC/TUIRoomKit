@@ -31,6 +31,14 @@ export {
 export { useRoomInvitation } from './hooks/useRoomInvitation';
 export { useRoomInvitationH5 } from './hooks/useRoomInvitationH5';
 
+// Debug-only helper for local development / quickstart.
+// Do not use secretKey-based UserSig generation in production clients.
+export { genTestUserSig } from './debug/genTestUserSig';
+export type {
+  GenTestUserSigParams,
+  GenTestUserSigResult,
+} from './debug/genTestUserSig';
+
 (ConferenceMainView as any).install = (app: any) => {
   app.component('ConferenceView', ConferenceMainView);
 };

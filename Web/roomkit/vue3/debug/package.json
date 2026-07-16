@@ -1,5 +1,0 @@
-{
-  "main": "../lib/debug/index.js",
-  "module": "../es/debug/index.mjs",
-  "types": "../es/debug/index.d.ts"
-}
