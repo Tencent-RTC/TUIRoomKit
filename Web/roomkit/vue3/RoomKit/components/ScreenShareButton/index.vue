@@ -28,7 +28,7 @@
         @click.stop
       >
         <div class="dropdown-item" @click="handleSelectScreenShare">
-          <IconScreenShare size="20" />
+          <IconScreenShare size="16" />
           <span class="dropdown-item-text">{{ t('ScreenShare.StartSharing') }}</span>
         </div>
         <div
@@ -36,7 +36,7 @@
           class="dropdown-item"
           @click="handleSelectWhiteboard"
         >
-          <component :is="IconWhiteboard" :size="20" />
+          <component :is="IconWhiteboard" :size="16" />
           <span class="dropdown-item-text">{{ t('Whiteboard.Open') }}</span>
         </div>
       </div>
@@ -54,13 +54,14 @@ import { BuiltinWidget, InterceptorAction } from '../../adapter/type';
 import IconButton from '../base/IconButton.vue';
 import vClickOutside from '../base/vClickOutside';
 import { IconWhiteboard, STANDALONE_WHITEBOARD_CANVAS_COLOR } from '../Whiteboard/constants';
+import { requestAutoStartAnnotation } from '../Whiteboard/useAutoStartAnnotation';
 import { useWhiteboardToolbar } from '../Whiteboard/useWhiteboardToolbar';
 
 const { currentRoom } = useRoomState();
 const { localParticipant, participantWithScreen, participantList } = useRoomParticipantState();
 const { screenStatus, screenLastError, startScreenShare, stopScreenShare } = useDeviceState();
 const { startWhiteboard, stopWhiteboard } = useWhiteboardState();
-const { isStandaloneWhiteboard } = useWhiteboardToolbar();
+const { isStandaloneWhiteboard, isToolbarExpanded } = useWhiteboardToolbar();
 const { t } = useUIKit();
 
 const showMenu = ref(false);
@@ -127,6 +128,12 @@ async function handleStartScreenShare() {
   try {
     clearLocalScreenSharePreviewConfirmation();
     await startScreenShare({ screenAudio: true });
+    if (
+      notWebinar.value
+      && conference.getWidgetVisible(BuiltinWidget.AnnotationWidget)
+    ) {
+      requestAutoStartAnnotation();
+    }
   } catch (error: unknown) {
     const err = error as { code?: number; name?: string; message?: string };
     let message = t('ScreenShare.UnknownErrorOccurredWhileSharing');
@@ -230,6 +237,8 @@ async function handleSelectWhiteboard() {
   try {
     // Standalone whiteboard runs on a white canvas without a real screen share.
     await startWhiteboard({ canvasColor: STANDALONE_WHITEBOARD_CANVAS_COLOR });
+    // Opening a blank whiteboard is a request to draw, unlike screen annotation.
+    isToolbarExpanded.value = true;
   } catch (error) {
     console.error('[ScreenShareButton] start whiteboard failed:', error);
     TUIToast.warning({ message: t('Whiteboard.StartFailed') });
@@ -317,9 +326,9 @@ function handleScreenShare() {
   .dropdown-item {
     display: flex;
     flex-direction: row;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
-    padding: 8px 12px;
+    padding: 6px 8px;
     color: var(--text-color-primary);
     cursor: pointer;
     border-radius: 6px;
@@ -329,8 +338,8 @@ function handleScreenShare() {
     }
 
     .dropdown-item-text {
-      font-size: 14px;
-      line-height: 22px;
+      font-size: 13px;
+      line-height: 20px;
     }
   }
 }

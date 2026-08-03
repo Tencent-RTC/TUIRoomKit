@@ -84,16 +84,14 @@
 <script setup lang="ts">
 import { ref, computed, watch, toRef } from 'vue';
 import { IconSearch, useUIKit, TUIButton } from '@tencentcloud/uikit-base-component-vue3';
-import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
-import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomParticipantStatus, RoomParticipantRole, DeviceStatus } from 'tuikit-atomicx-vue3';
+import { useRoomParticipantState, useRoomState, RoomParticipantStatus, RoomParticipantRole, DeviceStatus } from 'tuikit-atomicx-vue3/room';
 import { combineComparators, createComparator } from '../../utils/compare';
 import ParticipantActionH5 from './ParticipantActionH5.vue';
 import ParticipantItemH5 from './ParticipantItemH5.vue';
 import PendingParticipantItemH5 from './PendingParticipantItemH5.vue';
 import RoomActionH5 from './RoomActionH5.vue';
 import { useParticipantAction } from './useParticpantAction';
-import type { RoomParticipant } from 'tuikit-atomicx-vue3';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 const { pendingParticipantList } = useRoomParticipantState();
 

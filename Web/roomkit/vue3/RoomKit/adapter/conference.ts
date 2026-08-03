@@ -1,7 +1,7 @@
 import { getCurrentInstance, inject, reactive, shallowReactive, markRaw } from 'vue';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
-import { callExperimentalAPI as atomicxCallExperimentalAPI } from 'tuikit-atomicx-vue3';
 import {
+  callExperimentalAPI as atomicxCallExperimentalAPI,
   useLoginState,
   useRoomEngine,
   useRoomState,

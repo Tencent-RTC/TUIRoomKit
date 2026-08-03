@@ -141,16 +141,16 @@ import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useContactStore, useLoginStore } from 'tuikit-atomicx-vue3/chat';
-import { Avatar } from 'tuikit-atomicx-vue3';
-import { UserPicker } from 'tuikit-atomicx-vue3';
+import { Avatar } from 'tuikit-atomicx-vue3/room';
+import { UserPicker } from 'tuikit-atomicx-vue3/room';
 import Datepicker from './Datepicker.vue';
 import DurationSelector from './DurationSelector.vue';
 import Timepicker from './Timepicker.vue';
 import TimezoneSelector from './TimezoneSelector.vue';
 import { convertTimezoneToUTC, convertTimeBetweenTimezones } from './utils';
 import type { EditFormData } from './type';
-import type { RoomInfo } from 'tuikit-atomicx-vue3';
-import type { UserPickerDataSource, UserPickerRow } from 'tuikit-atomicx-vue3';
+import type { RoomInfo } from 'tuikit-atomicx-vue3/room';
+import type { UserPickerDataSource, UserPickerRow } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 

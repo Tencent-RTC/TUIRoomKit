@@ -47,9 +47,9 @@ import { IconUser, useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomParticipantRole, DeviceStatus, RoomType } from 'tuikit-atomicx-vue3';
-import { Avatar } from 'tuikit-atomicx-vue3';
-import type { RoomParticipant } from 'tuikit-atomicx-vue3';
+import { RoomParticipantRole, DeviceStatus, RoomType } from 'tuikit-atomicx-vue3/room';
+import { Avatar } from 'tuikit-atomicx-vue3/room';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 interface Props {
   participant: RoomParticipant;

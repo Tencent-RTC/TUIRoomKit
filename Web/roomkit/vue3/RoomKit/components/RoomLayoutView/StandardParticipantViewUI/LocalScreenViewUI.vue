@@ -26,6 +26,7 @@
       v-if="showAnnotationDock"
       :container-el="localScreenContainerRef"
       :view-el="screenShareViewRef"
+      :auto-start-enabled="isScreenSharePreviewReady"
     />
   </div>
 </template>
@@ -36,96 +37,64 @@ import {
   TUIButton,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { DeviceStatus, useDeviceState, useWhiteboardState, WhiteboardStatus, WhiteboardTool } from 'tuikit-atomicx-vue3/room';
-import { conference } from '../../../adapter/conference';
 import {
-  clearLocalScreenSharePreviewConfirmation,
-  confirmLocalScreenSharePreview,
-  getLocalScreenShareSurface,
-  isLocalScreenSharePreviewConfirmed,
-  updateLocalScreenShareView,
-} from '../../../adapter/screenSharePreview';
+  RoomType,
+  useRoomState,
+  useWhiteboardState,
+  WhiteboardStatus,
+  WhiteboardTool,
+} from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../../adapter/conference';
 import { BuiltinWidget } from '../../../adapter/type';
 import { WHITEBOARD_TOOL_CURSORS } from '../../Whiteboard/constants';
+import { useWhiteboardSessionContext } from '../../Whiteboard/useWhiteboardSessionContext';
 import { useWhiteboardToolbar } from '../../Whiteboard/useWhiteboardToolbar';
 import WhiteboardDock from '../../Whiteboard/WhiteboardDock.vue';
+import { useLocalScreenSharePreview } from './useLocalScreenSharePreview';
 
 const MINI_REGION_MAX_HEIGHT = 200;
 
+const props = defineProps<{
+  annotationDisabled?: boolean;
+}>();
+
 const { t } = useUIKit();
-const { screenStatus, stopScreenShare } = useDeviceState();
+const { currentRoom } = useRoomState();
 const {
   whiteboardStatus,
   currentToolConfig,
   updateWhiteboard,
   setToolConfig,
 } = useWhiteboardState();
+const { isHostWhiteboard } = useWhiteboardSessionContext();
 const { isStandaloneWhiteboard } = useWhiteboardToolbar();
 const localScreenContainerRef = ref<HTMLElement>();
 const screenShareViewRef = ref<HTMLElement>();
 // The tile is too small to host the annotation dock; unmount it while mini.
 const isMiniRegion = ref(false);
-const showPreviewWarning = ref(false);
-const shouldShowPreviewWarning = computed(() =>
-  showPreviewWarning.value
-  && screenStatus.value === DeviceStatus.On
-  && whiteboardStatus.value !== WhiteboardStatus.On,
-);
+const {
+  shouldShowPreviewWarning,
+  isScreenSharePreviewReady,
+  confirmScreenSharePreview: handleContinuePreview,
+  stopScreenSharePreview: handleStopPreview,
+} = useLocalScreenSharePreview(screenShareViewRef);
+const ownsHostSession = isHostWhiteboard;
 const showAnnotationDock = computed(() =>
-  !isMiniRegion.value
+  !props.annotationDisabled
+  && !isMiniRegion.value
   && !shouldShowPreviewWarning.value
-  && conference.getWidgetVisible(BuiltinWidget.AnnotationWidget),
+  && currentRoom.value?.roomType !== RoomType.Webinar
+  && conference.getWidgetVisible(BuiltinWidget.AnnotationWidget)
+  && (
+    whiteboardStatus.value === WhiteboardStatus.Off
+    || ownsHostSession.value
+  ),
 );
 const whiteboardCursor = computed(() =>
-  whiteboardStatus.value === WhiteboardStatus.On
+  !props.annotationDisabled
+  && ownsHostSession.value
     ? WHITEBOARD_TOOL_CURSORS[currentToolConfig.value.tool] ?? 'default'
     : '',
-);
-
-async function bindScreenSharePreview() {
-  if (
-    screenStatus.value !== DeviceStatus.On
-    || whiteboardStatus.value === WhiteboardStatus.On
-    || !screenShareViewRef.value
-  ) {
-    return;
-  }
-  try {
-    await updateLocalScreenShareView(screenShareViewRef.value);
-    if (!isLocalScreenSharePreviewConfirmed()) {
-      const displaySurface = await getLocalScreenShareSurface();
-      if (displaySurface === 'browser') {
-        confirmLocalScreenSharePreview();
-        showPreviewWarning.value = false;
-      } else {
-        showPreviewWarning.value = true;
-      }
-    }
-  } catch (error) {
-    console.error('[LocalScreenViewUI] update screen share preview failed:', error);
-  }
-}
-
-async function handleContinuePreview() {
-  confirmLocalScreenSharePreview();
-  showPreviewWarning.value = false;
-}
-
-async function handleStopPreview() {
-  clearLocalScreenSharePreviewConfirmation();
-  await stopScreenShare();
-}
-
-watch(
-  [screenStatus, whiteboardStatus],
-  ([status]) => {
-    if (status === DeviceStatus.Off) {
-      clearLocalScreenSharePreviewConfirmation();
-      showPreviewWarning.value = false;
-    }
-    bindScreenSharePreview();
-  },
-  { flush: 'post' },
 );
 
 // While the tile is mini the annotation dock unmounts, so also drop drawing mode
@@ -133,7 +102,7 @@ watch(
 watch(isMiniRegion, (mini) => {
   if (
     mini
-    && whiteboardStatus.value === WhiteboardStatus.On
+    && ownsHostSession.value
     && currentToolConfig.value.tool !== WhiteboardTool.None
   ) {
     void setToolConfig({ tool: WhiteboardTool.None });
@@ -151,12 +120,8 @@ onMounted(() => {
   if (screenShareViewRef.value) {
     updateWhiteboard({ view: screenShareViewRef.value });
   }
-  bindScreenSharePreview();
 });
 onBeforeUnmount(() => {
-  if (screenStatus.value === DeviceStatus.Off) {
-    clearLocalScreenSharePreviewConfirmation();
-  }
   resizeObserver.disconnect();
 });
 </script>
@@ -188,6 +153,7 @@ onBeforeUnmount(() => {
     height: 100%;
 
     &.whiteboard-view {
+      background-color: #fff;
       :deep(video) {
         background-color: #fff !important;
         height: auto !important;

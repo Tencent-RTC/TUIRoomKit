@@ -5,8 +5,6 @@
  * 用于配置视频通话中的虚拟背景效果，支持背景模糊和自定义背景图片。
  */
 
-import { addI18n } from 'tuikit-atomicx-vue3';
-import { enResource, zhResource } from './i18n';
 import VirtualBackgroundPanelComponent from './VirtualBackgroundPanel.vue';
 
 /**
@@ -31,7 +29,7 @@ import VirtualBackgroundPanelComponent from './VirtualBackgroundPanel.vue';
  * </template>
  *
  * <script setup>
- * import { VirtualBackgroundPanel } from 'tuikit-atomicx-vue3';
+ * import { VirtualBackgroundPanel } from './components/VirtualBackgroundPanel';
  *
  * const assetsPath = 'https://web.sdk.qcloud.com/hybrid/trtc-sdk-v5/assets';
  * const customImages = [
@@ -46,8 +44,6 @@ import VirtualBackgroundPanelComponent from './VirtualBackgroundPanel.vue';
  */
 const VirtualBackgroundPanel = VirtualBackgroundPanelComponent;
 
-addI18n('en-US', { translation: enResource });
-addI18n('zh-CN', { translation: zhResource });
 export {
   VirtualBackgroundPanel,
 };

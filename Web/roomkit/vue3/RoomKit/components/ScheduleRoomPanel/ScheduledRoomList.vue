@@ -153,14 +153,14 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { Dropdown, IconApplyStageLabel, IconHorizontalMore2, IconLoadingSchedule, IconShareLinkIconH5, IconTime, TUIButton, TUIDialog, TUIMessageBox, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useLoginState } from 'tuikit-atomicx-vue3/room';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomStatus } from 'tuikit-atomicx-vue3';
+import { RoomStatus } from 'tuikit-atomicx-vue3/room';
 import { useRoomModal } from 'tuikit-atomicx-vue3/room';
 import RoomDetail from './RoomDetail.vue';
 import RoomEdit from './RoomEdit.vue';
 import RoomShare from './RoomShare.vue';
 import { diffArray } from './utils';
 import type { EditFormData } from './type';
-import type { RoomInfo, RoomUser } from 'tuikit-atomicx-vue3';
+import type { RoomInfo, RoomUser } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 const { handleErrorWithModal } = useRoomModal();

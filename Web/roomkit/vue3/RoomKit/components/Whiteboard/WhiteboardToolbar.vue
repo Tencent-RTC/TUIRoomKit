@@ -23,6 +23,7 @@
         v-for="item in TOOL_ITEMS"
         :key="item.tool"
         class="tool-item"
+        :data-whiteboard-tool="item.tool"
       >
         <button
           :class="['tool-btn', { active: isToolActive(item.tool) }]"
@@ -34,59 +35,6 @@
           <span class="tool-label">{{ t(item.labelKey) }}</span>
         </button>
         <span v-if="item.tool === WhiteboardTool.Laser" class="divider tool-divider" />
-
-        <div
-          v-if="supportsSettings(item.tool) && settingsTool === item.tool"
-          :class="[
-            'popover',
-            'tool-settings-popover',
-            `popover-${props.settingsPlacement}`,
-          ]"
-        >
-          <div v-if="item.hasShapeOptions" class="shape-options">
-            <button
-              v-for="shape in SHAPE_OPTIONS"
-              :key="shape.type"
-              :class="['shape-option', { active: selectedShape === shape.type }]"
-              :aria-label="t(shape.labelKey)"
-              @click="handleSelectShape(shape.type)"
-            >
-              <component :is="shape.icon" :size="18" />
-            </button>
-          </div>
-          <div class="settings-section">
-            <div class="line-widths">
-              <button
-                v-for="width in WHITEBOARD_LINE_WIDTHS"
-                :key="width"
-                :class="['line-width', { active: getToolStyle(item.tool).lineWidth === width }]"
-                :aria-label="`${width}px`"
-                @click="handleLineWidthSelect(item.tool, width)"
-              >
-                <span class="line-dot" :style="{ width: `${width + 2}px`, height: `${width + 2}px` }" />
-              </button>
-            </div>
-          </div>
-          <span class="settings-divider" />
-          <div class="settings-section">
-            <div class="palette">
-              <button
-                v-for="color in COLOR_OPTIONS"
-                :key="color"
-                :class="[
-                  'color-dot',
-                  {
-                    active: getToolStyle(item.tool).color === color,
-                    white: color === '#FFFFFF',
-                  },
-                ]"
-                :style="{ backgroundColor: color }"
-                :aria-label="color"
-                @click="handleColorSelect(item.tool, color)"
-              />
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -112,7 +60,6 @@
     </button>
     <button
       class="tool-btn"
-      :disabled="!canUndo"
       :aria-label="t('Whiteboard.Clear')"
       @click="handleClear"
     >
@@ -139,14 +86,79 @@
       <component :is="IconCollapse" :size="18" />
       <span class="tool-label">{{ t('Whiteboard.Collapse') }}</span>
     </button>
+
+    <div
+      v-if="settingsTool !== null"
+      ref="settingsBarRef"
+      :class="[
+        'tool-settings-bar',
+        `settings-bar-${props.settingsPlacement}`,
+      ]"
+      :style="{
+        '--settings-arrow-left': settingsArrowLeft,
+        '--settings-offset-x': settingsOffsetX,
+      }"
+    >
+      <div class="settings-content">
+        <div v-if="settingsTool === WhiteboardTool.Shape" class="shape-options">
+          <button
+            v-for="shape in SHAPE_OPTIONS"
+            :key="shape.type"
+            :class="['shape-option', { active: selectedShape === shape.type }]"
+            :aria-label="t(shape.labelKey)"
+            @click="handleSelectShape(shape.type)"
+          >
+            <component :is="shape.icon" :size="18" />
+          </button>
+          <span class="settings-divider" />
+        </div>
+
+        <div class="line-widths">
+          <button
+            v-for="width in WHITEBOARD_LINE_WIDTHS"
+            :key="width"
+            :class="['line-width', { active: settingsStyle.lineWidth === width }]"
+            :aria-label="`${width}px`"
+            @click="handleLineWidthSelect(width)"
+          >
+            <span class="line-dot" :style="{ width: `${width + 2}px`, height: `${width + 2}px` }" />
+          </button>
+        </div>
+
+        <span class="settings-divider" />
+
+        <div class="palette">
+          <button
+            v-for="color in COLOR_OPTIONS"
+            :key="color"
+            :class="[
+              'color-dot',
+              {
+                active: settingsStyle.color === color,
+                white: color === '#FFFFFF',
+              },
+            ]"
+            :style="{ backgroundColor: color }"
+            :aria-label="color"
+            @click="handleColorSelect(color)"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from 'vue';
 import { TUIMessageBox, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { WhiteboardTool, useWhiteboardState } from 'tuikit-atomicx-vue3/room';
-import { useWhiteboardToolbar } from './useWhiteboardToolbar';
 import {
   TOOL_ITEMS,
   SHAPE_OPTIONS,
@@ -159,12 +171,17 @@ import {
   IconEllipse,
   WHITEBOARD_COLOR_PALETTE,
   WHITEBOARD_LINE_WIDTHS,
-  DEFAULT_TOOL_STYLE,
 } from './constants';
+import { useWhiteboardSessionContext } from './useWhiteboardSessionContext';
+import { useWhiteboardToolbar } from './useWhiteboardToolbar';
 import type { ToolItem, WhiteboardToolStyle } from './constants';
 
 const props = withDefaults(defineProps<{
   settingsPlacement?: 'top' | 'bottom';
+  // Bounds the settings bar horizontally; it is wider than the toolbar itself.
+  containerEl?: HTMLElement;
+  // Only read to recompute the settings bar position while the dock is dragged.
+  dockPosition?: { x: number; y: number } | null;
 }>(), {
   settingsPlacement: 'top',
 });
@@ -185,15 +202,112 @@ const {
   clear,
   snapshot,
 } = useWhiteboardState();
+const { sessionOwnerUserId, isGuestWhiteboard } = useWhiteboardSessionContext();
 // Toolbar session state lives at module level (see useWhiteboardToolbar) so it
 // survives the component remount that a layout/mini-region change triggers.
-const { selectedShape, toolStyles } = useWhiteboardToolbar();
+const {
+  selectedShape,
+  toolStyles,
+  defaultToolStyle,
+  hasOpenedToolbar,
+} = useWhiteboardToolbar();
+const SETTINGS_EDGE_GAP = 12;
 const toolbarRef = ref<HTMLElement>();
-const settingsTool = ref<WhiteboardTool | null>(null);
+const settingsBarRef = ref<HTMLElement>();
+const settingsArrowLeft = ref('50%');
+const settingsOffsetX = ref('0px');
+let settingsResizeObserver: ResizeObserver | null = null;
+
+const settingsTool = computed<WhiteboardTool | null>(() => (
+  supportsSettings(currentToolConfig.value.tool)
+    ? currentToolConfig.value.tool
+    : null
+));
+const settingsStyle = computed<WhiteboardToolStyle>(() => (
+  settingsTool.value === null
+    ? { ...defaultToolStyle.value }
+    : getToolStyle(settingsTool.value)
+));
 const COLOR_OPTIONS = WHITEBOARD_COLOR_PALETTE.filter(color => color !== 'transparent');
 
+function updateSettingsPosition() {
+  const toolbar = toolbarRef.value;
+  const settingsBar = settingsBarRef.value;
+  const tool = settingsTool.value;
+  if (!toolbar || !settingsBar || tool === null) {
+    return;
+  }
+
+  const toolItem = toolbar.querySelector<HTMLElement>(`[data-whiteboard-tool="${tool}"]`);
+  if (!toolItem) {
+    return;
+  }
+
+  const toolbarRect = toolbar.getBoundingClientRect();
+  const settingsRect = settingsBar.getBoundingClientRect();
+  // The settings bar is wider than the toolbar it is centered on, so a dock near
+  // an edge would push it outside the view and get it clipped.
+  const centeredLeft = toolbarRect.left + toolbarRect.width / 2 - settingsRect.width / 2;
+  let settingsLeft = centeredLeft;
+  if (props.containerEl) {
+    const containerRect = props.containerEl.getBoundingClientRect();
+    const minLeft = containerRect.left + SETTINGS_EDGE_GAP;
+    const maxLeft = containerRect.right - SETTINGS_EDGE_GAP - settingsRect.width;
+    // A bar too wide for the container sticks to its left edge and scrolls.
+    settingsLeft = Math.min(Math.max(centeredLeft, minLeft), Math.max(minLeft, maxLeft));
+  }
+  settingsOffsetX.value = `${settingsLeft - centeredLeft}px`;
+
+  const toolRect = toolItem.getBoundingClientRect();
+  const toolCenter = toolRect.left + toolRect.width / 2;
+  const minArrowLeft = 12;
+  const maxArrowLeft = settingsRect.width - minArrowLeft;
+  const arrowLeft = Math.min(
+    Math.max(toolCenter - settingsLeft, minArrowLeft),
+    maxArrowLeft,
+  );
+  settingsArrowLeft.value = `${arrowLeft}px`;
+}
+
+watch(
+  [
+    settingsTool,
+    () => props.settingsPlacement,
+    () => props.containerEl,
+    () => props.dockPosition,
+  ],
+  async () => {
+    await nextTick();
+    updateSettingsPosition();
+  },
+  { flush: 'post' },
+);
+
+watch(
+  [settingsBarRef, () => props.containerEl],
+  async ([settingsBar]) => {
+    settingsResizeObserver?.disconnect();
+    settingsResizeObserver = null;
+    if (!settingsBar) {
+      return;
+    }
+
+    settingsResizeObserver = new ResizeObserver(updateSettingsPosition);
+    settingsResizeObserver.observe(settingsBar);
+    if (toolbarRef.value) {
+      settingsResizeObserver.observe(toolbarRef.value);
+    }
+    if (props.containerEl) {
+      settingsResizeObserver.observe(props.containerEl);
+    }
+    await nextTick();
+    updateSettingsPosition();
+  },
+  { flush: 'post' },
+);
+
 function getStoredToolStyle(tool: WhiteboardTool): WhiteboardToolStyle {
-  return toolStyles.value[tool] ?? { ...DEFAULT_TOOL_STYLE };
+  return toolStyles.value[tool] ?? { ...defaultToolStyle.value };
 }
 
 function saveToolStyle(tool: WhiteboardTool, style: WhiteboardToolStyle): void {
@@ -251,15 +365,9 @@ function activeShapeIcon(item: ToolItem) {
 
 async function handleToolClick(item: ToolItem) {
   if (isToolActive(item.tool)) {
-    if (supportsSettings(item.tool)) {
-      settingsTool.value = settingsTool.value === item.tool ? null : item.tool;
-    } else {
-      settingsTool.value = null;
-    }
     return;
   }
 
-  settingsTool.value = null;
   await applyToolConfig(item.tool);
 }
 
@@ -268,50 +376,46 @@ async function handleSelectShape(shape: 'rect' | 'ellipse') {
   await applyToolConfig(WhiteboardTool.Shape);
 }
 
-async function handleColorSelect(tool: WhiteboardTool, color: string) {
+async function handleColorSelect(color: string) {
+  const tool = settingsTool.value;
+  if (tool === null) {
+    return;
+  }
   const nextStyle = { ...getStoredToolStyle(tool), color };
   saveToolStyle(tool, nextStyle);
   await applyToolConfig(tool, nextStyle);
 }
 
-async function handleLineWidthSelect(tool: WhiteboardTool, lineWidth: number) {
+async function handleLineWidthSelect(lineWidth: number) {
+  const tool = settingsTool.value;
+  if (tool === null) {
+    return;
+  }
   const nextStyle = { ...getStoredToolStyle(tool), lineWidth };
   saveToolStyle(tool, nextStyle);
   await applyToolConfig(tool, nextStyle);
 }
 
-function handleOutsidePointerDown(event: MouseEvent) {
-  if (settingsTool.value === null) {
-    return;
-  }
-  if (toolbarRef.value && toolbarRef.value.contains(event.target as Node)) {
-    return;
-  }
-  settingsTool.value = null;
-}
-
+// The dock renders this toolbar only while expanded, so mounting means opening.
 onMounted(async () => {
-  document.addEventListener('mousedown', handleOutsidePointerDown, true);
-
-  const currentTool = currentToolConfig.value.tool;
-  if (!supportsSettings(currentTool)) {
-    return;
-  }
-
-  await applyToolConfig(currentTool);
+  const tool = currentToolConfig.value.tool;
+  const armPen = !hasOpenedToolbar.value && tool === WhiteboardTool.None;
+  hasOpenedToolbar.value = true;
+  await applyToolConfig(armPen ? WhiteboardTool.Pen : tool);
 });
 
 onBeforeUnmount(() => {
-  document.removeEventListener('mousedown', handleOutsidePointerDown, true);
+  settingsResizeObserver?.disconnect();
+  settingsResizeObserver = null;
 });
 
 function handleClear() {
   TUIMessageBox.confirm({
-    title: t('Whiteboard.ClearConfirmTitle'),
-    content: t('Whiteboard.ClearConfirmContent'),
+    title: t('Whiteboard.ClearAllConfirmTitle'),
+    content: t('Whiteboard.ClearAllConfirmContent'),
     callback: async (action) => {
       if (action === 'confirm') {
-        await clear();
+        await clear('all');
       }
     },
   });
@@ -319,7 +423,9 @@ function handleClear() {
 
 async function handleSave() {
   try {
-    const url = await snapshot();
+    const url = await snapshot(
+      isGuestWhiteboard.value ? sessionOwnerUserId.value ?? undefined : undefined,
+    );
     const link = document.createElement('a');
     link.href = url;
     link.download = `whiteboard-${Date.now()}.png`;
@@ -335,6 +441,7 @@ async function handleSave() {
 
 <style lang="scss" scoped>
 .whiteboard-toolbar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -463,47 +570,101 @@ async function handleSave() {
     background: var(--stroke-color-module, rgb(255 255 255 / 16%));
   }
 
-  .popover {
+  .tool-settings-bar {
     position: absolute;
     left: 50%;
     z-index: 10;
-    padding: 8px;
-    border-radius: 10px;
-    color: var(--text-color-primary, #1d2029);
-    background-color: var(--bg-color-dialog, #fff);
-    border: 1px solid var(--stroke-color-primary, #d5d8de);
-    box-shadow: 0 4px 16px rgb(0 0 0 / 24%);
-  }
-
-  .popover-top {
-    bottom: calc(100% + 8px);
-    transform: translateX(-50%);
-  }
-
-  .popover-bottom {
-    top: calc(100% + 8px);
-    transform: translateX(-50%);
-  }
-
-  .tool-settings-popover {
     box-sizing: border-box;
-    width: 188px;
-    padding: 16px;
+    width: max-content;
+    max-width: min(680px, calc(100vw - 32px));
+    padding: 8px 10px;
+    border: 1px solid var(--stroke-color-module, rgb(255 255 255 / 16%));
+    border-radius: 14px;
+    color: var(--text-color-primary, #fff);
+    background-color: var(--bg-color-operate, #2a2c33);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 24%);
+
+    &::before,
+    &::after {
+      position: absolute;
+      left: var(--settings-arrow-left, 50%);
+      content: '';
+      transform: translateX(-50%);
+    }
+
+    &::before {
+      width: 18px;
+      height: 10px;
+      background-color: var(--stroke-color-module, rgb(255 255 255 / 16%));
+    }
+
+    &::after {
+      width: 16px;
+      height: 9px;
+      background-color: inherit;
+    }
+  }
+
+  .settings-bar-top {
+    bottom: calc(100% + 10px);
+    transform: translateX(calc(-50% + var(--settings-offset-x, 0px)));
+
+    &::before {
+      bottom: -10px;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+
+    &::after {
+      bottom: -8px;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+  }
+
+  .settings-bar-bottom {
+    top: calc(100% + 10px);
+    transform: translateX(calc(-50% + var(--settings-offset-x, 0px)));
+
+    &::before {
+      top: -10px;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+
+    &::after {
+      top: -8px;
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+  }
+
+  .settings-content,
+  .shape-options,
+  .line-widths,
+  .palette {
+    display: flex;
+    align-items: center;
+  }
+
+  .settings-content {
+    gap: 8px;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   .shape-options {
-    display: flex;
-    gap: 6px;
-    padding-bottom: 8px;
-    margin-bottom: 8px;
-    border-bottom: 1px solid var(--stroke-color-module, #e7e9ed);
+    gap: 4px;
   }
 
   .settings-divider {
-    display: block;
-    height: 1px;
-    margin: 12px 0;
-    background: var(--stroke-color-module, #e7e9ed);
+    flex: 0 0 1px;
+    width: 1px;
+    height: 28px;
+    margin: 0 2px;
+    background: var(--stroke-color-module, rgb(255 255 255 / 16%));
   }
 
   .shape-option {
@@ -512,14 +673,15 @@ async function handleSave() {
     justify-content: center;
     width: 36px;
     height: 36px;
+    padding: 0;
     border: none;
     border-radius: 8px;
     background: transparent;
-    color: var(--text-color-primary, #1d2029);
+    color: inherit;
     cursor: pointer;
 
     &:hover:not(.active) {
-      background-color: var(--button-color-secondary-hover, #f2f3f5);
+      background-color: var(--button-color-secondary-hover, rgb(255 255 255 / 12%));
     }
 
     &.active {
@@ -538,22 +700,24 @@ async function handleSave() {
   }
 
   .palette {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px 14px;
-    justify-items: center;
+    flex: none;
+    gap: 9px;
+    padding: 3px 5px 3px 1px;
   }
 
   .color-dot {
     position: relative;
-    width: 18px;
-    height: 18px;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
     padding: 0;
-    border: 1px solid var(--stroke-color-primary, #b8bec9);
+    border: 2px solid transparent;
     border-radius: 50%;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 32%);
     cursor: pointer;
 
     &.active {
+      border-color: var(--bg-color-operate, #2a2c33);
       outline: 2px solid #1c66e5;
       outline-offset: 1px;
     }
@@ -565,17 +729,13 @@ async function handleSave() {
 
     &.white {
       background-color: #fff;
-      border-color: #949ba8;
-      box-shadow: inset 0 0 0 1px #d5d8de;
+      box-shadow: 0 0 0 1px rgb(148 155 168 / 80%);
     }
-
   }
 
   .line-widths {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-start;
-    margin-top: 0;
+    flex: none;
+    gap: 4px;
   }
 
   .line-width {
@@ -586,23 +746,22 @@ async function handleSave() {
     width: 32px;
     height: 32px;
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: 8px;
     background: transparent;
-    color: var(--text-color-primary, #1d2029);
+    color: inherit;
     cursor: pointer;
 
     &:hover:not(.active) {
-      background-color: var(--button-color-secondary-hover, #f2f3f5);
+      background-color: var(--button-color-secondary-hover, rgb(255 255 255 / 12%));
     }
 
     &.active {
-      border-color: #1c66e5;
-      background-color: #1c66e5;
-      color: #fff;
-      box-shadow: 0 0 0 1px #1c66e5;
+      border-color: rgb(28 102 229 / 40%);
+      background-color: rgb(28 102 229 / 18%);
+      color: #4c8dff;
 
       &:hover {
-        background-color: #1a5cd0;
+        background-color: rgb(28 102 229 / 24%);
       }
     }
 

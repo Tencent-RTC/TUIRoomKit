@@ -23,7 +23,7 @@
  * </template>
  *
  * <script setup>
- * import { Subtitle } from 'tuikit-atomicx-vue3';
+ * import { Subtitle } from './components/ASRTools';
  * </script>
  */
 
@@ -46,16 +46,11 @@
  * </template>
  *
  * <script setup>
- * import { RealtimeMessageList } from 'tuikit-atomicx-vue3';
+ * import { RealtimeMessageList } from './components/ASRTools';
  * </script>
  */
-import { addI18n } from 'tuikit-atomicx-vue3';
 import RealtimeMessageListComponent from './components/RealtimeMessageList.vue';
 import SubtitleComponent from './components/Subtitle.vue';
-import { enResource, zhResource } from './i18n';
-
-addI18n('en-US', { translation: enResource });
-addI18n('zh-CN', { translation: zhResource });
 
 const Subtitle = SubtitleComponent;
 const RealtimeMessageList = RealtimeMessageListComponent;

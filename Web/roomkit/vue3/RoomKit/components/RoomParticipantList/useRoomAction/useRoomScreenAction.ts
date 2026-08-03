@@ -2,7 +2,7 @@ import type { Component } from 'vue';
 import { computed, reactive } from 'vue';
 import { IconAllMembersShareScreen, IconHostShareScreen, TUIMessageBox, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
-import { DeviceType, RoomParticipantRole } from 'tuikit-atomicx-vue3';
+import { DeviceType, RoomParticipantRole } from 'tuikit-atomicx-vue3/room';
 
 const { participantWithScreen, disableAllDevices } = useRoomParticipantState();
 const { currentRoom } = useRoomState();

@@ -76,11 +76,11 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { TOAST_TYPE, TUIButton, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState } from 'tuikit-atomicx-vue3/room';
 import { useVirtualBackgroundState } from 'tuikit-atomicx-vue3/room';
-import { VirtualBackgroundEvent, VirtualBackgroundType } from 'tuikit-atomicx-vue3';
+import { VirtualBackgroundEvent, VirtualBackgroundType } from 'tuikit-atomicx-vue3/room';
 // Asset imports
 import BlurredBackground from './assets/blurred-background.png';
 import CloseVirtualBackground from './assets/close-virtual-background.png';
-import type { CustomBackgroundImage } from 'tuikit-atomicx-vue3';
+import type { CustomBackgroundImage } from 'tuikit-atomicx-vue3/room';
 
 // Hooks and composables
 const { t } = useUIKit();
@@ -197,9 +197,6 @@ async function initializeVirtualBackground() {
     selectedBackground.value = resolveInitialSelection();
     const config = getVirtualBackgroundConfig(selectedBackground.value);
     await setVirtualBackground(config);
-    // eslint-disable-next-line no-promise-executor-return
-    await new Promise(resolve => setTimeout(resolve, 3000)); // todo sdk 修复加载逻辑后移除此处
-
     isInitialized.value = true;
   } catch (error) {
     console.error('Failed to initialize virtual background:', error);

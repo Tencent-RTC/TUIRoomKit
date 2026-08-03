@@ -165,17 +165,17 @@ import {
   IconClose1,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useContactStore, useLoginStore } from 'tuikit-atomicx-vue3/chat';
-import { useLoginState } from 'tuikit-atomicx-vue3';
+import { useLoginState } from 'tuikit-atomicx-vue3/room';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { Avatar } from 'tuikit-atomicx-vue3';
+import { Avatar } from 'tuikit-atomicx-vue3/room';
 import { useRoomModal } from 'tuikit-atomicx-vue3/room';
-import { UserPicker } from 'tuikit-atomicx-vue3';
+import { UserPicker } from 'tuikit-atomicx-vue3/room';
 import Datepicker from './Datepicker.vue';
 import DurationSelector from './DurationSelector.vue';
 import Timepicker from './Timepicker.vue';
 import TimezoneSelector from './TimezoneSelector.vue';
 import { getCurrentTimeInTimezone, getNext15MinuteInterval, convertTimezoneToUTC, convertTimeBetweenTimezones } from './utils';
-import type { ScheduleRoomOptions } from 'tuikit-atomicx-vue3';
+import type { ScheduleRoomOptions } from 'tuikit-atomicx-vue3/room';
 import type { UserPickerRow, UserPickerResultItem } from 'tuikit-atomicx-vue3/room';
 
 interface Props {

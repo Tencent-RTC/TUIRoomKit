@@ -13,11 +13,11 @@
       <template #dropdown>
         <div class="operate-list">
           <div class="operate-item" @click="handleOpenUserPicker">
-            <IconInvite :size="18" />
+            <IconInvite :size="16" />
             <span class="operate-item-text">{{ t('Invite.AddMember') }}</span>
           </div>
           <div class="operate-item" @click="handleOpenRoomShare">
-            <IconShare :size="18" />
+            <IconShare :size="16" />
             <span class="operate-item-text">{{ t('Invite.ShareRoom') }}</span>
           </div>
         </div>
@@ -180,25 +180,34 @@ const handleUserPickerConfirm = async () => {
 }
 
 .operate-list {
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
   flex-direction: column;
-  font-size: 12px;
-  font-weight: 400;
+  gap: 4px;
+  white-space: nowrap;
   color: var(--text-color-primary);
 
   .operate-item {
     display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 6px;
+    flex-direction: row;
     gap: 6px;
+    align-items: center;
     width: 100%;
     box-sizing: border-box;
+    padding: 6px 8px;
+    color: var(--text-color-primary);
+    cursor: pointer;
+    border-radius: 6px;
+
+    &:hover {
+      background: var(--button-color-secondary-hover);
+    }
 
     .operate-item-text {
       flex: 1;
       min-width: 0;
+      font-size: 13px;
+      line-height: 20px;
     }
   }
 }

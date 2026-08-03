@@ -18,7 +18,7 @@
 import { computed, ref } from 'vue';
 import { useUIKit, IconManageMember, TUIPopup } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomParticipantListH5 } from '../RoomParticipantList';
+import RoomParticipantListH5 from '../RoomParticipantList/RoomParticipantListH5.vue';
 import IconButtonH5 from '../base/IconButtonH5.vue';
 import PopUpArrowDown from '../base/PopUpArrowDown.vue';
 

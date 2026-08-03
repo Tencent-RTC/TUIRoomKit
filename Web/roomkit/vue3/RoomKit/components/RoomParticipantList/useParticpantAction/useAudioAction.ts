@@ -7,8 +7,8 @@ import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
-import { DeviceType } from 'tuikit-atomicx-vue3';
-import type { RoomParticipant } from 'tuikit-atomicx-vue3';
+import { DeviceType } from 'tuikit-atomicx-vue3/room';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 

@@ -20,7 +20,7 @@
           {{ item.label }}
         </div>
       </div>
-      <div class="divide-line"></div>
+      <div class="divide-line" />
       <div class="setting-content">
         <AudioSettingPanel
           v-if="activeSettingTab === 'audio'"
@@ -34,7 +34,7 @@
       </div>
     </div>
     <template #footer>
-      <div></div>
+      <div />
     </template>
   </TUIDialog>
 </template>
@@ -42,8 +42,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useUIKit, TUIDialog } from '@tencentcloud/uikit-base-component-vue3';
-import { VideoSettingPanel } from '../VideoSettingPanel';
-import { AudioSettingPanel } from '../AudioSettingPanel';
+import AudioSettingPanel from '../AudioSettingPanel/index.vue';
+import VideoSettingPanel from '../VideoSettingPanel/index.vue';
 
 defineProps<{
   visible: boolean;

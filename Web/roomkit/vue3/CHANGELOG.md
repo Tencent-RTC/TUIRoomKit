@@ -4,6 +4,20 @@
 
 ---
 
+## [6.1.4] - 2026-08-03
+
+### Added
+
+- Added interactive whiteboard support.
+
+### Fixed
+
+- Fixed whiteboard rendering clarity.
+
+## [6.1.3] - 2026-07-20
+
+- Added data reporting for start-recording and whiteboard activation API calls.
+
 ## [6.1.2] - 2026-07-17
 
 ### Fixed

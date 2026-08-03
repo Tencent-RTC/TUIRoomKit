@@ -36,9 +36,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick, watch } from 'vue';
 import { useAITranscriberState } from 'tuikit-atomicx-vue3/room';
-import { formatTimestampToTime } from 'tuikit-atomicx-vue3';
 import { getDisplayName, getMessageDisplayLines, hasDisplayableText } from '../utils/display';
-import type { SubtitleDisplayMode, TranscriberMessage } from 'tuikit-atomicx-vue3';
+import { formatTimestampToTime } from '../utils/formatTimestampToTime';
+import type { SubtitleDisplayMode, TranscriberMessage } from 'tuikit-atomicx-vue3/room';
 
 interface MessageGroup {
   sender: string;

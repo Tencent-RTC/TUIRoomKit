@@ -20,7 +20,7 @@ import { watch, computed } from 'vue';
 import type { ComputedRef } from 'vue';
 import { TUISelect, TUIOption, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState } from 'tuikit-atomicx-vue3/room';
-import { VideoQuality } from 'tuikit-atomicx-vue3';
+import { VideoQuality } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 

@@ -45,7 +45,7 @@
               <span>{{ t('CurrentRoomInfo.Copy') }}</span>
             </div>
           </div>
-          <div class="room-info-item">
+          <div v-if="isRoomLinkVisible" class="room-info-item">
             <div class="room-info-label">
               {{ t('CurrentRoomInfo.RoomLink') }}
             </div>
@@ -90,8 +90,13 @@ onUnmounted(() => {
   }
 });
 
+const isRoomLinkVisible = computed(() => conference.getFeatureConfig('shareLink') !== '');
+
 const roomLink = computed(() => {
   const customLink = conference.getFeatureConfig('shareLink');
+  if (customLink === '') {
+    return '';
+  }
   if (customLink) {
     return customLink;
   }
@@ -182,6 +187,7 @@ const durationTime = computed(() => {
     }
 
     .room-info-value {
+      min-width: 100px;
       flex: 1;
       color: var(--text-color-primary);
       font-size: 14px;

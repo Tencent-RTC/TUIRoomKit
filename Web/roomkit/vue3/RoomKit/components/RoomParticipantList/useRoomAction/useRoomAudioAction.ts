@@ -1,7 +1,7 @@
 import { reactive, computed, defineComponent } from 'vue';
 import { TUIToast, TOAST_TYPE, TUIMessageBox, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
-import { DeviceType } from 'tuikit-atomicx-vue3';
+import { DeviceType } from 'tuikit-atomicx-vue3/room';
 
 const { currentRoom } = useRoomState();
 

@@ -3,9 +3,7 @@
  * @description 美颜设置面板组件，用于配置视频通话中的美颜效果，支持磨皮、美白、红润等美颜功能。
  */
 
-import { addI18n } from 'tuikit-atomicx-vue3';
 import FreeBeautyPanelComponent from './FreeBeautyPanel.vue';
-import { enResource, zhResource } from './i18n';
 
 /**
  * 美颜设置面板组件
@@ -31,7 +29,7 @@ import { enResource, zhResource } from './i18n';
  * </template>
  *
  * <script setup>
- * import { FreeBeautyPanel } from 'tuikit-atomicx-vue3';
+ * import { FreeBeautyPanel } from './components/FreeBeautyPanel';
  *
  * function handleClose() {
  *   console.log('Panel closed');
@@ -40,8 +38,6 @@ import { enResource, zhResource } from './i18n';
  */
 const FreeBeautyPanel = FreeBeautyPanelComponent;
 
-addI18n('en-US', { translation: enResource });
-addI18n('zh-CN', { translation: zhResource });
 export {
   FreeBeautyPanel,
 };

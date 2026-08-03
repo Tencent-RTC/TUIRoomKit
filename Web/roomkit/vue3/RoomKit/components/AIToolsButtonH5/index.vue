@@ -45,7 +45,7 @@
     </div>
   </TUIPopup>
 
-  <Teleport to="body">
+  <Teleport to="#roomPage">
     <div v-if="isSubtitlesVisible" class="ai-subtitle-h5">
       <Subtitle
         class="subtitle-panel-trigger-h5"

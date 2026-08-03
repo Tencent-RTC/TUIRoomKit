@@ -50,7 +50,7 @@ import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState, useRoomState, DeviceStatus, useRoomParticipantState, DeviceError, RoomParticipantRole, useRoomModal, RoomType } from 'tuikit-atomicx-vue3/room';
-import { VideoSettingPanel } from '../VideoSettingPanel';
+import VideoSettingPanel from '../VideoSettingPanel/index.vue';
 import { conference } from '../../adapter/conference';
 import { InterceptorAction } from '../../adapter/type';
 import IconButton from '../base/IconButton.vue';

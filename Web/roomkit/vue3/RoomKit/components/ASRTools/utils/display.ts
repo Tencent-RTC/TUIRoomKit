@@ -1,5 +1,5 @@
 import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
-import type { SubtitleDisplayMode, TranscriberLanguage, TranscriberMessage, TranslationText } from 'tuikit-atomicx-vue3';
+import type { SubtitleDisplayMode, TranscriberLanguage, TranscriberMessage, TranslationText } from 'tuikit-atomicx-vue3/room';
 
 const { participantList } = useRoomParticipantState();
 

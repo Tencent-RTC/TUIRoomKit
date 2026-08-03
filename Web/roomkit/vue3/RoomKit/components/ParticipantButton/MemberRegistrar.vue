@@ -2,7 +2,7 @@
 import { onUnmounted } from 'vue';
 import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomParticipantList } from '../RoomParticipantList';
+import RoomParticipantList from '../RoomParticipantList/index.vue';
 import { conference } from '../../adapter/conference';
 import { BuiltinWidget } from '../../adapter/type';
 import ParticipantButton from './index.vue';

@@ -2,7 +2,7 @@
  * 时区和时间相关的工具函数
  */
 
-import { RoomType } from 'tuikit-atomicx-vue3';
+import { RoomType } from 'tuikit-atomicx-vue3/room';
 
 /**
  * 获取指定时区的当前时间

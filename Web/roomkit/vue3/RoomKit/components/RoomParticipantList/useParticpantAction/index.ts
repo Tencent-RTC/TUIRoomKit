@@ -1,8 +1,7 @@
 import { computed } from 'vue';
 import type { ComputedRef, CSSProperties, Ref } from 'vue';
-import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
-import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomParticipantRole, DeviceStatus, RoomType } from 'tuikit-atomicx-vue3';
+import { RoomParticipantRole, DeviceStatus, RoomType } from 'tuikit-atomicx-vue3/room';
+import { useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import { useSetAdminAction, useRevokeAdminAction } from './useAdminAction';
 import { useMuteAudioAction, useUnmuteAudioAction } from './useAudioAction';
 import { useKickAction } from './useKickAction';
@@ -11,8 +10,8 @@ import { useNameCardAction } from './useNameCardAction';
 import { useDemoteToAudienceAction, usePromoteToParticipantAction } from './useToggleWebinarRole';
 import { useTransferOwnerAction } from './useTransferOwnerAction';
 import { useMuteVideoAction, useUnmuteVideoAction } from './useVideoAction';
-import type { RoomParticipant, RoomUser } from 'tuikit-atomicx-vue3';
 import type { TUIIcon } from '@tencentcloud/uikit-base-component-vue3';
+import type { RoomParticipant, RoomUser } from 'tuikit-atomicx-vue3/room';
 
 const {
   localParticipant,
@@ -86,8 +85,8 @@ export function useParticipantAction({ targetParticipant }: { targetParticipant:
     if (!isWebinar.value && ((isLocalOwner.value || (isLocalAdmin.value && targetIsGeneralUser.value) || targetIsMe.value))) {
       controlListResult.push(nameCardAction);
     }
-    // 禁止聊天：我是房主目标用户是普通用户或者管理员/我是管理员目标用户是普通用户
-    if ((isLocalOwner.value && (targetIsGeneralUser.value || targetIsAdmin.value)) || (isLocalAdmin.value && targetIsGeneralUser.value)) {
+    // 禁止聊天：房主/管理员只能操作普通用户，排除自己。
+    if ((isLocalOwner.value || isLocalAdmin.value) && targetIsGeneralUser.value && !targetIsMe.value) {
       controlListResult.push(messageAction);
     }
     // 踢出房间：我是房主目标用户是普通用户或者管理员/我是管理员目标用户是普通用户
@@ -134,8 +133,8 @@ export function useAudienceAction({ targetAudience }: { targetAudience: RoomUser
     if (isLocalOwner.value && targetIsAdmin.value) {
       controlListResult.push(revokeAdminAction);
     }
-    // 禁止聊天：不是我自己 && （我是房主/我是管理员，目标用户不是管理员）
-    if (!targetIsMe.value && (isLocalOwner.value || (isLocalAdmin.value && !targetIsAdmin.value))) {
+    // 禁止聊天：房主/管理员只能操作普通用户，排除自己。
+    if (!targetIsMe.value && (isLocalOwner.value || isLocalAdmin.value) && !targetIsAdmin.value) {
       controlListResult.push(messageAction);
     }
     // 踢出房间：不是我自己 && （我是房主/我是管理员，目标用户不是管理员）

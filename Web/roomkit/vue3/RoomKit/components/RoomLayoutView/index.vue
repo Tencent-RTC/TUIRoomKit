@@ -9,6 +9,7 @@
           v-if="currentRoom?.roomType === RoomType.Standard"
           :participant="participant"
           :stream-type="streamType"
+          :annotation-disabled="layoutTemplate === RoomLayoutTemplate.GridLayout"
         />
         <WebinarParticipantViewUI
           v-if="currentRoom?.roomType === RoomType.Webinar"
@@ -22,7 +23,15 @@
 
 <script setup lang="ts">
 import { watch } from 'vue';
-import { RoomView, useRoomParticipantState, useRoomState, RoomLayoutTemplate, RoomType } from 'tuikit-atomicx-vue3/room';
+import {
+  RoomView,
+  useRoomParticipantState,
+  useRoomState,
+  useWhiteboardState,
+  RoomLayoutTemplate,
+  RoomType,
+  WhiteboardTool,
+} from 'tuikit-atomicx-vue3/room';
 import StandardParticipantViewUI from './StandardParticipantViewUI/index.vue';
 import WebinarParticipantViewUI from './WebinarParticipantViewUI/index.vue';
 
@@ -34,12 +43,36 @@ const emits = defineEmits(['update:layoutTemplate']);
 
 const { currentRoom } = useRoomState();
 const { participantList, participantWithScreen } = useRoomParticipantState();
+const { currentToolConfig, setToolConfig } = useWhiteboardState();
 
-watch(participantWithScreen, (newVal, oldVal) => {
-  if (currentRoom.value?.roomType === RoomType.Standard && newVal && !oldVal) {
-    emits('update:layoutTemplate', RoomLayoutTemplate.SidebarLayout);
-  }
-});
+watch(
+  () => props.layoutTemplate,
+  async (layoutTemplate) => {
+    if (
+      layoutTemplate === RoomLayoutTemplate.GridLayout
+      && currentToolConfig.value.tool !== WhiteboardTool.None
+    ) {
+      await setToolConfig({ tool: WhiteboardTool.None });
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  [
+    () => currentRoom.value?.roomType,
+    participantWithScreen,
+  ],
+  ([roomType, screenParticipant]) => {
+    if (
+      roomType === RoomType.Standard
+      && screenParticipant
+    ) {
+      emits('update:layoutTemplate', RoomLayoutTemplate.SidebarLayout);
+    }
+  },
+  { immediate: true },
+);
 
 watch(
   () => participantList.value.length + (participantWithScreen.value ? 1 : 0),

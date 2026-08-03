@@ -32,10 +32,10 @@
 import type { Ref } from 'vue';
 import { computed, toRef } from 'vue';
 import { useUIKit, TUIIcon, TUIPopup } from '@tencentcloud/uikit-base-component-vue3';
-import { Avatar } from 'tuikit-atomicx-vue3';
+import { Avatar } from 'tuikit-atomicx-vue3/room';
 import PopUpArrowDown from './PopUpArrowDown.vue';
 import { useParticipantAction } from './useParticpantAction';
-import type { RoomParticipant } from 'tuikit-atomicx-vue3';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 defineOptions({
   name: 'ParticipantActionH5',

@@ -81,9 +81,9 @@
 
 <script lang="ts" setup>
 import { IconCopy, IconLoadingSchedule, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { RoomStatus } from 'tuikit-atomicx-vue3';
+import { RoomStatus } from 'tuikit-atomicx-vue3/room';
 import { useCopy } from './useCopy';
-import type { RoomInfo } from 'tuikit-atomicx-vue3';
+import type { RoomInfo } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 const { copy } = useCopy();

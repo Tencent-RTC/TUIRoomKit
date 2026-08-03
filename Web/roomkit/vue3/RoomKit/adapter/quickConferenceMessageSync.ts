@@ -1,13 +1,16 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-continue */
-import { nextTick, watch } from 'vue';
+import { effectScope, nextTick, watch } from 'vue';
+import type { ComputedRef } from 'vue';
 import { TUIConstants, TUICore } from '@tencentcloud/tui-core-lite';
 import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
-import { useConversationListState, useMessageActionState, useMessageListState } from 'tuikit-atomicx-vue3/chat';
+import { LoginStore, MessageStatus, useChatContext } from 'tuikit-atomicx-vue3/chat';
 import { useLoginState, useRoomState } from 'tuikit-atomicx-vue3/room';
-import type { MessageModel } from 'tuikit-atomicx-vue3/chat';
+import type { ConversationInfo, CustomMessageInfo, MessageInfo } from 'tuikit-atomicx-vue3/chat';
 import type { RoomUser } from 'tuikit-atomicx-vue3/room';
+
+const CHAT_CHANNEL_ID = 'default';
 
 interface QuickConferencePayload {
   businessID: string;
@@ -27,9 +30,21 @@ const pendingQuickConferencePayloadMap = new Map<string, Partial<QuickConference
 const dismissedRoomIdSet = new Set<string>();
 const pendingRoomLeftTimerMap = new Map<string, ReturnType<typeof setTimeout>>();
 const quickConferenceMessageIdCacheMap = new Map<string, string>();
-const { messageList } = useMessageListState();
-const { activeConversation } = useConversationListState();
-const { modifyMessage } = useMessageActionState();
+const modifyingRoomIdSet = new Set<string>();
+
+let messageList!: ComputedRef<readonly MessageInfo[] | undefined>;
+let activeConversation!: ComputedRef<ConversationInfo | undefined>;
+let getChat: () => any = () => null;
+
+const chatStateScope = effectScope(true);
+chatStateScope.run(() => {
+  const chatContext = useChatContext(CHAT_CHANNEL_ID);
+  messageList = chatContext.messageList as ComputedRef<readonly MessageInfo[] | undefined>;
+  activeConversation = chatContext.activeConversation as ComputedRef<ConversationInfo | undefined>;
+  const loginStore = LoginStore();
+  getChat = () => loginStore.getChat();
+});
+
 const { loginUserInfo } = useLoginState();
 const { getRoomInfo } = useRoomState();
 const checkingQuickConferenceRoomIdSet = new Set<string>();
@@ -43,23 +58,24 @@ const getDefaultQuickConferencePayload = (): QuickConferencePayload => ({
   userList: [],
 });
 
-const parseQuickConferencePayload = (message: MessageModel): QuickConferencePayload => {
+const parseQuickConferencePayload = (message: MessageInfo): QuickConferencePayload => {
   try {
+    const customData = (message as CustomMessageInfo)?.messagePayload?.customData;
     return {
       ...getDefaultQuickConferencePayload(),
-      ...JSON.parse(message?.payload?.data || '{}'),
+      ...JSON.parse(customData || '{}'),
     };
   } catch {
     return getDefaultQuickConferencePayload();
   }
 };
 
-const findQuickConferenceMessage = (roomId: string): MessageModel | undefined => {
+const findQuickConferenceMessage = (roomId: string): MessageInfo | undefined => {
   const currentMessageList = messageList.value || [];
   const cachedMessageId = quickConferenceMessageIdCacheMap.get(roomId);
 
   if (cachedMessageId) {
-    const cachedMessage = currentMessageList.find(message => message.ID === cachedMessageId);
+    const cachedMessage = currentMessageList.find(message => message.msgID === cachedMessageId);
     if (cachedMessage) {
       return cachedMessage;
     }
@@ -70,8 +86,8 @@ const findQuickConferenceMessage = (roomId: string): MessageModel | undefined =>
     const message = currentMessageList[index];
     const payload = parseQuickConferencePayload(message);
     if (payload.businessID === 'group_room_message' && payload.roomId === roomId) {
-      if (message.ID) {
-        quickConferenceMessageIdCacheMap.set(roomId, message.ID);
+      if (message.msgID) {
+        quickConferenceMessageIdCacheMap.set(roomId, message.msgID);
       }
       return message;
     }
@@ -101,30 +117,61 @@ const updateQuickConferenceMessage = async (roomId: string, partialPayload: Part
     return;
   }
 
+  const currentPayload = parseQuickConferencePayload(message);
   const nextPayload = {
-    ...parseQuickConferencePayload(message),
+    ...currentPayload,
     ...partialPayload,
   };
 
-  if (message.status !== 'success') {
-    mergePendingQuickConferencePayload(roomId, partialPayload);
-    return message;
+  if (dismissedRoomIdSet.has(roomId)) {
+    nextPayload.roomState = 'destroyed';
   }
 
+  if (JSON.stringify(currentPayload) === JSON.stringify(nextPayload)) {
+    pendingQuickConferencePayloadMap.delete(roomId);
+    return;
+  }
+
+  if (message.status !== MessageStatus.SendSuccess) {
+    mergePendingQuickConferencePayload(roomId, partialPayload);
+    return;
+  }
+
+  if (modifyingRoomIdSet.has(roomId)) {
+    mergePendingQuickConferencePayload(roomId, partialPayload);
+    return;
+  }
+
+  const chat = getChat();
+  const rawMessage = chat?.findMessage?.(message.msgID);
+  if (!rawMessage) {
+    mergePendingQuickConferencePayload(roomId, partialPayload);
+    return;
+  }
+
+  modifyingRoomIdSet.add(roomId);
   pendingQuickConferencePayloadMap.delete(roomId);
   try {
-    const result = await modifyMessage(message, {
-      payload: {
-        data: JSON.stringify(nextPayload),
-      },
-    });
-    return result;
+    if (!rawMessage.payload) {
+      rawMessage.payload = {};
+    }
+    rawMessage.payload.data = JSON.stringify(nextPayload);
+    await chat.modifyMessage(rawMessage);
   } catch (error: any) {
     if (error?.code === 20026 || error?.code === 20027) {
       mergePendingQuickConferencePayload(roomId, partialPayload);
-      return message;
+      return;
     }
     throw error;
+  } finally {
+    modifyingRoomIdSet.delete(roomId);
+    // A newer payload (e.g. room destroyed) may have arrived while this
+    // message was being modified and was queued as pending. Flush it here
+    // instead of relying solely on the messageList watcher, since an in-place
+    // modifyMessage does not always emit a new messageList reference.
+    if (pendingQuickConferencePayloadMap.has(roomId)) {
+      void Promise.resolve().then(() => flushPendingQuickConferenceMessages());
+    }
   }
 };
 
@@ -132,7 +179,7 @@ const flushPendingQuickConferenceMessages = async () => {
   const pendingEntries = Array.from(pendingQuickConferencePayloadMap.entries());
   for (const [roomId, partialPayload] of pendingEntries) {
     const message = findQuickConferenceMessage(roomId);
-    if (!message || message.status !== 'success') {
+    if (!message || message.status !== MessageStatus.SendSuccess) {
       continue;
     }
     await updateQuickConferenceMessage(roomId, partialPayload);
@@ -191,7 +238,7 @@ const clearPendingRoomLeftTimer = (roomId: string) => {
   pendingRoomLeftTimerMap.delete(roomId);
 };
 
-watch(messageList, () => {
+watch(() => messageList.value, () => {
   flushPendingQuickConferenceMessages();
 }, { deep: false });
 
@@ -207,13 +254,13 @@ watch(
 );
 
 TUICore.registerEvent(TUIConstants.TUIRoom.SERVICE.NAME, TUIConstants.TUIRoom.SERVICE.EVENT.QUICK_CONFERENCE_MESSAGE_CREATED, {
-  onNotifyEvent: (_eventName: string, subKey: string, params: { roomId: string; message?: MessageModel }) => {
+  onNotifyEvent: (_eventName: string, subKey: string, params: { roomId: string; message?: MessageInfo }) => {
     if (subKey !== TUIConstants.TUIRoom.SERVICE.EVENT.QUICK_CONFERENCE_MESSAGE_CREATED) {
       return;
     }
     if (params?.roomId && params?.message) {
-      if (params.message.ID) {
-        quickConferenceMessageIdCacheMap.set(params.roomId, params.message.ID);
+      if (params.message.msgID) {
+        quickConferenceMessageIdCacheMap.set(params.roomId, params.message.msgID);
       }
       flushPendingQuickConferenceMessages();
     }
@@ -277,7 +324,11 @@ TUICore.registerEvent(TUIConstants.TUIRoom.SERVICE.NAME, TUIConstants.TUIRoom.SE
     if (subKey !== TUIConstants.TUIRoom.SERVICE.EVENT.PARTICIPANT_LIST_CHANGE) {
       return;
     }
-    updateQuickConferenceMessage(params?.roomId || '', {
+    const roomId = params?.roomId || '';
+    if (!roomId || dismissedRoomIdSet.has(roomId)) {
+      return;
+    }
+    updateQuickConferenceMessage(roomId, {
       userList: (params?.participantList || []).map(item => ({
         faceUrl: item.avatarUrl,
         nickName: item.userName,
@@ -292,7 +343,11 @@ TUICore.registerEvent(TUIConstants.TUIRoom.SERVICE.NAME, TUIConstants.TUIRoom.SE
     if (subKey !== TUIConstants.TUIRoom.SERVICE.EVENT.OWNER_CHANGED) {
       return;
     }
-    updateQuickConferenceMessage(params?.roomId || '', {
+    const roomId = params?.roomId || '';
+    if (!roomId || dismissedRoomIdSet.has(roomId)) {
+      return;
+    }
+    updateQuickConferenceMessage(roomId, {
       owner: params?.newOwner?.userId || '',
     });
   },

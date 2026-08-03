@@ -53,11 +53,11 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useAITranscriberState } from 'tuikit-atomicx-vue3/room';
-import { RealtimeTranscriberEvent } from 'tuikit-atomicx-vue3';
+import { RealtimeTranscriberEvent } from 'tuikit-atomicx-vue3/room';
 import { SUBTITLE_CLEAR_DELAY_MS } from '../constants';
 import { getDisplayName, getMessageDisplayLines } from '../utils/display';
-import type { RealtimeTranscriberEventInfoMap, TranscriberMessage } from 'tuikit-atomicx-vue3';
-import type { SubtitleDisplayMode } from 'tuikit-atomicx-vue3';
+import type { RealtimeTranscriberEventInfoMap, TranscriberMessage } from 'tuikit-atomicx-vue3/room';
+import type { SubtitleDisplayMode } from 'tuikit-atomicx-vue3/room';
 
 const SUBTITLE_LAYOUT_TYPOGRAPHY = {
   pc: {

@@ -23,7 +23,7 @@
 import { ref, defineProps, watch } from 'vue';
 import { useUIKit, TUISwitch } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState } from 'tuikit-atomicx-vue3/room';
-import { MirrorType } from 'tuikit-atomicx-vue3';
+import { MirrorType } from 'tuikit-atomicx-vue3/room';
 import CameraSelect from './CameraSelect.vue';
 import VideoPreview from './VideoPreview.vue';
 import VideoProfile from './VideoProfile.vue';

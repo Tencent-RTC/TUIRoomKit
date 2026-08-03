@@ -161,9 +161,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { IconSearch, useUIKit, TUIButton } from '@tencentcloud/uikit-base-component-vue3';
-import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
-import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomParticipantStatus, RoomParticipantRole, DeviceStatus, RoomType } from 'tuikit-atomicx-vue3';
+import { useRoomParticipantState, useRoomState, RoomParticipantStatus, RoomParticipantRole, DeviceStatus, RoomType } from 'tuikit-atomicx-vue3/room';
 import { combineComparators, createComparator } from '../../utils/compare';
 import AudienceAction from './AudienceAction.vue';
 import AudienceItem from './AudienceItem.vue';
@@ -171,7 +169,7 @@ import ParticipantAction from './ParticipantAction.vue';
 import ParticipantItem from './ParticipantItem.vue';
 import PendingParticipantItem from './PendingParticipantItem.vue';
 import RoomAction from './RoomAction.vue';
-import type { RoomParticipant, RoomUser } from 'tuikit-atomicx-vue3';
+import type { RoomParticipant, RoomUser } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 const {

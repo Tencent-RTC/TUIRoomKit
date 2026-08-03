@@ -84,7 +84,6 @@ watch(
 );
 
 onUnmounted(() => {
-  setActiveConversation(undefined);
   unsubscribeMessageEvent();
 });
 </script>

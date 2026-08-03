@@ -42,6 +42,7 @@ import RoomLayoutViewH5 from './RoomLayoutViewH5/index.vue';
 import RoomSidePanel from './RoomSidePanel/index.vue';
 import ScheduledRoomButton from './ScheduledRoomButton/index.vue';
 import ScreenShareButton from './ScreenShareButton/index.vue';
+import WhiteboardEntryButtonH5 from './Whiteboard/WhiteboardEntryButtonH5.vue';
 import SettingButton from './SettingButton/index.vue';
 import SettingButtonH5 from './SettingButtonH5/index.vue';
 import StartRoomButton from './StartRoomButton/index.vue';
@@ -89,6 +90,7 @@ import InviteRegistrarH5 from './CallButtonH5/InviteRegistrarH5.vue';
 import ChatRegistrarH5 from './RoomChatH5/ChatRegistrarH5.vue';
 import SettingsRegistrarH5 from './SettingButtonH5/SettingsRegistrarH5.vue';
 import AIToolsRegistrarH5 from './AIToolsButtonH5/AIToolsRegistrarH5.vue';
+import WhiteboardRegistrarH5 from './Whiteboard/WhiteboardRegistrarH5.vue';
 
 export {
   CloudRecordingButton,
@@ -145,6 +147,7 @@ export {
   PasswordDialogH5,
   LoginUserInfoH5,
   AIToolsButtonH5,
+  WhiteboardEntryButtonH5,
   showRoomInvitationH5,
   hideRoomInvitationH5,
   // Registrar components (PC)
@@ -181,4 +184,5 @@ export {
   SettingsRegistrarH5,
   AIToolsRegistrarH5,
   CloudRecordingRegistrarH5,
+  WhiteboardRegistrarH5,
 };

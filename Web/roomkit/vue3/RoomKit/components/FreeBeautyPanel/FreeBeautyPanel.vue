@@ -93,7 +93,7 @@ import {
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useDeviceState } from 'tuikit-atomicx-vue3/room';
 import { useFreeBeautyState } from 'tuikit-atomicx-vue3/room';
-import type { FreeBeautyConfig } from 'tuikit-atomicx-vue3';
+import type { FreeBeautyConfig } from 'tuikit-atomicx-vue3/room';
 
 // Utility function for throttling
 function throttle<T extends (...args: any[]) => any>(

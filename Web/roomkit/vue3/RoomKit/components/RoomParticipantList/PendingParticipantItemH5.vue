@@ -29,9 +29,9 @@
 import { ref, computed, watch } from 'vue';
 import { useUIKit, TUIButton, TUIToast } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomParticipantStatus } from 'tuikit-atomicx-vue3';
-import { Avatar } from 'tuikit-atomicx-vue3';
-import type { RoomParticipant } from 'tuikit-atomicx-vue3';
+import { RoomParticipantStatus } from 'tuikit-atomicx-vue3/room';
+import { Avatar } from 'tuikit-atomicx-vue3/room';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 defineOptions({
   name: 'PendingParticipantItemH5',

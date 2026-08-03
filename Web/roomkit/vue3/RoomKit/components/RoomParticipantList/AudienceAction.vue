@@ -46,7 +46,7 @@
 import { ref, computed, onUnmounted } from 'vue';
 import { TUIButton, IconArrowUp, useUIKit, TUIIcon } from '@tencentcloud/uikit-base-component-vue3';
 import { useAudienceAction } from './useParticpantAction';
-import type { RoomUser } from 'tuikit-atomicx-vue3';
+import type { RoomUser } from 'tuikit-atomicx-vue3/room';
 
 interface Props {
   audience: RoomUser;

@@ -1,9 +1,34 @@
 <template>
   <div
+    ref="streamCoverRef"
     class="stream-cover-container"
-    :class="{ border: activeSpeaking }"
+    :class="{
+      border: activeSpeaking,
+      'standalone-whiteboard': isScreenStream && isStandaloneWhiteboard,
+    }"
     @contextmenu.prevent
   >
+    <div
+      v-if="isScreenStream"
+      ref="whiteboardViewRef"
+      :class="['whiteboard-view', { active: ownsWhiteboardSession }]"
+      :style="whiteboardViewStyle"
+      @click.stop
+      @pointerdown.stop
+      @pointermove.stop
+      @pointerup.stop
+      @pointercancel.stop
+      @touchstart="handleWhiteboardTouchStart"
+      @touchmove="handleWhiteboardTouchMove"
+      @touchend="handleWhiteboardTouchEnd"
+      @touchcancel="handleWhiteboardTouchCancel"
+    />
+    <WhiteboardDockH5
+      v-if="showAnnotationDock"
+      ref="whiteboardDockRef"
+      :view-el="whiteboardViewRef"
+      :participant-user-id="participant.userId"
+    />
     <div
       v-if="
         streamType === VideoStreamType.Camera &&
@@ -18,7 +43,10 @@
         :user-id="participant.userId"
       />
     </div>
-    <div class="corner-user-info-container">
+    <div
+      v-if="!(isScreenStream && isStandaloneWhiteboard)"
+      class="corner-user-info-container"
+    >
       <div
         v-if="showIcon"
         :class="showMasterIcon ? 'master-icon' : 'admin-icon'"
@@ -48,7 +76,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from 'vue';
 import {
   IconScreenOpen,
   IconUser,
@@ -58,14 +93,25 @@ import {
 } from '@tencentcloud/uikit-base-component-vue3';
 import {
   Avatar,
+  RoomType,
   RoomParticipantRole,
   DeviceStatus,
   VideoStreamType,
   useRoomParticipantState,
+  useRoomState,
+  useWhiteboardState,
+  WhiteboardStatus,
+  WhiteboardTool,
 } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../../adapter/conference';
+import { BuiltinWidget } from '../../../adapter/type';
+import { useWhiteboardSessionContext } from '../../Whiteboard/useWhiteboardSessionContext';
+import { useWhiteboardToolbar } from '../../Whiteboard/useWhiteboardToolbar';
+import WhiteboardDockH5 from '../../Whiteboard/WhiteboardDockH5.vue';
 import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
+const { currentRoom } = useRoomState();
 
 interface Props {
   participant: RoomParticipant;
@@ -73,7 +119,98 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const { speakingUsers } = useRoomParticipantState();
+const {
+  speakingUsers,
+  localParticipant,
+} = useRoomParticipantState();
+const {
+  whiteboardStatus,
+  currentToolConfig,
+  setToolConfig,
+  updateWhiteboard,
+} = useWhiteboardState();
+const {
+  sessionOwnerUserId,
+  isHostWhiteboard,
+  isGuestWhiteboard,
+} = useWhiteboardSessionContext();
+const { isStandaloneWhiteboard } = useWhiteboardToolbar();
+
+const WHITEBOARD_ASPECT_RATIO = 16 / 9;
+const streamCoverRef = ref<HTMLElement>();
+const whiteboardViewRef = ref<HTMLElement>();
+const whiteboardDockRef = ref<InstanceType<typeof WhiteboardDockH5>>();
+const whiteboardViewStyle = ref<Record<string, string>>({});
+let resizeObserver: ResizeObserver | null = null;
+let isWhiteboardPinchGesture = false;
+
+// Drawing tools own single-finger touches; the select tool leaves them to the
+// tile so the shared screen can still be panned and swiped.
+const isWhiteboardDrawing = computed(() =>
+  currentToolConfig.value.tool !== WhiteboardTool.None,
+);
+
+// Pinch-to-zoom scales the tile through a CSS transform while the whiteboard
+// keeps its own coordinate mapping, so strokes drawn during the gesture drift
+// away from the fingers. Fall back to the select tool and collapse the toolbar
+// so a two-finger gesture only ever zooms.
+function beginWhiteboardPinchGesture() {
+  if (isWhiteboardPinchGesture) {
+    return;
+  }
+  isWhiteboardPinchGesture = true;
+  whiteboardDockRef.value?.collapse();
+  if (!isWhiteboardDrawing.value) {
+    return;
+  }
+  setToolConfig({ tool: WhiteboardTool.None }).catch((error) => {
+    console.error('[ParticipantViewUIH5] reset whiteboard tool on pinch failed:', error);
+  });
+}
+
+function handleWhiteboardTouchStart(event: TouchEvent) {
+  if (event.touches.length >= 2) {
+    beginWhiteboardPinchGesture();
+    return;
+  }
+  if (isWhiteboardDrawing.value) {
+    event.stopPropagation();
+  }
+}
+
+function handleWhiteboardTouchMove(event: TouchEvent) {
+  if (isWhiteboardPinchGesture || event.touches.length >= 2) {
+    beginWhiteboardPinchGesture();
+    return;
+  }
+  if (!isWhiteboardDrawing.value) {
+    return;
+  }
+  event.stopPropagation();
+  event.preventDefault();
+}
+
+function handleWhiteboardTouchEnd(event: TouchEvent) {
+  if (isWhiteboardPinchGesture) {
+    if (event.touches.length === 0) {
+      isWhiteboardPinchGesture = false;
+    }
+    return;
+  }
+  if (isWhiteboardDrawing.value) {
+    event.stopPropagation();
+  }
+}
+
+function handleWhiteboardTouchCancel(event: TouchEvent) {
+  if (isWhiteboardPinchGesture) {
+    isWhiteboardPinchGesture = false;
+    return;
+  }
+  if (isWhiteboardDrawing.value) {
+    event.stopPropagation();
+  }
+}
 
 const activeSpeaking = computed(() => {
   const hasSpeakVolume = speakingUsers.value.get(props.participant.userId);
@@ -124,6 +261,96 @@ const showIcon = computed(() => showMasterIcon.value || showAdminIcon.value);
 const isScreenStream = computed(
   () => props.streamType === VideoStreamType.Screen
 );
+
+const isLocalParticipant = computed(() =>
+  props.participant.userId === localParticipant.value?.userId,
+);
+const ownsWhiteboardSession = computed(() => {
+  if (!isScreenStream.value) {
+    return false;
+  }
+  if (isLocalParticipant.value) {
+    return isHostWhiteboard.value;
+  }
+  return isGuestWhiteboard.value
+    && sessionOwnerUserId.value === props.participant.userId;
+});
+const showAnnotationDock = computed(() =>
+  isScreenStream.value
+  && currentRoom.value?.roomType !== RoomType.Webinar
+  && conference.getWidgetVisible(BuiltinWidget.AnnotationWidget)
+  && (
+    whiteboardStatus.value === WhiteboardStatus.Off
+    || ownsWhiteboardSession.value
+  ),
+);
+
+function updateWhiteboardViewRect() {
+  const container = streamCoverRef.value;
+  if (!container || !isScreenStream.value) {
+    return;
+  }
+
+  const containerWidth = container.clientWidth;
+  const containerHeight = container.clientHeight;
+  if (!containerWidth || !containerHeight) {
+    return;
+  }
+
+  let width = containerWidth;
+  let height = Math.round(width / WHITEBOARD_ASPECT_RATIO);
+  if (height > containerHeight) {
+    height = containerHeight;
+    width = Math.round(height * WHITEBOARD_ASPECT_RATIO);
+  }
+
+  whiteboardViewStyle.value = {
+    width: `${width}px`,
+    height: `${height}px`,
+    left: `${Math.round((containerWidth - width) / 2)}px`,
+    top: `${Math.round((containerHeight - height) / 2)}px`,
+  };
+}
+
+async function bindWhiteboardView() {
+  updateWhiteboardViewRect();
+  await nextTick();
+
+  const view = whiteboardViewRef.value;
+  if (!ownsWhiteboardSession.value || !view) {
+    return;
+  }
+  try {
+    await updateWhiteboard({
+      view,
+    });
+  } catch (error) {
+    console.error('[ParticipantViewUIH5] update whiteboard view failed:', error);
+  }
+}
+
+watch(
+  [ownsWhiteboardSession, whiteboardViewRef],
+  () => {
+    void bindWhiteboardView();
+  },
+  { flush: 'post', immediate: true },
+);
+
+onMounted(() => {
+  updateWhiteboardViewRect();
+  if (streamCoverRef.value) {
+    resizeObserver = new ResizeObserver(() => {
+      updateWhiteboardViewRect();
+    });
+    resizeObserver.observe(streamCoverRef.value);
+  }
+});
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
+  resizeObserver = null;
+});
 </script>
 
 <style lang="scss" scoped>
@@ -159,8 +386,22 @@ const isScreenStream = computed(
   transform: translateZ(0);
   will-change: transform;
 
+  &.standalone-whiteboard {
+    background: #fff;
+  }
+
   &.border {
     border: $border-width solid var(--uikit-color-green-5);
+  }
+
+  .whiteboard-view {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+
+    &.active {
+      pointer-events: auto;
+    }
   }
 
   .center-user-info-container {
@@ -207,6 +448,7 @@ const isScreenStream = computed(
     color: var(--uikit-color-white-1);
     border-radius: 16px;
     background-color: var(--uikit-color-black-5);
+    z-index: 2;
 
     .master-icon,
     .admin-icon {

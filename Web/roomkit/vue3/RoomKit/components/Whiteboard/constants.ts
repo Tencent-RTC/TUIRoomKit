@@ -100,6 +100,12 @@ export const WHITEBOARD_COLOR_PALETTE = [
   'transparent',
 ] as const;
 
+export const WHITEBOARD_GUEST_COLOR_PALETTE = WHITEBOARD_COLOR_PALETTE.filter(color =>
+  color !== 'transparent'
+  && color !== '#FFFFFF'
+  && color !== DEFAULT_TOOL_STYLE.color,
+);
+
 export const IconPen = IconBrush;
 export const IconRect = IconRectangle;
 export const IconEllipse = IconCircle;

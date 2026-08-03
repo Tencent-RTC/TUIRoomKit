@@ -306,6 +306,7 @@ const handleLeaveRoom = () => {
   .dialog-message {
     padding: 16px 0;
     font-size: 14px;
+    line-height: 20px;
     color: var(--text-color-primary);
   }
   </style>

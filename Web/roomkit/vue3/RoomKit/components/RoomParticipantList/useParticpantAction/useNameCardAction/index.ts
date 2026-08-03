@@ -2,7 +2,7 @@ import { h, render, markRaw } from 'vue';
 import { TUIToast, TOAST_TYPE, IconEditNameCard, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
 import ChangeNameCardDialog from './changeNameCardDialog.vue';
-import type { RoomParticipant } from 'tuikit-atomicx-vue3';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 export function calculateByteLength(str: string) {
   let byteLength = 0;

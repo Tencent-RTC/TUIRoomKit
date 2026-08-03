@@ -46,7 +46,7 @@
 import { ref, computed, toRef, onUnmounted } from 'vue';
 import { TUIButton, IconArrowUp, useUIKit, TUIIcon } from '@tencentcloud/uikit-base-component-vue3';
 import { useParticipantAction } from './useParticpantAction';
-import type { RoomParticipant } from 'tuikit-atomicx-vue3';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 interface Props {
   participant: RoomParticipant;

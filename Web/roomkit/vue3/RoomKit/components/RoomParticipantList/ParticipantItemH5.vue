@@ -44,9 +44,9 @@ import {
   IconScreenOpen,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
-import { RoomParticipantRole, DeviceStatus } from 'tuikit-atomicx-vue3';
-import { Avatar } from 'tuikit-atomicx-vue3';
-import type { RoomParticipant } from 'tuikit-atomicx-vue3';
+import { RoomParticipantRole, DeviceStatus } from 'tuikit-atomicx-vue3/room';
+import { Avatar } from 'tuikit-atomicx-vue3/room';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 defineOptions({
   name: 'ParticipantItemH5',

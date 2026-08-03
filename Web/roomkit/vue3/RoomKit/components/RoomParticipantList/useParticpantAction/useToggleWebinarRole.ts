@@ -2,7 +2,7 @@ import type { Component } from 'vue';
 import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import { IconSetAdmin, IconRevokeAdmin, useUIKit, TUIToast } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
-import type { RoomParticipant, RoomUser } from 'tuikit-atomicx-vue3';
+import type { RoomParticipant, RoomUser } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 const { promoteToParticipant, demoteToAudience } = useRoomParticipantState();

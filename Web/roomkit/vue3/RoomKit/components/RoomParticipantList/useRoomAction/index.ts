@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
-import { RoomParticipantRole } from 'tuikit-atomicx-vue3';
+import { RoomParticipantRole } from 'tuikit-atomicx-vue3/room';
 import useRoomAudioAction from './useRoomAudioAction';
 import useRoomScreenAction from './useRoomScreenAction';
 import useRoomVideoAction from './useRoomVideoAction';

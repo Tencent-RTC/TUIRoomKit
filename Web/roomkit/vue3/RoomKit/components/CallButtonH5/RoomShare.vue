@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <div class="share-item">
+      <div v-if="isRoomLinkVisible" class="share-item">
         <div class="share-label">
           {{ t('RoomShare.RoomLink') }}
         </div>
@@ -98,8 +98,14 @@ const formatDateTime = (timestamp?: number): string => {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 };
 
+// An explicit empty string in shareLink means the room link should be hidden.
+const isRoomLinkVisible = computed(() => conference.getFeatureConfig('shareLink') !== '');
+
 const roomLink = computed(() => {
   const customLink = conference.getFeatureConfig('shareLink');
+  if (customLink === '') {
+    return '';
+  }
   if (customLink) {
     return customLink;
   }
@@ -120,7 +126,7 @@ const copyRoomInfoAndLink = async () => {
     `${t('RoomShare.RoomId')}: ${props.roomInfo.roomId}`,
     props.roomInfo.password ? `${t('RoomShare.Password')}: ${props.roomInfo.password}` : null,
     props.roomInfo.scheduledStartTime && props.roomInfo.scheduledEndTime ? `${t('RoomShare.RoomTime')}: ${formatDateTime(props.roomInfo.scheduledStartTime)} - ${formatDateTime(props.roomInfo.scheduledEndTime)}` : null,
-    `${t('RoomShare.RoomLink')}: ${roomLink.value}`,
+    isRoomLinkVisible.value ? `${t('RoomShare.RoomLink')}: ${roomLink.value}` : null,
   ].filter(Boolean);
 
   const roomInfoText = roomInfoLines.join('\n');

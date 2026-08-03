@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { ref, defineProps, computed } from 'vue';
 import { TUIDialog, TUIInput, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import type { RoomParticipant } from 'tuikit-atomicx-vue3';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 interface Props {
   userInfo: RoomParticipant;

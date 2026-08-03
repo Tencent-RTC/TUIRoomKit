@@ -32,8 +32,8 @@ import { ref, computed } from 'vue';
 import { IconUser, useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomParticipantState } from 'tuikit-atomicx-vue3/room';
-import { Avatar } from 'tuikit-atomicx-vue3';
-import type { RoomUser } from 'tuikit-atomicx-vue3';
+import { Avatar } from 'tuikit-atomicx-vue3/room';
+import type { RoomUser } from 'tuikit-atomicx-vue3/room';
 
 interface Props {
   audience: RoomUser;

@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <div class="invite-item">
+      <div v-if="isRoomLinkVisible" class="invite-item">
         <div class="invite-label">
           {{ t('RoomShare.RoomLink') }}
         </div>
@@ -77,8 +77,13 @@ const visible = computed({
   set: value => emit('update:visible', value),
 });
 
+const isRoomLinkVisible = computed(() => conference.getFeatureConfig('shareLink') !== '');
+
 const roomLink = computed(() => {
   const customLink = conference.getFeatureConfig('shareLink');
+  if (customLink === '') {
+    return '';
+  }
   if (customLink) {
     return customLink;
   }
@@ -97,7 +102,7 @@ const copyRoomIdAndLink = async () => {
   const roomInfoLines = [
     `${t('RoomShare.RoomId')}: ${props.roomId}`,
     props.password ? `${t('RoomShare.Password')}: ${props.password}` : null,
-    `${t('RoomShare.RoomLink')}: ${roomLink.value}`,
+    isRoomLinkVisible.value ? `${t('RoomShare.RoomLink')}: ${roomLink.value}` : null,
   ].filter(Boolean);
 
   const roomInfoText = roomInfoLines.join('\n');

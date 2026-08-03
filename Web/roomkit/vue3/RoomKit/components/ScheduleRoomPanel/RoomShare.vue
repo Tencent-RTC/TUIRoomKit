@@ -71,7 +71,7 @@ import { computed } from 'vue';
 import { IconCopy, TUIButton, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useCopy } from './useCopy';
 import { generateRoomLink } from './utils';
-import type { RoomInfo } from 'tuikit-atomicx-vue3';
+import type { RoomInfo } from 'tuikit-atomicx-vue3/room';
 
 const { t } = useUIKit();
 const { copy } = useCopy();

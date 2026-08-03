@@ -3,8 +3,6 @@
  * @description 预约房间管理组件，用于创建和管理预约房间，支持房间预约、参与者管理、安全设置等功能。
  */
 
-import { addI18n } from 'tuikit-atomicx-vue3';
-import { enResource, zhResource } from './i18n';
 import ScheduledRoomListComponent from './ScheduledRoomList.vue';
 import ScheduleRoomPanelComponent from './ScheduleRoomPanel.vue';
 
@@ -25,7 +23,7 @@ import ScheduleRoomPanelComponent from './ScheduleRoomPanel.vue';
  * </template>
  *
  * <script setup>
- * import { ScheduledRoomList } from 'tuikit-atomicx-vue3';
+ * import { ScheduledRoomList } from './components/ScheduleRoomPanel';
  * </script>
  */
 const ScheduledRoomList = ScheduledRoomListComponent;
@@ -63,7 +61,7 @@ const ScheduledRoomList = ScheduledRoomListComponent;
  * </template>
  *
  * <script setup>
- * import { ScheduleRoomPanel } from 'tuikit-atomicx-vue3';
+ * import { ScheduleRoomPanel } from './components/ScheduleRoomPanel';
  * import { ref } from 'vue';
  *
  * const isVisible = ref(false);
@@ -81,8 +79,6 @@ const ScheduledRoomList = ScheduledRoomListComponent;
  */
 const ScheduleRoomPanel = ScheduleRoomPanelComponent;
 
-addI18n('en-US', { translation: enResource });
-addI18n('zh-CN', { translation: zhResource });
 export {
   ScheduleRoomPanel,
   ScheduledRoomList,

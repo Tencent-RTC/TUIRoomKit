@@ -64,7 +64,7 @@ import {
   TUIIcon,
 } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomType } from 'tuikit-atomicx-vue3';
+import { RoomType } from 'tuikit-atomicx-vue3/room';
 import useRoomActions from './useRoomAction';
 
 const { t } = useUIKit();

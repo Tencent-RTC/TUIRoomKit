@@ -1,28 +1,33 @@
 <template>
-  <div>
-    <Dropdown
-      trigger="click"
-      placement="top"
-      :teleported="true"
+  <div
+    v-click-outside="closeMenu"
+    class="ai-tools-button-wrapper"
+  >
+    <IconButton
+      :title="t('AITools.Title')"
+      :is-active="showMenu"
+      @click-icon="toggleMenu"
     >
-      <IconButton :title="t('AITools.Title')">
-        <IconAIIcon :size="24" />
-      </IconButton>
-      <template #dropdown>
-        <div class="operate-list">
-          <div class="operate-item" @click="toggleSubtitles">
-            <IconAISubtitles :size="18" />
-            <span class="operate-item-text">{{ isSubtitlesVisible ? t('AITools.SubtitlesClose') : t('AITools.SubtitlesOpen') }}</span>
-          </div>
-          <div class="operate-item" @click="toggleRealtimeMessageList">
-            <IconAITranscription :size="18" />
-            <span class="operate-item-text">{{ activeWidgetId === BuiltinWidget.AIToolsWidget ? t('AITools.RealtimeMessageListClose') : t('AITools.RealtimeMessageListOpen') }}</span>
-          </div>
+      <IconAIIcon :size="24" />
+    </IconButton>
+    <transition name="menu-fade">
+      <div
+        v-show="showMenu"
+        class="dropdown-menu"
+        @click.stop
+      >
+        <div class="dropdown-item" @click="handleToggleSubtitles">
+          <IconAISubtitles :size="16" />
+          <span class="dropdown-item-text">{{ isSubtitlesVisible ? t('AITools.SubtitlesClose') : t('AITools.SubtitlesOpen') }}</span>
         </div>
-      </template>
-    </Dropdown>
+        <div class="dropdown-item" @click="handleToggleRealtimeMessageList">
+          <IconAITranscription :size="16" />
+          <span class="dropdown-item-text">{{ activeWidgetId === BuiltinWidget.AIToolsWidget ? t('AITools.RealtimeMessageListClose') : t('AITools.RealtimeMessageListOpen') }}</span>
+        </div>
+      </div>
+    </transition>
   </div>
-  <Teleport to="body">
+  <Teleport to="#roomPage">
     <div v-if="isSubtitlesVisible" class="ai-subtitle-pc">
       <Subtitle
         :target-language="targetLanguage"
@@ -47,18 +52,19 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
-import { Dropdown, IconAIIcon, IconAISubtitles, IconAITranscription, IconSettings, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { IconAIIcon, IconAISubtitles, IconAITranscription, IconSettings, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import {
   RoomParticipantRole,
   useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
-import { Subtitle } from '../ASRTools';
 import { BuiltinWidget } from '../../adapter/type';
 import { useASRToolsState } from '../../hooks/useASRToolsState';
 import { useRoomSidePanel } from '../../hooks/useRoomSidePanel';
 import { useSubtitlesState } from '../../hooks/useSubtitlesState';
+import { Subtitle } from '../ASRTools';
 import IconButton from '../base/IconButton.vue';
+import vClickOutside from '../base/vClickOutside';
 import AISettingsDialog from './AISettingsDialog.vue';
 
 interface Props {
@@ -75,6 +81,7 @@ const { isSubtitlesVisible } = useSubtitlesState();
 const { currentRoom } = useRoomState();
 const { localParticipant } = useRoomParticipantState();
 const isSettingsDialogVisible = ref(false);
+const showMenu = ref(false);
 const isOwner = computed(() => currentRoom.value?.roomOwner?.userId === localParticipant.value?.userId);
 const {
   targetLanguage,
@@ -83,7 +90,16 @@ const {
   ensureASRStarted,
 } = useASRToolsState();
 
-async function toggleSubtitles() {
+function toggleMenu() {
+  showMenu.value = !showMenu.value;
+}
+
+function closeMenu() {
+  showMenu.value = false;
+}
+
+async function handleToggleSubtitles() {
+  closeMenu();
   if (!isSubtitlesVisible.value) {
     await ensureASRStarted();
   }
@@ -91,7 +107,8 @@ async function toggleSubtitles() {
   isSubtitlesVisible.value = !isSubtitlesVisible.value;
 }
 
-async function toggleRealtimeMessageList() {
+async function handleToggleRealtimeMessageList() {
+  closeMenu();
   if (activeWidgetId.value !== BuiltinWidget.AIToolsWidget) {
     await ensureASRStarted();
   }
@@ -142,29 +159,69 @@ watch(() => localParticipant.value?.role, (role, previousRole) => {
   cursor: pointer;
 }
 
-.operate-list {
+.ai-tools-button-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.dropdown-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 1000;
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
   flex-direction: column;
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--text-color-primary);
+  gap: 4px;
+  padding: 8px;
+  white-space: nowrap;
+  background: var(--bg-color-operate);
+  border: 1px solid var(--stroke-color-primary);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--uikit-color-black-16);
+  transform: translateX(-50%);
   text-align: initial;
 
-  .operate-item {
+  .dropdown-item {
     display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 6px;
+    flex-direction: row;
     gap: 6px;
-    width: 100%;
-    box-sizing: border-box;
+    align-items: center;
+    padding: 6px 8px;
+    color: var(--text-color-primary);
+    cursor: pointer;
+    border-radius: 6px;
 
-    .operate-item-text {
-      flex: 1;
-      min-width: 0;
+    &:hover {
+      background: var(--button-color-secondary-hover);
+    }
+
+    .dropdown-item-text {
+      font-size: 13px;
+      line-height: 20px;
     }
   }
+}
+
+.menu-fade-enter-active,
+.menu-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.menu-fade-enter-from {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.menu-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.menu-fade-enter-to,
+.menu-fade-leave-from {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 </style>
