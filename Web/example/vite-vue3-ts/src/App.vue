@@ -3,6 +3,7 @@
     <div id="app">
       <router-view />
     </div>
+    <IntegrationCard />
   </UIKitProvider>
 </template>
 
@@ -12,6 +13,7 @@ import { conference, useRoomInvitation, useRoomInvitationH5, RoomEvent } from '@
 import { TUIMessageBox, UIKitProvider, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useRoute, useRouter } from 'vue-router';
 import { isPC } from './utils/utils';
+import IntegrationCard from './components/IntegrationCard/index.vue';
 
 const { t } = useUIKit();
 const initialTheme = ref(localStorage.getItem('tuiRoom-theme') || 'light');

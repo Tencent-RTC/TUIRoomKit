@@ -55,5 +55,11 @@ const handleJoinRoom = async (roomId: string, roomType: TUIRoomType) => {
   position: relative;
   width: 100%;
   height: 100%;
+
+  :deep(.main) {
+    justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 70px;
+  }
 }
 </style>

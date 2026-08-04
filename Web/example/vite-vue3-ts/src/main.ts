@@ -9,10 +9,10 @@ export const addI18n = (lng: string, resource: any, deep = true, overwrite = fal
   i18next.addResourceBundle(lng, 'translation', resource.translation, deep, overwrite);
 };
 
+addI18n('en-US', { translation: enResource }, true, true);
+addI18n('zh-CN', { translation: zhResource }, true, true);
+
 const app = createApp(App);
 
 app.use(router);
 app.mount('#app');
-
-addI18n('en-US', { translation: enResource }, true, true);
-addI18n('zh-CN', { translation: zhResource }, true, true);
