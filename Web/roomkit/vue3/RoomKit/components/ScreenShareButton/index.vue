@@ -47,9 +47,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { IconScreenShare, IconStopScreenShare, TUIMessageBox, TUIToast, useUIKit, IconUnSupport } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, DeviceStatus, useRoomState, useRoomParticipantState, RoomParticipantRole, DeviceError, TUIErrorCode, RoomType, useWhiteboardState } from 'tuikit-atomicx-vue3/room';
+
+import { useDeviceState, DeviceStatus, useRoomState, useRoomParticipantState, RoomParticipantRole, DeviceError, DeviceType, TUIErrorCode, RoomType, useWhiteboardState } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
 import { clearLocalScreenSharePreviewConfirmation } from '../../adapter/screenSharePreview';
+import { handleMediaCaptureError } from '../../hooks/useMediaCaptureError';
 import { BuiltinWidget, InterceptorAction } from '../../adapter/type';
 import IconButton from '../base/IconButton.vue';
 import vClickOutside from '../base/vClickOutside';
@@ -127,6 +129,7 @@ const isLowerRoleParticipantPublishingInWebinar = computed(() => {
 async function handleStartScreenShare() {
   try {
     clearLocalScreenSharePreviewConfirmation();
+
     await startScreenShare({ screenAudio: true });
     if (
       notWebinar.value
@@ -136,48 +139,28 @@ async function handleStartScreenShare() {
     }
   } catch (error: unknown) {
     const err = error as { code?: number; name?: string; message?: string };
-    let message = t('ScreenShare.UnknownErrorOccurredWhileSharing');
-    switch (err.name) {
-      case 'NotReadableError':
-        message = t('ScreenShare.SystemProhibitsAccessScreenContent');
-        break;
-      case 'NotAllowedError':
-        if (err.message?.includes('Permission denied by system')) {
-          message = t('ScreenShare.SystemProhibitsAccessScreenContent');
-        } else {
-          message = t('ScreenShare.UserCanceledScreenSharing');
-        }
-        break;
-      default:
-        break;
-    }
-    if (err.code === TUIErrorCode.ERR_OPEN_SCREEN_SHARE_NEED_PERMISSION_FROM_ADMIN) {
-      message = t('ScreenShare.NotAllowedToShareScreen');
-    }
     const ERROR_SPEAKER_LIMIT_EXCEEDED = 100253;
-    if (err?.code === ERROR_SPEAKER_LIMIT_EXCEEDED) {
-      message = t('ScreenShare.HigherRoleParticipantPublishingInWebinar');
+
+    // Business-level errors handled with toasts first.
+    if (err.name === 'NotAllowedError' && !err.message?.includes('Permission denied by system')) {
+      // User closed the screen picker — not a real error, just inform.
+      TUIToast.warning({ message: t('ScreenShare.UserCanceledScreenSharing') });
+    } else if (err.code === TUIErrorCode.ERR_OPEN_SCREEN_SHARE_NEED_PERMISSION_FROM_ADMIN) {
+      TUIToast.warning({ message: t('ScreenShare.NotAllowedToShareScreen') });
+    } else if (err.code === ERROR_SPEAKER_LIMIT_EXCEEDED) {
+      TUIToast.warning({ message: t('ScreenShare.HigherRoleParticipantPublishingInWebinar') });
+    } else if (err.code === TUIErrorCode.ERR_FREQ_LIMIT) {
+      TUIToast.warning({ message: t('RoomCommon.FrequencyLimit') });
+    } else {
+      // System-blocking errors (OS denied screen recording, etc.).
+      handleMediaCaptureError({ error, deviceType: DeviceType.ScreenShare });
     }
-    if (err.code === TUIErrorCode.ERR_FREQ_LIMIT) {
-      message = t('RoomCommon.FrequencyLimit');
-    }
-    TUIToast.warning({
-      message,
-    });
   }
 }
 
 async function doStartScreenShare() {
-  await conference.executeInterceptor(InterceptorAction.StartScreenShare, () => {
-    TUIMessageBox.confirm({
-      title: t('ScreenShare.StartSharing'),
-      content: t('ScreenShare.StartSharingConfirm'),
-      callback: async (action) => {
-        if (action === 'confirm') {
-          await handleStartScreenShare();
-        }
-      },
-    });
+  await conference.executeInterceptor(InterceptorAction.StartScreenShare, async () => {
+    await handleStartScreenShare();
   });
 }
 
@@ -194,12 +177,7 @@ async function startScreenShareFlow() {
     });
     return;
   }
-  if (screenLastError.value === DeviceError.NotSupportCapture) {
-    TUIToast.warning({
-      message: t('ScreenShare.BrowserDoesNotSupportScreenSharing'),
-    });
-    return;
-  }
+
   if (isHigherRoleParticipantPublishingInWebinar.value) {
     TUIToast.warning({
       message: t('ScreenShare.HigherRoleParticipantPublishingInWebinar'),

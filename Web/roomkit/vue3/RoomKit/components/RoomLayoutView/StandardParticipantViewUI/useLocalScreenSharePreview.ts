@@ -24,7 +24,7 @@ export function useLocalScreenSharePreview(
   screenShareViewRef: Ref<HTMLElement | undefined>,
 ) {
   const { screenStatus, stopScreenShare } = useDeviceState();
-  const { whiteboardStatus } = useWhiteboardState();
+  const { whiteboardStatus, updateWhiteboard } = useWhiteboardState();
   const showPreviewWarning = ref(false);
   const isScreenSharePreviewReady = ref(false);
 
@@ -40,30 +40,41 @@ export function useLocalScreenSharePreview(
     isScreenSharePreviewReady.value = false;
   }
 
-  async function bindScreenSharePreview(): Promise<void> {
+  async function bindScreenSharePreview(view: HTMLElement): Promise<void> {
+    await updateLocalScreenShareView(view);
     if (
-      screenStatus.value !== DeviceStatus.On
-      || whiteboardStatus.value === WhiteboardStatus.On
-      || !screenShareViewRef.value
+      !isLocalScreenSharePreviewConfirmed()
+      && whiteboardStatus.value !== WhiteboardStatus.On
     ) {
+      const displaySurface = await getLocalScreenShareSurface();
+      if (displaySurface === 'browser') {
+        confirmLocalScreenSharePreview();
+        showPreviewWarning.value = false;
+      } else {
+        showPreviewWarning.value = true;
+      }
+    }
+    isScreenSharePreviewReady.value = isLocalScreenSharePreviewConfirmed();
+  }
+  async function bindLocalScreenViews(): Promise<void> {
+    const view = screenShareViewRef.value;
+    if (!view) {
       return;
     }
 
-    try {
-      await updateLocalScreenShareView(screenShareViewRef.value);
-      if (!isLocalScreenSharePreviewConfirmed()) {
-        const displaySurface = await getLocalScreenShareSurface();
-        if (displaySurface === 'browser') {
-          confirmLocalScreenSharePreview();
-          showPreviewWarning.value = false;
-        } else {
-          showPreviewWarning.value = true;
-        }
+    if (screenStatus.value === DeviceStatus.On) {
+      try {
+        await bindScreenSharePreview(view);
+      } catch (error) {
+        isScreenSharePreviewReady.value = false;
+        console.error('[useLocalScreenSharePreview] update screen share preview failed:', error);
       }
-      isScreenSharePreviewReady.value = isLocalScreenSharePreviewConfirmed();
+    }
+
+    try {
+      await updateWhiteboard({ view });
     } catch (error) {
-      isScreenSharePreviewReady.value = false;
-      console.error('[useLocalScreenSharePreview] update screen share preview failed:', error);
+      console.error('[useLocalScreenSharePreview] update whiteboard view failed:', error);
     }
   }
 
@@ -84,13 +95,13 @@ export function useLocalScreenSharePreview(
       if (status === DeviceStatus.Off) {
         resetPreviewState();
       }
-      bindScreenSharePreview();
+      bindLocalScreenViews();
     },
     { flush: 'post' },
   );
 
   onMounted(() => {
-    bindScreenSharePreview();
+    bindLocalScreenViews();
   });
 
   onBeforeUnmount(() => {

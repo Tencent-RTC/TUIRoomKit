@@ -21,6 +21,12 @@
             <span class="text">{{ t('FreeBeauty.Compare') }}</span>
           </div>
         </div>
+        <div
+          v-if="!isCameraTesting && !isCameraTestLoading && !isLoading"
+          class="attention-info"
+        >
+          <span class="preview-unavailable-info">{{ t('MediaCapture.CameraPreviewUnavailable') }}</span>
+        </div>
         <div v-if="isLoading" class="mask" />
         <div v-if="isLoading" class="spinner" />
       </div>
@@ -91,8 +97,9 @@ import {
   TUIButton,
   TUIToast,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState } from 'tuikit-atomicx-vue3/room';
+import { DeviceType, useDeviceState } from 'tuikit-atomicx-vue3/room';
 import { useFreeBeautyState } from 'tuikit-atomicx-vue3/room';
+import { handleMediaCaptureError } from '../../hooks/useMediaCaptureError';
 import type { FreeBeautyConfig } from 'tuikit-atomicx-vue3/room';
 
 // Utility function for throttling
@@ -323,7 +330,7 @@ async function startCameraTestFunction() {
     await startCameraTest({ view: 'test-preview' });
   } catch (error) {
     console.error('Failed to start camera test:', error);
-    TUIToast.error({ message: t('FreeBeauty.CameraTestFailed') });
+    handleMediaCaptureError({ error, deviceType: DeviceType.Camera });
   }
 }
 
@@ -444,6 +451,25 @@ onMounted(async () => {
     gap: 30px;
     box-sizing: border-box;
     padding: 0 6px;
+  }
+
+  // Sits below the mask, spinner and control bar of the preview area.
+  .attention-info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+
+    .preview-unavailable-info {
+      font-size: 16px;
+      line-height: 24px;
+      color: var(--uikit-color-gray-7);
+    }
   }
 
   .reset,

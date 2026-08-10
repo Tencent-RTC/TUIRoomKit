@@ -1,6 +1,6 @@
 import { watch } from 'vue';
 import { TUIConstants, TUICore, TUILogin } from '@tencentcloud/tui-core-lite';
-import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
+import TUIRoomEngine, { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import { RoomInfo, RoomParticipantEvent, RoomUser, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import { conference } from './conference';
 import { RoomEvent } from './type';
@@ -10,10 +10,27 @@ const { participantList, getParticipantList, subscribeEvent } = useRoomParticipa
 let conferenceLoginPromise: Promise<void> | null = null;
 let conferenceLoginUserId = '';
 let latestParticipantRoomId = '';
+let hasReportedTimRoomKitFramework = false;
 const ROOM_DISMISS_CONFIRM_DELAY = 200;
 const dismissedRoomIdSet = new Set<string>();
 const pendingParticipantEmptyTimerMap = new Map<string, ReturnType<typeof setTimeout>>();
 const pendingParticipantEmptyListMap = new Map<string, Array<{ avatarUrl: string; userId: string; userName: string }>>();
+
+const reportTimRoomKitFramework = () => {
+  if (hasReportedTimRoomKitFramework) {
+    return;
+  }
+  hasReportedTimRoomKitFramework = true;
+  TUIRoomEngine?.callExperimentalAPI(
+    JSON.stringify({
+      api: 'setFramework',
+      params: {
+        component: 'TIMRoomKit',
+        language: `vue3`,
+      },
+    }),
+  );
+};
 
 const clearPendingParticipantEmptyTimer = (roomId: string) => {
   const timer = pendingParticipantEmptyTimerMap.get(roomId);
@@ -62,6 +79,7 @@ TUICore.registerService(TUIConstants.TUIRoom.SERVICE.NAME, {
       return;
     }
     try {
+      reportTimRoomKitFramework();
       await ensureConferenceLogin();
       await conference.start({
         roomId: params.roomId,
@@ -79,6 +97,7 @@ TUICore.registerEvent(TUIConstants.TUIRoom.SERVICE.NAME, TUIConstants.TUIRoom.SE
     if (subKey !== TUIConstants.TUIRoom.SERVICE.EVENT.JOIN_ROOM) {
       return;
     }
+    reportTimRoomKitFramework();
     if (currentRoom.value?.roomId === params.roomId) {
       TUICore.notifyEvent(TUIConstants.TUIRoom.SERVICE.NAME, TUIConstants.TUIRoom.SERVICE.EVENT.ROOM_JOINED, {
         roomInfo: currentRoom.value,

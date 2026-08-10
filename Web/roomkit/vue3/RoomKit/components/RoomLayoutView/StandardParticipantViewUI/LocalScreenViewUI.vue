@@ -63,7 +63,6 @@ const { currentRoom } = useRoomState();
 const {
   whiteboardStatus,
   currentToolConfig,
-  updateWhiteboard,
   setToolConfig,
 } = useWhiteboardState();
 const { isHostWhiteboard } = useWhiteboardSessionContext();
@@ -116,9 +115,6 @@ const resizeObserver = new ResizeObserver(() => {
 onMounted(() => {
   if (localScreenContainerRef.value) {
     resizeObserver.observe(localScreenContainerRef.value);
-  }
-  if (screenShareViewRef.value) {
-    updateWhiteboard({ view: screenShareViewRef.value });
   }
 });
 onBeforeUnmount(() => {

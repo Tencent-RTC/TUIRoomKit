@@ -255,9 +255,9 @@ async function handleCallAllPendingParticipant() {
       font-size: 14px;
       font-weight: 400;
       color: var(--text-color-primary);
-      filter: drop-shadow(0 2px 4px var(--base-color-black-8))
-        drop-shadow(0 6px 10px var(--base-color-black-8))
-        drop-shadow(0 3px 14px var(--base-color-black-8));
+      filter: drop-shadow(0 2px 4px var(--uikit-color-black-8))
+        drop-shadow(0 6px 10px var(--uikit-color-black-8))
+        drop-shadow(0 3px 14px var(--uikit-color-black-8));
       border-radius: 20px;
       transform: translateX(4px);
     }

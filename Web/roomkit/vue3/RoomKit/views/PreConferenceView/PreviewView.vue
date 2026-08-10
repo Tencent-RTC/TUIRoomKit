@@ -78,7 +78,6 @@ import {
 import { RoomType,
   useDeviceState,
   useRoomState,
-  useRoomModal,
 } from 'tuikit-atomicx-vue3/room';
 import CameraButton from '../../components/CameraButton/index.vue';
 import JoinRoomButton from '../../components/JoinRoomButton/index.vue';
@@ -89,6 +88,7 @@ import ScheduledRoomButton from '../../components/ScheduledRoomButton/index.vue'
 import { ScheduledRoomList } from '../../components/ScheduleRoomPanel';
 import StartRoomButton from '../../components/StartRoomButton/index.vue';
 import ThemeButton from '../../components/ThemeButton/index.vue';
+
 
 interface Emits {
   (e: 'create-room', roomId: string, roomType: RoomType): void;
@@ -127,8 +127,6 @@ const {
   stopCameraTest,
   stopMicrophoneTest,
 } = useDeviceState();
-const { handleErrorWithModal } = useRoomModal();
-
 watch(isMicrophoneTesting, () => {
   emit('microphone-preference-change', isMicrophoneTesting.value);
 });
@@ -199,17 +197,9 @@ onMounted(() => {
   const roomPreviewVideo = document.getElementById('room-preview-video');
   TUIRoomEngine.once('ready', async () => {
     if (roomPreviewVideo) {
-      try {
-        await startCameraTest({ view: roomPreviewVideo as HTMLDivElement });
-      } catch (error: any) {
-        handleErrorWithModal(error);
-      }
+      startCameraTest({ view: roomPreviewVideo as HTMLDivElement });
     }
-    try {
-      await startMicrophoneTest();
-    } catch (error: any) {
-      handleErrorWithModal(error);
-    }
+    startMicrophoneTest();
   });
 });
 

@@ -1,6 +1,12 @@
 <template>
   <div class="virtual-background">
     <div id="stream-preview" class="stream-preview">
+      <div
+        v-if="!isCameraPreviewing && !isLoading"
+        class="attention-info"
+      >
+        <span class="preview-unavailable-info">{{ t('MediaCapture.CameraPreviewUnavailable') }}</span>
+      </div>
       <div v-if="isLoading" class="mask" />
       <div v-if="isLoading" class="spinner" />
     </div>
@@ -74,9 +80,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
 import { TOAST_TYPE, TUIButton, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState } from 'tuikit-atomicx-vue3/room';
-import { useVirtualBackgroundState } from 'tuikit-atomicx-vue3/room';
-import { VirtualBackgroundEvent, VirtualBackgroundType } from 'tuikit-atomicx-vue3/room';
+import { DeviceType, useDeviceState, useVirtualBackgroundState, VirtualBackgroundEvent, VirtualBackgroundType } from 'tuikit-atomicx-vue3/room';
+import { handleMediaCaptureError } from '../../hooks/useMediaCaptureError';
 // Asset imports
 import BlurredBackground from './assets/blurred-background.png';
 import CloseVirtualBackground from './assets/close-virtual-background.png';
@@ -142,6 +147,9 @@ function resolveInitialSelection(): BackgroundType {
 const selectedBackground = ref<BackgroundType>(resolveInitialSelection());
 const isLoading = ref(false);
 const isInitialized = ref(false);
+// Tracks the preview started by this panel only, so the hint reflects what is
+// actually rendered in `#stream-preview`.
+const isCameraPreviewing = ref(false);
 
 // Helper functions
 /**
@@ -174,13 +182,20 @@ async function closePanel() {
   emit('close');
 }
 
+// Virtual background needs an extra package the user has to enable in the console.
+const ERR_VIRTUAL_BACKGROUND_PACKAGE_REQUIRED = 5401;
+
 /**
- * Show error toast message
+ * Show an error raised by the virtual background APIs. Camera capture failures
+ * are not handled here, they go through handleMediaCaptureError.
  */
-function showErrorToast(message: string) {
+function showVirtualBackgroundError(error: any, fallbackKey: string) {
+  const messageKey = error?.code === ERR_VIRTUAL_BACKGROUND_PACKAGE_REQUIRED
+    ? 'VirtualBackground.PackageRequired'
+    : fallbackKey;
   TUIToast({
     type: TOAST_TYPE.ERROR,
-    message: t(message),
+    message: t(messageKey),
   });
 }
 
@@ -190,9 +205,17 @@ function showErrorToast(message: string) {
 async function initializeVirtualBackground() {
   isLoading.value = true;
   isInitialized.value = false;
+  isCameraPreviewing.value = false;
   try {
     await initVirtualBackground({ assetsPath: props.assetsPath });
-    await startCameraTest({ view: 'stream-preview' });
+    try {
+      await startCameraTest({ view: 'stream-preview' });
+      isCameraPreviewing.value = true;
+    } catch (error) {
+      console.error('Failed to start camera preview:', error);
+      handleMediaCaptureError({ error, deviceType: DeviceType.Camera });
+      return;
+    }
 
     selectedBackground.value = resolveInitialSelection();
     const config = getVirtualBackgroundConfig(selectedBackground.value);
@@ -200,7 +223,7 @@ async function initializeVirtualBackground() {
     isInitialized.value = true;
   } catch (error) {
     console.error('Failed to initialize virtual background:', error);
-    showErrorToast('VirtualBackground.InitializeFailed');
+    showVirtualBackgroundError(error, 'VirtualBackground.InitializeFailed');
   } finally {
     isLoading.value = false;
   }
@@ -222,7 +245,7 @@ async function applyVirtualBackground(type: BackgroundType) {
     await setVirtualBackground(config);
   } catch (error) {
     console.error('Failed to apply virtual background:', error);
-    showErrorToast('VirtualBackground.ApplyFailed');
+    showVirtualBackgroundError(error, 'VirtualBackground.ApplyFailed');
   } finally {
     isLoading.value = false;
   }
@@ -241,7 +264,7 @@ async function confirmVirtualBackground() {
     closePanel();
   } catch (error) {
     console.error('Failed to save virtual background:', error);
-    showErrorToast('VirtualBackground.SaveFailed');
+    showVirtualBackgroundError(error, 'VirtualBackground.SaveFailed');
   }
 }
 
@@ -256,7 +279,10 @@ async function cancelVirtualBackground() {
  * Handle virtual background error event
  */
 function handleVirtualBackgroundAbort() {
-  showErrorToast('VirtualBackground.Aborted');
+  TUIToast({
+    type: TOAST_TYPE.ERROR,
+    message: t('VirtualBackground.Aborted'),
+  });
 }
 
 // Lifecycle hooks
@@ -271,6 +297,7 @@ onMounted(async () => {
 onUnmounted(() => {
   setVirtualBackground(virtualBackgroundConfig.value || { enable: false });
   stopCameraTest();
+  isCameraPreviewing.value = false;
   unsubscribeEvent(
     VirtualBackgroundEvent.onAbort,
     handleVirtualBackgroundAbort,
@@ -297,6 +324,25 @@ onUnmounted(() => {
   overflow: hidden;
   border-radius: 8px;
   background-color: var(--uikit-color-black-1);
+}
+
+// Sits below the mask and spinner of the preview area.
+.attention-info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+
+  .preview-unavailable-info {
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--uikit-color-gray-7);
+  }
 }
 
 .setting {

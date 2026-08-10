@@ -1,16 +1,22 @@
 <template>
   <div class="room-chat">
+    <!-- Remount on room switch so Barrage keeps a roomId snapshot (keepAlive-safe). -->
     <BarrageList
+      v-if="currentRoom?.roomId"
+      :key="currentRoom.roomId"
       ref="barrageListRef"
       class="room-message-list"
+      :roomId="currentRoom.roomId"
     >
       <template #user-badge="{ message }">
         <span :class="['user-badge', getRoleClass(message.sender.userId)]">{{ getRoleLabel(message.sender.userId) }}</span>
       </template>
     </BarrageList>
     <BarrageInput
+      v-if="currentRoom?.roomId"
+      :key="`input-${currentRoom.roomId}`"
+      :roomId="currentRoom.roomId"
       class="room-message-input"
-      hideSendButton
       :placeholder="placeholder"
       :disabled="localParticipant?.isMessageDisabled"
     />
@@ -20,8 +26,8 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import { useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { BarrageInput, BarrageList } from 'tuikit-atomicx-vue3/live';
 import { useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
+import { BarrageInput, BarrageList } from './Barrage';
 
 interface Props {
   isActive?: boolean;
@@ -73,7 +79,7 @@ const placeholder = computed(() =>
 
 watch(() => props.isActive, (newVal, oldVal) => {
   if (newVal && !oldVal && barrageListRef.value) {
-    barrageListRef.value?.scrollToBottom({ behavior: 'smooth' });
+    barrageListRef.value?.scrollToBottom('smooth');
   }
 });
 </script>
@@ -95,8 +101,6 @@ watch(() => props.isActive, (newVal, oldVal) => {
 
   .room-message-input {
     flex-shrink: 0;
-    border: 1px solid var(--stroke-color-secondary);
-    border-radius: 8px;
   }
 }
 

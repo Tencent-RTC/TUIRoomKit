@@ -4,9 +4,10 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue';
-import { conference, ConferenceMainView, RoomEvent as ConferenceRoomEvent, BuiltinWidget } from '@tencentcloud/roomkit-web-vue3';
+import { conference, ConferenceMainView, RoomEvent as ConferenceRoomEvent, handleMediaCaptureError, InterceptorAction } from '@tencentcloud/roomkit-web-vue3';
 import {
   useUIKit,
+  TUIMessageBox,
 } from '@tencentcloud/uikit-base-component-vue3';
 import {
   useLoginState,
@@ -95,21 +96,13 @@ async function handleOpenCamera() {
     updateVideoQuality({ quality: VideoQuality.Quality720P });
   }
   if (getCameraPreference()) {
-    try {
-      await openLocalCamera();
-    } catch (error) {
-      handleErrorWithModal(error);
-    }
+    await openLocalCamera();
   }
 }
 
 async function handleOpenMicrophone() {
-  try {
-    await muteMicrophone();
-    await openLocalMicrophone();
-  } catch (error) {
-    handleErrorWithModal(error);
-  }
+  await muteMicrophone();
+  await openLocalMicrophone();
   if (getMicrophonePreference()) {
     await unmuteMicrophone();
   }
@@ -119,11 +112,30 @@ const handleBackHome = () => {
   router.replace('/home');
 };
 
+let removeScreenShareInterceptor: (() => void) | undefined;
+
 onMounted(() => {
   conference.on(ConferenceRoomEvent.ROOM_DISMISS, handleBackHome);
   conference.on(ConferenceRoomEvent.ROOM_LEAVE, handleBackHome);
   conference.on(ConferenceRoomEvent.ROOM_ERROR, handleBackHome);
   conference.on(ConferenceRoomEvent.KICKED_OUT, handleBackHome);
+
+  removeScreenShareInterceptor = conference.onWill(
+    InterceptorAction.StartScreenShare,
+    (_action, next, abort) => {
+      TUIMessageBox.confirm({
+        title: t('ScreenShare.StartSharing'),
+        content: t('ScreenShare.StartSharingConfirm'),
+        callback: async (action) => {
+          if (action === 'confirm') {
+            await next();
+          } else {
+            abort();
+          }
+        },
+      });
+    },
+  );
 });
 
 onUnmounted(() => {
@@ -131,6 +143,7 @@ onUnmounted(() => {
   conference.off(ConferenceRoomEvent.ROOM_LEAVE, handleBackHome);
   conference.off(ConferenceRoomEvent.ROOM_ERROR, handleBackHome);
   conference.off(ConferenceRoomEvent.KICKED_OUT, handleBackHome);
+  removeScreenShareInterceptor?.();
 });
 
 </script>

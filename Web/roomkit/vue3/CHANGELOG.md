@@ -4,6 +4,24 @@
 
 ---
 
+## [6.1.5] - 2026-08-09
+
+### Added
+
+- Migrated the seminar barrage (on-screen comments) feature to be maintained within RoomKit.
+- Added clear error prompts for device permission capture failures, covering both PC and mobile scenarios.
+
+### Fixed
+
+- Fixed an issue where opening the member list while screen sharing with the top-bar layout incorrectly switched to the sidebar layout.
+- Unified error handling for failed video preview rendering.
+- Fixed abnormal whiteboard display caused by local preview going through `videoMixer`, and adjusted barrage styles accordingly.
+- Removed obsolete virtual background code and fixed background saving compatibility when the camera is not enabled.
+
+### Changed
+
+Lowered the frequency and log level of `KeyMetricsStats` reporting.
+
 ## [6.1.4] - 2026-08-03
 
 ### Added

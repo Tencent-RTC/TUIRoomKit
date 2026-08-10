@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue';
-import { conference, ConferenceMainViewH5, RoomEvent as ConferenceRoomEvent, BuiltinWidget } from '@tencentcloud/roomkit-web-vue3';
+import { conference, ConferenceMainViewH5, RoomEvent as ConferenceRoomEvent, handleMediaCaptureError } from '@tencentcloud/roomkit-web-vue3';
 import {
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
@@ -96,21 +96,13 @@ async function handleOpenCamera() {
     updateVideoQuality({ quality: VideoQuality.Quality720P });
   }
   if (getCameraPreference()) {
-    try {
-      await openLocalCamera();
-    } catch (error) {
-      handleErrorWithModal(error);
-    }
+    await openLocalCamera();
   }
 }
 
 async function handleOpenMicrophone() {
-  try {
-    await muteMicrophone();
-    await openLocalMicrophone();
-  } catch (error) {
-    handleErrorWithModal(error);
-  }
+  await muteMicrophone();
+  await openLocalMicrophone();
   if (getMicrophonePreference()) {
     await unmuteMicrophone();
   }

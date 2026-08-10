@@ -30,6 +30,7 @@ export {
 
 export { useRoomInvitation } from './hooks/useRoomInvitation';
 export { useRoomInvitationH5 } from './hooks/useRoomInvitationH5';
+export { handleMediaCaptureError } from './hooks/useMediaCaptureError';
 
 // Debug-only helper for local development / quickstart.
 // Do not use secretKey-based UserSig generation in production clients.

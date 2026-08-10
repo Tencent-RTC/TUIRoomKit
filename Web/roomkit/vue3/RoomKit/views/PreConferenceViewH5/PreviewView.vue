@@ -61,7 +61,7 @@
 import { onMounted, onBeforeUnmount, watch } from 'vue';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import { useUIKit, IconLoading } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, useRoomModal } from 'tuikit-atomicx-vue3/room';
+import { useDeviceState } from 'tuikit-atomicx-vue3/room';
 import CameraButtonH5 from '../../components/CameraButtonH5/index.vue';
 import JoinRoomButtonH5 from '../../components/JoinRoomButtonH5/index.vue';
 import LanguageButton from '../../components/LanguageButton/index.vue';
@@ -90,8 +90,6 @@ const {
   stopCameraTest,
   stopMicrophoneTest,
 } = useDeviceState();
-const { handleErrorWithModal } = useRoomModal();
-
 watch(isMicrophoneTesting, (newVal) => {
   emit('microphone-preference-change', newVal);
 });
@@ -115,17 +113,9 @@ onMounted(() => {
   const roomPreviewVideo = document.getElementById('room-preview-video');
   TUIRoomEngine.once('ready', async () => {
     if (roomPreviewVideo) {
-      try {
-        await startCameraTest({ view: roomPreviewVideo as HTMLDivElement });
-      } catch (error: any) {
-        handleErrorWithModal(error);
-      }
+      startCameraTest({ view: roomPreviewVideo as HTMLDivElement });
     }
-    try {
-      await startMicrophoneTest();
-    } catch (error: any) {
-      handleErrorWithModal(error);
-    }
+    startMicrophoneTest();
   });
 });
 

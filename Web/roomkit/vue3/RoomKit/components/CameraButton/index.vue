@@ -49,24 +49,25 @@ import {
   IconUnSupport,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, useRoomState, DeviceStatus, useRoomParticipantState, DeviceError, RoomParticipantRole, useRoomModal, RoomType } from 'tuikit-atomicx-vue3/room';
-import VideoSettingPanel from '../VideoSettingPanel/index.vue';
+import { useDeviceState, useRoomState, DeviceStatus, useRoomParticipantState, DeviceError, DeviceType, RoomParticipantRole, RoomType } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
 import { InterceptorAction } from '../../adapter/type';
+import { handleMediaCaptureError } from '../../hooks/useMediaCaptureError';
 import IconButton from '../base/IconButton.vue';
 import vClickOutside from '../base/vClickOutside';
+import VideoSettingPanel from '../VideoSettingPanel/index.vue';
 
 const props = defineProps<{
   cameraTestContainer?: HTMLDivElement | string;
 }>();
 
 const { t } = useUIKit();
-const { handleErrorWithModal } = useRoomModal();
 const { cameraStatus, cameraLastError, isCameraTesting, startCameraTest, stopCameraTest, openLocalCamera, closeLocalCamera } = useDeviceState();
 const { currentRoom } = useRoomState();
 const { localParticipant, participantList } = useRoomParticipantState();
 
 const showVideoSettingTab: Ref<boolean> = ref(false);
+const isProcessing = ref(false);
 const isCameraDisabled = computed(() => {
   if (localParticipant.value?.role === RoomParticipantRole.Owner || localParticipant.value?.role === RoomParticipantRole.Admin) {
     return false;
@@ -117,8 +118,11 @@ const title = computed(() => {
   return cameraStatus.value === DeviceStatus.On ? t('Camera.Stop') : t('Camera.Start');
 });
 
-// TODO：处理多次连续点击的情况，需要优化
 async function handleClickIcon() {
+  if (isProcessing.value) {
+    return;
+  }
+  isProcessing.value = true;
   try {
     if (isCameraDisabled.value) {
       TUIToast.warning({
@@ -145,66 +149,61 @@ async function handleClickIcon() {
         await closeLocalCamera();
       });
     } else if (isLowerRoleParticipantPublishingInWebinar.value) {
+      // Release the lock immediately — the actual open happens after user confirms.
+      isProcessing.value = false;
       TUIMessageBox.confirm({
         title: t('Camera.SomeonePresentingTitle'),
         content: t('Camera.SomeonePresentingConfirm'),
         callback: async (action) => {
           if (action === 'confirm') {
-            try {
-              await conference.executeInterceptor(InterceptorAction.OpenCamera, async () => {
-                await openLocalCamera();
-              });
-            } catch (error: any) {
-              handleErrorWithModal(error);
-              handleErrorWithToast(error);
-            }
+            await doOpenLocalCamera();
           }
         },
       });
+      return;
     } else {
       await conference.executeInterceptor(InterceptorAction.OpenCamera, async () => {
         await openLocalCamera();
       });
     }
   } catch (error: any) {
-    handleErrorWithModal(error);
     handleErrorWithToast(error);
+    handleMediaCaptureError({ error, deviceType: DeviceType.Camera });
+  } finally {
+    isProcessing.value = false;
+  }
+}
+
+async function doOpenLocalCamera() {
+  if (isProcessing.value) {
+    return;
+  }
+  isProcessing.value = true;
+  try {
+    await conference.executeInterceptor(InterceptorAction.OpenCamera, async () => {
+      await openLocalCamera();
+    });
+  } catch (error: any) {
+    handleErrorWithToast(error);
+    handleMediaCaptureError({ error, deviceType: DeviceType.Camera });
+  } finally {
+    isProcessing.value = false;
   }
 }
 
 function handleErrorWithToast(error: { code?: number } | unknown) {
-  let message = t('Camera.UnknownError');
-  switch (cameraLastError.value) {
-    case DeviceError.NotSupportCapture:
-      message = t('Camera.NotSupportCapture');
-      break;
-    case DeviceError.NoSystemPermission:
-      message = t('Camera.NoSystemPermission');
-      break;
-    case DeviceError.OccupiedError:
-      message = t('Camera.OccupiedError');
-      break;
-    case DeviceError.NoDeviceDetected:
-      message = t('Camera.NoDeviceDetected');
-      break;
-    default:
-      break;
-  }
   const err = error as { code?: number } | undefined;
   const ERROR_SPEAKER_LIMIT_EXCEEDED = 100253;
   switch (err?.code) {
     case ERROR_SPEAKER_LIMIT_EXCEEDED:
-      message = t('Camera.HigherRoleParticipantPublishingInWebinar');
+      TUIToast.warning({ message: t('Camera.HigherRoleParticipantPublishingInWebinar') });
       break;
     case TUIErrorCode.ERR_FREQ_LIMIT:
-      message = t('RoomCommon.FrequencyLimit');
+      TUIToast.warning({ message: t('RoomCommon.FrequencyLimit') });
       break;
     default:
       break;
   }
-  TUIToast.warning({
-    message,
-  });
 }
 
 function handleMore() {

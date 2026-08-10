@@ -42,9 +42,11 @@ import {
   IconUnSupport,
   useUIKit,
 } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, useRoomState, DeviceStatus, useRoomParticipantState, DeviceError, RoomParticipantRole, useRoomModal } from 'tuikit-atomicx-vue3/room';
+
+import { useDeviceState, useRoomState, DeviceStatus, useRoomParticipantState, DeviceError, DeviceType, RoomParticipantRole } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
 import { InterceptorAction } from '../../adapter/type';
+import { handleMediaCaptureError } from '../../hooks/useMediaCaptureError';
 import IconButtonH5 from '../base/IconButtonH5.vue';
 import vClickOutside from '../base/vClickOutside';
 
@@ -60,12 +62,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { t } = useUIKit();
-const { handleErrorWithModal } = useRoomModal();
 const { cameraStatus, cameraLastError, isCameraTesting, startCameraTest, stopCameraTest, openLocalCamera, closeLocalCamera } = useDeviceState();
 const { currentRoom } = useRoomState();
 const { localParticipant } = useRoomParticipantState();
 
 const showVideoSettingTab: Ref<boolean> = ref(false);
+const isProcessing = ref(false);
 
 const title = computed(() => {
   if (!props.showDescription) {
@@ -89,8 +91,11 @@ const isCameraDisabled = computed(() => {
 
 const hasNotSupportError = computed(() => cameraLastError.value !== DeviceError.NoError);
 
-// TODO：处理多次连续点击的情况，需要优化
 async function handleClickIcon() {
+  if (isProcessing.value) {
+    return;
+  }
+  isProcessing.value = true;
   try {
     if (isCameraDisabled.value) {
       TUIToast.warning({
@@ -107,45 +112,19 @@ async function handleClickIcon() {
       return;
     }
     if (localParticipant.value?.cameraStatus === DeviceStatus.On) {
-      conference.executeInterceptor(InterceptorAction.CloseCamera, async () => {
+      await conference.executeInterceptor(InterceptorAction.CloseCamera, async () => {
         await closeLocalCamera();
       });
     } else {
-      conference.executeInterceptor(InterceptorAction.OpenCamera, async () => {
+      await conference.executeInterceptor(InterceptorAction.OpenCamera, async () => {
         await openLocalCamera();
       });
     }
   } catch (error: any) {
-    handleErrorWithModal(error);
-    handleErrorWithToast();
+    handleMediaCaptureError({ error, deviceType: DeviceType.Camera });
+  } finally {
+    isProcessing.value = false;
   }
-}
-
-function handleErrorWithToast() {
-  if (cameraLastError.value === DeviceError.NoError) {
-    return;
-  }
-  let message = '';
-  switch (cameraLastError.value) {
-    case DeviceError.NotSupportCapture:
-      message = t('Camera.NotSupportCapture');
-      break;
-    case DeviceError.NoSystemPermission:
-      message = t('Camera.NoSystemPermission');
-      break;
-    case DeviceError.OccupiedError:
-      message = t('Camera.OccupiedError');
-      break;
-    case DeviceError.NoDeviceDetected:
-      message = t('Camera.NoDeviceDetected');
-      break;
-    default:
-      message = t('Camera.UnknownError');
-      break;
-  }
-  TUIToast.warning({
-    message,
-  });
 }
 
 function handleHideVideoSettingTab() {

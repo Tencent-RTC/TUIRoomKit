@@ -8,12 +8,18 @@ type Task = () => void | Promise<void>;
 export class DataReport {
   private taskQueue: Task[] = [];
   private isReady = false;
+  // Deduplicate per-page-lifecycle: each key is reported at most once per session.
+  private reportedKeys = new Set<MetricsKey>();
 
   constructor() {
     this.bindEvent();
   }
 
   public reportCount(key: MetricsKey) {
+    if (this.reportedKeys.has(key)) {
+      return;
+    }
+    this.reportedKeys.add(key);
     try {
       const task = this.createReportCountTask(key);
       if (!this.isReady) {

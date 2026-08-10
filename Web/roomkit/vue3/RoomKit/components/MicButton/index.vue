@@ -37,16 +37,16 @@
 import type { Ref } from 'vue';
 import { ref, computed } from 'vue';
 import { useUIKit, TUIToast, IconUnSupport } from '@tencentcloud/uikit-base-component-vue3';
-import { useDeviceState, useRoomState, useRoomParticipantState, RoomParticipantRole, DeviceStatus, DeviceError, useRoomModal } from 'tuikit-atomicx-vue3/room';
-import AudioSettingPanel from '../AudioSettingPanel/index.vue';
+import { useDeviceState, useRoomState, useRoomParticipantState, RoomParticipantRole, DeviceStatus, DeviceError, DeviceType } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
 import { InterceptorAction } from '../../adapter/type';
+import { handleMediaCaptureError } from '../../hooks/useMediaCaptureError';
+import AudioSettingPanel from '../AudioSettingPanel/index.vue';
 import IconButton from '../base/IconButton.vue';
 import vClickOutside from '../base/vClickOutside';
 import AudioIcon from './AudioIcon.vue';
 
 const { t } = useUIKit();
-const { handleErrorWithModal } = useRoomModal();
 const { currentRoom } = useRoomState();
 const {
   currentMicVolume,
@@ -61,6 +61,7 @@ const {
 const { localParticipant, muteMicrophone, unmuteMicrophone } = useRoomParticipantState();
 
 const showAudioSettingTab: Ref<boolean> = ref(false);
+const isProcessing = ref(false);
 
 const isMicrophoneDisabled = computed(() => {
   if (localParticipant.value?.role === RoomParticipantRole.Owner || localParticipant.value?.role === RoomParticipantRole.Admin) {
@@ -82,6 +83,10 @@ const isMuted = computed(() => {
 const hasNotSupportError = computed(() => DeviceError.NoError !== microphoneLastError.value);
 
 async function handleClickIcon() {
+  if (isProcessing.value) {
+    return;
+  }
+  isProcessing.value = true;
   try {
     if (isMicrophoneDisabled.value) {
       TUIToast.warning({
@@ -98,46 +103,20 @@ async function handleClickIcon() {
       return;
     }
     if (microphoneStatus.value === DeviceStatus.On) {
-      conference.executeInterceptor(InterceptorAction.CloseMicrophone, async () => {
+      await conference.executeInterceptor(InterceptorAction.CloseMicrophone, async () => {
         await muteMicrophone();
       });
     } else {
-      conference.executeInterceptor(InterceptorAction.OpenMicrophone, async () => {
+      await conference.executeInterceptor(InterceptorAction.OpenMicrophone, async () => {
         await openLocalMicrophone();
         await unmuteMicrophone();
       });
     }
   } catch (error) {
-    handleErrorWithModal(error);
-    handleErrorWithToast();
+    handleMediaCaptureError({ error, deviceType: DeviceType.Microphone });
+  } finally {
+    isProcessing.value = false;
   }
-}
-
-function handleErrorWithToast() {
-  if (microphoneLastError.value === DeviceError.NoError) {
-    return;
-  }
-  let message = '';
-  switch (microphoneLastError.value) {
-    case DeviceError.NotSupportCapture:
-      message = t('Microphone.NotSupportCapture');
-      break;
-    case DeviceError.NoSystemPermission:
-      message = t('Microphone.NoSystemPermission');
-      break;
-    case DeviceError.OccupiedError:
-      message = t('Microphone.OccupiedError');
-      break;
-    case DeviceError.NoDeviceDetected:
-      message = t('Microphone.NoDeviceDetected');
-      break;
-    default:
-      message = t('Microphone.UnknownError');
-      break;
-  }
-  TUIToast.warning({
-    message,
-  });
 }
 
 function handleMore() {
