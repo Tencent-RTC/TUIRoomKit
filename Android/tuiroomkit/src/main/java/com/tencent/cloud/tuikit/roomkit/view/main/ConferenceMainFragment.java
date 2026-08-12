@@ -74,6 +74,10 @@ public class ConferenceMainFragment extends Fragment implements ConferenceEventC
         mViewModel.startConference(startConferenceParams, new ConferenceMainViewModel.GetConferenceInfoCallback() {
             @Override
             public void onSuccess(TUIRoomDefine.RoomInfo roomInfo) {
+                if (!isAdded()) {
+                    Log.w(TAG, "startConference onSuccess but fragment not attached");
+                    return;
+                }
                 Map<String, Object> param = new HashMap<>(3);
                 param.put(KEY_CONFERENCE_INFO, roomInfo);
                 param.put(KEY_CONFERENCE_ERROR, SUCCESS);
@@ -83,6 +87,10 @@ public class ConferenceMainFragment extends Fragment implements ConferenceEventC
 
             @Override
             public void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message) {
+                if (!isAdded()) {
+                    Log.w(TAG, "startConference onError but fragment not attached, error=" + error);
+                    return;
+                }
                 onDismiss();
                 Map<String, Object> param = new HashMap<>(3);
                 param.put(KEY_CONFERENCE_INFO, roomInfo);
@@ -103,6 +111,10 @@ public class ConferenceMainFragment extends Fragment implements ConferenceEventC
         mViewModel.joinConference(joinConferenceParams, new ConferenceMainViewModel.GetConferenceInfoCallback() {
             @Override
             public void onSuccess(TUIRoomDefine.RoomInfo roomInfo) {
+                if (!isAdded()) {
+                    Log.w(TAG, "joinConference onSuccess but fragment not attached");
+                    return;
+                }
                 Map<String, Object> param = new HashMap<>(3);
                 param.put(KEY_CONFERENCE_INFO, roomInfo);
                 param.put(KEY_CONFERENCE_ERROR, SUCCESS);
@@ -112,6 +124,10 @@ public class ConferenceMainFragment extends Fragment implements ConferenceEventC
 
             @Override
             public void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message) {
+                if (!isAdded()) {
+                    Log.w(TAG, "joinConference onError but fragment not attached, error=" + error);
+                    return;
+                }
                 if (error == TUICommonDefine.Error.NEED_PASSWORD) {
                     popEnterPasswordView(joinConferenceParams);
                 } else {
@@ -139,7 +155,9 @@ public class ConferenceMainFragment extends Fragment implements ConferenceEventC
             @Override
             public void onConfirm(String password) {
                 if (TextUtils.isEmpty(password)) {
-                    RoomToast.toastShortMessageCenter(getContext().getString(R.string.tuiroomkit_password_is_empty));
+                    if (isAdded()) {
+                        RoomToast.toastShortMessageCenter(getString(R.string.tuiroomkit_password_is_empty));
+                    }
                     return;
                 }
                 mPasswordPopView.enableJoinRoomButton(false);
@@ -152,19 +170,31 @@ public class ConferenceMainFragment extends Fragment implements ConferenceEventC
         mViewModel.joinEncryptRoom(joinConferenceParams, password, new ConferenceMainViewModel.GetConferenceInfoCallback() {
             @Override
             public void onSuccess(TUIRoomDefine.RoomInfo roomInfo) {
+                if (!isAdded()) {
+                    Log.w(TAG, "joinEncryptRoom onSuccess but fragment not attached");
+                    return;
+                }
                 Map<String, Object> param = new HashMap<>(3);
                 param.put(KEY_CONFERENCE_INFO, roomInfo);
                 param.put(KEY_CONFERENCE_ERROR, SUCCESS);
                 param.put(KEY_CONFERENCE_MESSAGE, "");
                 TUICore.notifyEvent(KEY_CONFERENCE, KEY_CONFERENCE_JOINED, param);
-                mPasswordPopView.dismiss();
+                if (mPasswordPopView != null) {
+                    mPasswordPopView.dismiss();
+                }
             }
 
             @Override
             public void onError(TUIRoomDefine.RoomInfo roomInfo, TUICommonDefine.Error error, String message) {
+                if (!isAdded()) {
+                    Log.w(TAG, "joinEncryptRoom onError but fragment not attached, error=" + error);
+                    return;
+                }
                 if (error == TUICommonDefine.Error.WRONG_PASSWORD) {
-                    mPasswordPopView.enableJoinRoomButton(true);
-                    RoomToast.toastShortMessageCenter(getContext().getString(R.string.tuiroomkit_room_password_error));
+                    if (mPasswordPopView != null) {
+                        mPasswordPopView.enableJoinRoomButton(true);
+                    }
+                    RoomToast.toastShortMessageCenter(getString(R.string.tuiroomkit_room_password_error));
                 } else {
                     Map<String, Object> param = new HashMap<>(3);
                     param.put(KEY_CONFERENCE_INFO, roomInfo);
@@ -279,6 +309,10 @@ public class ConferenceMainFragment extends Fragment implements ConferenceEventC
     }
 
     public void onDismiss() {
+        if (mActivity == null) {
+            Log.w(TAG, "onDismiss but activity already released");
+            return;
+        }
         mActivity.finish();
         release();
     }
@@ -327,6 +361,10 @@ public class ConferenceMainFragment extends Fragment implements ConferenceEventC
     }
 
     private String transErrorMessage(TUICommonDefine.Error error, String message) {
+        if (!isAdded()) {
+            Log.w(TAG, "transErrorMessage fragment not attached, error=" + error);
+            return message;
+        }
         String errorMessage = "";
         switch (error) {
             case ROOM_ID_NOT_EXIST:
@@ -361,6 +399,10 @@ public class ConferenceMainFragment extends Fragment implements ConferenceEventC
     }
 
     private void showErrorToast(TUICommonDefine.Error error) {
+        if (!isAdded()) {
+            Log.w(TAG, "showErrorToast fragment not attached, error=" + error);
+            return;
+        }
         String errorMessage = "";
         switch (error) {
             case ROOM_ID_NOT_EXIST:
