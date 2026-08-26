@@ -7,7 +7,7 @@ import SettingButton from './index.vue';
 const unregister = conference.registerWidget({
   id: BuiltinWidget.SettingsWidget,
   zone: { pc: 'bottom-center' },
-  order: 8,
+  order: 9,
   component: SettingButton,
 });
 

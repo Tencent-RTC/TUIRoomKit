@@ -1,9 +1,13 @@
-import AIToolsButton from './AIToolsButton/index.vue';
+import {
+  ASRButton,
+  ASRButtonH5,
+  ASRRegistrar,
+  ASRRegistrarH5,
+} from './ASRTools';
 import CloudRecordingButton from './CloudRecording/CloudRecordingButton.vue';
 import CloudRecordingButtonH5 from './CloudRecording/CloudRecordingButtonH5.vue';
 import CloudRecordingStatus from './CloudRecording/CloudRecordingStatus.vue';
 import CloudRecordingStatusH5 from './CloudRecording/CloudRecordingStatusH5.vue';
-import AIToolsButtonH5 from './AIToolsButtonH5/index.vue';
 import BasicBeautyButton from './BasicBeautyButton/index.vue';
 import CallButton from './CallButton/index.vue';
 import CallButtonH5 from './CallButtonH5/index.vue';
@@ -72,7 +76,6 @@ import ChatRegistrar from './RoomChat/ChatRegistrar.vue';
 import MemberRegistrar from './ParticipantButton/MemberRegistrar.vue';
 import VirtualBackgroundRegistrar from './VirtualBackgroundButton/VirtualBackgroundRegistrar.vue';
 import BasicBeautyRegistrar from './BasicBeautyButton/BasicBeautyRegistrar.vue';
-import AIToolsRegistrar from './AIToolsButton/AIToolsRegistrar.vue';
 import SettingsRegistrar from './SettingButton/SettingsRegistrar.vue';
 import LeaveRoomRegistrar from './LeaveRoomButton/LeaveRoomRegistrar.vue';
 import BarrageRegistrar from './RoomBarrage/BarrageRegistrar.vue';
@@ -89,7 +92,6 @@ import CameraRegistrarH5 from './CameraButtonH5/CameraRegistrarH5.vue';
 import InviteRegistrarH5 from './CallButtonH5/InviteRegistrarH5.vue';
 import ChatRegistrarH5 from './RoomChatH5/ChatRegistrarH5.vue';
 import SettingsRegistrarH5 from './SettingButtonH5/SettingsRegistrarH5.vue';
-import AIToolsRegistrarH5 from './AIToolsButtonH5/AIToolsRegistrarH5.vue';
 import WhiteboardRegistrarH5 from './Whiteboard/WhiteboardRegistrarH5.vue';
 
 export {
@@ -124,7 +126,7 @@ export {
   ScheduledRoomButton,
   StartRoomButton,
   RoomSidePanel,
-  AIToolsButton,
+  ASRButton,
   showRoomInvitation,
   hideRoomInvitation,
   BarrageButton,
@@ -146,7 +148,7 @@ export {
   SwitchCameraButtonH5,
   PasswordDialogH5,
   LoginUserInfoH5,
-  AIToolsButtonH5,
+  ASRButtonH5,
   WhiteboardEntryButtonH5,
   showRoomInvitationH5,
   hideRoomInvitationH5,
@@ -166,7 +168,7 @@ export {
   MemberRegistrar,
   VirtualBackgroundRegistrar,
   BasicBeautyRegistrar,
-  AIToolsRegistrar,
+  ASRRegistrar,
   SettingsRegistrar,
   LeaveRoomRegistrar,
   BarrageRegistrar,
@@ -182,7 +184,7 @@ export {
   InviteRegistrarH5,
   ChatRegistrarH5,
   SettingsRegistrarH5,
-  AIToolsRegistrarH5,
+  ASRRegistrarH5,
   CloudRecordingRegistrarH5,
   WhiteboardRegistrarH5,
 };

@@ -4,6 +4,24 @@
 
 ---
 
+## [6.1.8] - 2026-08-26
+
+### Fixed
+
+- Fixed an issue where the PC whiteboard annotation toolbar button could not be clicked.
+
+## [6.1.7] - 2026-08-18
+
+### Changed
+
+- Optimized subtitle interaction: changed the transparent text effect to a blinking-cursor typewriter effect.
+
+## [6.1.6] - 2026-08-17
+
+### Changed
+
+- Optimize real-time subtitle interaction.
+
 ## [6.1.5] - 2026-08-09
 
 ### Added

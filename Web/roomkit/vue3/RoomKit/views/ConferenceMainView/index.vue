@@ -89,7 +89,7 @@
             <MemberRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.MemberWidget)" />
             <VirtualBackgroundRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.VirtualBackgroundWidget) && notWebinar" />
             <BasicBeautyRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.BasicBeautyWidget) && ownerOrNotWebinar" />
-            <AIToolsRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) && notWebinar" />
+            <ASRRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) && notWebinar" />
             <SettingsRegistrar v-if="conference.getWidgetVisible(BuiltinWidget.SettingsWidget) && ownerOrNotWebinar" />
             <BarrageRegistrar
               v-if="conference.getWidgetVisible(BuiltinWidget.BarrageWidget) && isWebinar"
@@ -176,7 +176,7 @@ import {
   MemberRegistrar,
   VirtualBackgroundRegistrar,
   BasicBeautyRegistrar,
-  AIToolsRegistrar,
+  ASRRegistrar,
   SettingsRegistrar,
   LeaveRoomRegistrar,
   BarrageRegistrar,
@@ -434,7 +434,7 @@ onUnmounted(() => {
   position: absolute;
   bottom: 0;
   left: 0;
-  z-index: 1;
+  z-index: 12;
   box-sizing: border-box;
   display: flex;
   align-items: center;
