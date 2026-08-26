@@ -1,0 +1,56 @@
+.participantContent {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  height: 50px;
+  border-bottom: 1px solid var(--stroke-color-secondary);
+}
+
+.pendingParticipantItemH5 {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: 50px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    background: var(--list-color-hover);
+  }
+
+  &:last-child .participantContent {
+    border-bottom: none;
+  }
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.userName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusContainer {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+  align-items: center;
+}

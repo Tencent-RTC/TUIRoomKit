@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
 import { useUIKit } from '@tencentcloud/uikit-base-component-react';
-import { RoomParticipantList } from 'tuikit-atomicx-react/room';
+import { RoomParticipantList } from '../RoomParticipantList';
 import { BuiltinWidget } from '../../adapter/type';
 import { useRoomSidePanel } from '../../hooks/useRoomSidePanel';
-import { MemberButton } from './MemberButton';
 
 /**
  * Registration-only component: mounts the member list panel into the side
- * panel store. Mirrors Vue `MemberRegistrar.vue` (empty template, register on
- * mount). Renders the trigger button alongside.
+ * panel store. Returns null — the actual trigger button (`MemberButton`) must
+ * be placed separately in a stable location (e.g. `OverflowBar`) so that
+ * layout changes do not unmount this registrar and inadvertently close the
+ * panel via the cleanup function.
  */
 export function MemberRegistrar() {
   const { t } = useUIKit();
@@ -23,5 +24,5 @@ export function MemberRegistrar() {
     [registerSidePanel, t],
   );
 
-  return <MemberButton />;
+  return null;
 }

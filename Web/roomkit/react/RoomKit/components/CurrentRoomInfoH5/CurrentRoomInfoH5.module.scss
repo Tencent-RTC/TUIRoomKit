@@ -1,0 +1,38 @@
+.roomTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 100%;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-color-primary);
+}
+
+.roomTitleTop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roomTitleName {
+  flex: 1;
+  min-width: 0;
+  max-width: 60vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roomTitleIcon {
+  flex-shrink: 0;
+}
+
+.roomDuration {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}

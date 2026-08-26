@@ -1,0 +1,21 @@
+.videoControl {
+  position: relative;
+  display: flex;
+}
+
+.videoIconContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  line-height: 0;
+}
+
+.unSupportIcon {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+}
+

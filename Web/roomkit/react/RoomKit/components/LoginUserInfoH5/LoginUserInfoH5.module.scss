@@ -1,0 +1,29 @@
+.loginUserInfo {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.trigger {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.userId {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color-primary);
+}
+
+.logoutPopup {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-color-primary);
+  text-align: center;
+  cursor: pointer;
+}

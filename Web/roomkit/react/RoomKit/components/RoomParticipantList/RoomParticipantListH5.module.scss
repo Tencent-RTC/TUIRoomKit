@@ -1,0 +1,111 @@
+.participantListH5 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 200px;
+  height: 100%;
+  background: var(--bg-color-operate);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.searchContainer {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.searchBox {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  color: var(--text-color-primary);
+  background-color: var(--bg-color-input);
+  border-radius: 16px;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 100%;
+  margin-left: 8px;
+  font-size: 14px;
+  color: var(--text-color-primary);
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.tabs {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 3px 4px;
+  margin: 0 20px;
+  cursor: pointer;
+  background-color: var(--bg-color-input);
+  border-radius: 20px;
+}
+
+.tab {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 20px;
+
+  &.active {
+    background-color: var(--bg-color-operate);
+  }
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-color-primary);
+  // Match Vue tab title polish (drop-shadow + slight offset).
+  filter: drop-shadow(0 2px 4px var(--uikit-color-black-8))
+    drop-shadow(0 6px 10px var(--uikit-color-black-8))
+    drop-shadow(0 3px 14px var(--uikit-color-black-8));
+  border-radius: 20px;
+  transform: translateX(4px);
+}
+
+.participantContainer,
+.unjoinedUserContainer {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  max-height: 100%;
+  padding: 10px 0;
+  overflow-y: auto;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-size: 14px;
+  color: #999999;
+}
+
+.footer {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 16px 20px;
+}

@@ -1,0 +1,50 @@
+.participantActionH5 {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.headerTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actionItem {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 0;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  border-bottom: 1px solid var(--stroke-color-secondary);
+  transition: background 0.2s ease;
+
+  &:active {
+    background: var(--list-color-hover);
+  }
+}
+
+.actionIcon {
+  flex-shrink: 0;
+}
+
+.actionText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

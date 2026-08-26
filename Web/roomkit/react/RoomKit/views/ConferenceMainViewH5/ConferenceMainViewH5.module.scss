@@ -1,0 +1,160 @@
+.roomPage {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.roomContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 56px;
+  padding: 8px 16px;
+  background-color: var(--bg-color-bottombar);
+  border-bottom: 1px solid var(--stroke-color-secondary);
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.headerLeft {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  justify-content: flex-start;
+}
+
+.headerCenter {
+  display: flex;
+  flex: 2;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.headerRight {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  width: auto;
+}
+
+.recordingStatusAnchor {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  transition: transform 0.3s;
+  transform: translateY(0);
+
+  &.toolbarVisible {
+    transform: translateY(56px);
+  }
+}
+
+.roomMain {
+  position: absolute;
+  right: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  user-select: none;
+  background-color: var(--bg-color-topbar);
+
+  input,
+  textarea,
+  [contenteditable='true'] {
+    user-select: text;
+  }
+}
+
+/* Align Vue H5 v-tui-loading on <main> (transparent background). */
+.loadingMask {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.loadingMaskActive {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.loadingSpinner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.loadingCircular {
+  flex-shrink: 0;
+  color: var(--button-color-primary-default);
+  animation: conf-h5-loading-rotate 2s linear infinite;
+}
+
+.loadingText {
+  max-width: 200px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--text-color-primary);
+  text-align: center;
+  word-break: break-word;
+}
+
+@keyframes conf-h5-loading-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.roomFooter {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 90px;
+  background-color: var(--bg-color-operate);
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.toolbarHidden {
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+}

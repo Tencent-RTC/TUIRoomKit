@@ -19,6 +19,7 @@ import {
 } from '../../adapter/type';
 import {
   CameraButton,
+  ChatButton,
   ChatRegistrar,
   CloudRecordingButton,
   CloudRecordingStatus,
@@ -29,6 +30,7 @@ import {
   LeaveRoomButton,
   LocalNetworkInfo,
   LoginUserInfo,
+  MemberButton,
   MemberRegistrar,
   MicButton,
   PasswordDialog,
@@ -284,6 +286,12 @@ export function ConferenceMainView(props: ConferenceMainViewProps) {
             )}
         </main>
 
+        {/* Panel registrars are mounted here, outside OverflowBar, so that a
+            layout change (side panel opening/closing) never causes them to
+            unmount and inadvertently clear activeId via their cleanup. */}
+        {notWebinar && <ChatRegistrar />}
+        <MemberRegistrar />
+
         <footer
           className={classNames(styles.controlBar, {
             [styles.toolbarHidden]: !showToolbar,
@@ -298,8 +306,8 @@ export function ConferenceMainView(props: ConferenceMainViewProps) {
             {ownerOrNotWebinar && <ScreenShareButton />}
             {(isOwner || isAdmin) && <CloudRecordingButton />}
             {notWebinar && <InviteButton />}
-            {notWebinar && <ChatRegistrar />}
-            <MemberRegistrar />
+            {notWebinar && <ChatButton />}
+            <MemberButton />
             {ownerOrNotWebinar && <SettingsButton />}
           </OverflowBar>
 
