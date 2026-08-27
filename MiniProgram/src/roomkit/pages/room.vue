@@ -4,13 +4,19 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
 import ConferenceMainView from '../TUIRoom/conference.vue';
 import { conference, RoomEvent } from '../TUIRoom/index.ts';
 import { getBasicInfo } from '../config/basic-info-config';
+import { syncLocalPusherOnPageShow } from '../TUIRoom/hooks/useWxMediaGuard';
 
 declare const uni: any;
 const roomInfo = JSON.parse(uni.getStorageSync('tuiRoom-roomInfo'));
 const userInfo = getBasicInfo();
+
+onShow(() => {
+  syncLocalPusherOnPageShow();
+});
 
 onMounted(async () => {
   const { action, isSeatEnabled, roomParam, roomId } = roomInfo;

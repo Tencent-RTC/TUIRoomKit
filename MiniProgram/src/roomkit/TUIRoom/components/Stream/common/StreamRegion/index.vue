@@ -14,9 +14,11 @@
         @scale="handleScaleChange"
       >
         <trtc-pusher
-          v-if="basicStore.userId === props.streamInfo.userId"
+          v-if="isLocalPusher"
           :id="playRegionDomId"
+          :key="localPusherEpoch"
           ref="pusher"
+          bind:error="handleLivePusherError"
         />
         <trtc-player
           v-if="basicStore.userId !== props.streamInfo.userId"
@@ -27,7 +29,7 @@
       </movable-view>
     </movable-area>
     <div v-if="!streamInfo.hasVideoStream" class="center-user-info-container">
-      <Avatar class="avatar-region" :img-src="userInfo.avatarUrl" />
+      <Avatar class="avatar-region" :img-src="userInfo?.avatarUrl" />
     </div>
     <div class="corner-user-info-container">
       <div
@@ -83,7 +85,13 @@ import {
   TUIRole,
 } from '@tencentcloud/tuiroom-engine-wx';
 import useGetRoomEngine from '../../../../hooks/useRoomEngine';
+import {
+  canMountLocalPusher,
+  localPusherEpoch,
+} from '../../../../hooks/useLocalPusher';
+import { isWeChat } from '../../../../utils/environment';
 import { isInnerScene } from '../../../../utils/constants';
+import { handleLivePusherError } from '../../../../services/function/livePusherError';
 import { storeToRefs } from 'pinia';
 const roomEngine = useGetRoomEngine();
 
@@ -137,71 +145,116 @@ const isScreenStream = computed(
   () => props.streamInfo.streamType === TUIVideoStreamType.kScreenStream
 );
 
+const isLocalPusher = computed(
+  () =>
+    basicStore.userId === props.streamInfo.userId && canMountLocalPusher.value
+);
+
 const userInfo = computed(() => roomStore.userInfoObj[props.streamInfo.userId]);
 const displayName = computed(() => {
   const user = roomStore.userInfoObj[props.streamInfo.userId];
+  if (!user) {
+    return props.streamInfo.userId;
+  }
   if (isInnerScene) {
     return `${user.nameCard || user.userName} | ${user.userId}`;
   }
   return user.nameCard || user.userName || user.userId;
 });
 
+async function bindLocalVideoView() {
+  if (basicStore.userId !== props.streamInfo.userId) {
+    return;
+  }
+  // WeChat live-pusher does not use a DOM view. setLocalVideoView(non-null)
+  // maps to startLocalPreview; calling it before enterRoom makes enterRoom
+  // turn off videoPreview while keeping enableCamera, so the stream publishes
+  // but the local UI stays in the camera-off state.
+  if (isWeChat) {
+    return;
+  }
+  await nextTick();
+  if (!canMountLocalPusher.value) {
+    return;
+  }
+  await roomEngine.instance?.setLocalVideoView({
+    view: `${playRegionDomId.value}`,
+  });
+}
+
+async function bindRemoteVideoView() {
+  await nextTick();
+  if (!player.value) {
+    return;
+  }
+  logger.debug(
+    `${logPrefix}watch isVideoStreamAvailable:`,
+    props.streamInfo.userId,
+    player.value
+  );
+  await player.value.setTRTCStreamId(playRegionDomId.value);
+  roomEngine.instance?.setRemoteVideoView({
+    userId: props.streamInfo.userId,
+    streamType: props.streamInfo.streamType,
+    view: `${playRegionDomId.value}`,
+  });
+  await roomEngine.instance?.startPlayRemoteVideo({
+    userId: props.streamInfo.userId,
+    streamType: props.streamInfo.streamType,
+  });
+  const trtcCloud = roomEngine.instance?.getTRTCCloud();
+  await trtcCloud?.setRemoteRenderParams(
+    props.streamInfo.userId,
+    props.streamInfo.streamType === TUIVideoStreamType.kScreenStream
+      ? TRTCVideoStreamType.TRTCVideoStreamTypeSub
+      : TRTCVideoStreamType.TRTCVideoStreamTypeBig,
+    {
+      mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
+      rotation: TRTCVideoRotation.TRTCVideoRotation0,
+      fillMode:
+        props.streamInfo.streamType === TUIVideoStreamType.kScreenStream
+          ? TRTCVideoFillMode.TRTCVideoFillMode_Fit
+          : TRTCVideoFillMode.TRTCVideoFillMode_Fill,
+    }
+  );
+}
+
 onMounted(() => {
   watch(
     () => props.streamInfo.hasVideoStream,
     async val => {
       if (val) {
-        await nextTick();
-        if (player.value) {
-          logger.debug(
-            `${logPrefix}watch isVideoStreamAvailable:`,
-            props.streamInfo.userId,
-            player.value
-          );
-          if (basicStore.userId === props.streamInfo.userId) {
-            if (props.streamInfo.hasVideoStream) {
-              await roomEngine.instance?.setLocalVideoView({
-                view: `${playRegionDomId.value}`,
-              });
-            }
-          } else {
-            await player.value.setTRTCStreamId(playRegionDomId.value);
-            roomEngine.instance?.setRemoteVideoView({
-              userId: props.streamInfo.userId,
-              streamType: props.streamInfo.streamType,
-              view: `${playRegionDomId.value}`,
-            });
-            await roomEngine.instance?.startPlayRemoteVideo({
-              userId: props.streamInfo.userId,
-              streamType: props.streamInfo.streamType,
-            });
-            const trtcCloud = roomEngine.instance?.getTRTCCloud();
-            await trtcCloud?.setRemoteRenderParams(
-              props.streamInfo.userId,
-              props.streamInfo.streamType === TUIVideoStreamType.kScreenStream
-                ? TRTCVideoStreamType.TRTCVideoStreamTypeSub
-                : TRTCVideoStreamType.TRTCVideoStreamTypeBig,
-              {
-                mirrorType: TRTCVideoMirrorType.TRTCVideoMirrorType_Disable,
-                rotation: TRTCVideoRotation.TRTCVideoRotation0,
-                fillMode:
-                  props.streamInfo.streamType ===
-                  TUIVideoStreamType.kScreenStream
-                    ? TRTCVideoFillMode.TRTCVideoFillMode_Fit
-                    : TRTCVideoFillMode.TRTCVideoFillMode_Fill,
-              }
-            );
-          }
+        if (basicStore.userId === props.streamInfo.userId) {
+          await bindLocalVideoView();
+        } else {
+          await bindRemoteVideoView();
         }
-      } else {
-        if (
-          basicStore.userId === props.streamInfo.userId &&
-          props.streamInfo.streamType === TUIVideoStreamType.kCameraStream
-        ) {
+      } else if (
+        basicStore.userId === props.streamInfo.userId &&
+        props.streamInfo.streamType === TUIVideoStreamType.kCameraStream
+      ) {
+        // On WeChat, view=null maps to stopLocalPreview and leaves
+        // openLocalCamera waiting for onCameraDidReady. Turning the camera
+        // off must go through closeLocalCamera, not unbinding the view.
+        if (!isWeChat) {
           await roomEngine.instance?.setLocalVideoView({
             view: null,
           });
         }
+      }
+    },
+    { immediate: true }
+  );
+  watch(localPusherEpoch, async () => {
+    if (basicStore.userId === props.streamInfo.userId) {
+      await bindLocalVideoView();
+    }
+  });
+  watch(
+    canMountLocalPusher,
+    async val => {
+      if (val && basicStore.userId === props.streamInfo.userId) {
+        await bindLocalVideoView();
       }
     },
     { immediate: true }
@@ -222,9 +275,7 @@ onMounted(() => {
            * Replay local video streams only when they are open
            **/
           if (props.streamInfo.hasVideoStream) {
-            await roomEngine.instance?.setLocalVideoView({
-              view: `${playRegionDomId.value}`,
-            });
+            await bindLocalVideoView();
           }
         } else {
           await nextTick();
@@ -277,6 +328,7 @@ function handleScaleChange(event: {
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -295,6 +347,7 @@ function handleScaleChange(event: {
     position: absolute;
     bottom: 4px;
     left: 0;
+    z-index: 2;
     display: flex;
     align-content: center;
     align-items: center;

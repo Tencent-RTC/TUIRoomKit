@@ -53,6 +53,12 @@ export interface RoomParam {
   password?: string;
 }
 
+/**
+ * Entering was abandoned because WeChat never granted the record scope, which
+ * live-pusher needs before TRTC can finish entering the room.
+ */
+export const WX_MICROPHONE_REQUIRED = 'WxMicrophoneRequired';
+
 export enum EventType {
   SERVICE_READY = 'ServiceReady',
   ROOM_LOGIN = 'RoomLogin',
@@ -65,6 +71,7 @@ export enum EventType {
   ROOM_DISMISS = 'RoomDestroy',
   ROOM_ERROR = 'RoomError',
   ROOM_NEED_PASSWORD = 'RoomNeedPassword',
+  WX_DEVICE_PERMISSION_DENIED = 'WxDevicePermissionDenied',
   KICKED_OUT = 'KickedOut',
   KICKED_OFFLINE = 'KickedOffline',
   USER_SIG_EXPIRED = 'UserSigExpired',

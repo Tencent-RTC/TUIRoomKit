@@ -9,7 +9,7 @@ import {
   TRTCVideoRotation,
 } from '@tencentcloud/tuiroom-engine-wx';
 import { IRoomService, EventType } from '../types';
-import { isMobile } from '../../utils/environment';
+import { isMobile, isWeChat } from '../../utils/environment';
 import { MESSAGE_DURATION } from '../../constants/message';
 import logger from '../../utils/common/logger';
 
@@ -270,7 +270,11 @@ export class MediaManager {
       userId === this.service.basicStore.userId &&
       streamType === TUIVideoStreamType.kCameraStream
     ) {
-      this.service.roomEngine.instance?.setLocalVideoView({ view: null });
+      // WeChat live-pusher does not use a DOM view. Clearing it here would
+      // call stopLocalPreview and hang the next openLocalCamera.
+      if (!isWeChat) {
+        this.service.roomEngine.instance?.setLocalVideoView({ view: null });
+      }
     } else {
       await this.service.roomEngine.instance?.stopPlayRemoteVideo({
         userId,

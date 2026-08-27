@@ -8,6 +8,27 @@ import {
   TencentCloudChat,
 } from '@tencentcloud/tuiroom-engine-wx';
 import useGetRoomEngine from '../../../hooks/useRoomEngine';
+import { formatFilePayload, formatImageInfoArray, MESSAGE_TYPE } from '../util';
+
+const SUPPORTED_MESSAGE_TYPES: string[] = [
+  MESSAGE_TYPE.TEXT,
+  MESSAGE_TYPE.IMAGE,
+  MESSAGE_TYPE.FILE,
+];
+
+function isSupportedMessage(message: { type: string }) {
+  return SUPPORTED_MESSAGE_TYPES.includes(message.type);
+}
+
+function getMessagePayload(type: string, payload: Record<string, any> = {}) {
+  if (type === MESSAGE_TYPE.IMAGE) {
+    return { imageInfoArray: formatImageInfoArray(payload.imageInfoArray) };
+  }
+  if (type === MESSAGE_TYPE.FILE) {
+    return formatFilePayload(payload);
+  }
+  return { text: payload.text };
+}
 
 export default function useMessageList() {
   const { t } = useI18n();
@@ -37,9 +58,7 @@ export default function useMessageList() {
       isCompleted,
     } = imResponse.data;
     messageList.value.splice(0, 0, ...historyMessageList);
-    const currentMessageList = messageList.value.filter(
-      item => item.type === 'TIMTextElem'
-    );
+    const currentMessageList = messageList.value.filter(isSupportedMessage);
     chatStore.setMessageListInfo(
       currentMessageList,
       isCompleted,
@@ -100,22 +119,15 @@ export default function useMessageList() {
     options.data.forEach((message: any) => {
       if (
         message.conversationID !== currentConversationId ||
-        message.type !== TencentCloudChat.TYPES.MSG_TEXT
+        !isSupportedMessage(message)
       ) {
         return;
       }
-      const {
-        ID,
-        payload: { text },
-        nick: userName,
-        from: userId,
-      } = message;
+      const { ID, payload, nick: userName, from: userId } = message;
       chatStore.updateMessageList({
         ID,
-        type: 'TIMTextElem',
-        payload: {
-          text,
-        },
+        type: message.type,
+        payload: getMessagePayload(message.type, payload),
         nick: userName || userId,
         from: userId,
         flow: 'in',
@@ -127,9 +139,8 @@ export default function useMessageList() {
   async function setMessageListInfo() {
     const { currentMessageList, isCompleted, nextReqMessageId } =
       await getMessageList();
-    const filterCurrentMessageList = currentMessageList.filter(
-      (item: any) => item.type === 'TIMTextElem'
-    );
+    const filterCurrentMessageList =
+      currentMessageList.filter(isSupportedMessage);
     chatStore.setMessageListInfo(
       filterCurrentMessageList,
       isCompleted,

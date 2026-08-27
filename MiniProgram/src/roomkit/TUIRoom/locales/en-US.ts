@@ -1,6 +1,8 @@
 export default {
   'The room does not exist, please confirm the room number or create a room!':
     'The room does not exist, please confirm the room number or create a room!',
+  'Microphone permission is required to join the meeting, please enable it and try again':
+    'Microphone permission is required to join the meeting, please enable it and try again',
   'Log out': 'Log out',
   'Edit profile': 'Edit profile',
   'User Name': 'User Name',
@@ -126,7 +128,25 @@ export default {
   'Muted by the moderator': 'Muted by the moderator',
   'Type a message': 'Type a message',
   Send: 'Send',
+  Image: 'Image',
+  File: 'File',
+  Forward: 'Forward',
   'Failed to send the message': 'Failed to send the message',
+  'Failed to send the image': 'Failed to send the image',
+  'Failed to send the file': 'Failed to send the file',
+  'Failed to download the file': 'Failed to download the file',
+  'Failed to open the file': 'Failed to open the file',
+  'Failed to forward the file': 'Failed to forward the file',
+  'Failed to save the file': 'Failed to save the file',
+  'This file type cannot be previewed': 'This file type cannot be previewed',
+  'File saved': 'File saved',
+  'WeChat on mobile cannot save this file type to your phone':
+    'This file type cannot be previewed or saved on mobile. You can forward it to WeChat.',
+  'The file cannot exceed 100MB': 'The file cannot exceed 100MB',
+  Loading: 'Loading...',
+  'No more messages': 'No more messages',
+  'Back to bottom': 'Back to bottom',
+  'n new messages': ({ named }: any) => `${named('count')} new messages`,
   'Applying for the stage': 'Applying for the stage',
   'Apply for the stage': 'Apply for the stage',
   'Cancel Apply': 'Cancel Apply',
@@ -491,6 +511,26 @@ export default {
     ({ named }: any) =>
       `You can go to "System Preferences - Security & Privacy - ${named('deviceType')}" to enable device permissions.`,
   'Go to Settings': 'Go to Settings',
+  'Files are selected from your WeChat chats':
+    'Files are selected from your WeChat chats. Continue?',
+  // WeChat showModal buttons allow at most 4 characters.
+  'Go (short)': 'Go',
+  'Authorize (short)': 'Allow',
+  'Go to Settings (short)': 'Open',
+  'Cancel (short)': 'No',
+  'I got it (short)': 'OK',
+  Tip: 'Notice',
+  'Permission prompt': 'Permission prompt',
+  'The current mini program does not have live-pusher permission':
+    'This mini program has not enabled real-time audio/video (live-pusher), so the meeting cannot start. Please enable the live-pusher / live-player capability in WeChat Official Account Platform and retry.',
+  'Please tap to grant device permission': ({ named }: any) =>
+    `This meeting needs the ${named('deviceType')}. Tap to authorize`,
+  'You have denied device permission, please enable it in mini-program settings':
+    ({ named }: any) =>
+      `You have denied ${named('deviceType')} permission. Please enable it in mini-program settings and retry`,
+  'WeChat does not have device permission, please enable it in system settings':
+    ({ named }: any) =>
+      `WeChat does not have ${named('deviceType')} permission. Please enable it in system settings > WeChat and retry`,
   addMember: 'addMember',
   shareRoom: 'shareRoom',
   'Invitation sent, waiting for members to join.':

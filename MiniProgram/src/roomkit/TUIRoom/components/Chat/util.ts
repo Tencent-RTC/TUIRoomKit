@@ -9,6 +9,27 @@
  * https://cloud.tencent.com/document/product/269/59590
  */
 
+import type { MessageFileInfo, MessageImageInfo } from '../../stores/chat';
+
+export const MESSAGE_TYPE = {
+  TEXT: 'TIMTextElem',
+  IMAGE: 'TIMImageElem',
+  FILE: 'TIMFileElem',
+};
+
+/**
+ * Chat SDK file messages are capped at 100MB.
+ **/
+export const MAX_FILE_SIZE = 100 * 1024 * 1024;
+
+/**
+ * The Chat SDK returns three sizes in order: origin, large and thumbnail.
+ **/
+const IMAGE_SIZE_INDEX = {
+  ORIGIN: 0,
+  THUMBNAIL: 2,
+};
+
 export const emojiBaseUrl =
   'https://web.sdk.qcloud.com/im/assets/emoji-plugin/';
 const deprecatedEmojiBaseUrl = 'https://web.sdk.qcloud.com/im/assets/emoji/';
@@ -408,6 +429,102 @@ export function decodeMessageText(payload: string) {
     }
   }
   return renderDom;
+}
+
+export function formatImageInfoArray(
+  imageInfoArray: Record<string, any>[] = []
+): MessageImageInfo[] {
+  return imageInfoArray.map(item => ({
+    imageUrl: item.imageUrl || item.url || '',
+    width: item.width,
+    height: item.height,
+  }));
+}
+
+/**
+ * The thumbnail is used for the message bubble and the origin one for preview.
+ * A local image message only carries a single temporary file path, so both fall back to it.
+ **/
+export function getImageMessageUrl(imageInfoArray: MessageImageInfo[] = []) {
+  const getUrl = (imageInfo?: MessageImageInfo) =>
+    imageInfo?.imageUrl || imageInfo?.url || '';
+  const origin = imageInfoArray[IMAGE_SIZE_INDEX.ORIGIN];
+  const thumbnail = imageInfoArray[IMAGE_SIZE_INDEX.THUMBNAIL] || origin;
+  return {
+    thumbnailUrl: getUrl(thumbnail) || getUrl(origin),
+    originUrl: getUrl(origin),
+  };
+}
+
+export function formatFilePayload(
+  payload: Record<string, any> = {}
+): MessageFileInfo {
+  return {
+    fileName: payload.fileName || payload.name || '',
+    fileSize: payload.fileSize || payload.size || 0,
+    fileUrl: payload.fileUrl || payload.url || '',
+  };
+}
+
+export function formatFileSize(fileSize = 0) {
+  if (fileSize >= 1024 * 1024) {
+    return `${(fileSize / (1024 * 1024)).toFixed(2)} MB`;
+  }
+  if (fileSize >= 1024) {
+    return `${(fileSize / 1024).toFixed(2)} KB`;
+  }
+  return `${fileSize} B`;
+}
+
+/**
+ * wx.openDocument only accepts these document types.
+ **/
+const DOCUMENT_FILE_TYPES = [
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+  'ppt',
+  'pptx',
+  'pdf',
+];
+
+export function getFileExtension(fileName = '') {
+  const index = fileName.lastIndexOf('.');
+  if (index <= 0 || index === fileName.length - 1) {
+    return '';
+  }
+  return fileName.slice(index + 1).toLowerCase();
+}
+
+export function isDocumentFile(fileName = '') {
+  return DOCUMENT_FILE_TYPES.includes(getFileExtension(fileName));
+}
+
+/**
+ * wx.saveFileToDisk is only available on WeChat for Windows and Mac.
+ **/
+export function canSaveFileToDisk() {
+  try {
+    const platform = String(
+      uni.getSystemInfoSync()?.platform || ''
+    ).toLowerCase();
+    return platform === 'windows' || platform === 'mac';
+  } catch (e) {
+    return false;
+  }
+}
+
+export function getSandboxFilePath(fileName = '') {
+  const userDataPath =
+    (uni as any).env?.USER_DATA_PATH ||
+    (globalThis as any).wx?.env?.USER_DATA_PATH ||
+    '';
+  const safeName = (fileName || `file_${Date.now()}`).replace(
+    /[\\/:*?"<>|]/g,
+    '_'
+  );
+  return userDataPath ? `${userDataPath}/${safeName}` : '';
 }
 
 export function decodeSendTextMsg(payload: string) {

@@ -9,9 +9,25 @@ import {
   TUIVideoStreamType,
   TUIUserInfo,
 } from '@tencentcloud/tuiroom-engine-wx';
-import { EventType, IRoomService, RoomParam } from '../types';
+import {
+  EventType,
+  IRoomService,
+  RoomParam,
+  WX_MICROPHONE_REQUIRED,
+} from '../types';
 import { isMobile, isWeChat } from '../../utils/environment';
 import logger from '../../utils/common/logger';
+import { MediaAuthState } from '../../utils/wxPermission';
+import {
+  allowMountLocalPusher,
+  resetLocalPusherState,
+  waitForPusherRemount,
+} from '../../hooks/useLocalPusher';
+import {
+  ensureMediaAfterEnter,
+  ensureMediaBeforeEnter,
+  setRoomEntering,
+} from '../../hooks/useWxMediaGuard';
 
 const logPrefix = '[RoomService:roomActionManager]';
 
@@ -45,6 +61,12 @@ export type RoomParamsInfo = {
 
 export class RoomActionManager {
   private service: IRoomService;
+
+  /** Devices the room was asked to open, opened once the room is up. */
+  private pendingWxMediaNeed: MediaAuthState = {
+    camera: false,
+    microphone: false,
+  };
 
   constructor(service: IRoomService) {
     this.service = service;
@@ -88,6 +110,7 @@ export class RoomActionManager {
       },
     });
     this.service.emit(EventType.ROOM_START, { roomId });
+    this.openWxMediaAfterEnter();
   }
 
   public async join(roomId: string, params: JoinParams = {}) {
@@ -112,6 +135,7 @@ export class RoomActionManager {
       },
     });
     this.service.emit(EventType.ROOM_JOIN, { roomId });
+    this.openWxMediaAfterEnter();
   }
 
   public async leaveRoom() {
@@ -178,8 +202,10 @@ export class RoomActionManager {
   }
 
   public async enterRoom(options: { roomId: string; roomParam?: RoomParam }) {
+    setRoomEntering(true);
     try {
-      const { roomId, roomParam } = options;
+      const { roomId } = options;
+      const roomParam = await this.prepareWxMedia(options.roomParam);
       const roomInfo = await this.doEnterRoom({
         roomId,
         roomType: TUIRoomType.kConference,
@@ -199,16 +225,111 @@ export class RoomActionManager {
             timeout: 0,
           }));
       }
-      this.setRoomParams(roomParam);
+      // Not awaited: openLocalCamera can start the preview yet never resolve,
+      // which would keep the entering overlay up forever.
+      this.setRoomParams(roomParam).catch((mediaError: unknown) => {
+        logger.error(`${logPrefix}setRoomParams error:`, mediaError);
+      });
     } catch (error) {
       logger.error(`${logPrefix}enterRoom error:`, error);
       this.service.errorHandler.handleError(error, 'enterRoom');
       throw error;
+    } finally {
+      setRoomEntering(false);
     }
   }
 
-  private async setRoomParams(roomParam?: RoomParam) {
+  /**
+   * Settle the WeChat scopes, then mount live-pusher with the answer and strip
+   * the room params we are not allowed to honour.
+   *
+   * The record scope has to be resolved here rather than after the room is up:
+   * live-pusher cannot start without it, and TUIRoomEngine.enterRoom never
+   * settles while the pusher is down, so the user would sit on the entering
+   * overlay forever with no prompt to act on.
+   */
+  private async prepareWxMedia(
+    roomParam?: RoomParam
+  ): Promise<RoomParam | undefined> {
+    this.pendingWxMediaNeed = {
+      microphone: !!roomParam?.isOpenMicrophone,
+      camera: !!roomParam?.isOpenCamera,
+    };
+    if (!isWeChat) {
+      return roomParam;
+    }
+    resetLocalPusherState();
+    const auth = await ensureMediaBeforeEnter(
+      { camera: !!roomParam?.isOpenCamera },
+      this.service.t.bind(this.service)
+    );
+    this.pendingWxMediaNeed = {
+      microphone: this.pendingWxMediaNeed.microphone && auth.microphone,
+      camera: this.pendingWxMediaNeed.camera && auth.camera,
+    };
+    if (!auth.microphone) {
+      const error = new Error(
+        'WeChat denied the record scope, live-pusher cannot start'
+      ) as Error & { code: string };
+      error.code = WX_MICROPHONE_REQUIRED;
+      throw error;
+    }
+    // TRTC enterRoom waits for live-pusher to exist on the page.
+    this.restoreLocalUserForPusher();
+    allowMountLocalPusher(auth);
+    await waitForPusherRemount();
     if (!roomParam) {
+      return roomParam;
+    }
+    return {
+      ...roomParam,
+      isOpenMicrophone: roomParam.isOpenMicrophone && auth.microphone,
+      isOpenCamera: roomParam.isOpenCamera && auth.camera,
+    };
+  }
+
+  private openWxMediaAfterEnter() {
+    if (!isWeChat) {
+      return;
+    }
+    // Not awaited: start / join should resolve as soon as the room is up,
+    // rather than waiting for the devices to come online.
+    ensureMediaAfterEnter(
+      this.pendingWxMediaNeed,
+      this.service.t.bind(this.service)
+    ).catch((error: unknown) => {
+      logger.error(`${logPrefix}ensureMediaAfterEnter error:`, error);
+    });
+  }
+
+  /**
+   * resetRoomData() clears local user/stream. Restore them so StreamRegion can
+   * render trtc-pusher before enterRoom, which TRTC requires on WeChat.
+   */
+  private restoreLocalUserForPusher() {
+    const { userId, userName, avatarUrl } = this.service.basicStore;
+    if (!userId) {
+      return;
+    }
+    this.service.roomStore.addUserInfo({
+      userId,
+      userName,
+      avatarUrl,
+    });
+    this.service.roomStore.addStreamInfo(
+      userId,
+      TUIVideoStreamType.kCameraStream
+    );
+  }
+
+  /**
+   * Device selection and auto-open for platforms with a device list. WeChat
+   * has neither: live-pusher owns the devices, and opening them before the
+   * user grants a scope makes TRTC report "Not allowed to use microphone".
+   * The WeChat path runs in openWxMediaAfterEnter instead.
+   */
+  private async setRoomParams(roomParam?: RoomParam) {
+    if (!roomParam || isWeChat) {
       return;
     }
     const {
@@ -247,70 +368,70 @@ export class RoomActionManager {
     const isCanOpenMicrophone =
       isMaster || (!isMicrophoneDisableForAllUser && isFreeSpeakMode);
     if (isCanOpenMicrophone) {
-      if (isOpenMicrophone) {
-        await this.service.roomEngine.instance?.unmuteLocalAudio();
-        if (!this.service.basicStore.isOpenMic) {
-          this.service.roomEngine.instance?.openLocalMicrophone();
-          this.service.basicStore.setIsOpenMic(true);
-        }
-        if (!isWeChat && !isMobile) {
-          const microphoneList =
-            await this.service.roomEngine.instance?.getMicDevicesList();
-          const speakerList =
-            await this.service.roomEngine.instance?.getSpeakerDevicesList();
-          if (microphoneList?.length === 0 || speakerList?.length === 0) return;
-          if (
-            !this.service.roomStore.currentMicrophoneId &&
-            microphoneList.length > 0
-          ) {
-            this.service.roomStore.setCurrentMicrophoneId(
-              microphoneList[0].deviceId
-            );
+      try {
+        if (isOpenMicrophone) {
+          await this.service.roomEngine.instance?.unmuteLocalAudio();
+          if (!this.service.basicStore.isOpenMic) {
+            await this.service.roomEngine.instance?.openLocalMicrophone();
+            this.service.basicStore.setIsOpenMic(true);
           }
-          if (
-            !this.service.roomStore.currentSpeakerId &&
-            speakerList.length > 0
-          ) {
-            this.service.roomStore.setCurrentSpeakerId(speakerList[0].deviceId);
+          if (!isMobile) {
+            const microphoneList =
+              await this.service.roomEngine.instance?.getMicDevicesList();
+            const speakerList =
+              await this.service.roomEngine.instance?.getSpeakerDevicesList();
+            if (microphoneList?.length > 0 && speakerList?.length > 0) {
+              if (!this.service.roomStore.currentMicrophoneId) {
+                this.service.roomStore.setCurrentMicrophoneId(
+                  microphoneList[0].deviceId
+                );
+              }
+              if (!this.service.roomStore.currentSpeakerId) {
+                this.service.roomStore.setCurrentSpeakerId(
+                  speakerList[0].deviceId
+                );
+              }
+              await this.service.roomEngine.instance?.setCurrentMicDevice({
+                deviceId: this.service.roomStore.currentMicrophoneId,
+              });
+            }
           }
-          await this.service.roomEngine.instance?.setCurrentMicDevice({
-            deviceId: this.service.roomStore.currentMicrophoneId,
-          });
+        } else {
+          await this.service.roomEngine.instance?.muteLocalAudio();
         }
-      } else {
-        await this.service.roomEngine.instance?.muteLocalAudio();
+      } catch (error) {
+        logger.error(`${logPrefix}open microphone error:`, error);
       }
     }
 
-    // 是否可以自动打开摄像头
     const isCanOpenCamera =
       isMaster || (!isCameraDisableForAllUser && isFreeSpeakMode);
     if (isCanOpenCamera && isOpenCamera) {
-      if (isMobile) {
-        await this.service.roomEngine.instance?.openLocalCamera({
-          isFrontCamera: this.service.basicStore.isFrontCamera,
-        });
-        return;
-      }
-      const deviceManager =
-        this.service.roomEngine.instance?.getMediaDeviceManager();
-      if (!this.service.roomStore.currentCameraId) {
-        const cameraList = await deviceManager.getDevicesList({
-          type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
-        });
-        if (cameraList && cameraList.length > 0) {
-          this.service.roomStore.setCurrentCameraId(cameraList[0].deviceId);
+      try {
+        if (isMobile) {
+          await this.service.roomEngine.instance?.openLocalCamera({
+            isFrontCamera: this.service.basicStore.isFrontCamera,
+          });
+          return;
         }
+        const deviceManager =
+          this.service.roomEngine.instance?.getMediaDeviceManager();
+        if (!this.service.roomStore.currentCameraId) {
+          const cameraList = await deviceManager.getDevicesList({
+            type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
+          });
+          if (cameraList && cameraList.length > 0) {
+            this.service.roomStore.setCurrentCameraId(cameraList[0].deviceId);
+          }
+        }
+        await deviceManager.setCurrentDevice({
+          type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
+          deviceId: this.service.roomStore.currentCameraId,
+        });
+        await this.service.roomEngine.instance?.openLocalCamera();
+      } catch (error) {
+        logger.error(`${logPrefix}open camera error:`, error);
       }
-      await deviceManager.setCurrentDevice({
-        type: TUIMediaDeviceType.kMediaDeviceTypeVideoCamera,
-        deviceId: this.service.roomStore.currentCameraId,
-      });
-      /**
-       * Turn on the local camera
-       *
-       **/
-      await this.service.roomEngine.instance?.openLocalCamera();
     }
   }
 
@@ -339,7 +460,8 @@ export class RoomActionManager {
     trtcCloud?.enableSmallVideoStream(!isH5, smallParam);
     roomEngine.instance?.muteLocalAudio();
 
-    if (!roomInfo.isSeatEnabled) {
+    // On WeChat, open the mic only after live-pusher is mounted with auth.
+    if (!roomInfo.isSeatEnabled && !isWeChat) {
       roomEngine.instance?.openLocalMicrophone();
       this.service.basicStore.setIsOpenMic(true);
     }

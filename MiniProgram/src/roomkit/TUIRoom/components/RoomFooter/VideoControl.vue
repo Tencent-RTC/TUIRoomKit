@@ -70,6 +70,7 @@ import { useBasicStore } from '../../stores/basic';
 import TuiButton from '../common/base/Button.vue';
 import TUIMessage from '../common/base/Message/index';
 import TUIMessageBox from '../common/base/MessageBox/index';
+import { ensureDeviceUsable } from '../../hooks/useWxMediaGuard';
 const roomEngine = useGetRoomEngine();
 const { deviceManager } = useDeviceManager();
 
@@ -129,6 +130,12 @@ async function toggleMuteVideo() {
       });
       return;
     }
+    const isDeviceReady = await ensureDeviceUsable('camera', t, {
+      userGesture: true,
+    });
+    if (!isDeviceReady) {
+      return;
+    }
     if (isMobile) {
       await roomEngine.instance?.openLocalCamera({
         isFrontCamera: basicStore.isFrontCamera,
@@ -162,6 +169,13 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
 
 // Accept the host invitation and turn on the camera
 async function handleAccept() {
+  const isDeviceReady = await ensureDeviceUsable('camera', t, {
+    userGesture: true,
+  });
+  if (!isDeviceReady) {
+    await handleReject();
+    return;
+  }
   roomStore.setCanControlSelfVideo(true);
   await roomEngine.instance?.responseRemoteRequest({
     requestId: requestOpenCameraRequestId.value,

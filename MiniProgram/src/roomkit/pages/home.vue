@@ -13,6 +13,10 @@ import PreConferenceView from '../TUIRoom/preConference.vue';
 import { conference } from '../TUIRoom/index.ts';
 import { getBasicInfo } from '../config/basic-info-config';
 import { onMounted } from 'vue';
+import {
+  reportTUIKeyFeature,
+  TUIKeyFeature,
+} from '../TUIRoom/utils/tuiKeyFeatures';
 
 declare const uni: any;
 
@@ -82,6 +86,7 @@ async function handleInit() {
   uni.removeStorageSync('tuiRoom-roomInfo');
   const { userId, sdkAppId, userSig, userName, avatarUrl } = userInfo;
   await conference.login({ sdkAppId, userId, userSig });
+  reportTUIKeyFeature(TUIKeyFeature.roomKitWx);
   await conference.setSelfInfo({ userName, avatarUrl });
 }
 

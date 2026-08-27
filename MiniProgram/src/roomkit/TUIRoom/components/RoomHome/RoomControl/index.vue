@@ -2,15 +2,27 @@
   <div class="control-container">
     <div class="container-button-group">
       <div class="button-item" @click="enterRoom">
-        <svg-icon style="display: flex" class="button-icon" :icon="EnterRoomIcon" />
+        <svg-icon
+          style="display: flex"
+          class="button-icon"
+          :icon="EnterRoomIcon"
+        />
         <span>{{ t('Join Room') }}</span>
       </div>
       <div class="button-item" @click="createRoom">
-        <svg-icon style="display: flex" class="button-icon" :icon="CreateRoomIcon" />
+        <svg-icon
+          style="display: flex"
+          class="button-icon"
+          :icon="CreateRoomIcon"
+        />
         <span>{{ t('New Room') }}</span>
       </div>
       <div class="button-item" @click="scheduleRoom">
-        <svg-icon style="display: flex" class="button-icon" :icon="ScheduleRoomIcon" />
+        <svg-icon
+          style="display: flex"
+          class="button-icon"
+          :icon="ScheduleRoomIcon"
+        />
         <span>{{ t('Schedule') }}</span>
       </div>
     </div>

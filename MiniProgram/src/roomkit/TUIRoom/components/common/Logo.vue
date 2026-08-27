@@ -1,14 +1,6 @@
 <!-- eslint-disable max-len -->
 <template>
   <div class="logo-container">
-    <!-- Logo under Chinese black theme on PC -->
-    <div v-if="!isMobile && isZH && isDarkTheme">
-      <svg-icon style="display: flex" :icon="LogoOfPCInChineseBlackIcon" />
-    </div>
-    <!-- Logo under Chinese white theme on PC -->
-    <div v-if="!isMobile && isZH && isLightTheme">
-      <svg-icon style="display: flex" :icon="LogoOfPCInChineseWhiteIcon" />
-    </div>
     <!-- Mobile Chinese black and white theme logo -->
     <div v-if="isMobile && isZH" class="mobile-zh-logo">
       <span class="logo" :class="isLightTheme ? 'light' : 'dark'">
@@ -37,8 +29,6 @@ import { computed } from 'vue';
 import SvgIcon from './base/SvgIcon.vue';
 import { useBasicStore } from '../../stores/basic';
 import { storeToRefs } from 'pinia';
-import LogoOfPCInChineseBlackIcon from '../../assets/icons/LogoOfPCInChineseBlackIcon.svg';
-import LogoOfPCInChineseWhiteIcon from '../../assets/icons/LogoOfPCInChineseWhiteIcon.svg';
 import LogoOfMobileInChinese from '../../assets/icons/LogoOfMobileInChinese.svg';
 import LogoTitleOfMobileInChinese from '../../assets/icons/LogoTitleOfMobileInChinese.svg';
 import LogoInEnglish from '../../assets/icons/LogoInEnglish.svg';
@@ -51,9 +41,6 @@ const { defaultTheme } = storeToRefs(basicStore);
 
 const isEN = computed(() => i18n.global.locale.value === 'en-US');
 const isZH = computed(() => i18n.global.locale.value === 'zh-CN');
-const isDarkTheme = computed(() =>
-  theme.value ? theme.value === 'dark' : defaultTheme.value === 'dark'
-);
 const isLightTheme = computed(() =>
   theme.value ? theme.value === 'light' : defaultTheme.value === 'light'
 );
