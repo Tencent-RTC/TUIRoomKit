@@ -59,6 +59,13 @@
         </div>
       </div>
     </div>
+    <!--
+      HarmonyOS live-pusher / live-player only swallow touch that lands on them
+      directly, so a regular view on top is enough to catch and bubble gestures.
+      It must stay a regular view: cover-view is composited above everything
+      else and would block the toolbars and every popup. No pinch handling.
+    -->
+    <div v-if="isHarmonyOS" class="harmony-gesture-layer"></div>
     <!-- Slide the control bar left or right -->
     <div v-if="totalPageNumber > 1" class="swipe">
       <div
@@ -90,6 +97,7 @@ import { useBasicStore } from '../../../stores/basic';
 import { LAYOUT } from '../../../constants/render';
 import StreamRegion from '../../Stream/common/StreamRegion/index.vue';
 import logger from '../../../utils/common/logger';
+import { isHarmonyOS } from '../../../utils/environment';
 
 import {
   TUIRoomEngine,
@@ -109,9 +117,8 @@ const { streamList, localStream, streamInfoObj, currentSpeakerInfo } =
   storeToRefs(roomStore);
 const basicStore = useBasicStore();
 
-const defaultLocalStream = getNewStreamInfo(
-  basicStore.userId,
-  TUIVideoStreamType.kCameraStream
+const defaultLocalStream = computed(() =>
+  getNewStreamInfo(basicStore.userId, TUIVideoStreamType.kCameraStream)
 );
 
 const setLayout = async (layout: LAYOUT) => {
@@ -504,10 +511,22 @@ onUnmounted(() => {
 .swipe {
   position: absolute;
   bottom: 100px;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+}
+
+.harmony-gesture-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  // A fully transparent view can be skipped during hit testing on HarmonyOS.
+  background-color: rgba(0, 0, 0, 0.01);
 }
 
 .swipe-dots {

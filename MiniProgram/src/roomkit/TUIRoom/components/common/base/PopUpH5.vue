@@ -35,13 +35,16 @@ function handleClose() {
 <style lang="scss" scoped>
 .popup-container {
   position: static;
+  display: flex;
   flex: 1;
+  flex-direction: column;
   width: 100vw;
   height: 100%;
   background-color: var(--bg-color-topbar);
 
   .popup-main-header {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     width: 100%;
@@ -76,17 +79,16 @@ function handleClose() {
   }
 
   .popup-main-content {
+    flex: 1;
     width: 100%;
-    height: calc(100% - 130px);
+    min-height: 0;
     overflow: hidden;
   }
 
   .popup-main-footer {
-    position: sticky;
-    bottom: 0;
+    flex-shrink: 0;
     width: 100%;
     height: auto;
-    padding-top: 10px;
   }
 }
 </style>

@@ -67,6 +67,7 @@ import TuiButton from '../common/base/Button.vue';
 import AudioMediaControl from '../common/AudioMediaControl.vue';
 import { useBasicStore } from '../../stores/basic';
 import TUIMessageBox from '../common/base/MessageBox/index';
+import { ensureDeviceUsable } from '../../hooks/useWxMediaGuard';
 
 const roomEngine = useRoomEngine();
 
@@ -124,6 +125,12 @@ async function toggleMuteAudio() {
       return;
     }
     // There is a microphone list and permissions
+    const isDeviceReady = await ensureDeviceUsable('microphone', t, {
+      userGesture: true,
+    });
+    if (!isDeviceReady) {
+      return;
+    }
     await roomEngine.instance?.unmuteLocalAudio();
     if (!basicStore.isOpenMic) {
       roomEngine.instance?.openLocalMicrophone();
@@ -153,6 +160,13 @@ async function onRequestReceived(eventInfo: { request: TUIRequest }) {
 }
 // Accept the host invitation and turn on the microphone
 async function handleAccept() {
+  const isDeviceReady = await ensureDeviceUsable('microphone', t, {
+    userGesture: true,
+  });
+  if (!isDeviceReady) {
+    await handleReject();
+    return;
+  }
   roomStore.setCanControlSelfAudio(true);
   await roomEngine.instance?.responseRemoteRequest({
     requestId: requestOpenMicRequestId.value,

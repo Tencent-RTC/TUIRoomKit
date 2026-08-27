@@ -1,6 +1,7 @@
 import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-wx';
-import { EventType } from '../types';
-import { isElectron } from '../../utils/environment';
+import { EventType, WX_MICROPHONE_REQUIRED } from '../types';
+import { isElectron, isWeChat } from '../../utils/environment';
+import { handleLivePusherError } from './livePusherError';
 
 type ErrorFunctionName = 'createRoom' | 'enterRoom' | 'onError';
 export class ErrorHandler {
@@ -41,6 +42,10 @@ export class ErrorHandler {
         message =
           'The room does not exist, please confirm the room number or create a room!';
         break;
+      case WX_MICROPHONE_REQUIRED:
+        message =
+          'Microphone permission is required to join the meeting, please enable it and try again';
+        break;
       default:
         message = 'Failed to enter the meeting';
     }
@@ -74,6 +79,14 @@ export class ErrorHandler {
   }
 
   private handleOnError(error: any) {
+    if (isWeChat) {
+      const device = getWxDeniedDevice(error);
+      if (device) {
+        this.service.emit(EventType.WX_DEVICE_PERMISSION_DENIED, { device });
+        return;
+      }
+      handleLivePusherError(error);
+    }
     if (error.message === 'enter trtc room failed , error code : -1') {
       this.service.emit(EventType.ROOM_NOTICE_MESSAGE_BOX, {
         type: 'warning',
@@ -99,6 +112,36 @@ export class ErrorHandler {
 }
 
 type MediaDeviceType = 'camera' | 'microphone' | 'screenShare';
+
+/**
+ * TRTC-WX surfaces a denied scope as onError { code: -1 } with the reason only
+ * in the message, so it has to be matched by text. Patterns are kept narrow —
+ * a loose "mic" substring would swallow unrelated errors.
+ */
+const WX_DENIED_DEVICE_PATTERNS: Array<{
+  device: 'camera' | 'microphone';
+  pattern: RegExp;
+}> = [
+  {
+    device: 'microphone',
+    pattern:
+      /not allowed to use microphone|scope\.record|microphone (?:permission )?(?:denied|not authorized)/,
+  },
+  {
+    device: 'camera',
+    pattern:
+      /not allowed to use camera|scope\.camera|camera (?:permission )?(?:denied|not authorized)/,
+  },
+];
+
+function getWxDeniedDevice(error: any): 'camera' | 'microphone' | null {
+  const message = String(error?.message || '').toLowerCase();
+  const matched = WX_DENIED_DEVICE_PATTERNS.find(item =>
+    item.pattern.test(message)
+  );
+  return matched ? matched.device : null;
+}
+
 class MediaDeviceErrorHandler {
   private service: any;
 

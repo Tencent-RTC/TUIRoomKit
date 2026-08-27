@@ -23,11 +23,14 @@ const chooseEmoji = (itemName: string) => {
 
 <style lang="scss" scoped>
 .emoji-tool {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  justify-items: center;
+  align-content: start;
+  box-sizing: border-box;
   width: 100%;
   height: 200px;
+  padding: 8px 4px 12px;
   overflow-y: auto;
   background-color: var(--bg-color-function);
   box-shadow: var(--uikit-color-black-8);
@@ -36,7 +39,7 @@ const chooseEmoji = (itemName: string) => {
 .emoji-item {
   width: 9vw;
   height: 9vw;
-  margin: 2vw;
+  margin: 6px 0;
 }
 
 .emoji-image {

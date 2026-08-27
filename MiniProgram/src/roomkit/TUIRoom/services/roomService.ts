@@ -17,6 +17,8 @@ import { useChatStore } from '../stores/chat';
 import useDeviceManager from '../hooks/useDeviceManager';
 import logger from '../utils/common/logger';
 import { isMobile } from '../utils/environment';
+import { resetLocalPusherState } from '../hooks/useLocalPusher';
+import { bindTrtcCloudLivePusherError } from './function/livePusherError';
 import i18n from '../locales';
 import { MESSAGE_DURATION } from '../constants/message';
 import {
@@ -159,6 +161,7 @@ export class RoomService implements IRoomService {
 
   public bindRoomEngineEvents() {
     roomEngine.instance?.on(TUIRoomEvents.onError, this.onError);
+    bindTrtcCloudLivePusherError();
     roomEngine.instance?.on(
       TUIRoomEvents.onRoomDismissed,
       this.onRoomDismissed
@@ -439,6 +442,7 @@ export class RoomService implements IRoomService {
     this.basicStore.reset();
     this.chatStore.reset();
     this.roomStore.reset();
+    resetLocalPusherState();
   }
 
   private storeInit(option: RoomInitData) {

@@ -1,6 +1,8 @@
 export default {
   'The room does not exist, please confirm the room number or create a room!':
     '房间不存在，请确认房间号或创建房间！',
+  'Microphone permission is required to join the meeting, please enable it and try again':
+    '加入会议需要麦克风权限，请开启后重试',
   'Log out': '退出登录',
   'Edit profile': '编辑资料',
   'User Name': '用户名',
@@ -118,7 +120,25 @@ export default {
   'Muted by the moderator': '已被主持人禁言',
   'Type a message': '说点什么...',
   Send: '发送',
+  Image: '图片',
+  File: '文件',
+  Forward: '转发',
   'Failed to send the message': '发送消息失败',
+  'Failed to send the image': '发送图片失败',
+  'Failed to send the file': '发送文件失败',
+  'Failed to download the file': '下载文件失败',
+  'Failed to open the file': '打开文件失败',
+  'Failed to forward the file': '转发失败',
+  'Failed to save the file': '保存文件失败',
+  'This file type cannot be previewed': '该文件类型暂不支持预览',
+  'File saved': '已保存到本地',
+  'WeChat on mobile cannot save this file type to your phone':
+    '该文件类型无法预览或保存到手机，可转发到微信后查看',
+  'The file cannot exceed 100MB': '文件不能超过 100MB',
+  Loading: '加载中...',
+  'No more messages': '没有更多消息',
+  'Back to bottom': '回到底部',
+  'n new messages': ({ named }: any) => `${named('count')} 条新消息`,
   'Applying for the stage': '正在申请上台',
   'Apply for the stage': '申请上台',
   'Cancel Apply': '取消申请',
@@ -470,6 +490,26 @@ export default {
     ({ named }: any) =>
       `你可前往"系统设置 - 隐私与安全性 - ${named('deviceType')}"开启设备权限。`,
   'Go to Settings': '前往设置',
+  'Files are selected from your WeChat chats':
+    '发送文件需从微信聊天记录中选择，是否前往？',
+  // WeChat showModal buttons allow at most 4 characters.
+  'Go (short)': '前往',
+  'Authorize (short)': '去授权',
+  'Go to Settings (short)': '前往设置',
+  'Cancel (short)': '取消',
+  'I got it (short)': '我知道了',
+  Tip: '提示',
+  'Permission prompt': '权限提示',
+  'The current mini program does not have live-pusher permission':
+    '当前小程序未开通实时音视频（live-pusher）能力，无法进行音视频会议。请在微信公众平台为小程序开通「实时播放音视频流」类目权限后重试。',
+  'Please tap to grant device permission': ({ named }: any) =>
+    `会议需要使用${named('deviceType')}，请点击授权`,
+  'You have denied device permission, please enable it in mini-program settings':
+    ({ named }: any) =>
+      `您已拒绝${named('deviceType')}权限，请前往小程序设置页面开启后重试`,
+  'WeChat does not have device permission, please enable it in system settings':
+    ({ named }: any) =>
+      `您的微信没有${named('deviceType')}权限，请前往手机系统设置 > 微信，开启权限后重试`,
   addMember: '添加成员',
   shareRoom: '分享房间',
   'Invitation sent, waiting for members to join.':

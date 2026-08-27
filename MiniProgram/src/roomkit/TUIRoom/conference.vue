@@ -70,6 +70,7 @@ import {
   RoomInitData,
 } from './services/index';
 import useDeviceManager from './hooks/useDeviceManager';
+import { ensureDeviceUsable } from './hooks/useWxMediaGuard';
 import { storeToRefs } from 'pinia';
 import { useUIKit } from '@tencentcloud/uikit-base-component-uni';
 
@@ -181,6 +182,11 @@ onMounted(() => {
   roomService.on(EventType.ROOM_LEAVE, onLeaveRoom);
   roomService.on(EventType.ROOM_DISMISS, onDismissRoom);
   roomService.on(EventType.ROOM_NEED_PASSWORD, onRoomNeedPassword);
+  roomService.on(EventType.ROOM_ERROR, onRoomError);
+  roomService.on(
+    EventType.WX_DEVICE_PERMISSION_DENIED,
+    onWxDevicePermissionDenied
+  );
 });
 onUnmounted(() => {
   roomService.off(EventType.ROOM_NOTICE_MESSAGE, showMessage);
@@ -193,6 +199,11 @@ onUnmounted(() => {
   roomService.off(EventType.ROOM_LEAVE, onLeaveRoom);
   roomService.off(EventType.ROOM_DISMISS, onDismissRoom);
   roomService.off(EventType.ROOM_NEED_PASSWORD, onRoomNeedPassword);
+  roomService.off(EventType.ROOM_ERROR, onRoomError);
+  roomService.off(
+    EventType.WX_DEVICE_PERMISSION_DENIED,
+    onWxDevicePermissionDenied
+  );
   roomService.resetStore();
 });
 
@@ -297,6 +308,23 @@ async function createRoom(options: {
 
 async function enterRoom(options: { roomId: string; roomParam?: RoomParam }) {
   await roomService.enterRoom(options);
+}
+
+// Entering failed, so ROOM_START / ROOM_JOIN will never arrive to hide the
+// overlay.
+function onRoomError() {
+  isShowLoading.value = false;
+}
+
+// TRTC rejected the device although the room is up. Recreating live-pusher is
+// the only way capture can recover, so force it even if the scope looks granted.
+function onWxDevicePermissionDenied(eventInfo: {
+  device: 'camera' | 'microphone';
+}) {
+  ensureDeviceUsable(eventInfo.device, t, {
+    open: true,
+    forceRecreate: true,
+  });
 }
 
 function onRoomNeedPassword(code: TUIErrorCode) {

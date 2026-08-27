@@ -84,7 +84,8 @@ watch(
       customStyle.value.width = addSuffix(val);
       customStyle.value.height = addSuffix(val);
     }
-  }
+  },
+  { immediate: true }
 );
 
 onMounted(() => {
@@ -126,7 +127,7 @@ watch(
           .replace(/currentColor/g, currentColor || baseColor)
           .replace(/var\(--active-color-2\)/g, activeColor);
         // 将 svg 数据进行 URL 编码
-        customStyle.value.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(baseStr)}");`;
+        customStyle.value.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(baseStr)}")`;
         customStyle.value.backgroundSize = `100% 100%`;
       },
     });
