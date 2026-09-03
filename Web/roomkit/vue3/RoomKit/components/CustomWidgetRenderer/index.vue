@@ -177,66 +177,85 @@ provide(widgetDeclarationOrderContextKey, {
 const sortedWidgets = computed(() => conference.getRegisteredWidgets(props.zone, props.platform));
 const enableOverflow = computed(() => props.platform === 'pc' && props.zone === 'bottom-center');
 
-/** Number of items that fit within the container before overflow occurs */
-const visibleCount = ref(Infinity);
+/** Widget ids currently collapsed into the More menu. Empty means everything fits. */
+const overflowWidgetIds = ref<string[]>([]);
 
 const measureContainerRef = ref<HTMLElement | null>(null);
 
 /**
  * Widgets that are visible in the toolbar.
  * On H5, all widgets are always visible (overflow is handled by ExpandFooterH5).
- * On PC, only the first `visibleCount` items are shown.
+ * On PC, widgets with `overflow: false` stay here even when the bar is narrow.
  */
 const visibleWidgets = computed(() => {
-  if (!enableOverflow.value) {
+  if (!enableOverflow.value || overflowWidgetIds.value.length === 0) {
     return sortedWidgets.value;
   }
-  return sortedWidgets.value.slice(0, visibleCount.value);
+  const overflowSet = new Set(overflowWidgetIds.value);
+  return sortedWidgets.value.filter(widget => !overflowSet.has(widget.id));
 });
 
 /**
  * Widgets that overflow into the MoreButton dropdown (PC only).
  */
 const overflowWidgets = computed(() => {
-  if (!enableOverflow.value) {
+  if (!enableOverflow.value || overflowWidgetIds.value.length === 0) {
     return [];
   }
-  if (visibleCount.value >= sortedWidgets.value.length) {
-    return [];
-  }
-  return sortedWidgets.value.slice(visibleCount.value);
+  const overflowSet = new Set(overflowWidgetIds.value);
+  return sortedWidgets.value.filter(widget => overflowSet.has(widget.id));
 });
 
 /** Width reserved for the "More" button itself (icon-button + gap) */
 const MORE_BUTTON_WIDTH = 56;
 
+function canCollapseToMore(widget: WidgetConfig): boolean {
+  return widget.overflow !== false;
+}
+
+function sumLayoutWidth(indices: number[], widths: number[], gap: number): number {
+  if (indices.length === 0) {
+    return 0;
+  }
+  let total = 0;
+  for (let i = 0; i < indices.length; i += 1) {
+    total += widths[indices[i]];
+    if (i > 0) {
+      total += gap;
+    }
+  }
+  return total;
+}
+
 /**
  * Measure children widths from the hidden measurement container and
- * compute how many widgets fit within the parent container's width.
+ * compute which widgets must collapse into More. Widgets with
+ * `overflow: false` are skipped so they stay on the toolbar.
  */
 function recalculate() {
   if (!enableOverflow.value) {
-    visibleCount.value = Infinity;
+    overflowWidgetIds.value = [];
     return;
   }
 
   if (!measureContainerRef.value) {
-    visibleCount.value = Infinity;
+    overflowWidgetIds.value = [];
     return;
   }
 
   // The parent element is the actual toolbar container (e.g. .control-center)
   const parentEl = measureContainerRef.value.parentElement;
   if (!parentEl) {
-    visibleCount.value = Infinity;
+    overflowWidgetIds.value = [];
     return;
   }
 
   const containerWidth = parentEl.offsetWidth;
   const measureChildren = Array.from(measureContainerRef.value.children) as HTMLElement[];
+  const widgets = sortedWidgets.value;
 
-  if (measureChildren.length === 0) {
-    visibleCount.value = Infinity;
+  if (measureChildren.length === 0 || measureChildren.length !== widgets.length) {
+    overflowWidgetIds.value = [];
     return;
   }
 
@@ -251,26 +270,32 @@ function recalculate() {
 
   // If everything fits, no overflow needed
   if (totalWidth <= containerWidth) {
-    visibleCount.value = Infinity;
+    overflowWidgetIds.value = [];
     return;
   }
 
-  // Calculate how many items fit when the "More" button is present
+  // Collapse overflowable widgets from the right until the rest fit
+  // next to the More button. Pinned widgets (`overflow: false`) stay.
   const availableWidth = containerWidth - MORE_BUTTON_WIDTH - props.gap;
-  let usedWidth = 0;
-  let count = 0;
+  const visibleIndices: number[] = widgets.map((_, index) => index);
+  const overflowIndices: number[] = [];
 
-  for (let i = 0; i < widths.length; i += 1) {
-    const widthWithGap = i > 0 ? widths[i] + props.gap : widths[i];
-    if (usedWidth + widthWithGap <= availableWidth) {
-      usedWidth += widthWithGap;
-      count += 1;
-    } else {
+  for (let i = widgets.length - 1; i >= 0; i -= 1) {
+    if (sumLayoutWidth(visibleIndices, widths, props.gap) <= availableWidth) {
       break;
     }
+    if (!canCollapseToMore(widgets[i])) {
+      continue;
+    }
+    const pos = visibleIndices.indexOf(i);
+    if (pos === -1) {
+      continue;
+    }
+    visibleIndices.splice(pos, 1);
+    overflowIndices.unshift(i);
   }
 
-  visibleCount.value = Math.max(count, 0);
+  overflowWidgetIds.value = overflowIndices.map(index => widgets[index].id);
 }
 
 function isCustomTrigger(widget: WidgetConfig): widget is WidgetConfig & { component: Component } {

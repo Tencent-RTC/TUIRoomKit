@@ -101,6 +101,11 @@ interface BaseWidget {
   id: string;
   zone?: WidgetZoneConfig;
   order?: number;
+  /**
+   * Whether this widget can collapse into the More menu when the toolbar
+   * is too narrow. Defaults to true. Set false to keep it always visible.
+   */
+  overflow?: boolean;
   panel?: {
     title: string | (() => string);
     component: Component;

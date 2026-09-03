@@ -252,7 +252,9 @@ class Conference extends ConferenceDeprecated implements IConference {
     const widgets = this.registeredWidgets.filter((w) => {
       const resolved = this.resolveZone(w.zone, platform);
       if (resolved === undefined) {
-        return false;
+        // Panel-only widgets have no toolbar zone. Include them when listing
+        // everything (side panels), but never when filtering a toolbar zone.
+        return !zone;
       }
       if (zone) {
         return resolved === zone;

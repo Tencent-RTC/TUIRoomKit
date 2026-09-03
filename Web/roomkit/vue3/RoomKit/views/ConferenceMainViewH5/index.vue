@@ -67,7 +67,7 @@
             <InviteRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.InviteWidget) && notWebinar()" />
             <ChatRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.RoomChatWidget) && notWebinar()" />
             <CloudRecordingRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.RecordingWidget) && (isOwner || isAdmin)" />
-            <AIToolsRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) && notWebinar()" />
+            <ASRRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.AIToolsWidget) && notWebinar()" />
             <SettingsRegistrarH5 v-if="conference.getWidgetVisible(BuiltinWidget.SettingsWidget) && ownerOrNotWebinar()" />
           </CustomWidgetRenderer>
         </ExpandFooterH5>
@@ -117,7 +117,7 @@ import {
   InviteRegistrarH5,
   ChatRegistrarH5,
   SettingsRegistrarH5,
-  AIToolsRegistrarH5,
+  ASRRegistrarH5,
   CloudRecordingRegistrarH5,
 } from '../../components';
 import useCustomizedAutoPlayDialog from '../../hooks/useCustomizedAutoPlayDialog';
@@ -282,6 +282,7 @@ onUnmounted(() => {
   &-right {
     flex: 1;
     display: flex;
+    gap: 8px;
     align-items: center;
     justify-content: flex-end;
     width: auto;
@@ -321,6 +322,7 @@ onUnmounted(() => {
 
 .room-footer {
   position: absolute;
+  z-index: 12;
   box-sizing: border-box;
   background-color: var(--bg-color-operate);
   width: 100%;

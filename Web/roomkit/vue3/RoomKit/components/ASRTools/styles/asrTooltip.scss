@@ -1,0 +1,45 @@
+// Replaces native `title` so hover hints appear after ~100ms instead of ~1s.
+@mixin asr-tooltip {
+  @media (hover: hover) {
+    &::before {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 50%;
+      z-index: 4;
+      padding: 4px 8px;
+      color: var(--text-color-primary);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      white-space: nowrap;
+      pointer-events: none;
+      content: attr(data-tooltip);
+      background: var(--bg-color-operate);
+      border-radius: 6px;
+      box-shadow:
+        0 1px 2px var(--uikit-color-black-7),
+        0 8px 16px var(--uikit-color-black-6);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%);
+      transition: opacity 0.12s ease, visibility 0s linear 0.12s;
+    }
+
+    &:hover::before,
+    &:focus-visible::before {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.12s ease 0.1s, visibility 0s linear 0.1s;
+    }
+
+    // An open control must not keep a hover hint; an empty `::before` still
+    // paints a white nub over the panel that just opened.
+    &:not([data-tooltip])::before,
+    &[data-tooltip=""]::before,
+    &[aria-pressed="true"]::before {
+      content: none;
+      display: none;
+    }
+  }
+}

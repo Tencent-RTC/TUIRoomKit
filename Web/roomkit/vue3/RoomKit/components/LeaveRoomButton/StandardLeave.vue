@@ -98,7 +98,7 @@ import {
 } from 'tuikit-atomicx-vue3/room';
 import { RoomEvent as ConferenceRoomEvent } from '../../adapter/type';
 import { eventCenter } from '../../utils/eventCenter';
-import { useASRToolsState } from '../../hooks/useASRToolsState';
+import { useASRToolsState } from '../ASRTools/useASRToolsState';
 
 const { t } = useUIKit();
 interface Props {
@@ -113,7 +113,7 @@ const {
 } = useRoomState();
 const { localParticipant, participantList, transferOwner }
     = useRoomParticipantState();
-const { hasStartedASR, stopASR } = useASRToolsState();
+const { asrOn, stopASR } = useASRToolsState();
 
 const showTransferDialog = ref(false);
 const showConfirmDialog = ref(false);
@@ -131,7 +131,7 @@ const dialogMessage = computed(() => {
   if (otherParticipants.value.length === 0) {
     return t('Room.LeaveRoomTip');
   }
-  if (hasStartedASR.value) {
+  if (asrOn.value) {
     return t('Room.ConfirmLeaveWithAsrTip');
   }
   return t('Room.ConfirmLeaveTip');
@@ -203,7 +203,7 @@ const autoTransferAndLeave = async () => {
   try {
     const targetParticipant = otherParticipants.value[0];
 
-    if (hasStartedASR.value) {
+    if (asrOn.value) {
       await stopASR({ suppressError: true, resetState: true });
     }
 
@@ -251,7 +251,7 @@ const handleTransferAndLeave = async () => {
   try {
     isTransferring.value = true;
 
-    if (hasStartedASR.value) {
+    if (asrOn.value) {
       await stopASR({ suppressError: true, resetState: true });
     }
 

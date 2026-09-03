@@ -1,28 +1,39 @@
 <template>
   <div>
-    <Dropdown
-      ref="dropdownRef"
-      trigger="click"
-      placement="top"
-      :teleported="false"
-      :hideOnClick="false"
+    <div
+      v-click-outside="closeMenu"
+      class="invite-button-wrapper"
     >
-      <IconButton :title="t('Invite.Title')">
+      <IconButton :title="t('Invite.Title')" @click-icon="toggleMenu">
         <IconInvite :size="24" />
       </IconButton>
-      <template #dropdown>
-        <div class="operate-list">
-          <div class="operate-item" @click="handleOpenUserPicker">
-            <IconInvite :size="16" />
-            <span class="operate-item-text">{{ t('Invite.AddMember') }}</span>
-          </div>
-          <div class="operate-item" @click="handleOpenRoomShare">
-            <IconShare :size="16" />
-            <span class="operate-item-text">{{ t('Invite.ShareRoom') }}</span>
+      <transition name="menu-fade">
+        <div
+          v-show="showMenu"
+          class="dropdown-menu"
+          @click.stop
+        >
+          <div class="operate-list">
+            <button
+              class="operate-item"
+              type="button"
+              @click="handleOpenUserPicker"
+            >
+              <IconInvite :size="16" />
+              <span class="operate-item-text">{{ t('Invite.AddMember') }}</span>
+            </button>
+            <button
+              class="operate-item"
+              type="button"
+              @click="handleOpenRoomShare"
+            >
+              <IconShare :size="16" />
+              <span class="operate-item-text">{{ t('Invite.ShareRoom') }}</span>
+            </button>
           </div>
         </div>
-      </template>
-    </Dropdown>
+      </transition>
+    </div>
 
     <TUIDialog
       v-model:visible="userPickerVisible"
@@ -64,11 +75,12 @@
 
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue';
-import { Dropdown, IconInvite, IconShare, TUIButton, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { IconInvite, IconShare, TUIButton, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
 import { useContactListState } from 'tuikit-atomicx-vue3/chat';
 import { UserPicker, useLoginState, useRoomParticipantState, useRoomState, RoomParticipantStatus } from 'tuikit-atomicx-vue3/room';
 import { conference } from '../../adapter/conference';
 import IconButton from '../base/IconButton.vue';
+import vClickOutside from '../base/vClickOutside';
 import RoomShare from './RoomShare.vue';
 import type { RoomUser } from 'tuikit-atomicx-vue3/room';
 
@@ -78,11 +90,19 @@ const { currentRoom, callUserToRoom } = useRoomState();
 const { participantList, pendingParticipantList } = useRoomParticipantState();
 const { friendList: defaultFriendList } = useContactListState();
 
-const dropdownRef = ref<{ closeDropdown?: () => void }>();
+const showMenu = ref(false);
 const userPickerRef = ref();
 const userPickerVisible = ref(false);
 const roomShareVisible = ref(false);
 const customContactList = ref<RoomUser[]>([]);
+
+function toggleMenu() {
+  showMenu.value = !showMenu.value;
+}
+
+function closeMenu() {
+  showMenu.value = false;
+}
 
 const contactListProvider = computed(() => conference.getFeatureConfig('contactList'));
 
@@ -120,7 +140,7 @@ const userPickerData = computed(() => friendList.value
   })));
 
 const openDialogAfterCloseDropdown = async (dialog: 'userPicker' | 'roomShare') => {
-  dropdownRef.value?.closeDropdown?.();
+  closeMenu();
   await nextTick();
   if (dialog === 'userPicker') {
     userPickerVisible.value = true;
@@ -159,57 +179,76 @@ const handleUserPickerConfirm = async () => {
 </script>
 
 <style lang="scss" scoped>
-.control-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 20px;
+.invite-button-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
 
-  .control-title {
-    text-align: center;
-    font-family: "PingFang SC";
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 20px;
-  }
+.dropdown-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 1000;
+  padding: 6px;
+  background: var(--bg-color-operate);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px var(--uikit-color-black-16);
+  transform: translateX(-50%);
 }
 
 .operate-list {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  white-space: nowrap;
+  gap: 2px;
+  width: max-content;
   color: var(--text-color-primary);
+}
 
-  .operate-item {
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 6px 8px;
-    color: var(--text-color-primary);
-    cursor: pointer;
-    border-radius: 6px;
+.operate-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
 
-    &:hover {
-      background: var(--button-color-secondary-hover);
-    }
-
-    .operate-item-text {
-      flex: 1;
-      min-width: 0;
-      font-size: 13px;
-      line-height: 20px;
-    }
+  &:hover {
+    background: var(--button-color-secondary-hover);
   }
+}
+
+.operate-item-text {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.menu-fade-enter-active,
+.menu-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.menu-fade-enter-from {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.menu-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.menu-fade-enter-to,
+.menu-fade-leave-from {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .room-user-picker {
