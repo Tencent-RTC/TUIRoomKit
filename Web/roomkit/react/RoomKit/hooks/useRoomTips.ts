@@ -39,6 +39,8 @@ export function useRoomTips() {
   currentRoomRef.current = currentRoom;
   const localParticipantRef = useRef(localParticipant);
   localParticipantRef.current = localParticipant;
+  const localIsMessageDisabledRef = useRef(localParticipant?.isMessageDisabled);
+  localIsMessageDisabledRef.current = localParticipant?.isMessageDisabled;
 
   useEffect(() => {
     // Keyed map of currently-shown invitation message boxes so we can close
@@ -51,7 +53,7 @@ export function useRoomTips() {
           message: tRef.current('RoomNotifications.BecomeOwner'),
         });
       }
-      if (localParticipantRef.current?.userId === newOwner.userId && localParticipantRef.current?.isMessageDisabled) {
+      if (localParticipantRef.current?.userId === newOwner.userId && localIsMessageDisabledRef.current) {
         await disableUserMessage({
           userId: newOwner.userId,
           disable: false,

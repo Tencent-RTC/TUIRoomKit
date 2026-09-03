@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { visualizer } from 'rollup-plugin-visualizer';
-import legacy from '@vitejs/plugin-legacy';
 import path from 'path';
 
 // https://vitejs.dev/config/
@@ -34,10 +33,6 @@ export default defineConfig({
     react(),
     visualizer({
       // open: true,
-    }),
-    legacy({
-      targets: ['ie >= 11'], // Specify the browser targets here
-      additionalLegacyPolyfills: ['regenerator-runtime/runtime'], // Optional polyfills
     }),
   ],
 });

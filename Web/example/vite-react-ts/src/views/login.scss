@@ -5,10 +5,19 @@
   justify-content: center;
   width: 100%;
   height: 100%;
+  /* Single demo login font entry (widget Login inherits this). */
+  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: var(--bg-color-dialog);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
+
+  /* Beat MUI / native control defaults that prefer Roboto. */
+  & * {
+    font-family: inherit;
+  }
 
   @media screen and (orientation: portrait), (orientation: landscape) {
     .phone-prefix {

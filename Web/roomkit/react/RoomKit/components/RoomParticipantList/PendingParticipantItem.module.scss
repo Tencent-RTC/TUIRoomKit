@@ -1,0 +1,41 @@
+.unjoined-user-item {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  box-sizing: border-box;
+  height: 52px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+
+  &.hovered {
+    background: var(--list-color-hover);
+  }
+}
+
+.user-info {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+}
+
+.user-name {
+  margin-left: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.status-text {
+  font-size: 12px;
+}

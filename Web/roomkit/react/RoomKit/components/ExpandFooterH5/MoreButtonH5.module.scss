@@ -1,0 +1,13 @@
+.moreButtonH5 {
+  width: 33px;
+  height: 52px;
+}
+
+.iconContainer {
+  display: inline-flex;
+  transition: transform 0.3s ease;
+}
+
+.iconRotate {
+  transform: rotate(180deg);
+}

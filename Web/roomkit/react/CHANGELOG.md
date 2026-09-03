@@ -4,6 +4,17 @@
 
 ---
 
+## [6.1.4] - 2026-08-26
+
+### Added
+
+- Added H5 (mobile web) conference support: `ConferenceMainViewH5`, `PreConferenceViewH5`, and related H5 controls for camera, microphone, members, chat, invitation, recording, and layout.
+- Exported `useRoomInvitationH5` for handling room invitations on mobile.
+
+## [6.1.3] - 2026-07-20
+
+- Added data reporting for start-recording API calls.
+
 ## [6.1.2] - 2026-07-17
 
 ### Fixed

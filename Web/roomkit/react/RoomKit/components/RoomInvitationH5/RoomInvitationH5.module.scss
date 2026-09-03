@@ -1,0 +1,185 @@
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.invitationContainer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 101%;
+  padding: 0;
+  overflow: hidden;
+  color: var(--text-color-button);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.backgroundBlur {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  filter: blur(5px);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  transform: scale(1.1);
+}
+
+.backgroundMask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  background-color: var(--bg-color-mask);
+  opacity: 0.8;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  animation: slide-up 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.roomInfoContainer {
+  display: flex;
+  flex: 2;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.avatarWrapper {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.inviteText {
+  max-width: 90%;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roomInfo {
+  box-sizing: border-box;
+
+  // Need width:100% (not only max-width) so that .detail max-width:50%
+  // resolves against the screen, not a shrink-wrapped title width — otherwise
+  // "房间成员：N人" ellipsizes to "房间成员：…".
+  width: 100%;
+  max-width: 100%;
+  padding: 0 20px;
+  margin-top: 32px;
+  text-align: center;
+}
+
+.roomTitle {
+  overflow: hidden;
+  font-size: 24px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roomDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.detail {
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.divider {
+  color: inherit;
+}
+
+.actions {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 66%;
+  font-size: 16px;
+}
+
+.actionItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.acceptButton,
+.rejectButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.acceptButton {
+  background-color: var(--text-color-success);
+  transform: rotate(90deg);
+}
+
+.rejectButton {
+  background-color: var(--text-color-error);
+}
+
+.acceptButtonIcon,
+.rejectButtonIcon {
+  color: var(--text-color-button);
+}
+
+.acceptButtonText,
+.rejectButtonText {
+  font-size: 16px;
+}

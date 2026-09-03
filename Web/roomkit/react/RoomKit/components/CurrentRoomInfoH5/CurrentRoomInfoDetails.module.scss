@@ -1,0 +1,64 @@
+.roomInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 20px 20px;
+  color: var(--text-color-primary);
+  background-color: var(--bg-color-dialog);
+  border-radius: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.roomInfoItem {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 14px;
+}
+
+.roomInfoTitle {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color-primary);
+}
+
+.roomInfoLabel {
+  flex-shrink: 0;
+  min-width: 80px;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--text-color-secondary);
+  text-align: start;
+}
+
+.roomInfoValue {
+  flex: 1;
+  gap: 8px;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--text-color-primary);
+  text-align: start;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  white-space: nowrap;
+}
+
+.roomInfoCopy {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: var(--text-color-link);
+  cursor: pointer;
+}
+
+.copyIcon {
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--text-color-link-hover);
+  }
+}

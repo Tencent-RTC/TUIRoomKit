@@ -1,0 +1,106 @@
+.participantItemH5 {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: 50px;
+  padding: 0 20px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    background: var(--list-color-hover);
+  }
+}
+
+.participantContent {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  height: 50px;
+  border-bottom: 1px solid var(--stroke-color-secondary);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.userDetails {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.userNameRow {
+  display: flex;
+  align-items: center;
+}
+
+.userName {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-color-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roleInfo {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.masterIcon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--text-color-link-hover);
+}
+
+.adminIcon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--text-color-warning);
+}
+
+.userExtraInfo {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--text-color-link-hover);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.userExtraInfoAdmin {
+    color: var(--text-color-warning);
+  }
+}
+
+.userExtraInfoAdmin {
+  color: var(--text-color-warning);
+}
+
+.memberAvState {
+  display: flex;
+  flex-shrink: 0;
+  gap: 12px;
+  align-items: center;
+  color: var(--uikit-color-gray-7);
+}
+
+.stateIcon {
+  flex-shrink: 0;
+}

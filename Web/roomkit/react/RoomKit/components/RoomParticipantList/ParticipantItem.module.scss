@@ -1,0 +1,88 @@
+.participant-item {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  box-sizing: border-box;
+  height: 52px;
+  padding: 0 20px;
+  cursor: pointer;
+
+  &.hovered {
+    background: var(--list-color-hover);
+  }
+}
+
+.user-info {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  min-width: 0;
+
+  .user-name {
+    min-width: 0;
+    margin-left: 12px;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color-secondary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .role-info {
+    display: flex;
+    flex-shrink: 0;
+    margin-left: 8px;
+
+    .master-icon,
+    .admin-icon {
+      display: flex;
+      color: var(--text-color-link);
+    }
+
+    .admin-icon {
+      color: var(--text-color-warning);
+    }
+
+    .user-extra-info,
+    .user-extra-info-admin {
+      margin-left: 4px;
+      overflow: hidden;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: var(--text-color-link);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .user-extra-info-admin {
+      color: var(--text-color-warning);
+      transition: none;
+    }
+  }
+}
+
+.member-av-state {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  color: var(--uikit-color-gray-7);
+
+  .state-icon {
+    margin-left: 16px;
+  }
+
+  .disable-icon {
+    opacity: 0.4;
+  }
+}
+
+.action-area {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}

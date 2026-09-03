@@ -7,6 +7,9 @@ body,
   margin: 0;
   overflow: hidden;
   color: var(--text-color-primary);
+  /* Demo-wide H5 font so Toast / MessageBox / Invitation (body portals) match UI. */
+  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 #app {

@@ -1,0 +1,11 @@
+.chatContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chatTitle {
+  padding: 0 20px;
+  font-size: 16px;
+  font-weight: 600;
+}

@@ -1,0 +1,57 @@
+.roomActionH5Container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.actionButton {
+  flex: 1;
+  min-width: 0;
+}
+
+.moreActionsContent {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+}
+
+.actionItem {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:active {
+    background: var(--list-color-hover);
+  }
+}
+
+.actionIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+
+  /* Vue's `.tui-icon` wrapper is 20x20 while the nested svg keeps its 16x16
+   * default — mirror that so the icon shows at the same size as Vue. */
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.actionText {
+  flex: 1;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

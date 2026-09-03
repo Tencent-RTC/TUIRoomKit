@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   TUIMessageBox,
   UIKitProvider,
@@ -9,8 +9,11 @@ import {
   RoomEvent,
   conference,
   useRoomInvitation,
+  useRoomInvitationH5,
+  type AcceptCallParams,
 } from '@tencentcloud/roomkit-web-react';
-import AppRouter from '@/router';
+import { useLeaveRoomGuard } from '@/router';
+import { isPC } from '@/utils/utils';
 import '@/styles/base.scss';
 
 const InnerApp = () => {
@@ -19,17 +22,27 @@ const InnerApp = () => {
   const location = useLocation();
   const bootstrappedRef = useRef(false);
 
-  const roomInvitation = useRoomInvitation({
-    onAcceptCall: ({ roomId, password, roomType }) => {
-      const search = new URLSearchParams();
-      search.set('roomId', roomId);
-      if (password) search.set('password', password);
-      if (roomType !== undefined && roomType !== null) {
-        search.set('roomType', String(roomType));
-      }
-      navigate(`/room?${search.toString()}`);
-    },
-  });
+  useLeaveRoomGuard();
+
+  const handleAcceptCall = ({
+    roomId,
+    password,
+    roomType,
+  }: AcceptCallParams) => {
+    const search = new URLSearchParams();
+    search.set('roomId', roomId);
+    if (password) search.set('password', password);
+    if (roomType !== undefined && roomType !== null) {
+      search.set('roomType', String(roomType));
+    }
+    navigate(`/room?${search.toString()}`);
+  };
+
+  // Same as Vue App.vue: host picks one invitation hook by platform.
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- isPC is constant (matches Vue)
+  const roomInvitation = !isPC
+    ? useRoomInvitationH5({ onAcceptCall: handleAcceptCall })
+    : useRoomInvitation({ onAcceptCall: handleAcceptCall });
 
   useEffect(() => {
     const onLoginExpired = () => {
@@ -83,7 +96,7 @@ const InnerApp = () => {
 
   return (
     <div id="app">
-      <AppRouter />
+      <Outlet />
       {roomInvitation}
     </div>
   );

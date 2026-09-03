@@ -17,8 +17,10 @@
   position: absolute;
   top: 0 - $border-width;
   left: 0 - $border-width;
+  z-index: 0;
   width: calc(100% + $border-width * 2);
   height: calc(100% + $border-width * 2);
+  overflow: hidden;
   background-color: var(--bg-color-bubble-reciprocal);
 
   &::before {
@@ -43,6 +45,7 @@
   position: absolute;
   bottom: 8px;
   left: 8px;
+  z-index: 1;
   box-sizing: border-box;
   display: flex;
   align-content: center;

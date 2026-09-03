@@ -1,0 +1,173 @@
+.homeContainerH5 {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  font-family: PingFang SC, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-color-primary);
+  background-color: var(--bg-color-default);
+}
+
+@supports (height: 100dvh) {
+  .homeContainerH5 {
+    height: 100dvh;
+  }
+}
+
+.themeLight,
+.themeDark {
+  // theme markers; palette tokens live in css variables
+}
+
+.headerH5 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background-color: var(--bg-color-operate);
+}
+
+.userInfoSection {
+  flex: 1;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.mainH5 {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.previewCard {
+  width: 100%;
+  max-width: 440px;
+  height: 350px;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cameraPreviewArea {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-color-topbar);
+}
+
+.cameraPreviewAreaHeader {
+  position: absolute;
+  z-index: 999;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-sizing: border-box;
+}
+
+.videoPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.attentionInfo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.offCameraInfo {
+  font-size: 16px;
+  color: var(--text-color-secondary);
+}
+
+.loading {
+  animation: loading-rotate 2s linear infinite;
+}
+
+.mediaControlsOverlay {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  display: flex;
+  padding: 0 12px;
+  background-color: var(--bg-color-mask);
+  border-radius: 50px;
+  transform: translateX(-50%);
+  backdrop-filter: blur(10px);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.primaryButton {
+  flex: 1;
+  height: 50px;
+}
+
+.footerH5 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 32px;
+}
+
+.brandLogo {
+  width: 466px;
+  height: 32px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.brandLightZh {
+  background-image: url('../../assets/logo-white-zh.png');
+}
+
+.brandLightEn {
+  background-image: url('../../assets/logo-white-en.png');
+}
+
+.brandDarkZh {
+  background-image: url('../../assets/logo-black-zh.png');
+}
+
+.brandDarkEn {
+  background-image: url('../../assets/logo-black-en.png');
+}
+
+@keyframes loading-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
