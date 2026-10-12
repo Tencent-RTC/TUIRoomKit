@@ -1,0 +1,424 @@
+<template>
+  <RoomKitProvider class="preconference-root">
+    <div
+      ref="viewRef"
+      class="preconference-view"
+      :class="{
+        'is-compact': compact,
+        'is-preview-open': compact && previewOpen,
+      }"
+    >
+      <PreconferenceTopbar
+        :user-name="displayUserName"
+        :avatar-url="displayAvatarUrl"
+        :compact="compact"
+        :preview-open="previewOpen"
+        @logout="logout"
+        @open-preview="openPreview"
+      />
+      <div v-if="faultBannerKey" class="pre-fault-banner">
+        <IconAlertCircle :size="14" />
+        <span>{{ t(faultBannerKey) }}</span>
+      </div>
+      <main class="pre-main">
+        <div
+          v-if="compact && previewOpen"
+          class="preview-backdrop"
+          @click="closePreview"
+        />
+        <div class="pre-grid">
+          <section
+            class="preview-card"
+            :aria-label="t('Preconference.PreviewRegion')"
+          >
+            <div
+              class="preview-compact-close"
+              role="button"
+              tabindex="0"
+              :aria-label="t('Preconference.ClosePreview')"
+              @click="closePreview"
+              @keydown.enter.prevent="closePreview"
+              @keydown.space.prevent="closePreview"
+            >
+              <IconClose :size="12" />
+            </div>
+            <slot name="preview">
+              <LocalPreview
+                v-if="!compact || previewOpen"
+                @banner-change="faultBannerKey = $event"
+              />
+            </slot>
+            <slot name="devices" />
+          </section>
+          <div class="join-side">
+            <div
+              class="join-stack"
+              :class="{ 'is-refresh-return': showRefreshReturn }"
+            >
+              <JoinCard
+                :busy="busy"
+                :initial-room-id="initialRoomId"
+                @create="emit('create')"
+                @schedule="openSchedule()"
+                @join="emit('join', $event)"
+              />
+              <RefreshReturnCard
+                :busy="busy"
+                @confirm="$emit('rejoin')"
+                @cancel="$emit('dismissLastRoom')"
+              />
+            </div>
+            <ScheduledList
+              @join="emit('join', $event)"
+              @edit="openSchedule($event)"
+            />
+          </div>
+        </div>
+      </main>
+      <SchedulePanel
+        v-model:open="scheduleOpen"
+        :user-name="displayUserName || credentials.userId"
+        :meeting="editingMeeting"
+        :schedule="submitSchedule"
+        @scheduled="handleScheduled"
+      />
+    </div>
+  </RoomKitProvider>
+</template>
+
+<script setup lang="ts">
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useLoginState } from 'tuikit-atomicx-vue3/room';
+import {
+  IconAlertCircle,
+  IconClose,
+  RoomKitProvider,
+  ScheduledList,
+  SchedulePanel,
+  t,
+  useSchedule,
+} from '@tencentcloud/roomkit-web-vue3-next';
+import type {
+  Credentials,
+  ScheduleRoomInput,
+  ScheduledRoom,
+} from '@tencentcloud/roomkit-web-vue3-next';
+import LocalPreview from './LocalPreview.vue';
+import RefreshReturnCard from './RefreshReturnCard.vue';
+import JoinCard from './JoinCard.vue';
+import PreconferenceTopbar from './PreconferenceTopbar.vue';
+/** Prototype compact breakpoint: hide the preview column below this width. */
+const COMPACT_WIDTH = 950;
+
+const props = withDefaults(
+  defineProps<{
+    busy?: boolean;
+    showRefreshReturn?: boolean;
+    initialRoomId?: string;
+    credentials: Credentials;
+  }>(),
+  { busy: false, showRefreshReturn: false, initialRoomId: '' },
+);
+const { loginUserInfo } = useLoginState();
+const displayUserName = computed(() =>
+  loginUserInfo.value?.userName || loginUserInfo.value?.userId || props.credentials.userId,
+);
+const displayAvatarUrl = computed(() => loginUserInfo.value?.avatarUrl || '');
+const emit = defineEmits<{
+  create: [];
+  join: [roomId: string];
+  scheduled: [roomId: string];
+  rejoin: [];
+  dismissLastRoom: [];
+  logout: [];
+}>();
+const { schedule, update } = useSchedule();
+const viewRef = ref<HTMLElement>();
+const compact = ref(false);
+const previewOpen = ref(false);
+const scheduleOpen = ref(false);
+const editingMeeting = ref<ScheduledRoom>();
+const faultBannerKey = ref<string>();
+let resizeObserver: ResizeObserver | undefined;
+
+function syncCompact() {
+  void nextTick(() => {
+    const width = viewRef.value?.offsetWidth ?? 0;
+    compact.value = width > 0 && width < COMPACT_WIDTH;
+    if (!compact.value) {
+      previewOpen.value = false;
+    }
+  });
+}
+
+function logout() {
+  emit('logout');
+}
+
+function openPreview() {
+  previewOpen.value = true;
+}
+
+function closePreview() {
+  previewOpen.value = false;
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && previewOpen.value) {
+    closePreview();
+  }
+}
+
+onMounted(() => {
+  if (viewRef.value && typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(syncCompact);
+    resizeObserver.observe(viewRef.value);
+    syncCompact();
+  }
+  document.addEventListener('keydown', onKeydown);
+});
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
+  document.removeEventListener('keydown', onKeydown);
+});
+function submitSchedule(input: ScheduleRoomInput) {
+  return editingMeeting.value
+    ? update(editingMeeting.value.roomId, input)
+    : schedule(input);
+}
+function handleScheduled(roomId: string) {
+  editingMeeting.value = undefined;
+  emit('scheduled', roomId);
+}
+function openSchedule(meeting?: ScheduledRoom) {
+  editingMeeting.value = meeting;
+  scheduleOpen.value = true;
+}
+</script>
+
+<style scoped lang="scss">
+.preconference-root {
+  height: 100%;
+  min-height: 0;
+}
+
+.preconference-root :deep(.rk-root-slot) {
+  height: 100%;
+}
+
+.preconference-view {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--rk-bg-page);
+  container-type: size;
+}
+
+[role='button']:focus-visible {
+  outline: 2px solid var(--rk-brand);
+  outline-offset: 3px;
+}
+
+.pre-fault-banner {
+  position: absolute;
+  top: 76px;
+  right: 40px;
+  left: 40px;
+  z-index: 20;
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #c24141;
+  background: color-mix(in srgb, var(--rk-danger) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rk-danger) 30%, transparent);
+  border-radius: 12px;
+}
+
+:global(.rk-root[data-rk-theme='dark']) .pre-fault-banner {
+  color: var(--rk-text-primary);
+}
+
+.pre-main {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+
+  /* Vertical padding has to shrink on short viewports. High-DPI laptops report
+     a small CSS viewport height even at 100% browser zoom, and a fixed 76px top
+     and bottom then eats enough of it to starve the schedule list. */
+  padding: clamp(16px, 5vh, 76px) 40px;
+  overflow: hidden auto;
+}
+
+.preview-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 98;
+  cursor: pointer;
+  background: rgb(0 0 0 / 45%);
+}
+
+.pre-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(380px, 1fr);
+  flex: 0 0 auto;
+  gap: 24px;
+
+  width: 75%;
+  height: 95%;
+
+  /* Floor so a short viewport scrolls `.pre-main` instead of compressing the
+     row. `flex-shrink: 0` keeps that floor: the default shrink would squeeze
+     the grid back into the scrollport and the cards would clip again. */
+  min-height: 520px;
+  min-width: 0;
+
+  /* Centers the grid while there is spare room. Auto margins resolve to 0 once
+     the grid is taller than `.pre-main`, so the top stays reachable. */
+  margin-block: auto;
+}
+
+.preview-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+
+  /* Video floor (280) + gap + mic/camera row + padding. `min-height: 0` let the
+     row shrink past that, and `overflow: hidden` then clipped the controls
+     without growing the page scroll height. */
+  min-height: 400px;
+  padding: 20px;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: var(--rk-radius-xl);
+}
+
+.preview-compact-close {
+  display: none;
+}
+
+.join-side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 380px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.join-stack {
+  display: grid;
+  flex: none;
+}
+
+.join-stack > :deep(.join-card),
+.join-stack > :deep(.refresh-return-card) {
+  grid-area: 1 / 1;
+}
+
+.join-stack.is-refresh-return > :deep(.join-card) {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.join-stack:not(.is-refresh-return) > :deep(.refresh-return-card) {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.preconference-root[data-rk-theme='dark'] :deep(.join-form .join-submit:disabled) {
+  background: var(--rk-bg-muted);
+}
+
+.entry-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--rk-danger);
+}
+
+.is-compact .pre-main {
+  justify-content: flex-start;
+  padding: 2% 5% 3%;
+}
+
+.is-compact .pre-grid {
+  flex: none;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
+}
+
+.is-compact .preview-card {
+  display: none;
+  min-height: 0;
+}
+
+.is-compact .join-side {
+  min-width: 0;
+  overflow: visible;
+}
+
+.is-preview-open .preview-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 99;
+  display: flex;
+  width: calc(100% - 80px);
+  max-width: 480px;
+  max-height: calc(100% - 80px);
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+}
+
+.is-preview-open :deep(.video-preview) {
+  min-height: 200px;
+}
+
+.is-preview-open .preview-compact-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: var(--rk-bg-hover);
+  border-radius: 8px;
+}
+
+@media (width <= 520px) {
+  .pre-main,
+  .is-compact .pre-main {
+    padding: 12px 16px 24px;
+  }
+}
+
+@media (width <= 1548px) {
+  .pre-grid {
+    width: 100%;
+    max-width: 1102px;
+  }
+}
+</style>

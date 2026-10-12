@@ -1,0 +1,1 @@
+export { useEnterRoom } from './useEnterRoom';

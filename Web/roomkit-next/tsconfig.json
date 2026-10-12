@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "useDefineForClassFields": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "allowJs": true,
+    "experimentalDecorators": true,
+    "paths": {
+      "@/*": ["./roomkit/*"]
+    }
+  },
+  "include": [
+    "roomkit/**/*.ts",
+    "roomkit/**/*.d.ts",
+    "roomkit/**/*.tsx",
+    "roomkit/**/*.vue",
+    "test/**/*.ts"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

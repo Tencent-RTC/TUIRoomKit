@@ -1,0 +1,32 @@
+.rk-root[data-rk-theme='dark'] {
+  --rk-text-primary: #f2f2f2;
+  --rk-text-secondary: #9a9a9a;
+  --rk-text-tertiary: #6e6e6e;
+  --rk-text-inverse: #1c1c1c;
+  --rk-text-disabled: #525252;
+  --rk-bg-page: #0a0a0a;
+  --rk-bg-surface: #1c1c1c;
+  --rk-bg-raised: #333333;
+  --rk-bg-muted: color-mix(in srgb, #f2f2f2 8%, transparent);
+  --rk-bg-hover: color-mix(in srgb, #f2f2f2 6%, transparent);
+  --rk-option-hover: color-mix(in srgb, #f2f2f2 10%, transparent);
+  --rk-bg-overlay: rgba(0, 0, 0, 0.55);
+  --rk-bg-device-fault: #0a0a0a;
+  --rk-border: color-mix(in srgb, #f2f2f2 12%, transparent);
+  --rk-border-strong: color-mix(in srgb, #f2f2f2 18%, transparent);
+  --rk-avatar-bg: var(--rk-brand);
+  --rk-avatar-fg: #ffffff;
+  --rk-toggle-off: #9a9aa0;
+  --rk-knob: #ffffff;
+  --rk-track: #4a4a4a;
+  --rk-on-accent: #ffffff;
+  --rk-shadow-pop: 0 4px 12px color-mix(in srgb, #0a0a0a 35%, transparent);
+  --rk-shadow-dialog: 0 8px 24px color-mix(in srgb, #0a0a0a 45%, transparent);
+  --rk-tooltip-bg: rgba(20, 25, 40, .92);
+  --rk-tooltip-fg: #fff;
+  --rk-tooltip-border: 0;
+  --rk-dialog-border: 0;
+  --rk-dialog-cancel-bg: var(--rk-bg-hover);
+  --rk-dialog-cancel-border: 0;
+  --rk-dialog-cancel-hover: var(--rk-option-hover);
+}

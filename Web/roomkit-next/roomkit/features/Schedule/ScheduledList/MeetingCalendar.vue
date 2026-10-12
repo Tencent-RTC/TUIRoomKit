@@ -1,0 +1,791 @@
+<template>
+  <section class="calendar-card" :aria-label="t('Calendar.Region')">
+    <header class="cal-header">
+      <h2 class="cal-title">
+        <i class="cal-title-dot" />{{ t('Calendar.Title') }}
+      </h2>
+      <div class="cal-nav">
+        <TUIButton
+          class="cal-nav-btn"
+          variant="ghost"
+          size="sm"
+          :aria-label="t('Calendar.PreviousWeek')"
+          :disabled="!canPrevWeek"
+          @click="moveWeek(-7)"
+        >
+          <IconChevron class="previous" :size="14" />
+        </TUIButton>
+        <TUIButton
+          class="cal-nav-btn"
+          variant="ghost"
+          size="sm"
+          :aria-label="t('Calendar.NextWeek')"
+          :disabled="!canNextWeek"
+          @click="moveWeek(7)"
+        >
+          <IconChevron class="next" :size="14" />
+        </TUIButton>
+        <TUIButton
+          class="cal-nav-btn cal-nav-btn-text"
+          variant="ghost"
+          size="sm"
+          @click="goToday"
+        >
+          {{ t('Calendar.Today') }}
+        </TUIButton>
+      </div>
+    </header>
+    <div class="cal-days">
+      <div
+        v-for="day in days"
+        :key="day.key"
+        class="cal-day"
+        :class="{
+          active: selected === day.key,
+          today: day.key === todayKey,
+          'has-event': eventDays.has(day.key),
+        }"
+        :aria-pressed="selected === day.key"
+        :aria-label="day.date.toLocaleDateString(i18n.language)"
+        @click="selectVisibleDay(day.key)"
+      >
+        <span class="cal-day-wk">{{
+          day.key === todayKey
+            ? t('Calendar.Today')
+            : t(WEEKDAY_KEYS[day.date.getDay()])
+        }}</span>
+        <span class="cal-day-num">{{ day.date.getDate() }}</span>
+        <i class="cal-day-dot" />
+      </div>
+    </div>
+    <div class="cal-list" aria-live="polite">
+      <article
+        v-for="meeting in visibleMeetings"
+        :key="meeting.roomId"
+        class="cal-item"
+        :class="`is-${status(meeting)}`"
+      >
+        <div class="cal-item-time">
+          <strong class="cal-item-time-h">{{
+            formatTime(meeting.scheduledStartTime * 1000)
+          }}</strong><span class="cal-item-time-d">{{
+            t(STATUS_KEYS[status(meeting)])
+          }}</span>
+        </div>
+        <i class="cal-item-bar" aria-hidden="true" />
+        <div class="cal-item-body">
+          <h3 class="cal-item-title" :title="meeting.roomName">
+            {{ meeting.roomName }}
+          </h3>
+          <div class="cal-item-meta">
+            <span
+              v-if="meeting.ownerUserId === currentUserId"
+              class="cal-item-badge"
+            >{{ t('Calendar.Owner') }}</span>
+            <i
+              v-if="meeting.ownerUserId === currentUserId"
+              class="cal-item-meta-sep"
+              aria-hidden="true"
+            />
+            <span class="cal-item-meta-text">{{ timeRange(meeting) }}</span>
+            <i
+              class="cal-item-meta-sep"
+              aria-hidden="true"
+            />
+            <span class="cal-item-meta-text">{{ meeting.roomId }}</span>
+          </div>
+        </div>
+        <div
+          v-if="meeting.roomId && status(meeting) !== 'ended'"
+          class="cal-item-actions"
+        >
+          <TUIDropdown
+            class="cal-item-more"
+            placement="bottom"
+            @command="onMore($event, meeting)"
+          >
+            <TUIButton
+              class="cal-item-icon"
+              variant="ghost"
+              size="sm"
+              :title="t('Calendar.More')"
+              :aria-label="t('Calendar.More')"
+            >
+              <IconMore :size="16" />
+            </TUIButton>
+            <template #menu>
+              <TUIDropdownItem command="detail">
+                {{ t('Schedule.ViewDetail') }}
+              </TUIDropdownItem>
+              <TUIDropdownItem
+                v-if="canManage(meeting)"
+                command="edit"
+              >
+                {{ t('Schedule.EditRoom') }}
+              </TUIDropdownItem>
+              <TUIDropdownItem
+                v-if="canManage(meeting)"
+                command="cancel"
+                danger
+              >
+                {{ t('Schedule.CancelRoom') }}
+              </TUIDropdownItem>
+            </template>
+          </TUIDropdown>
+          <TUIButton
+            class="cal-item-icon cal-item-share"
+            variant="ghost"
+            size="sm"
+            :title="t('Calendar.Share')"
+            :aria-label="t('Calendar.Share')"
+            @click="$emit('share', meeting)"
+          >
+            <IconExternalLink :size="15" />
+          </TUIButton>
+          <TUIButton
+            class="cal-item-join"
+            variant="ghost"
+            size="sm"
+            @click="$emit('join', meeting.roomId)"
+          >
+            {{ t('Calendar.Join') }}
+          </TUIButton>
+        </div>
+      </article>
+      <div
+        v-if="loading"
+        class="cal-list-empty"
+        role="status"
+      >
+        <IconLoading
+          class="cal-empty-spinner"
+          :size="24"
+          spin
+        />
+        <p>{{ t('Calendar.Loading') }}</p>
+      </div>
+      <div
+        v-else-if="error"
+        class="cal-list-empty"
+        role="status"
+      >
+        <span class="cal-empty-icon"><IconCalendar :size="18" /></span>
+        <p>{{ error }}</p>
+        <TUIButton
+          class="cal-empty-action"
+          variant="ghost"
+          size="sm"
+          @click="$emit('refresh')"
+        >
+          {{ t('Calendar.Retry') }}
+        </TUIButton>
+      </div>
+      <div v-else-if="!visibleMeetings.length" class="cal-list-empty">
+        <span class="cal-empty-icon"><IconCalendar :size="18" /></span>
+        <p>{{ t('Calendar.EmptyDay') }}</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import { RoomStatus } from 'tuikit-atomicx-vue3/room';
+import {
+  IconCalendar,
+  IconChevron,
+  IconExternalLink,
+  IconLoading,
+  IconMore,
+  TUIButton,
+  TUIDropdown,
+  TUIDropdownItem,
+} from '../../../base';
+import { i18n, t } from '../../../i18n';
+import {
+  addDays,
+  canShiftScheduleListWeek,
+  clampScheduleListFirstDay,
+  dateKey,
+  eventDayKeys,
+  formatTime,
+  isScheduleDateSelectable,
+  scheduleSelectableRange,
+} from '../SchedulePanel/scheduleUtils';
+import type { ScheduledRoom } from './index';
+
+const WEEKDAY_KEYS = [
+  'Calendar.Sun',
+  'Calendar.Mon',
+  'Calendar.Tue',
+  'Calendar.Wed',
+  'Calendar.Thu',
+  'Calendar.Fri',
+  'Calendar.Sat',
+];
+const STATUS_KEYS = {
+  live: 'Calendar.StatusLive',
+  upcoming: 'Calendar.StatusUpcoming',
+  ended: 'Calendar.StatusEnded',
+};
+
+const props = defineProps<{
+  meetings: ScheduledRoom[];
+  now: number;
+  currentUserId?: string;
+  loading?: boolean;
+  error?: string;
+}>();
+const emit = defineEmits<{
+  join: [roomId: string];
+  refresh: [];
+  share: [meeting: ScheduledRoom];
+  detail: [meeting: ScheduledRoom];
+  edit: [meeting: ScheduledRoom];
+  cancel: [meeting: ScheduledRoom];
+}>();
+const listNow = computed(() => new Date(props.now));
+const listRange = computed(() => scheduleSelectableRange(listNow.value));
+const selected = ref(dateKey(listNow.value));
+const firstDay = ref(clampScheduleListFirstDay(listNow.value, listNow.value));
+const todayKey = computed(() => dateKey(listNow.value));
+const days = computed(() =>
+  Array.from({ length: 7 }, (_, index) => {
+    const date = addDays(firstDay.value, index);
+    return { date, key: dateKey(date) };
+  }),
+);
+const canPrevWeek = computed(() =>
+  canShiftScheduleListWeek(firstDay.value, -7, listNow.value),
+);
+const canNextWeek = computed(() =>
+  canShiftScheduleListWeek(firstDay.value, 7, listNow.value),
+);
+const eventDays = computed(() => eventDayKeys(props.meetings, props.now));
+const visibleMeetings = computed(() =>
+  props.meetings
+    .filter(meeting => dateKey(new Date(meeting.scheduledStartTime * 1000)) === selected.value)
+    .filter(meeting => status(meeting) !== 'ended')
+    .sort((a, b) => a.scheduledStartTime - b.scheduledStartTime),
+);
+function status(meeting: ScheduledRoom): keyof typeof STATUS_KEYS {
+  if (meeting.scheduledEndTime * 1000 <= props.now) {
+    return 'ended';
+  }
+  if (meeting.roomStatus === RoomStatus.Running) {
+    return 'live';
+  }
+  return 'upcoming';
+}
+function timeRange(meeting: ScheduledRoom): string {
+  return `${formatTime(meeting.scheduledStartTime * 1000)}-${formatTime(meeting.scheduledEndTime * 1000)}`;
+}
+function canManage(meeting: ScheduledRoom): boolean {
+  return meeting.ownerUserId === props.currentUserId
+    && meeting.roomStatus === RoomStatus.Scheduled;
+}
+function onMore(command: string | number, meeting: ScheduledRoom) {
+  if (command === 'detail') {
+    emit('detail', meeting);
+    return;
+  }
+  if (command === 'edit') {
+    emit('edit', meeting);
+    return;
+  }
+  if (command === 'cancel') {
+    emit('cancel', meeting);
+  }
+}
+function selectVisibleDay(key: string) {
+  if (!isScheduleDateSelectable(key, listRange.value.min, listRange.value.max)) {
+    return;
+  }
+  selected.value = key;
+}
+function moveWeek(offset: number) {
+  if (!canShiftScheduleListWeek(firstDay.value, offset, listNow.value)) {
+    return;
+  }
+  firstDay.value = clampScheduleListFirstDay(addDays(firstDay.value, offset), listNow.value);
+  selected.value = dateKey(firstDay.value);
+}
+function selectDate(date: Date) {
+  const now = listNow.value;
+  const { min, max } = scheduleSelectableRange(now);
+  firstDay.value = clampScheduleListFirstDay(date, now);
+  const key = dateKey(date);
+  selected.value = isScheduleDateSelectable(key, min, max) ? key : dateKey(firstDay.value);
+}
+defineExpose({ selectDate });
+function goToday() {
+  firstDay.value = clampScheduleListFirstDay(listNow.value, listNow.value);
+  selected.value = todayKey.value;
+}
+</script>
+
+<style scoped lang="scss">
+.calendar-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 28px;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: var(--rk-radius-xl);
+}
+
+/* Header and day grid keep their intrinsic height so that a height-bound card
+   only ever squeezes the meeting list below them. */
+.cal-header {
+  display: flex;
+  flex: none;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.cal-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--rk-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.cal-title-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--rk-brand);
+  border-radius: 50%;
+}
+
+.cal-nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.cal-nav-btn {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--rk-text-secondary);
+  background: transparent;
+  border: 1px solid var(--rk-border);
+  border-radius: var(--rk-radius-sm);
+}
+
+.cal-nav-btn:hover:not(:disabled) {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-muted);
+}
+
+.cal-nav-btn-text {
+  width: auto;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.previous {
+  transform: rotate(90deg);
+}
+
+.next {
+  transform: rotate(-90deg);
+}
+
+.cal-days {
+  display: flex;
+  flex: none;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.cal-day {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 4px;
+  text-align: center;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rk-radius-md);
+  transition:
+    background-color var(--rk-duration) var(--rk-ease),
+    border-color var(--rk-duration) var(--rk-ease),
+    color var(--rk-duration) var(--rk-ease);
+}
+
+.cal-day:hover {
+  background: var(--rk-bg-muted);
+}
+
+:global(.rk-root[data-rk-theme='dark']) .cal-day {
+  color: var(--rk-text-primary);
+}
+
+.cal-day.today:not(.active) {
+  color: var(--rk-brand);
+}
+
+.cal-day.active {
+  color: var(--rk-on-accent);
+  background: var(--rk-brand);
+}
+
+.cal-day span {
+  display: block;
+}
+
+.cal-day-wk {
+  margin-bottom: 4px;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+
+.cal-day.today:not(.active) .cal-day-wk {
+  color: var(--rk-brand);
+  opacity: 1;
+}
+
+.cal-day-num {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-day-dot {
+  display: block;
+  width: 3px;
+  height: 3px;
+  margin: 4px auto 0;
+  visibility: hidden;
+  background: var(--rk-brand);
+  border-radius: 50%;
+}
+
+.cal-day.has-event .cal-day-dot {
+  visibility: visible;
+}
+
+.cal-day.active .cal-day-dot {
+  background: var(--rk-on-accent);
+}
+
+.cal-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  padding: 0 4px 2px;
+  margin: 0 -4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+.cal-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 12px 11px 14px;
+  cursor: pointer;
+  background: rgba(70, 100, 150, 0.04);
+  border-radius: var(--rk-radius-md);
+  transition: background-color var(--rk-duration) var(--rk-ease);
+}
+
+.cal-item:hover {
+  background: rgba(70, 100, 150, 0.075);
+}
+
+.cal-item-time {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  align-self: stretch;
+  justify-content: center;
+  width: 48px;
+  text-align: center;
+}
+
+.cal-item-time-h {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  color: var(--rk-text-secondary);
+  letter-spacing: -0.02em;
+}
+
+.cal-item-time-d {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--rk-text-tertiary);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.cal-item-bar {
+  flex: none;
+  align-self: stretch;
+  width: 3px;
+  min-height: 36px;
+  background: var(--rk-brand);
+  border-radius: var(--rk-radius-pill);
+}
+
+.cal-item-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  align-self: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.cal-item-title {
+  margin: 0;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--rk-text-primary);
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.cal-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--rk-text-tertiary);
+}
+
+.cal-item-meta-text {
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-item-meta-sep {
+  flex: none;
+  width: 2px;
+  height: 2px;
+  background: var(--rk-text-tertiary);
+  border-radius: 50%;
+  opacity: 0.55;
+}
+
+.cal-item-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 16px;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--rk-brand);
+  background: var(--rk-brand-soft);
+  border-radius: 4px;
+}
+
+.cal-item-actions {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  align-items: center;
+  margin-right: 2px;
+}
+
+.cal-item-more {
+  display: inline-flex;
+  flex: none;
+  line-height: 0;
+}
+
+.cal-item-icon {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--rk-text-secondary);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+}
+
+.cal-item-icon:hover {
+  color: var(--rk-brand);
+  background: var(--rk-bg-muted);
+}
+
+.cal-item-icon svg {
+  display: block;
+}
+
+/* Beat TUIButton ghost hover (`.rk-btn-ghost:hover:not(:disabled)`). */
+.cal-item-actions .cal-item-join {
+  flex: none;
+  height: 28px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1;
+  color: var(--rk-text-secondary);
+  background: color-mix(in srgb, var(--rk-text-primary) 6%, var(--rk-bg-surface));
+  border: 0;
+  border-radius: 8px;
+  transition:
+    background-color var(--rk-duration) var(--rk-ease),
+    color var(--rk-duration) var(--rk-ease);
+}
+
+.cal-item-actions .cal-item-join:hover:not(:disabled) {
+  color: var(--rk-brand);
+  background: var(--rk-brand-soft);
+}
+
+.cal-item.is-live .cal-item-actions .cal-item-join,
+.cal-item.is-live .cal-item-actions .cal-item-join:hover:not(:disabled) {
+  color: var(--rk-brand);
+  background: var(--rk-brand-soft);
+}
+
+.cal-item.is-live .cal-item-time-d {
+  font-weight: 700;
+  color: var(--rk-brand);
+}
+
+.cal-item.is-upcoming .cal-item-bar {
+  background: color-mix(in srgb, var(--rk-brand) 42%, transparent);
+}
+
+.cal-item.is-upcoming .cal-item-time-d {
+  font-weight: 600;
+}
+
+/* Ended is the weakest tier: dimmed bar, lighter text, no join action. */
+.cal-item.is-ended .cal-item-bar {
+  opacity: 0.16;
+}
+
+.cal-item.is-ended .cal-item-time-h,
+.cal-item.is-ended .cal-item-title {
+  font-weight: 500;
+  color: var(--rk-text-tertiary);
+}
+
+.cal-item.is-ended .cal-item-badge {
+  opacity: 0.6;
+}
+
+.cal-list-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 20px 18px;
+  font-size: 13px;
+  color: var(--rk-text-tertiary);
+  text-align: center;
+}
+
+.cal-list-empty p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.cal-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--rk-text-tertiary);
+  background: var(--rk-bg-page);
+  border-radius: var(--rk-radius-md);
+}
+
+.cal-empty-spinner {
+  color: var(--rk-brand);
+}
+
+.cal-empty-action {
+  height: auto;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rk-brand);
+  background: transparent;
+  border: 0;
+}
+
+.cal-empty-action:hover {
+  text-decoration: underline;
+}
+
+:global(.rk-root[data-rk-theme='light']) .cal-item:not(.is-live) .cal-item-actions .cal-item-join:not(:hover) {
+  background: #eceef4;
+}
+
+:global(.rk-root[data-rk-theme='dark']) .cal-item {
+  background: rgba(140, 170, 230, 0.035);
+}
+
+:global(.rk-root[data-rk-theme='dark']) .cal-item:hover {
+  background: rgba(140, 170, 230, 0.07);
+}
+
+:global(.rk-root[data-rk-theme='dark']) .cal-item.is-live .cal-item-bar {
+  box-shadow: 0 0 10px color-mix(in srgb, var(--rk-brand) 45%, transparent);
+}
+
+@media (width <= 900px) {
+  .calendar-card {
+    min-height: 400px;
+  }
+}
+
+@media (width <= 520px) {
+  .calendar-card {
+    padding: 20px;
+  }
+
+  .cal-item {
+    gap: 8px;
+    padding: 11px 8px;
+  }
+
+  .cal-item-meta {
+    gap: 4px;
+  }
+}
+</style>

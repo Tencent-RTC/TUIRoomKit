@@ -1,0 +1,45 @@
+:root,
+.rk-root {
+  --rk-text-primary: #1c1b1c;
+  --rk-text-secondary: #636263;
+  --rk-text-tertiary: #8e8d8e;
+  --rk-text-inverse: #ffffff;
+  --rk-text-disabled: #c7c6c7;
+  --rk-bg-page: #f5f4f5;
+  --rk-bg-surface: #ffffff;
+  --rk-bg-muted: color-mix(in srgb, #1c1b1c 6%, transparent);
+  --rk-bg-hover: color-mix(in srgb, #1c1b1c 10%, transparent);
+  --rk-bg-raised: #ffffff;
+  --rk-option-hover: color-mix(in srgb, #1c1b1c 10%, transparent);
+  --rk-bg-overlay: rgba(0, 0, 0, 0.55);
+  --rk-bg-camera-off: var(--rk-bg-surface);
+  --rk-border: color-mix(in srgb, #1c1b1c 9%, transparent);
+  --rk-border-strong: color-mix(in srgb, #1c1b1c 18%, transparent);
+  --rk-avatar-bg: var(--rk-brand);
+  --rk-avatar-fg: #ffffff;
+  --rk-toggle-off: #e5e5ea;
+  --rk-knob: #ffffff;
+  --rk-track: var(--rk-gray-200);
+  --rk-on-accent: #ffffff;
+  --rk-focus-ring: color-mix(in srgb, var(--rk-brand) 22%, transparent);
+  --rk-focus-ring-danger: color-mix(in srgb, var(--rk-danger) 22%, transparent);
+  --rk-brand: #0071e3;
+  --rk-brand-soft: color-mix(in srgb, var(--rk-brand) 14%, transparent);
+  --rk-brand-hover: color-mix(in srgb, var(--rk-brand) 94%, #0d0d0d);
+  --rk-danger: #ff453a;
+  --rk-danger-hover: color-mix(in srgb, var(--rk-danger) 94%, #0d0d0d);
+  --rk-warning: #ff9f0a;
+  --rk-info: #0071e3;
+  /* Calling affordances stay green in both themes, so no dark override. */
+  --rk-success: var(--rk-green-400);
+  --rk-success-soft: color-mix(in srgb, var(--rk-success) 14%, transparent);
+  --rk-success-soft-strong: color-mix(in srgb, var(--rk-success) 24%, transparent);
+  --rk-tooltip-bg: var(--rk-bg-raised);
+  --rk-tooltip-fg: var(--rk-text-primary);
+  --rk-tooltip-border: 1px solid var(--rk-border);
+  --rk-tooltip-size: 11px;
+  --rk-tooltip-weight: 500;
+  --rk-dialog-cancel-bg: var(--rk-bg-muted);
+  --rk-dialog-cancel-border: 0;
+  --rk-dialog-cancel-hover: var(--rk-bg-hover);
+}
