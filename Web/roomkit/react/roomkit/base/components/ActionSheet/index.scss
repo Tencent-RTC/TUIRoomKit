@@ -1,0 +1,71 @@
+.rk-action-sheet-mask {
+  position: absolute;
+  inset: 0;
+  overscroll-behavior: contain;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 8px max(8px, env(safe-area-inset-bottom));
+  pointer-events: auto;
+  background: rgb(0 0 0 / 40%);
+}
+
+.rk-action-sheet-mask-bare {
+  background: transparent;
+}
+
+.rk-action-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  outline: none;
+}
+
+.rk-action-sheet-group {
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: var(--rk-radius-md);
+}
+
+.rk-action-sheet-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
+  color: var(--rk-text-primary);
+  font: inherit;
+  font-size: var(--rk-fs-lg);
+  font-weight: 400;
+  line-height: 1.2;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.rk-action-sheet-item + .rk-action-sheet-item {
+  border-top: 1px solid var(--rk-border);
+}
+
+.rk-action-sheet-item small {
+  color: var(--rk-text-secondary);
+  font-size: var(--rk-fs-sm);
+  font-weight: 400;
+}
+
+.rk-action-sheet-item.is-danger {
+  color: var(--rk-danger);
+  font-weight: 500;
+}
+
+.rk-action-sheet-item.is-cancel {
+  font-weight: 600;
+}
+
+.rk-action-sheet-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}

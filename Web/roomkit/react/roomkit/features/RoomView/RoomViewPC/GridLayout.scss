@@ -1,0 +1,139 @@
+.grid-layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  overflow: visible;
+}
+
+.grid-layout-body {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.grid-layout-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  place-content: flex-start;
+}
+
+/* A short last row on an unpaged grid sits centered; paged grids keep full rows. */
+.grid-layout-content.is-center-last {
+  justify-content: center;
+}
+
+/* The tile is the one clip for the video and the overlay; the halo below is the tile's
+   own shadow, which its overflow does not cut. */
+.grid-layout-tile {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: var(--room-view-tile-bg);
+  border-radius: var(--rk-radius-lg);
+}
+
+.grid-layout-video {
+  width: 100%;
+  height: 100%;
+}
+
+.grid-layout-video.is-hidden {
+  opacity: 0;
+}
+
+/* Same reasoning as the speaker layout: the halo sits outside the tile box, so the
+   layout draws it while the overlay keeps owning the state. The grid's 8px gaps give
+   the glow room to bleed. */
+.grid-layout-tile:has(.participant-view-overlay.is-speaking) {
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, #34c759 60%, transparent),
+    0 0 18px color-mix(in srgb, #34c759 18%, transparent);
+}
+
+.grid-layout-pager {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  pointer-events: none;
+}
+
+.grid-layout-page-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: #fff;
+  pointer-events: none;
+  cursor: pointer;
+  background: color-mix(in srgb, #000 42%, transparent);
+  border: 0;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.16s ease, transform 0.16s ease, background 0.15s;
+  transform: scale(0.92);
+}
+
+.grid-layout-page-btn:hover {
+  background: color-mix(in srgb, #000 58%, transparent);
+}
+
+.grid-layout:hover .grid-layout-page-btn {
+  pointer-events: auto;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.grid-layout:hover .grid-layout-page-btn:disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.22;
+}
+
+.grid-layout-page-icon.is-prev {
+  transform: rotate(90deg);
+}
+
+.grid-layout-page-icon.is-next {
+  transform: rotate(-90deg);
+}
+
+/* Lives in the 20px stage gap under the tiles, not on the video. */
+.grid-layout-page-ind {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  z-index: 8;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  height: 20px;
+  padding: 0 8px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  background: color-mix(in srgb, #000 42%, transparent);
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+  transform: translate(-50%, 100%);
+}
+
+.grid-layout:hover .grid-layout-page-ind {
+  opacity: 1;
+}

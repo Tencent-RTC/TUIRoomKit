@@ -1,0 +1,45 @@
+.toolbar-button-mobile {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: color-mix(in srgb, var(--rk-text-primary) 6%, transparent);
+  border-radius: 50%;
+  outline: none;
+  transition: background 0.15s, color 0.15s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toolbar-button-mobile:not(.is-disabled):active {
+  transform: scale(0.96);
+}
+
+.toolbar-button-mobile.is-active {
+  color: var(--rk-brand);
+  background: var(--rk-brand-soft);
+}
+
+.toolbar-button-mobile.is-blocked,
+.toolbar-button-mobile.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.toolbar-button-mobile-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.toolbar-button-mobile-icon svg {
+  width: 20px;
+  height: 20px;
+}

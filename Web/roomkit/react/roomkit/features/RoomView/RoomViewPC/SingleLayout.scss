@@ -1,0 +1,38 @@
+.single-layout {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  padding: 6px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--rk-brand) 1.6%, #f8f7f9);
+}
+
+.rk-root[data-rk-theme='dark'] .single-layout {
+  background: color-mix(in srgb, var(--rk-brand) 2%, #141414);
+}
+
+.single-layout-stream {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--room-view-tile-bg);
+  border-radius: 18px;
+}
+
+.single-layout-video {
+  width: 100%;
+  height: 100%;
+}
+
+.single-layout-video.is-hidden {
+  opacity: 0;
+}
+
+.single-layout-stream:has(.participant-view-overlay.is-speaking) {
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, #34c759 60%, transparent),
+    0 0 18px color-mix(in srgb, #34c759 18%, transparent);
+}

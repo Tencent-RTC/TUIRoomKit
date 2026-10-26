@@ -1,0 +1,145 @@
+@mixin hide-scrollbar {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+.schedule-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  padding: 8px 24px 16px;
+  overflow: auto;
+
+  @include hide-scrollbar;
+}
+
+.schedule-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.sch-field.is-topic {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 8px 16px;
+  align-items: center;
+  min-width: 0;
+}
+
+.sch-field.is-topic .sch-label {
+  font-size: var(--rk-fs-md);
+  font-weight: 400;
+  line-height: 40px;
+  color: var(--rk-text-primary);
+}
+
+.sch-field.is-topic .sch-topic-card {
+  box-sizing: border-box;
+  height: 40px;
+  min-height: 40px;
+  background: var(--rk-bg-raised, var(--rk-bg-surface));
+  border: 1px solid var(--rk-border);
+}
+
+.schedule-body .sch-topic-card:focus-within {
+  box-shadow: 0 0 0 1px var(--rk-brand);
+}
+
+.schedule-footer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 10px 24px 12px;
+  background: var(--rk-bg-surface);
+  border-top: 1px solid var(--rk-border);
+}
+
+.footer-button {
+  flex: none;
+  height: 36px;
+  padding: 0 16px;
+}
+
+@media (width <= 520px) {
+  .sch-field {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .sch-label {
+    line-height: 22px;
+  }
+}
+
+.rk-dialog-mask .rk-dialog:has(.schedule-body) {
+  height: auto;
+  max-height: min(88vh, calc(100% - 48px));
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.rk-dialog-mask .rk-dialog:has(.schedule-body) .rk-dialog-header {
+  padding: 0 0 8px;
+  margin-bottom: 0;
+}
+
+.rk-dialog-mask .rk-dialog:has(.schedule-body) .rk-dialog-title {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: var(--rk-fs-xl);
+}
+
+.rk-dialog-mask .rk-dialog:has(.schedule-body) .rk-dialog-title::before {
+  flex: none;
+  width: 3px;
+  height: 16px;
+  content: '';
+  background: var(--rk-brand);
+  border-radius: 2px;
+}
+
+.rk-dialog-mask .rk-dialog:has(.schedule-body) .rk-dialog-footer {
+  justify-content: flex-end;
+  padding: 0;
+  margin-top: 0;
+}
+
+.rk-dialog-mask .rk-dialog:has(.schedule-body) .rk-dialog-footer .rk-btn {
+  flex: none;
+  width: auto;
+  min-width: 0;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 12px;
+}
+
+.rk-dialog-mask .rk-dialog:has(.schedule-body),
+.rk-dialog-mask .rk-dialog:has(.schedule-body) * {
+  scrollbar-width: none;
+}
+
+.rk-dialog-mask .rk-dialog:has(.schedule-body)::-webkit-scrollbar,
+.rk-dialog-mask .rk-dialog:has(.schedule-body) *::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.rk-dialog-mask .rk-dialog:has(.schedule-body) .rk-dialog-body {
+  min-height: 0;
+}
+

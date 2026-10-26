@@ -1,0 +1,15 @@
+.overflow-toolbar-mobile {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Spaced from the sheet edge on its own, over TUIPopup's 16px body padding. */
+.overflow-toolbar-mobile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 4px;
+  padding: 6px 8px 14px;
+  margin: 0 -16px;
+}

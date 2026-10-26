@@ -1,0 +1,51 @@
+.virtual-background-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.virtual-background-item {
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  aspect-ratio: 4 / 3;
+  padding: 3px;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition: border-color var(--rk-duration) var(--rk-ease);
+}
+
+.virtual-background-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.virtual-background-item:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--rk-brand) 35%, transparent);
+}
+
+.virtual-background-item.is-active,
+.virtual-background-item.is-active:hover {
+  border-color: var(--rk-brand);
+}
+
+.virtual-background-face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--rk-bg-muted);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 8px;
+}
+
+.virtual-background-item.is-blur .virtual-background-face {
+  background-color: color-mix(in srgb, #e7e2d8 70%, var(--rk-bg-muted));
+}

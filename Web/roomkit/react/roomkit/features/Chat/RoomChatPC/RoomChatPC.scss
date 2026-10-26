@@ -1,0 +1,18 @@
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-panel-list {
+  flex: 1;
+  min-height: 0;
+  padding: 4px 12px 0;
+  overflow: hidden;
+}
+
+.chat-panel-input {
+  flex-shrink: 0;
+}

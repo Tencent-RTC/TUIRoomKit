@@ -1,23 +1,29 @@
 export const resource = {
-  // Room
-  'Room.TemporaryMeeting': "'s temporary room",
-  'Room.Webinar': "'s webinar",
-  'Room.LeaveRoomTitle': 'Leave Room',
-  'Room.ConfirmLeavePage':
-    'Are you sure you want to leave this page? You will exit the current room',
-  'Room.NotSupportWebinar': 'Not supported to join webinar',
-
-  // login
-  'Login.Expired': 'Login expired',
-  'Login.ExpiredDescription':
-    'Your login status has expired. For security reasons, please log in again.',
-  'Login.KickedOffline': 'Kicked offline',
-  'Login.KickedOfflineDescription':
-    'Your account just logged in on another device. If it is not you, please check your account security as soon as possible!',
   'Login.PhoneLogin': 'Phone Login',
   'Login.UserIDLogin': 'UserID Login',
-  'Login.Failed': 'Login failed',
   'Login.Error': 'Error',
-  'Login.PleaseConfigureSDKAPPID':
-    'Please configure SDKAPPID and SDKSECRETKEY in src/config/basic-info-config.ts',
+  'Login.PleaseConfigureSDKAPPID': 'Please configure SDKAPPID and SDKSECRETKEY in src/config/basic-info-config.js',
+  'Login.Expired': 'Login expired',
+  'Login.ExpiredDescription': 'Your login status has expired. For security reasons, please log in again.',
+  'Login.KickedOffline': 'Kicked offline',
+  'Login.KickedOfflineDescription': 'Your account just logged in on another device. If it is not you, please check your account security as soon as possible!',
+  'Preconference.CameraOff': 'Camera is off',
+  'Preconference.JoinSub': 'Enter meeting ID',
+  'Preconference.EmptyRoomId': 'Please enter a meeting ID',
+  'Preconference.RecentMeetings': 'Recent meetings',
+  'Preconference.LogoutConfirm': 'Are you sure you want to log out of the current account?',
+  'RoomInvitation.Subtitle': 'invites you to join the meeting',
+  'RoomInvitation.Topic': 'Topic',
+  'RoomInvitation.Id': 'Meeting ID',
+  'RoomInvitation.Reject': 'Decline',
+  'RoomInvitation.Accept': 'Accept and join',
+  'RoomInvitation.Timeout': 'Invitation timed out',
+  'RoomInvitation.Rejected': 'Invitation declined',
+  'RoomInvitation.HandleByOtherDevice': 'Handled on another device',
+  'RoomInvitation.AcceptFailed': 'Failed to join. Please try again later.',
+  'RefreshReturn.Title': 'Return to the last meeting?',
+  'RefreshReturn.Subtitle': 'You left the meeting by refreshing. The meeting is still in progress.',
+  'RefreshReturn.Still': 'The meeting is still in progress.',
+  'RefreshReturn.Cancel': 'Cancel',
+  'RefreshReturn.Confirm': 'Rejoin',
 };

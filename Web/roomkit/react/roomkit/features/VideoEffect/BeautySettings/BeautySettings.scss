@@ -1,0 +1,102 @@
+.beauty-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.beauty-settings-title {
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+}
+
+.beauty-settings-actions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.beauty-settings-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.beauty-settings-reset:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.beauty-settings-reset:hover:not(:disabled) {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-muted);
+}
+
+.beauty-settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 28px;
+}
+
+.beauty-settings-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 8px 0;
+}
+
+.beauty-settings-row.is-disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.beauty-settings-name {
+  flex-shrink: 0;
+  min-width: 36px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-secondary);
+  white-space: nowrap;
+}
+
+/* English copy is uneven (Rosy / Smooth / Whitening). Pin one column so sliders share a start edge. */
+.beauty-settings.is-en .beauty-settings-name {
+  width: 72px;
+}
+
+.beauty-settings-controls {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.beauty-settings-controls .rk-slider {
+  flex: 1;
+  min-width: 0;
+}
+
+.beauty-settings-value {
+  min-width: 20px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--rk-text-tertiary);
+  text-align: right;
+}
+
+@media (width <= 520px) {
+  .beauty-settings-grid {
+    grid-template-columns: 1fr;
+  }
+}

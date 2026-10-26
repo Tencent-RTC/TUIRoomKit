@@ -1,0 +1,13 @@
+.rk-watermark {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.rk-watermark-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-repeat: repeat;
+}

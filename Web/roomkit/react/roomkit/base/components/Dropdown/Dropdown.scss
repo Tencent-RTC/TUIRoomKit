@@ -1,0 +1,117 @@
+.rk-dropdown-anchor {
+  display: inline-flex;
+}
+
+.rk-dropdown {
+  --rk-dropdown-pad: 6px;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 168px;
+  padding: var(--rk-dropdown-pad);
+  overflow: visible;
+}
+
+.rk-root .rk-float.rk-dropdown.has-arrow {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.rk-root .rk-float.rk-dropdown.has-arrow .rk-dropdown-body {
+  box-sizing: border-box;
+  max-height: var(--rk-float-max);
+  padding: var(--rk-dropdown-pad);
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: var(--rk-dropdown-radius, var(--rk-radius-md));
+  box-shadow: var(--rk-shadow-pop);
+}
+
+.rk-root.is-h5 .rk-float.rk-dropdown.has-arrow .rk-dropdown-body {
+  background: var(--rk-h5-popover-bg);
+}
+
+.rk-root.is-h5 .rk-float.rk-dropdown.has-arrow .rk-dropdown-arrow-fill {
+  fill: var(--rk-h5-popover-bg);
+}
+
+.rk-dropdown-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(var(--rk-float-max) - 2 * var(--rk-dropdown-pad) - 2px);
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.rk-dropdown-arrow {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  width: 16px;
+  height: 8px;
+  pointer-events: none;
+}
+
+.rk-dropdown-arrow svg {
+  display: block;
+  width: 16px;
+  height: 8px;
+  overflow: visible;
+}
+
+.rk-dropdown-arrow-fill {
+  fill: var(--rk-bg-surface);
+}
+
+.rk-dropdown-arrow-stroke {
+  fill: var(--rk-border);
+}
+
+/* 7px of the 8px graphic sits outside the panel; the last 1px covers its border. */
+.rk-dropdown[data-placement^='bottom'] .rk-dropdown-arrow {
+  top: -7px;
+  transform: translateX(-50%);
+}
+
+.rk-dropdown[data-placement^='top'] .rk-dropdown-arrow {
+  bottom: -7px;
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.rk-dropdown[data-placement^='left'] .rk-dropdown-arrow,
+.rk-dropdown[data-placement^='right'] .rk-dropdown-arrow {
+  width: 8px;
+  height: 16px;
+}
+
+.rk-dropdown[data-placement^='left'] .rk-dropdown-arrow svg,
+.rk-dropdown[data-placement^='right'] .rk-dropdown-arrow svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.rk-dropdown[data-placement^='right'] .rk-dropdown-arrow {
+  right: -7px;
+  transform: translateY(-50%);
+}
+
+.rk-dropdown[data-placement^='right'] .rk-dropdown-arrow svg {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.rk-dropdown[data-placement^='left'] .rk-dropdown-arrow {
+  left: -7px;
+  transform: translateY(-50%);
+}
+
+.rk-dropdown[data-placement^='left'] .rk-dropdown-arrow svg {
+  transform: translate(-50%, -50%) rotate(-90deg);
+}

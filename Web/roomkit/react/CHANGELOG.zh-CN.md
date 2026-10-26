@@ -4,55 +4,13 @@
 
 ---
 
-## [6.1.4] - 2026-08-26
+## [7.0.0] - 2026-10-23
 
 ### 新增
 
-- 新增 H5（移动端 Web）会议能力：`ConferenceMainViewH5`、`PreConferenceViewH5`，以及摄像头、麦克风、成员、聊天、邀请、录制、布局等相关 H5 控件。
-- 导出 `useRoomInvitationH5`，用于移动端处理房间邀请。
-
-## [6.1.3] - 2026-07-20
-
-- 开启录制接口新增数据上报。
-
-## [6.1.2] - 2026-07-17
-
-### 修复
-
-- 修复打包产物中样式全部丢失的问题：`ConferenceMainView`、`PreConferenceView` 等组件在生产构建后无样式（构建时 CSS 未注入主入口）。
-
-## [6.1.1] - 2026-07-16
-
-### 新增
-
-- 导出 `genTestUserSig` 方法，对齐各端能力，方便快速接入与调试。
-
-### 变更
-
-- `ConferenceMainView` 与 `PreConferenceView` 默认改为撑满父容器（宽高 100%），不再强制占满整个视口。
-
-## [6.1.0] - 2026-07-13
-
-### 新增
-
-- 支持云端录制能力。
-
-### 修复
-
-- 修复麦克风开启前无法打开 AI 降噪插件的问题。
-- 修复超长时间挂机后 RTC 断连的问题。
-
-## [6.0.2] - 2026-06-12
-
-* Room: `ConferenceMainView` 新增 `renderParticipantView` 属性。修复通过 `renderParticipantView` 配置自定义覆盖层后，参与者设备状态变化无法立即更新到覆盖层的问题。
-
-### 
-
-## [6.0.1] - 2026-06-05
-
-### 新增
-
-- 正式发布 `@tencentcloud/roomkit-web-react` npm 包，对外接口与 `@tencentcloud/roomkit-web-vue3` 保持一致，同时提供 ESM 与 CJS 两种构建产物及完整 TypeScript 类型声明。
-- 支持进房前预览（`PreConferenceView`）与会议主界面（`ConferenceMainView`）两大核心视图。
-- 支持视频布局切换、摄像头/麦克风控制、屏幕分享、会中聊天、成员管理、房间邀请、会议预定等完整会中能力。
-- 导出 `atomicx` State 层 `Client`，支持纯 JavaScript / 非 React 环境调用。
+- 正式发布 `@tencentcloud/roomkit-web-react-next` npm 包，基于 `atomicx` State 层全新重构的 React 会议 UI 组件库，提供 ESM 与 CJS 两种构建产物及完整 TypeScript 类型声明。
+- 新增基于类的命令式核心 API：`RoomKit`，提供 `RoomLayoutTemplate`、`ExitReason` 及强类型的 `RoomKitJoinOptions` / `RoomKitEventMap`。
+- 新增 `ConferenceView` 场景视图，PC 与移动端（H5）开箱即用。
+- 支持完整会中能力：视频布局切换、摄像头/麦克风设备管理、屏幕分享、会中聊天、成员管理、会议预定、云端录制、实时字幕（转写）、小窗模式、视频特效。
+- 新增会前组装能力：`SchedulePanel`、`ScheduledListPC` / `ScheduledListMobile`、`MeetingDetailMobile`、`SettingsDialogPC`、`AudioDeviceMenu`、`VideoDeviceMenu`、`LanguageButton`、`ThemeButton`、`useDeviceFault`。
+- 新增主题（`ThemeName`）、国际化（`i18n` / `t` / `useI18n`）、UI 配置（`RoomKitProvider` / `setUIConfig` / `useUIConfig`，支持图标覆盖）及全套 `TUI*` 基础组件。

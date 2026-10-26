@@ -1,0 +1,44 @@
+.rk-badge {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.rk-badge-standalone {
+  min-width: 8px;
+  min-height: 8px;
+}
+
+.rk-badge-mark {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: var(--rk-fs-xs);
+  line-height: 16px;
+  color: var(--rk-on-accent);
+  text-align: center;
+  pointer-events: none;
+  border-radius: var(--rk-radius-pill);
+  transform: translate(50%, -50%);
+}
+
+.rk-badge-mark-dot {
+  width: 8px;
+  min-width: 8px;
+  height: 8px;
+  padding: 0;
+}
+
+.rk-badge-mark-danger { background: var(--rk-danger); }
+.rk-badge-mark-info { background: var(--rk-info); }
+.rk-badge-mark-success { background: var(--rk-green-500); }
+
+.rk-badge-standalone .rk-badge-mark {
+  position: relative;
+  top: auto;
+  right: auto;
+  transform: none;
+}

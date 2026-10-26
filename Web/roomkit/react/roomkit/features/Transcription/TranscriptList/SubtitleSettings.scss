@@ -1,0 +1,283 @@
+.cap-settings {
+  position: absolute;
+  z-index: 3;
+  box-sizing: border-box;
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  min-width: 260px;
+  padding: 8px;
+  color: var(--rk-text-primary);
+  font-size: var(--rk-fs-md);
+  text-align: left;
+  cursor: default;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border-strong);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 16%);
+  backdrop-filter: blur(24px);
+  animation: cap-settings-in 0.18s ease-out;
+}
+
+.cap-settings-icon.cap-settings-bottom,
+.cap-settings-panel {
+  top: calc(100% + 8px);
+  right: 0;
+}
+
+.cap-settings-icon.cap-settings-top {
+  right: 0;
+  bottom: calc(100% + 8px);
+  animation-name: cap-settings-in-up;
+}
+
+.cap-settings-picking {
+  display: flex;
+  flex-direction: column;
+  max-height: min(420px, calc(100vh - 120px));
+}
+
+.cap-settings-title {
+  padding: 8px 12px 4px;
+  color: var(--rk-text-tertiary);
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cap-settings-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 12px;
+  color: inherit;
+  font-family: inherit;
+  font-size: var(--rk-fs-md);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+}
+
+.cap-settings-row.is-toggle {
+  padding: 10px 12px;
+}
+
+.cap-settings-row.is-navigable {
+  cursor: pointer;
+}
+
+.cap-settings-row.is-navigable:hover {
+  background: var(--rk-bg-hover);
+}
+
+.cap-settings-row.is-dimmed {
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.cap-settings-label {
+  flex: none;
+  color: var(--rk-text-primary);
+  font-size: var(--rk-fs-md);
+  white-space: nowrap;
+}
+
+.cap-settings-value {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  color: var(--rk-text-tertiary);
+  font-size: var(--rk-fs-sm);
+}
+
+.cap-settings-value svg {
+  flex: none;
+  opacity: 0.8;
+}
+
+.cap-settings-value-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cap-settings-hint {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--rk-text-secondary);
+  font-size: var(--rk-fs-sm);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cap-settings-separator {
+  height: 1px;
+  margin: 6px 8px;
+  background: var(--rk-border);
+}
+
+.cap-settings-sizes {
+  display: flex;
+  flex: none;
+  gap: 5px;
+}
+
+.cap-settings-size {
+  height: 28px;
+  padding: 0 10px;
+  color: var(--rk-text-secondary);
+  font-family: inherit;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: 8px;
+}
+
+.cap-settings-size:hover {
+  background: var(--rk-bg-hover);
+}
+
+.cap-settings-size.is-active {
+  color: var(--rk-text-primary);
+  font-weight: 600;
+  background: var(--rk-brand-soft);
+  border-color: var(--rk-brand);
+}
+
+.cap-settings .rk-switch-sm {
+  width: 24px;
+  height: 14px;
+  padding: 1px;
+}
+
+.cap-settings .rk-switch-sm .rk-switch-thumb {
+  width: 12px;
+  height: 12px;
+}
+
+.cap-settings .rk-switch-on.rk-switch-sm .rk-switch-thumb {
+  transform: translateX(10px);
+}
+
+.cap-settings-picker-head {
+  display: flex;
+  flex: none;
+  gap: 6px;
+  align-items: center;
+  padding: 0 0 2px;
+}
+
+.cap-settings-back {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+}
+
+.cap-settings-back:hover {
+  background: var(--rk-bg-hover);
+}
+
+.cap-settings-back-icon {
+  transform: rotate(180deg);
+}
+
+.cap-settings-picker-title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-md);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cap-settings-picker-list {
+  flex: 1;
+  min-height: 0;
+  max-height: 248px;
+  margin-top: 2px;
+  padding-top: 4px;
+  overflow-y: auto;
+  border-top: 1px solid var(--rk-border);
+}
+
+.cap-settings-picker-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 10px;
+  color: var(--rk-text-primary);
+  font-family: inherit;
+  font-size: var(--rk-fs-md);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+}
+
+.cap-settings-picker-item:hover {
+  background: var(--rk-bg-hover);
+}
+
+.cap-settings-picker-item.is-selected {
+  color: var(--rk-text-primary);
+  font-weight: 600;
+}
+
+.cap-settings-picker-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes cap-settings-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cap-settings-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cap-settings {
+    animation: none;
+  }
+}

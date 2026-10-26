@@ -1,0 +1,79 @@
+.rk-swiper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.rk-swiper-vertical {
+  touch-action: pan-x;
+}
+
+.rk-swiper-disabled {
+  pointer-events: none;
+}
+
+.rk-swiper-dragging {
+  cursor: grabbing;
+}
+
+.rk-swiper-locked {
+  touch-action: none;
+}
+
+.rk-swiper-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.rk-swiper-vertical .rk-swiper-track {
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+}
+
+.rk-swiper-vertical .rk-swiper-item {
+  flex-basis: var(--rk-swiper-page, 100%);
+  width: 100%;
+  height: var(--rk-swiper-page, 100%);
+}
+
+.rk-swiper-dots {
+  position: absolute;
+  bottom: var(--rk-swiper-dot-inset, 16px);
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  transform: translateX(-50%);
+}
+
+.rk-swiper-vertical .rk-swiper-dots {
+  top: 50%;
+  right: var(--rk-swiper-dot-inset, 16px);
+  bottom: auto;
+  left: auto;
+  flex-direction: column;
+  transform: translateY(-50%);
+}
+
+.rk-swiper-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  cursor: pointer;
+  background: color-mix(in srgb, white 40%, transparent);
+  border: 0;
+  border-radius: 50%;
+}
+
+.rk-swiper-dot-active {
+  background: var(--rk-white);
+}

@@ -1,0 +1,120 @@
+.rk-list {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: var(--rk-radius-md);
+}
+
+.rk-list-scroller {
+  flex: 0 0 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.rk-list-fill {
+  flex: 1 1 auto;
+  height: 100%;
+}
+
+.rk-list-constrained {
+  overflow: auto;
+  overflow-anchor: none;
+  overscroll-behavior: contain;
+}
+
+.rk-list-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+.rk-list-plain {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.rk-list-spacer {
+  position: relative;
+  flex: none;
+  width: 100%;
+}
+
+.rk-list-window {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rk-list-row {
+  display: flex;
+  flex: none;
+  align-items: center;
+  box-sizing: border-box;
+  height: var(--rk-list-row-height, auto);
+}
+
+.rk-list-row + .rk-list-row {
+  border-top: 1px solid var(--rk-border);
+}
+
+.rk-list-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  padding: 16px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-secondary);
+}
+
+.rk-list-auto .rk-list-row {
+  height: auto;
+}
+
+.rk-list-plain .rk-list-empty {
+  min-height: 0;
+  padding: 12px 0;
+}
+
+.rk-list-plain .rk-list-row + .rk-list-row {
+  border-top: 0;
+}
+
+.rk-list-jump {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: 50%;
+}
+
+.rk-list-jump:active {
+  transform: scale(0.96);
+}

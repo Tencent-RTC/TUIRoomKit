@@ -1,0 +1,51 @@
+.video-settings-row {
+  display: flex;
+  gap: var(--rk-space-4);
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: var(--rk-space-2) 0;
+}
+
+.video-settings-row-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.video-settings-row-title {
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+}
+
+.video-settings-row-description {
+  font-size: var(--rk-fs-sm);
+  line-height: 1.4;
+  color: var(--rk-text-tertiary);
+}
+
+.video-settings-row-control {
+  display: flex;
+  flex: 1 1 120px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  max-width: 240px;
+}
+
+.video-settings-row-control .rk-select {
+  width: 100%;
+  min-width: 0;
+}
+
+@container settings-dialog (max-width: 560px) {
+  .video-settings-row {
+    flex-wrap: wrap;
+  }
+
+  .video-settings-row-control {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}

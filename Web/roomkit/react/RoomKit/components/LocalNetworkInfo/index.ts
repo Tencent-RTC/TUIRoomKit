@@ -1,1 +1,0 @@
-export { LocalNetworkInfo } from './LocalNetworkInfo';

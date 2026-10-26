@@ -1,0 +1,148 @@
+/* The chip sits flush with the topbar's 16px inset; the negative margin keeps the
+   text aligned while the pressed tint still has room around it. */
+.current-room-info-mobile {
+  display: inline-flex;
+  flex: 0 1 auto;
+  gap: 7px;
+  align-items: center;
+  min-width: 0;
+  padding: 4px 6px;
+  margin-left: -6px;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  user-select: none;
+  border-radius: 8px;
+  outline: none;
+}
+
+.current-room-info-mobile:active {
+  background: var(--rk-bg-hover);
+}
+
+.current-room-info-mobile-title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-md);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.current-room-info-mobile-time {
+  flex-shrink: 0;
+  padding-left: 7px;
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--rk-text-secondary);
+  border-left: 1px solid color-mix(in srgb, var(--rk-text-primary) 22%, transparent);
+}
+
+.current-room-info-mobile-caret {
+  flex-shrink: 0;
+  margin-left: 2px;
+  color: var(--rk-text-tertiary);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.current-room-info-mobile.is-open .current-room-info-mobile-caret {
+  transform: rotate(180deg);
+}
+
+.room-info-sheet-head {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.room-info-sheet-name {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--rk-text-primary);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room-info-sheet-divider {
+  height: 1px;
+  background: color-mix(in srgb, var(--rk-text-primary) 6%, transparent);
+}
+
+/* Label, value and copy share one column grid so every value starts on the same line. */
+.room-info-sheet-fields {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) 22px;
+  column-gap: 16px;
+}
+
+.room-info-sheet-row {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: center;
+  min-height: 42px;
+  font-size: var(--rk-fs-lg);
+  line-height: 1.2;
+}
+
+.room-info-sheet-label {
+  grid-column: 1;
+  color: var(--rk-text-secondary);
+  white-space: nowrap;
+}
+
+.room-info-sheet-value {
+  grid-column: 2;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--rk-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room-info-sheet-copy {
+  display: flex;
+  grid-column: 3;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  color: var(--rk-brand);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+}
+
+.room-info-sheet-copy:active {
+  opacity: 0.72;
+}
+
+.room-info-sheet-copy.is-copied {
+  color: color-mix(in srgb, var(--rk-success) 80%, var(--rk-text-primary));
+  background: color-mix(in srgb, var(--rk-success) 12%, transparent);
+}
+
+.room-info-sheet-error {
+  margin: 4px 0 0;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-danger);
+}
+
+.room-info-sheet-footer {
+  padding: 16px 16px 14px;
+}
+
+/* TUIButton has no success tone; the selector has to outrank its sticky touch :hover. */
+.room-info-sheet-footer .room-info-sheet-invite.is-copied:not(:disabled) {
+  color: color-mix(in srgb, var(--rk-success) 80%, var(--rk-text-primary));
+  background: color-mix(in srgb, var(--rk-success) 14%, transparent);
+  border-color: transparent;
+}

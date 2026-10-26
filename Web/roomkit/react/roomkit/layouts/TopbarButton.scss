@@ -1,0 +1,32 @@
+/* The design's topbar chips carry no outline: they read as raised because the surface
+   behind them is tinted. */
+.topbar-button {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+
+  /* The slot owns the width: an icon or the signal bars stay inside the 32px square,
+     a text label like 中文 pushes it wider. Padding stays under 8px so the square
+     case is decided by min-width rather than by the padding. */
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  user-select: none;
+  border: 0;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.15s;
+}
+
+/* An open dropdown keeps the hover plate rather than taking a brand tint: in the
+   design that tint marks the selected item inside a menu, never the chip itself.
+   A chip that colours by state, like the network bars, keeps its own colour. */
+.topbar-button:hover,
+.topbar-button-active {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-hover);
+}

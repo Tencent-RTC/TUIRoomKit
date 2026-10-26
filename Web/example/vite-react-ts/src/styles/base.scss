@@ -7,43 +7,4 @@ body,
   margin: 0;
   overflow: hidden;
   color: var(--text-color-primary);
-  /* Demo-wide H5 font so Toast / MessageBox / Invitation (body portals) match UI. */
-  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-#app {
-  display: flex;
-  flex-direction: column;
-}
-
-.placeholder-view {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: var(--text-color-primary);
-  background-color: var(--bg-color-operate);
-
-  .placeholder-view__content {
-    max-width: 560px;
-    padding: 24px 32px;
-    border: 1px solid var(--stroke-color-primary);
-    border-radius: 8px;
-    background-color: var(--bg-color-bubble-reciprocal);
-    line-height: 1.6;
-  }
-
-  .placeholder-view__title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 12px;
-  }
-
-  .placeholder-view__actions {
-    margin-top: 16px;
-    display: flex;
-    gap: 12px;
-  }
 }

@@ -1,0 +1,153 @@
+.cap-dock {
+  position: absolute;
+  bottom: var(--cap-dock-bottom, 86px);
+  left: 16px;
+  z-index: 2;
+  box-sizing: border-box;
+  width: min(720px, calc(100% - 32px));
+  max-width: min(720px, calc(100% - 32px));
+  text-align: initial;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.cap-dock-custom-width {
+  min-width: 0;
+  max-width: calc(100% - 32px);
+}
+
+.cap-dock-centered {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.cap-dock-dragging {
+  cursor: grabbing;
+  transition: none;
+}
+
+.cap-dock-resizing {
+  cursor: ew-resize;
+  user-select: none;
+  transition: none;
+}
+
+.cap-dock-idle {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.cap-dock-centered.cap-dock-idle {
+  transform: translateX(-50%) translateY(12px);
+}
+
+.cap-dock-resetting {
+  transition: none;
+}
+
+.cap-dock-resize {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  z-index: 2;
+  width: 8px;
+  padding: 0;
+  cursor: ew-resize;
+  background: transparent;
+  border: none;
+  appearance: none;
+}
+
+.cap-dock-resize-left {
+  left: 0;
+}
+
+.cap-dock-resize-right {
+  top: 36px;
+  right: 0;
+}
+
+.cap-dock-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  height: 11px;
+  cursor: grab;
+}
+
+.cap-dock-handle::after {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 32px;
+  height: 3px;
+  content: '';
+  background: transparent;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: background 0.15s ease;
+}
+
+.cap-dock:hover .cap-dock-handle::after {
+  background: rgb(255 255 255 / 32%);
+}
+
+.cap-dock-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  opacity: 0.6;
+  transition: opacity 0.16s ease;
+}
+
+.cap-dock:hover .cap-dock-actions,
+.cap-dock-actions.is-visible {
+  opacity: 1;
+}
+
+.cap-dock-settings {
+  position: relative;
+  flex: none;
+}
+
+.cap-dock-action {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: rgb(255 255 255 / 78%);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  transition: opacity 0.16s ease, background 0.12s ease, color 0.12s ease, transform 0.08s ease;
+}
+
+.cap-dock-action:hover {
+  color: #fff;
+  background: rgb(255 255 255 / 16%);
+}
+
+.cap-dock-action:active {
+  background: rgb(255 255 255 / 22%);
+  transform: scale(0.94);
+}
+
+.cap-dock-action.is-active {
+  color: #fff;
+  background: color-mix(in srgb, var(--rk-brand) 35%, transparent);
+  opacity: 1;
+}

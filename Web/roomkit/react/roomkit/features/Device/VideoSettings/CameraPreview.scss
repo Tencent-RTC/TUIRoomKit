@@ -1,0 +1,42 @@
+.camera-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 14px;
+  overflow: hidden;
+  background: #121212;
+  isolation: isolate;
+  border-radius: 12px;
+}
+
+.camera-preview-view {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.camera-preview-empty,
+.camera-preview-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px;
+  color: rgba(255, 255, 255, 0.86);
+  pointer-events: none;
+}
+
+.camera-preview-empty-title {
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+}
+
+@container settings-dialog (max-height: 420px) {
+  .camera-preview {
+    max-height: 180px;
+  }
+}

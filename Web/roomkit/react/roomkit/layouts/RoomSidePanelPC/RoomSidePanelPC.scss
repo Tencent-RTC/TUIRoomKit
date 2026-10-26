@@ -1,0 +1,209 @@
+/* The root box is the mounter's: it sets the column, the surface and the clipping.
+   Everything below only styles what lives inside the panel. */
+
+/* Slide in from the right on open; slide back out on close. The mounter that
+   also animates the space around the panel overrides this with its own timing. */
+.room-side-panel {
+  visibility: visible;
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), visibility 0s;
+  transform: translateX(0);
+}
+
+/* The mounter adds an exit gap when its own clipping box reaches past the slot
+   this panel sits in; without it the panel parks inside that strip. Hidden only
+   after the slide, so a closed panel leaves the tab order and cannot be
+   scrolled back into view. */
+.room-side-panel.is-closed {
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1),
+    visibility 0s linear 0.3s;
+  transform: translateX(calc(100% + var(--side-panel-exit-gap, 0px)));
+}
+
+.room-side-panel-header {
+  display: flex;
+  flex: 0 0 44px;
+  align-items: stretch;
+  height: 44px;
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.room-side-panel-tabs {
+  position: relative; /* Required for the absolute-positioned indicator */
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.room-side-panel-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mirrors .single-tab: the item itself carries the padding, gap and typography,
+   so the indicator can span it while its contents stay centered. */
+.room-side-panel-tab-item {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 0 0 12px;
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+  color: var(--rk-text-secondary);
+  letter-spacing: -0.005em;
+  transition: color 0.15s;
+}
+
+/* Text color only — the design's hover background resolves to the panel's own
+   surface color, so it never reads as a plate. */
+.room-side-panel-tab-item:hover {
+  color: var(--rk-text-primary);
+}
+
+/* Active tab keeps its brand color even while hovered.
+   Specificity (0,3,0) beats the plain :hover rule (0,2,0). */
+.room-side-panel-tab-item.room-side-panel-tab-active:hover {
+  color: var(--rk-info);
+}
+
+.room-side-panel-tab-item + .room-side-panel-tab-item {
+  margin-left: 4px;
+}
+
+/* Bare click target — all spacing and typography come from the item above. */
+.room-side-panel-tab {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  align-self: stretch;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.room-side-panel-tab .rk-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+/* Kept above the active-tab rule so the lower-specificity icon selectors stay ascending. */
+.room-side-panel-tab-close .rk-icon {
+  width: 8px;
+  height: 8px;
+}
+
+.room-side-panel-close .rk-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.room-side-panel-tab-active .room-side-panel-tab .rk-icon {
+  opacity: 1;
+}
+
+.room-side-panel-tab-active {
+  color: var(--rk-info);
+}
+
+/* Sliding indicator — left/width set by JS; mirrors .single-tab-indicator. */
+.room-side-panel-tab-indicator {
+  position: absolute;
+  bottom: -1px; /* Overlaps the header border, identical to the design */
+  left: 0;
+  width: 0;
+  height: 2px;
+  pointer-events: none;
+  background: var(--rk-info);
+  border-radius: var(--rk-radius-pill);
+  transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1), width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Tab close: hidden by default, revealed on tab hover — matches .single-tab-close. */
+.room-side-panel-tab-close {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  line-height: 1;
+  color: currentcolor;
+  pointer-events: none;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+/* Reveal the close button only when the mouse is over that tab item.
+   Intentionally excludes :focus-within — otherwise clicking the tab button
+   would keep the close visible until focus moves away. */
+.room-side-panel-tab-item:hover .room-side-panel-tab-close {
+  pointer-events: auto;
+  opacity: 0.72;
+}
+
+/* Needs to outrank the rule above, which would otherwise pin it at 0.72. */
+.room-side-panel-tab-item:hover .room-side-panel-tab-close:hover {
+  opacity: 1;
+}
+
+/* Whole-rail close matches .single-topbar-close: 20×20, 6px square hover plate. */
+.room-side-panel-close {
+  display: inline-flex;
+  flex: 0 0 20px;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0 8px 0 4px;
+  color: var(--rk-text-tertiary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.room-side-panel-close:hover {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-hover);
+}
+
+.room-side-panel-close:active {
+  background: color-mix(in srgb, var(--rk-text-primary) 12%, transparent);
+}
+
+.room-side-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.room-side-panel-placeholder {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-secondary);
+}

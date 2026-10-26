@@ -1,0 +1,42 @@
+.asr-menu {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  color: var(--rk-text-primary);
+}
+
+.asr-menu-hint {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  color: var(--rk-text-secondary);
+  font-size: var(--rk-fs-sm);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.asr-menu-hint svg {
+  flex: none;
+  color: var(--rk-brand);
+}
+
+.asr-menu .rk-dropdown-item {
+  gap: 8px;
+}
+
+.asr-menu .rk-dropdown-item span {
+  white-space: nowrap;
+}
+
+.asr-menu .rk-dropdown-item.is-on,
+.asr-menu .rk-dropdown-item.is-on svg {
+  color: var(--rk-brand);
+}
+
+.rk-dropdown:has(.asr-menu) {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 0;
+}

@@ -1,0 +1,135 @@
+.cal-share-card {
+  min-width: 0;
+}
+
+.cal-share-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 10px 0;
+}
+
+.cal-share-label {
+  flex: none;
+  width: 72px;
+  padding-top: 2px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-tertiary);
+}
+
+.cal-share-value {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--rk-fs-md);
+  line-height: 1.5;
+  color: var(--rk-text-primary);
+  word-break: break-all;
+}
+
+.cal-share-value-row {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.cal-share-link {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cal-share-people-wrap {
+  display: flex;
+  align-items: flex-end;
+}
+
+.cal-share-people {
+  display: -webkit-box;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+}
+
+.cal-share-people.is-empty {
+  color: var(--rk-text-tertiary);
+}
+
+.cal-share-people-count {
+  flex: none;
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  color: var(--rk-text-tertiary);
+  white-space: nowrap;
+}
+
+.cal-share-copy {
+  flex: none;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: -4px 0;
+  color: var(--rk-text-tertiary);
+  background: var(--rk-bg-surface);
+  border: 0;
+  border-radius: 5px;
+}
+
+.cal-share-copy:hover {
+  color: var(--rk-text-primary);
+}
+
+.cal-share-copy.is-copied,
+.cal-share-copy.is-copied:hover {
+  color: var(--rk-success);
+  background: var(--rk-success-soft);
+}
+
+.cal-share-copy-all {
+  width: 100%;
+  height: 44px;
+  border-radius: 999px;
+}
+
+/* Dialog chrome is teleported, so the share card has to restyle the shell from outside its scope. */
+.rk-dialog-mask .rk-dialog:has(.cal-share-card) {
+  padding: 22px 24px 20px;
+}
+
+.rk-dialog-mask .rk-dialog:has(.cal-share-card) .rk-dialog-header {
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.rk-dialog-mask .rk-dialog:has(.cal-share-card) .rk-dialog-title {
+  padding-right: 8px;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.rk-dialog-mask .rk-dialog:has(.cal-share-card) .rk-dialog-close {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 8px;
+}
+
+.rk-dialog-mask .rk-dialog:has(.cal-share-card) .rk-dialog-footer .rk-btn {
+  height: 44px;
+  border-radius: 999px;
+}
+
+.rk-dialog-mask .rk-dialog:has(.cal-share-card.is-detail) .rk-dialog-footer {
+  display: none;
+}

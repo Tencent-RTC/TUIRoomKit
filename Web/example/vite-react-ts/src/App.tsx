@@ -1,121 +1,69 @@
-import { useEffect, useRef, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import {
-  TUIMessageBox,
-  UIKitProvider,
-  useUIKit,
-} from '@tencentcloud/uikit-base-component-react';
-import {
-  RoomEvent,
-  conference,
-  useRoomInvitation,
-  useRoomInvitationH5,
-  type AcceptCallParams,
-} from '@tencentcloud/roomkit-web-react';
-import { useLeaveRoomGuard } from '@/router';
-import { isPC } from '@/utils/utils';
-import '@/styles/base.scss';
+import { useEffect, useRef } from 'react';
+import { TUIMessageBox, t, useI18n } from '@tencentcloud/roomkit-web-react';
+import { LoginEvent, useLoginState } from 'tuikit-atomicx-react/room';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { RouterView } from './router/index';
+import './App.scss';
 
-const InnerApp = () => {
-  const { t } = useUIKit();
+const EXIT_OVERLAY_TARGET = 'body';
+
+export function App() {
+  const { setLanguage } = useI18n();
+  const { subscribeEvent, unsubscribeEvent } = useLoginState();
   const navigate = useNavigate();
   const location = useLocation();
-  const bootstrappedRef = useRef(false);
+  const languageInitRef = useRef(false);
 
-  useLeaveRoomGuard();
-
-  const handleAcceptCall = ({
-    roomId,
-    password,
-    roomType,
-  }: AcceptCallParams) => {
-    const search = new URLSearchParams();
-    search.set('roomId', roomId);
-    if (password) search.set('password', password);
-    if (roomType !== undefined && roomType !== null) {
-      search.set('roomType', String(roomType));
+  if (!languageInitRef.current) {
+    languageInitRef.current = true;
+    const savedLanguage = localStorage.getItem('tuiRoom-language') || '';
+    if (savedLanguage) {
+      setLanguage(savedLanguage);
     }
-    navigate(`/room?${search.toString()}`);
-  };
+  }
 
-  // Same as Vue App.vue: host picks one invitation hook by platform.
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- isPC is constant (matches Vue)
-  const roomInvitation = !isPC
-    ? useRoomInvitationH5({ onAcceptCall: handleAcceptCall })
-    : useRoomInvitation({ onAcceptCall: handleAcceptCall });
+  const latestRef = useRef({ navigate, path: location.pathname });
+  latestRef.current = { navigate, path: location.pathname };
 
   useEffect(() => {
-    const onLoginExpired = () => {
+    function goToLogin() {
+      sessionStorage.removeItem('tuiRoom-userInfo');
+      if (latestRef.current.path !== '/login') {
+        latestRef.current.navigate({ pathname: '/login' }, { replace: true });
+      }
+    }
+
+    function onLoginExpired() {
       TUIMessageBox.alert({
         title: t('Login.Expired'),
-        content: t('Login.ExpiredDescription'),
+        message: t('Login.ExpiredDescription'),
+        appendTo: EXIT_OVERLAY_TARGET,
       });
-      navigate('/login', { replace: true });
-    };
-    const onKickedOffline = () => {
+      goToLogin();
+    }
+
+    function onKickedOffline() {
       TUIMessageBox.alert({
         title: t('Login.KickedOffline'),
-        content: t('Login.KickedOfflineDescription'),
+        message: t('Login.KickedOfflineDescription'),
+        appendTo: EXIT_OVERLAY_TARGET,
       });
-      navigate('/login', { replace: true });
-    };
-    conference.on(RoomEvent.USER_SIG_EXPIRED, onLoginExpired);
-    conference.on(RoomEvent.KICKED_OFFLINE, onKickedOffline);
+      goToLogin();
+    }
+
+    subscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
+    subscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
     return () => {
-      conference.off(RoomEvent.USER_SIG_EXPIRED, onLoginExpired);
-      conference.off(RoomEvent.KICKED_OFFLINE, onKickedOffline);
+      unsubscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
+      unsubscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
     };
-  }, [navigate, t]);
-
-  useEffect(() => {
-    if (bootstrappedRef.current) return;
-    bootstrappedRef.current = true;
-
-    if (location.pathname === '/login') return;
-
-    const storedData = sessionStorage.getItem('tuiRoom-userInfo') || '{}';
-    const userInfo = JSON.parse(storedData);
-    if (!userInfo?.userID) return;
-
-    conference
-      .login({
-        userId: userInfo.userID,
-        userSig: userInfo.userSig,
-        sdkAppId: userInfo.SDKAppID,
-      })
-      .catch((error: any) => {
-        console.error('Login failed:', error);
-        sessionStorage.removeItem('tuiRoom-userInfo');
-        const redirect = encodeURIComponent(
-          `${location.pathname}${location.search}`
-        );
-        navigate(`/login?redirect=${redirect}`, { replace: true });
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div id="app">
-      <Outlet />
-      {roomInvitation}
+      <RouterView />
     </div>
   );
-};
-
-export default function App() {
-  const [initialTheme] = useState(
-    () => localStorage.getItem('tuiRoom-theme') || 'light'
-  );
-  const [initialLanguage] = useState(
-    () => localStorage.getItem('tuiRoom-language') || ''
-  );
-
-  return (
-    <UIKitProvider
-      theme={initialTheme as any}
-      language={initialLanguage as any}
-    >
-      <InnerApp />
-    </UIKitProvider>
-  );
 }
+
+export default App;

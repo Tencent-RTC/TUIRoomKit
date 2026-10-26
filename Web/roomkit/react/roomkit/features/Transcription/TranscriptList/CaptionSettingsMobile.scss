@@ -1,0 +1,105 @@
+.caption-settings-mobile {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 16px;
+}
+
+.caption-settings-back {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  transform: rotate(180deg);
+}
+
+.caption-settings-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-lg);
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--rk-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.caption-settings-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 0;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+  text-align: left;
+  background: transparent;
+  border: 0;
+}
+
+.caption-settings-row.is-nav {
+  cursor: pointer;
+}
+
+.caption-settings-row.is-dimmed {
+  opacity: 0.4;
+}
+
+.caption-settings-value {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-tertiary);
+}
+
+.caption-settings-hint {
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-tertiary);
+}
+
+.caption-settings-mobile .rk-switch.rk-switch-lg {
+  width: 44px;
+  height: 26px;
+  padding: 3px;
+}
+
+.caption-settings-mobile .rk-switch-lg .rk-switch-thumb {
+  width: 20px;
+  height: 20px;
+}
+
+.caption-settings-mobile .rk-switch-on.rk-switch-lg .rk-switch-thumb {
+  transform: translateX(18px);
+}
+
+.caption-settings-langs {
+  display: flex;
+  flex-direction: column;
+}
+
+.caption-settings-lang {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 2px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.caption-settings-lang.is-selected {
+  color: var(--rk-brand);
+}

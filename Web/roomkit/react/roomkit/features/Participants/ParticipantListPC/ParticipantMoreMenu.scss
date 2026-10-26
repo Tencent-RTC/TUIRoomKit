@@ -1,0 +1,55 @@
+.participant-more-trigger {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: var(--rk-text-tertiary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  transition: background 0.12s ease, color 0.12s ease, opacity 0.12s ease;
+}
+
+.participant-more-trigger:hover,
+.participant-more-trigger.is-open {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-muted);
+}
+
+.participant-more-trigger .rk-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.participant-more-menu .rk-dropdown-item {
+  gap: 8px;
+  font-size: var(--rk-fs-sm);
+}
+
+.participant-more-menu .rk-dropdown-item .rk-icon {
+  flex: none;
+  color: var(--rk-text-secondary);
+}
+
+.participant-more-menu .rk-dropdown-item[data-danger='true'] .rk-icon {
+  color: var(--rk-danger);
+}
+
+.participant-rename-desc {
+  margin: 0 0 16px;
+  font-size: var(--rk-fs-sm);
+  line-height: 1.45;
+  color: var(--rk-text-secondary);
+}
+
+.participant-rename .rk-input-field {
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+}
+
+.participant-rename .rk-input-field::placeholder {
+  font-weight: 400;
+}

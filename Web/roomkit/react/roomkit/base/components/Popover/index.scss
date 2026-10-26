@@ -1,0 +1,139 @@
+.rk-popover-anchor {
+  display: inline-flex;
+}
+
+/* Column so content that opts into `min-height: 0` shrinks inside the height cap
+   `useFloating` hands down; anything else keeps its size and scrolls here instead. */
+.rk-popover {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 12px;
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.rk-popover-flush {
+  min-width: 0;
+  padding: 0;
+  border-radius: var(--rk-radius-lg);
+}
+
+/* Phone browsers clip a transformed child to an ancestor border-radius.
+   The shell stays square; the rounded fill lives on the body. */
+.rk-root .rk-float.rk-popover.has-arrow {
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.rk-root .rk-float.rk-popover.has-arrow .rk-popover-body {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  max-height: var(--rk-float-max);
+  padding: 12px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: var(--rk-radius-md);
+  box-shadow: var(--rk-shadow-pop);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.rk-root .rk-float.rk-popover.has-arrow.rk-popover-flush .rk-popover-body {
+  min-width: 0;
+  padding: 0;
+  border-radius: var(--rk-radius-lg);
+}
+
+.rk-root.is-h5 .rk-float.rk-popover.has-arrow .rk-popover-body {
+  background: var(--rk-h5-popover-bg);
+}
+
+.rk-root.is-h5 .rk-float.rk-popover.has-arrow .rk-popover-arrow {
+  background: transparent;
+}
+
+.rk-root.is-h5 .rk-float.rk-popover.has-arrow .rk-popover-arrow-fill {
+  fill: var(--rk-h5-popover-bg);
+}
+
+.rk-popover-arrow {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  width: 16px;
+  height: 8px;
+  pointer-events: none;
+  background: transparent;
+}
+
+.rk-popover-arrow svg {
+  display: block;
+  width: 16px;
+  height: 8px;
+  overflow: visible;
+}
+
+.rk-popover-arrow-fill {
+  fill: var(--rk-bg-surface);
+}
+
+.rk-popover-arrow-stroke {
+  fill: var(--rk-border);
+}
+
+/* 7px of the 8px graphic sits outside the panel; the last 1px covers its border. */
+.rk-popover[data-placement^='bottom'] .rk-popover-arrow {
+  top: -7px;
+  transform: translateX(-50%);
+}
+
+.rk-popover[data-placement^='top'] .rk-popover-arrow {
+  bottom: -7px;
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.rk-popover[data-placement^='left'] .rk-popover-arrow,
+.rk-popover[data-placement^='right'] .rk-popover-arrow {
+  width: 8px;
+  height: 16px;
+}
+
+.rk-popover[data-placement^='left'] .rk-popover-arrow svg,
+.rk-popover[data-placement^='right'] .rk-popover-arrow svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.rk-popover[data-placement^='right'] .rk-popover-arrow {
+  right: -7px;
+  transform: translateY(-50%);
+}
+
+.rk-popover[data-placement^='right'] .rk-popover-arrow svg {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.rk-popover[data-placement^='left'] .rk-popover-arrow {
+  left: -7px;
+  transform: translateY(-50%);
+}
+
+.rk-popover[data-placement^='left'] .rk-popover-arrow svg {
+  transform: translate(-50%, -50%) rotate(-90deg);
+}

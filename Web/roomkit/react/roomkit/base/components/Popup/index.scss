@@ -1,0 +1,139 @@
+.rk-popup-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rk-popup-root.is-open {
+  pointer-events: auto;
+}
+
+.rk-popup-mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgb(0 0 0 / 40%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.rk-popup-root.is-open .rk-popup-mask {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.rk-popup {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 70%;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  overflow: hidden;
+  color: var(--rk-text-primary);
+  pointer-events: auto;
+  background: var(--rk-bg-surface);
+  border-top: 1px solid var(--rk-border);
+  border-radius: 16px 16px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rk-popup-root.is-open .rk-popup {
+  transform: translateY(0);
+}
+
+.rk-popup.is-auto {
+  height: auto;
+  max-height: 78%;
+}
+
+.rk-popup.is-dragging,
+.rk-popup-mask.is-dragging {
+  transition: none;
+}
+
+.rk-popup.is-dragging {
+  touch-action: none;
+}
+
+.rk-popup-handle {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  padding: 10px 0 6px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.rk-popup.is-dragging .rk-popup-handle {
+  cursor: grabbing;
+}
+
+.rk-popup-handle i {
+  display: block;
+  width: 36px;
+  height: 4px;
+  background: var(--rk-border-strong);
+  border-radius: 2px;
+}
+
+.rk-popup-head {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 16px 10px;
+  touch-action: none;
+}
+
+.rk-popup-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--rk-fs-lg);
+  font-weight: 600;
+  color: var(--rk-text-primary);
+  white-space: nowrap;
+}
+
+.rk-popup-close {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin-left: auto;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: var(--rk-bg-hover);
+  border: none;
+  border-radius: 50%;
+}
+
+.rk-popup-body {
+  flex: 1;
+  min-height: 0;
+  padding: 0 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.rk-popup-footer {
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rk-popup,
+  .rk-popup-mask {
+    transition-duration: 0.01s;
+  }
+}

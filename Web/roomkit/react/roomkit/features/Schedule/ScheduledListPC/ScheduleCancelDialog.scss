@@ -1,0 +1,18 @@
+.cal-cancel-desc {
+  margin: 4px 0 0;
+  font-size: var(--rk-fs-md);
+  line-height: 1.55;
+  color: var(--rk-text-tertiary);
+}
+
+.cal-cancel-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.cal-cancel-button {
+  height: 36px;
+  padding: 0 16px;
+}

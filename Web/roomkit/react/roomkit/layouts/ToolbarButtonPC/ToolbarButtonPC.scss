@@ -1,0 +1,159 @@
+/* The chip is a frame around its controls, not a control itself: the padding lives on
+   the button and the caret so the whole surface the hover paints is also clickable. */
+.toolbar-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  color: var(--rk-text-primary);
+  background: color-mix(in srgb, var(--rk-text-primary) 6%, transparent);
+  border-radius: var(--rk-radius-md);
+  transition: background 0.15s;
+}
+
+.toolbar-button:hover {
+  background: color-mix(in srgb, var(--rk-text-primary) 10%, transparent);
+}
+
+.toolbar-button-active {
+  background: color-mix(in srgb, var(--rk-info) 14%, transparent);
+}
+
+/* Without a hover of its own the plain one wins on specificity and greys the tint out. */
+.toolbar-button-active:hover {
+  background: color-mix(in srgb, var(--rk-info) 22%, transparent);
+}
+
+.toolbar-button-danger {
+  background: color-mix(in srgb, var(--rk-danger) 14%, transparent);
+}
+
+.toolbar-button-danger:hover {
+  background: color-mix(in srgb, var(--rk-danger) 22%, transparent);
+}
+
+.toolbar-button-leave {
+  height: 44px;
+  color: var(--rk-on-accent);
+  background: var(--rk-danger);
+  border-radius: var(--rk-radius-pill);
+}
+
+.toolbar-button-leave:hover {
+  background: var(--rk-danger);
+  filter: brightness(0.94);
+}
+
+.toolbar-button-main {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  justify-content: center;
+  min-width: 48px;
+  padding: 0 10px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+/* Asymmetric padding keeps the icon optically centered next to the caret */
+.toolbar-button-with-menu .toolbar-button-main {
+  min-width: 36px;
+  padding: 0 0 0 8px;
+}
+
+.toolbar-button-leave .toolbar-button-main {
+  padding: 0 22px;
+}
+
+.toolbar-button-main:disabled,
+.toolbar-button-blocked .toolbar-button-main {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.toolbar-button-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  font-size: var(--rk-fs-md);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.toolbar-button-active .toolbar-button-icon {
+  color: var(--rk-info);
+}
+
+.toolbar-button-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.toolbar-button-notice {
+  position: absolute;
+  right: -1px;
+  bottom: 0;
+  color: var(--rk-danger);
+  pointer-events: none;
+}
+
+/* The rule above sizes every icon in the chip to 22px; the badge keeps its own box. */
+.toolbar-button-notice svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* The popover wraps the caret in its own anchor, so the stretch has to start there
+   for the caret to reach the full height of the chip. */
+.toolbar-button-with-menu .rk-popover-anchor {
+  align-self: stretch;
+}
+
+.toolbar-button-caret {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 100%;
+  padding: 0 4px 0 0;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  transition: color 0.12s;
+}
+
+.toolbar-button-caret:hover {
+  color: var(--rk-text-primary);
+}
+
+.toolbar-button-caret:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Rotate the glyph, not the padded hit target — otherwise the asymmetric padding
+   makes the caret look like it pivots around a corner. */
+.toolbar-button-caret svg {
+  width: 9px;
+  height: 9px;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center;
+}
+
+.toolbar-button[data-menu-open='1'] .toolbar-button-caret {
+  color: var(--rk-info);
+}
+
+.toolbar-button[data-menu-open='1'] .toolbar-button-caret svg {
+  transform: rotate(180deg);
+}
