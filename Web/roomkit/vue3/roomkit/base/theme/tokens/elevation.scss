@@ -1,0 +1,10 @@
+:root,
+.rk-root {
+  --rk-shadow-pop: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --rk-shadow-dialog: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --rk-z-dropdown: 20;
+  --rk-z-popover: 30;
+  --rk-z-tooltip: 40;
+  --rk-z-dialog: 50;
+  --rk-z-toast: 60;
+}

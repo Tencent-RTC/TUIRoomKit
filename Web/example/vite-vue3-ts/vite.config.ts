@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { visualizer } from 'rollup-plugin-visualizer';
 
 const path = require('path');
 
@@ -15,19 +14,6 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    rollupOptions: {
-      output: {
-        // Custom Split Strategy
-      },
-    },
   },
-  plugins: [
-    vue({
-      // Explanation: Solved the problem of introducing the generation of userSig files.
-      // reactivityTransform: true,
-    }),
-    visualizer({
-      // open: true,
-    }),
-  ],
+  plugins: [vue()],
 });

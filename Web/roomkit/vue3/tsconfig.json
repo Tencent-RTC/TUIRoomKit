@@ -10,17 +10,20 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "lib": ["esnext", "dom", "dom.iterable"],
     "allowJs": true,
+    "experimentalDecorators": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./roomkit/*"]
     }
   },
   "include": [
-    "RoomKit/**/*.ts",
-    "RoomKit/**/*.d.ts",
-    "RoomKit/**/*.tsx",
-    "RoomKit/**/*.vue"
+    "roomkit/**/*.ts",
+    "roomkit/**/*.d.ts",
+    "roomkit/**/*.tsx",
+    "roomkit/**/*.vue",
+    "test/**/*.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

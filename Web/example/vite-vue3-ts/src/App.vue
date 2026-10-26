@@ -1,95 +1,69 @@
 <template>
-  <UIKitProvider :theme="initialTheme" :language="initialLanguage">
-    <div id="app">
-      <router-view />
-    </div>
-    <IntegrationCard />
-  </UIKitProvider>
+  <div id="app">
+    <router-view />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
-import { conference, useRoomInvitation, useRoomInvitationH5, RoomEvent } from '@tencentcloud/roomkit-web-vue3';
-import { TUIMessageBox, UIKitProvider, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { onMounted, onUnmounted } from 'vue';
+import { TUIMessageBox, t, useI18n } from '@tencentcloud/roomkit-web-vue3';
+import { LoginEvent, useLoginState } from 'tuikit-atomicx-vue3/room';
 import { useRoute, useRouter } from 'vue-router';
-import { isPC } from './utils/utils';
-import IntegrationCard from './components/IntegrationCard/index.vue';
 
-const { t } = useUIKit();
-const initialTheme = ref(localStorage.getItem('tuiRoom-theme') || 'light');
-const initialLanguage = ref(localStorage.getItem('tuiRoom-language') || '');
+const EXIT_OVERLAY_TARGET = 'body';
 
+const savedLanguage = localStorage.getItem('tuiRoom-language') || '';
+const { setLanguage } = useI18n();
+const { subscribeEvent, unsubscribeEvent } = useLoginState();
 const router = useRouter();
 const route = useRoute();
 
-if (!isPC) {
-  useRoomInvitationH5({
-    onAcceptCall: (params) => {
-      router.push({
-        path: '/room',
-        query: params,
-      });
-    },
-  });
-} else {
-  useRoomInvitation({
-    onAcceptCall: (params) => {
-      router.push({
-        path: '/room',
-        query: params,
-      });
-    },
-  });
+if (savedLanguage) {
+  setLanguage(savedLanguage);
 }
 
-const onLoginExpired = () => {
+function goToLogin() {
+  sessionStorage.removeItem('tuiRoom-userInfo');
+  if (route.path !== '/login') {
+    router.replace({ path: '/login' });
+  }
+}
+
+function onLoginExpired() {
   TUIMessageBox.alert({
     title: t('Login.Expired'),
-    content: t('Login.ExpiredDescription'),
+    message: t('Login.ExpiredDescription'),
+    appendTo: EXIT_OVERLAY_TARGET,
   });
-  router.replace({ path: '/login' });
-};
-const onKickedOffline = () => {
+  goToLogin();
+}
+
+function onKickedOffline() {
   TUIMessageBox.alert({
     title: t('Login.KickedOffline'),
-    content: t('Login.KickedOfflineDescription'),
+    message: t('Login.KickedOfflineDescription'),
+    appendTo: EXIT_OVERLAY_TARGET,
   });
-  router.replace({ path: '/login' });
-};
-const bindEvent = () => {
-  conference.on(RoomEvent.USER_SIG_EXPIRED, onLoginExpired);
-  conference.on(RoomEvent.KICKED_OFFLINE, onKickedOffline);
-};
-const unbindEvent = () => {
-  conference.off(RoomEvent.USER_SIG_EXPIRED, onLoginExpired);
-  conference.off(RoomEvent.KICKED_OFFLINE, onKickedOffline);
-};
+  goToLogin();
+}
 
-onMounted(async () => {
+function bindEvent() {
+  subscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
+  subscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
+}
+
+function unbindEvent() {
+  unsubscribeEvent(LoginEvent.onLoginExpired, onLoginExpired);
+  unsubscribeEvent(LoginEvent.onKickedOffline, onKickedOffline);
+}
+
+onMounted(() => {
   bindEvent();
-  await router.isReady();
-  if (route.path === '/login') {
-    return;
-  }
-  const storedData = sessionStorage.getItem('tuiRoom-userInfo') || '{}';
-  const userInfo = JSON.parse(storedData);
-  try {
-    await conference.login({
-      userId: userInfo.userID,
-      userSig: userInfo.userSig,
-      sdkAppId: userInfo.SDKAppID,
-    });
-  } catch (error: any) {
-    console.error('Login failed:', error);
-    sessionStorage.removeItem('tuiRoom-userInfo');
-    router.replace({ path: '/login', query: { redirect: route.fullPath } });
-  }
 });
 
 onUnmounted(() => {
   unbindEvent();
 });
-
 </script>
 
 <style lang="scss">

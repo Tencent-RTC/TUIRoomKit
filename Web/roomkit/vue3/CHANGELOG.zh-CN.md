@@ -4,83 +4,17 @@
 
 ---
 
-## [6.1.8] - 2026-08-26
-
-### 修复
-
-- 修复 PC 端白板批注工具栏按钮不可点击的问题。
-
-## [6.1.7] - 2026-08-18
-
-### 优化
-
-- 优化字幕交互透明文字效果改为光标闪烁打字机效果
-
-## [6.1.6] - 2026-08-17
-
-### 优化
-
-- 优化实时字幕交互
-
-## [6.1.5] - 2026-08-09
+## [7.0.0] - 2026-10-23
 
 ### 新增
 
-- 研讨会弹幕功能迁移至 RoomKit 维护。
-- 设备权限采集失败时新增明确提示，区分 PC 端与移动端场景。
-
-### 修复
-
-- 修复屏幕分享场景下，顶部栏布局中打开成员列表后被错误切换为侧边栏布局的问题。
-- 统一处理视频预览区域渲染失败的场景。
-- 修复白板本地预览走 `videoMixer` 导致的显示异常，并调整弹幕相关样式。
-- 移除虚拟背景冗余代码，修复未开启摄像头时背景保存的兼容性问题。
-
-### 优化
-
-降低 `KeyMetricsStats` 上报频率并调低日志级别。
-
-## [6.1.4] - 2026-08-03
-
-### 新增
-
-- 新增互动白板功能。
-
-### 修复
-
-- 修复白板画面清晰度问题。
-
-## [6.1.3] - 2026-07-20
-
-### 优化
-
-- 开启录制、开启白板接口新增数据上报。
-
-## [6.1.2] - 2026-07-17
-
-### 修复
-
-- 修复打包产物中样式全部丢失的问题：`ConferenceMainView`、`PreConferenceView` 等组件在生产构建后无样式（构建时 CSS 未注入主入口）。
-
-## [6.1.1] - 2026-07-16
-
-### 新增
-
-- `setWidgetVisible` 支持控制白板（`WhiteboardWidget`）与批注（`AnnotationWidget`）入口按钮的显隐。
-- 导出 `genTestUserSig` 方法，对齐各端能力，方便快速接入与调试。
+- 正式发布 `@tencentcloud/roomkit-web-vue3` v7.0.0 npm 包，基于 `atomicx` State 层全新重构的 Vue 3 会议 UI 组件库，提供 ESM 与 CJS 两种构建产物及完整 TypeScript 类型声明。
+- 新增基于类的命令式核心 API：`RoomKit`，提供 `RoomLayoutTemplate`、`ExitReason` 及强类型的 `RoomKitJoinOptions` / `RoomKitEventMap`。
+- 新增 `ConferenceView` 场景视图，PC 与移动端（H5）开箱即用。
+- 支持完整会中能力：视频布局切换、摄像头/麦克风设备管理、屏幕分享、会中聊天、成员管理、会议预定、云端录制、实时字幕（转写）、互动白板、小窗模式、视频特效。
+- 新增会前组装能力：`SchedulePanel`、`ScheduledListPC` / `ScheduledListMobile`、`MeetingDetailMobile`、`SettingsDialogPC`、`AudioDeviceMenu`、`VideoDeviceMenu`、`LanguageButton`、`ThemeButton`、`useDeviceFault`。
+- 新增主题（`ThemeName`）、国际化（`i18n` / `t` / `useI18n`）、UI 配置（`RoomKitProvider` / `setUIConfig` / `useUIConfig`，支持图标覆盖）及全套 `TUI*` 基础组件。
 
 ### 变更
 
-- `ConferenceMainView` 与 `PreConferenceView` 默认改为撑满父容器（宽高 100%），不再强制占满整个视口。
-
-## [6.1.0] - 2026-07-13
-
-### 新增
-
-- 支持白板与屏幕共享批注能力。
-- 支持云端录制能力。
-
-### 修复
-
-- 修复麦克风开启前无法打开 AI 降噪插件的问题。
-- 修复超长时间挂机后 RTC 断连的问题。
+- 语义化版本跃迁：v7.0.0 取代已废弃的 v6.x 版本线（`@tencentcloud/roomkit-web-vue3` ≤ 6.2.x）。对外 API 与 v6.x 不兼容。
