@@ -1,0 +1,19 @@
+.overflow-toolbar {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.overflow-toolbar-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.overflow-toolbar-items {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}

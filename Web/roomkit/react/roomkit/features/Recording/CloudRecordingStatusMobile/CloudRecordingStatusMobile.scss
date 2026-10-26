@@ -1,0 +1,43 @@
+.cloud-recording-status-mobile {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 6px;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  color: var(--rk-danger);
+  user-select: none;
+  background: color-mix(in srgb, var(--rk-danger) 14%, transparent);
+  border-radius: 999px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cloud-recording-status-mobile.is-clickable {
+  cursor: pointer;
+}
+
+.cloud-recording-status-mobile.is-clickable:active {
+  background: color-mix(in srgb, var(--rk-danger) 22%, transparent);
+}
+
+.cloud-recording-status-mobile-dot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  background: var(--rk-danger);
+  border-radius: 50%;
+  animation: cloud-recording-status-mobile-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes cloud-recording-status-mobile-pulse {
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud-recording-status-mobile-dot {
+    animation: none;
+  }
+}

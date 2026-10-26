@@ -1,0 +1,18 @@
+.switch-camera {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.switch-camera svg {
+  width: 20px;
+  height: 20px;
+}

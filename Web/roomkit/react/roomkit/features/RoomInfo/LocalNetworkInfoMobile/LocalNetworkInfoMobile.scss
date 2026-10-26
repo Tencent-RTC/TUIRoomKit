@@ -1,0 +1,119 @@
+.local-network-info-mobile {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Bars bottom-align so they step up. */
+.local-network-info-mobile-bars {
+  display: inline-flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 12px;
+}
+
+.local-network-info-mobile-bars i {
+  display: block;
+  width: 3px;
+  background: currentcolor;
+  border-radius: 1px;
+}
+
+.local-network-info-mobile-disconnected i {
+  opacity: 0.4;
+}
+
+.local-network-info-mobile-bars i:nth-child(1) {
+  height: 4px;
+}
+
+.local-network-info-mobile-bars i:nth-child(2) {
+  height: 8px;
+}
+
+.local-network-info-mobile-bars i:nth-child(3) {
+  height: 12px;
+}
+
+.local-network-info-mobile-stability {
+  color: var(--rk-success);
+}
+
+.local-network-info-mobile-fluctuation {
+  color: var(--rk-warning);
+}
+
+.local-network-info-mobile-lag {
+  color: var(--rk-danger);
+}
+
+.local-network-info-mobile-disconnected {
+  color: var(--rk-text-tertiary);
+}
+
+/* Lit bars stand for the signal level; the rest stay visible but dim. */
+.local-network-info-mobile-fluctuation i:nth-child(3),
+.local-network-info-mobile-lag i:nth-child(2),
+.local-network-info-mobile-lag i:nth-child(3) {
+  opacity: 0.28;
+}
+
+.local-network-sheet-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding-bottom: 20px;
+}
+
+.local-network-sheet-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 8px;
+  background: var(--rk-bg-hover);
+  border-radius: 8px;
+}
+
+.local-network-sheet-label {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  line-height: 14px;
+  color: var(--rk-text-tertiary);
+}
+
+.local-network-sheet-arrow {
+  flex-shrink: 0;
+}
+
+.local-network-sheet-arrow-up {
+  color: var(--rk-blue-500);
+  transform: rotate(-90deg);
+}
+
+.local-network-sheet-arrow-down {
+  color: var(--rk-orange-500);
+  transform: rotate(90deg);
+}
+
+.local-network-sheet-value {
+  font-size: var(--rk-fs-md);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 18px;
+  color: var(--rk-text-primary);
+}
+
+.local-network-sheet-unit {
+  margin-left: 2px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 400;
+  color: var(--rk-text-tertiary);
+}

@@ -1,1 +1,0 @@
-export { ScreenShareButton } from './ScreenShareButton';

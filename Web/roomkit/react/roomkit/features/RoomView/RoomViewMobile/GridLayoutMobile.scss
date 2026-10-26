@@ -1,0 +1,238 @@
+.grid-layout-mobile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  overflow: visible;
+}
+
+.grid-layout-mobile-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.grid-layout-mobile-page {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.grid-layout-mobile-content {
+  display: grid;
+  place-content: center;
+}
+
+/* place-content: center sizes the row to its content, so a lone tile collapsed to
+   the mic icon with the camera off. Stretch the one cell to the stage instead. */
+.grid-layout-mobile-content.is-fill {
+  position: absolute;
+  inset: 0;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  place-content: stretch;
+}
+
+/* The tile is the one clip for the video and the overlay. */
+.grid-layout-mobile-tile {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--room-view-tile-bg);
+  isolation: isolate;
+  border-radius: 12px;
+}
+
+.grid-layout-mobile-video {
+  width: 100%;
+  height: 100%;
+}
+
+.grid-layout-mobile-video.is-hidden {
+  opacity: 0;
+}
+
+.grid-layout-mobile-tile.is-centered {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: var(--grid-layout-mobile-tile-width);
+}
+
+/* Half a column plus half a gap moves the last pair to the middle of the 3-column row. */
+.grid-layout-mobile-tile.is-pair-shifted {
+  width: var(--grid-layout-mobile-tile-width);
+  margin-inline-start: calc((var(--grid-layout-mobile-tile-width) + var(--grid-layout-mobile-gap)) / 2);
+}
+
+/* The ring sits on the tile, which owns the corners and the clip; the 4px gallery gap
+   leaves no room for an outer glow. */
+.grid-layout-mobile-pip:has(.participant-view-overlay.is-speaking)::after,
+.grid-layout-mobile-tile:has(.participant-view-overlay.is-speaking)::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  content: '';
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px var(--rk-success);
+}
+
+.grid-layout-mobile-content.is-share-page .grid-layout-mobile-tile {
+  background: #000;
+  border-radius: 12px;
+}
+
+/* A zoomed share grows past its cell; clip it to the stage. */
+.grid-layout-mobile-content.is-share-page {
+  overflow: hidden;
+}
+
+/* The browser must not claim the pinch or the pan of a zoomed share. */
+.grid-layout-mobile-tile.is-zoomable {
+  touch-action: none;
+}
+
+.grid-layout-mobile-pager {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  pointer-events: none;
+}
+
+/* Phones have no hover: a tap shows the arrows and the page count, and the next tap hides them. */
+.grid-layout-mobile-page-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: #fff;
+  pointer-events: none;
+  cursor: pointer;
+  background: color-mix(in srgb, #000 42%, transparent);
+  border: 0;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  transform: scale(0.92);
+}
+
+.grid-layout-mobile.is-chrome .grid-layout-mobile-page-btn {
+  pointer-events: auto;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.grid-layout-mobile.is-chrome .grid-layout-mobile-page-btn:disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.22;
+}
+
+.grid-layout-mobile-page-icon.is-prev {
+  transform: rotate(90deg);
+}
+
+.grid-layout-mobile-page-icon.is-next {
+  transform: rotate(-90deg);
+}
+
+.grid-layout-mobile-page-ind {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  height: 20px;
+  padding: 0 8px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  pointer-events: none;
+  background: color-mix(in srgb, #000 42%, transparent);
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+  transform: translateX(-50%);
+}
+
+.grid-layout-mobile.is-chrome .grid-layout-mobile-page-ind {
+  opacity: 1;
+}
+
+.grid-layout-mobile-share-who {
+  position: absolute;
+  top: auto;
+  right: auto;
+  bottom: 20px;
+  left: 20px;
+  z-index: 12;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  height: 22px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 22px;
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 999px;
+  transform: none;
+}
+
+.grid-layout-mobile-share-who-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The speaker's camera rides on the share page; dragging stays inside the stage. */
+.grid-layout-mobile-pip {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 13;
+  width: 112px;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  background: var(--room-view-tile-bg);
+  isolation: isolate;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.grid-layout-mobile-pip:active {
+  cursor: grabbing;
+}
+
+.grid-layout-mobile-pip.is-snapping {
+  transition: left 220ms var(--rk-ease), top 220ms var(--rk-ease);
+}
+
+/* The speaking ring and the camera-off mask inherit their corners from the view.
+   Vue targets the participant view root; the React view's class is hashed, so the
+   video wrapper inside the window carries the inherited radius instead. */
+.grid-layout-mobile-pip > .grid-layout-mobile-video {
+  border-radius: inherit;
+}

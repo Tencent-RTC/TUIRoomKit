@@ -1,0 +1,35 @@
+.rk-option {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: transparent;
+  border-radius: var(--rk-radius-md);
+
+  &:hover:not([aria-selected='true']),
+  &[data-highlighted='true']:not([aria-selected='true']) {
+    background: var(--rk-option-hover);
+  }
+
+  &[aria-selected='true'] {
+    color: var(--rk-brand);
+    background: var(--rk-brand-soft);
+  }
+
+  &[aria-disabled='true'] {
+    color: var(--rk-text-disabled);
+    cursor: not-allowed;
+  }
+}
+
+.rk-option-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

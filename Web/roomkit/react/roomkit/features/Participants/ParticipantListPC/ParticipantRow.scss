@@ -1,0 +1,146 @@
+.participant-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 10px;
+  transition: background 0.12s ease;
+}
+
+.participant-row:hover {
+  background: var(--rk-bg-muted);
+}
+
+.participant-row-avatar {
+  flex: none;
+}
+
+.participant-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.participant-row-name {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--rk-text-primary);
+}
+
+.participant-row-name-text {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Role chips share one shape. Soft fills mix into the surface.
+   Light text is darkened; dark text is lifted so both themes stay readable. */
+.participant-row-tag {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  padding: 0 6px;
+  font-size: var(--rk-fs-xs);
+  font-weight: 600;
+  line-height: 1;
+  color: color-mix(in srgb, var(--rk-brand) 78%, #000);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--rk-brand) 20%, var(--rk-bg-surface));
+  border-radius: 999px;
+}
+
+.participant-row-tag.is-admin {
+  color: color-mix(in srgb, var(--rk-warning) 58%, #000);
+  background: color-mix(in srgb, var(--rk-warning) 20%, var(--rk-bg-surface));
+}
+
+.rk-root[data-rk-theme='dark'] .participant-row-tag.is-owner {
+  color: color-mix(in srgb, var(--rk-brand) 70%, #fff);
+}
+
+.rk-root[data-rk-theme='dark'] .participant-row-tag.is-admin {
+  color: var(--rk-warning);
+}
+
+.participant-row-tag.is-self {
+  color: var(--rk-text-secondary);
+  background: color-mix(in srgb, var(--rk-text-primary) 10%, var(--rk-bg-surface));
+}
+
+.participant-row-tag.is-sharing {
+  gap: 3px;
+  color: var(--rk-brand-hover);
+  background: var(--rk-brand-soft);
+}
+
+.participant-row-icons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.participant-row-icon .rk-icon,
+.participant-row-more .rk-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.participant-row-tag.is-sharing .rk-icon {
+  width: 10px;
+  height: 10px;
+}
+
+.participant-row-icon,
+.participant-row-more {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: var(--rk-text-tertiary);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  transition: background 0.12s ease, color 0.12s ease, opacity 0.12s ease;
+}
+
+/* Always present but faint; the row hover promotes it to full strength. */
+.participant-row-more {
+  opacity: 0.55;
+}
+
+button.participant-row-icon,
+.participant-row-more {
+  cursor: pointer;
+}
+
+button.participant-row-icon:hover,
+.participant-row-more:hover {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-muted);
+}
+
+/* The off icons carry their own red slash, so the glyph itself stays neutral. */
+.participant-row-icon.on,
+.participant-row-icon.muted {
+  color: var(--rk-text-secondary);
+}
+
+.participant-row:hover .participant-row-more,
+.participant-row-more.is-open {
+  opacity: 1;
+}

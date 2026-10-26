@@ -1,0 +1,105 @@
+import {
+  DeviceStatus,
+  RoomParticipantRole,
+  VideoStreamType,
+  useRoomParticipantState,
+} from 'tuikit-atomicx-react/room';
+import type { RoomParticipant } from 'tuikit-atomicx-react/room';
+
+type Comparator<T> = (a: T, b: T) => -1 | 0 | 1;
+
+function combineComparators<T>(...comparators: Comparator<T>[]): Comparator<T> {
+  return (a, b) => {
+    for (const comparator of comparators) {
+      const result = comparator(a, b);
+      if (result !== 0) {
+        return result;
+      }
+    }
+    return 0;
+  };
+}
+
+function createComparator<T>(
+  rule: (data1: T, data2: T) => boolean,
+): Comparator<T> {
+  return (a, b) => {
+    if (rule(a, b) && rule(b, a)) {
+      return 0;
+    }
+    if (rule(a, b)) {
+      return -1;
+    }
+    if (rule(b, a)) {
+      return 1;
+    }
+    return 0;
+  };
+}
+
+export type StreamInfo = {
+  participant: RoomParticipant;
+  streamType: VideoStreamType;
+};
+
+/** Layouts hide the video under the overlay's camera-off mask: two layers clipped to the
+    same radius anti-alias separately, so the black video would show as corner ticks. */
+export function isCameraOff({ participant, streamType }: StreamInfo): boolean {
+  return streamType === VideoStreamType.Camera && participant.cameraStatus !== DeviceStatus.On;
+}
+
+/** Sorted camera streams + optional screen share, for conference layout surfaces. */
+export function useParticipantStreams() {
+  const {
+    localParticipant,
+    participantList,
+    participantWithScreen,
+  } = useRoomParticipantState();
+
+  const compareParticipants = combineComparators(
+    createComparator((user: RoomParticipant) =>
+      user.role === RoomParticipantRole.Owner,
+    ),
+    createComparator((user: RoomParticipant) =>
+      user.userId === localParticipant?.userId,
+    ),
+    createComparator((user: RoomParticipant) =>
+      user.role === RoomParticipantRole.Admin,
+    ),
+    createComparator((user: RoomParticipant) =>
+      user.screenShareStatus === DeviceStatus.On,
+    ),
+    createComparator((user: RoomParticipant) =>
+      user.cameraStatus === DeviceStatus.On
+      && user.microphoneStatus === DeviceStatus.On,
+    ),
+    createComparator((user: RoomParticipant) =>
+      user.cameraStatus === DeviceStatus.On,
+    ),
+    createComparator((user: RoomParticipant) =>
+      user.microphoneStatus === DeviceStatus.On,
+    ),
+  );
+
+  const sortedParticipantCameraList: StreamInfo[] = [...participantList]
+    .sort(compareParticipants)
+    .map(participant => ({
+      participant,
+      streamType: VideoStreamType.Camera,
+    }));
+
+  const participantStreamList: StreamInfo[] = [];
+  if (participantWithScreen) {
+    participantStreamList.push({
+      participant: participantWithScreen,
+      streamType: VideoStreamType.Screen,
+    });
+  }
+  participantStreamList.push(...sortedParticipantCameraList);
+
+  return {
+    sortedParticipantCameraList,
+    participantStreamList,
+    participantWithScreen,
+  };
+}

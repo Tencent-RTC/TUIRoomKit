@@ -1,0 +1,18 @@
+.rk-tooltip-anchor {
+  display: inline-flex;
+}
+
+.rk-tooltip {
+  position: absolute;
+  pointer-events: none;
+  max-width: 240px;
+  padding: 6px 8px;
+  border-radius: var(--rk-radius-sm);
+  background: var(--rk-tooltip-bg, var(--rk-bg-surface));
+  color: var(--rk-tooltip-fg, var(--rk-text-primary));
+  border: var(--rk-tooltip-border, 1px solid var(--rk-border));
+  font-size: var(--rk-tooltip-size, 11px);
+  font-weight: var(--rk-tooltip-weight, 500);
+  line-height: 1.4;
+  box-shadow: var(--rk-shadow-pop);
+}

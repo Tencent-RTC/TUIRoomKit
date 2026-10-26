@@ -2,11 +2,7 @@
   "compilerOptions": {
     "composite": true,
     "module": "esnext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true
+    "moduleResolution": "node"
   },
   "include": ["vite.config.ts"]
 }

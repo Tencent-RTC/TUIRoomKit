@@ -1,32 +1,30 @@
 {
-  "name": "@tencentcloud/roomkit-web-react-sample",
-  "version": "6.0.2",
-  "type": "module",
+  "name": "@tencentcloud/roomkit-web-react-next-sample",
+  "version": "0.1.0",
   "scripts": {
     "dev": "vite --force",
     "dev:deep": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
+    "lint": "./node_modules/.bin/eslint ./src --ext .ts,.tsx --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "@tencentcloud/roomkit-web-react": "6.1.4",
-    "@tencentcloud/uikit-base-component-react": "1.4.2",
+    "@tencentcloud/tuiroom-engine-js": "4.3.0",
+    "@tencentcloud/universal-api": "2.4.1",
+    "@tencentcloud/roomkit-web-react": "7.0.0",
+    "@tencentcloud/uikit-base-component-react": "1.4.4",
     "@tencentcloud/uikit-base-widget-react": "1.2.3",
-    "@tencentcloud/universal-api": "^2.4.0",
+    "tuikit-atomicx-react": "6.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.0",
-    "tuikit-atomicx-react": "6.3.5"
+    "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
     "@tencentcloud/eslint-config-hybrid": "~0.0.1",
     "@types/node": "^18.19.31",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-legacy": "^5.4.3",
     "@vitejs/plugin-react": "^4.6.0",
-    "rollup-plugin-visualizer": "^5.12.0",
     "sass": "^1.50.0",
     "typescript": "^5.5.4",
     "vite": "^5.2.8"

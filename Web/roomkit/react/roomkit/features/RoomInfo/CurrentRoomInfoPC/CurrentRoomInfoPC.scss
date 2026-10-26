@@ -1,0 +1,444 @@
+/* Light bar + compact card measured from pre-conference.html .info-chip / .info-card. */
+.current-room-info {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  max-width: 460px;
+  height: 24px;
+  padding: 0 8px;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  transition: background 0.15s;
+}
+
+.current-room-info:hover,
+.current-room-info.is-open {
+  background: var(--rk-bg-hover);
+}
+
+.current-room-info:active {
+  background: var(--rk-option-hover);
+}
+
+.current-room-info-title {
+  min-width: 0;
+  max-width: 220px;
+  overflow: hidden;
+  font-size: var(--rk-fs-md);
+  font-weight: 600;
+  color: var(--rk-text-primary);
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.current-room-info-time {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--rk-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.current-room-info-caret {
+  flex-shrink: 0;
+  margin-left: 2px;
+  color: var(--rk-text-tertiary);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.current-room-info.is-open .current-room-info-caret {
+  color: var(--rk-brand-hover);
+  transform: rotate(180deg);
+}
+
+.rk-root[data-rk-theme='light'] .current-room-info.is-open .current-room-info-caret {
+  color: var(--rk-brand);
+}
+
+.current-room-info.is-narrow {
+  max-width: 210px;
+  height: 32px;
+  padding: 0 8px 0 10px;
+}
+
+.current-room-info.is-narrow .current-room-info-title {
+  max-width: 110px;
+  font-size: var(--rk-fs-sm);
+}
+
+.current-room-info.is-narrow .current-room-info-time {
+  font-size: var(--rk-fs-sm);
+}
+
+.room-info-card {
+  display: flex;
+  flex-direction: column;
+  width: 256px;
+  max-width: min(256px, calc(100vw - 40px));
+  max-height: min(440px, calc(100vh - 140px));
+  overflow: hidden;
+  font-size: var(--rk-fs-lg);
+  line-height: normal;
+  color: var(--rk-text-primary);
+  letter-spacing: -0.005em;
+  pointer-events: auto;
+  background: var(--rk-bg-surface);
+  border: none;
+  border-radius: var(--rk-radius-md);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.32),
+    0 2px 10px rgba(0, 0, 0, 0.18);
+  transform-origin: top left;
+  animation: room-info-enter 260ms cubic-bezier(0.22, 1.12, 0.36, 1);
+}
+
+.rk-root[data-rk-theme='light'] .room-info-card {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.14),
+    0 2px 8px var(--rk-border);
+}
+
+.room-info-card.is-narrow {
+  width: 280px;
+}
+
+.room-info-card-header {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+  align-items: flex-start;
+  padding: 10px 10px 0;
+}
+
+.room-info-card h2 {
+  display: -webkit-box;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--rk-text-primary);
+  -webkit-line-clamp: 2;
+  letter-spacing: -0.012em;
+  -webkit-box-orient: vertical;
+}
+
+.room-info-card-close,
+.room-info-card-icon,
+.room-info-card-copy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  border: none;
+}
+
+.room-info-card-close {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin: -1px -6px 0 0;
+  color: var(--rk-text-tertiary);
+  background: transparent;
+  border-radius: 6px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.room-info-card-close:hover {
+  color: var(--rk-text-primary);
+  background: var(--rk-option-hover);
+}
+
+.room-info-card-close:active {
+  background: color-mix(in srgb, var(--rk-text-primary) 12%, transparent);
+}
+
+.room-info-card-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.room-info-card-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.room-info-card-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20px;
+  gap: 2px 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.room-info-card-label {
+  grid-area: 1 / 1;
+  font-size: var(--rk-fs-xs);
+  font-weight: 500;
+  line-height: 13px;
+  color: var(--rk-text-tertiary);
+  letter-spacing: 0.01em;
+}
+
+.room-info-card-value {
+  grid-area: 2 / 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--rk-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room-info-card-value.num {
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.room-info-card-value.link {
+  font-family: inherit;
+  font-size: var(--rk-fs-sm);
+  font-weight: 400;
+  color: var(--rk-text-secondary);
+  letter-spacing: 0;
+}
+
+.room-info-card-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--rk-text-tertiary);
+  background: transparent;
+  border-radius: 5px;
+  transition:
+    background 0.14s,
+    color 0.14s,
+    transform 0.1s;
+}
+
+.room-info-card-icon:hover {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-hover);
+}
+
+.room-info-card-icon:active {
+  transform: scale(0.88);
+}
+
+.room-info-card-icon:focus-visible {
+  outline: 2px solid var(--rk-focus-ring);
+  outline-offset: 2px;
+}
+
+.room-info-card-icon.is-copied,
+.room-info-card-field:hover .room-info-card-icon.is-copied {
+  color: color-mix(in srgb, var(--rk-success) 80%, var(--rk-text-primary));
+  background: color-mix(in srgb, var(--rk-success) 12%, transparent);
+}
+
+.room-info-card-field .room-info-card-icon {
+  position: relative;
+  z-index: 1;
+  grid-area: 2 / 2;
+  justify-self: end;
+  margin: -4px 0;
+  background: var(--rk-bg-surface);
+}
+
+.room-info-card-field:hover .room-info-card-icon {
+  color: var(--rk-text-secondary);
+}
+
+.room-info-card-host {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 10px 0;
+  margin: 10px -10px 0;
+  border-top: 1px solid var(--rk-border);
+}
+
+.room-info-card-avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  overflow: hidden;
+  font-size: var(--rk-fs-xs);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--rk-avatar-fg);
+  background: var(--rk-avatar-bg);
+  border-radius: 50%;
+}
+
+.room-info-card-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.room-info-card-host-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.room-info-card-host-name {
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  line-height: 15px;
+  color: var(--rk-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room-info-card-host-label {
+  font-size: var(--rk-fs-xs);
+  font-weight: 400;
+  line-height: 13px;
+  color: var(--rk-text-tertiary);
+}
+
+.room-info-card-copy {
+  flex-shrink: 0;
+  gap: 6px;
+  width: 100%;
+  height: 28px;
+  margin-top: 10px;
+  font-family: inherit;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  color: color-mix(in srgb, var(--rk-brand) 82%, var(--rk-text-primary));
+  letter-spacing: -0.005em;
+  background: var(--rk-brand-soft);
+  border-radius: 8px;
+  transition:
+    background 0.15s,
+    transform 0.1s,
+    color 0.15s;
+}
+
+.room-info-card-button-label {
+  min-width: 6em;
+  text-align: center;
+}
+
+.room-info-card-copy:hover {
+  background: color-mix(in srgb, var(--rk-brand) 22%, transparent);
+}
+
+.room-info-card-copy:active {
+  transform: scale(0.985);
+}
+
+.room-info-card-copy.is-copied {
+  color: color-mix(in srgb, var(--rk-success) 80%, var(--rk-text-primary));
+  background: color-mix(in srgb, var(--rk-success) 14%, transparent);
+}
+
+.room-info-card-copy:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.room-info-card-close:focus-visible,
+.room-info-card-copy:focus-visible {
+  outline: 2px solid var(--rk-focus-ring);
+  outline-offset: 2px;
+}
+
+.room-info-card-check {
+  animation: ic-pop 0.26s cubic-bezier(0.22, 1.3, 0.36, 1);
+}
+
+.room-info-card-error {
+  margin: 8px 0 0;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-danger);
+}
+
+.room-info-card-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@keyframes ic-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes room-info-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .room-info-card,
+  .room-info-card-check {
+    animation: none;
+  }
+
+  .current-room-info,
+  .current-room-info-caret {
+    transition: none;
+  }
+
+  .room-info-card-copy:active,
+  .room-info-card-icon:active {
+    transform: none;
+  }
+}
+
+/* TUIPopover teleports the card; strip the float chrome so the card owns the surface. */
+.rk-float.rk-popover:has(> .room-info-card) {
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}

@@ -1,0 +1,113 @@
+.device-fault-sheet-root {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.device-fault-sheet-root.is-open {
+  pointer-events: auto;
+}
+
+.device-fault-sheet-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.device-fault-sheet-root.is-open .device-fault-sheet-mask {
+  opacity: 1;
+}
+
+.device-fault-sheet {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  padding: 0 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  color: var(--rk-text-primary);
+  text-align: center;
+  background: var(--rk-bg-surface);
+  border-radius: 16px 16px 0 0;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(100%);
+}
+
+.device-fault-sheet-root.is-open .device-fault-sheet {
+  transform: translateY(0);
+}
+
+.device-fault-sheet-handle {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 6px;
+}
+
+.device-fault-sheet-handle i {
+  display: block;
+  width: 36px;
+  height: 4px;
+  background: var(--rk-border-strong);
+  border-radius: 2px;
+}
+
+.device-fault-sheet-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 10px auto 12px;
+  color: var(--rk-warning);
+  background: color-mix(in srgb, var(--rk-warning) 14%, transparent);
+  border-radius: 50%;
+}
+
+.device-fault-sheet-title {
+  margin: 0 0 6px;
+  font-size: var(--rk-fs-lg);
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--rk-text-primary);
+}
+
+.device-fault-sheet-body {
+  margin: 0;
+  font-size: var(--rk-fs-md);
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--rk-text-secondary);
+}
+
+.device-fault-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.device-fault-sheet-button {
+  box-sizing: border-box;
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: var(--rk-fs-lg);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: var(--rk-bg-page);
+  border: 0;
+  border-radius: 10px;
+}
+
+.device-fault-sheet-button.is-primary {
+  font-weight: 600;
+  color: var(--rk-on-accent);
+  background: var(--rk-brand);
+}

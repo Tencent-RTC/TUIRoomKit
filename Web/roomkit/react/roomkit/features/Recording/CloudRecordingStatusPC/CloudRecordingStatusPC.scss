@@ -1,0 +1,42 @@
+.cloud-recording-status {
+  box-sizing: border-box;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  color: var(--rk-danger);
+  user-select: none;
+  background: color-mix(in srgb, var(--rk-danger) 14%, transparent);
+  border-radius: 8px;
+}
+
+.cloud-recording-status.is-clickable {
+  cursor: pointer;
+}
+
+.cloud-recording-status.is-clickable:hover {
+  opacity: 0.9;
+}
+
+.cloud-recording-status-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  background: var(--rk-danger);
+  border-radius: 50%;
+
+  /* steps(10) approximates the old breathing pulse with fewer GPU blends. */
+  animation: cloud-recording-status-pulse 1.2s steps(10, end) infinite;
+}
+
+@keyframes cloud-recording-status-pulse {
+  0%,
+  15%,
+  100% { opacity: 1; }
+
+  50%,
+  65% { opacity: 0.3; }
+}

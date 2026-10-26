@@ -1,0 +1,102 @@
+.rk-select {
+  display: inline-flex;
+  width: 100%;
+}
+
+.rk-select-trigger {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 0 10px;
+  font: inherit;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: var(--rk-bg-raised);
+  border: 1px solid var(--rk-border);
+  border-radius: var(--rk-radius-md);
+  outline: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus,
+  &:focus-visible,
+  &:active {
+    border-color: var(--rk-border);
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.rk-select-sm .rk-select-trigger {
+  height: var(--rk-control-sm);
+  font-size: var(--rk-fs-sm);
+}
+
+.rk-select-md .rk-select-trigger {
+  height: var(--rk-control-md);
+  font-size: var(--rk-fs-md);
+}
+
+.rk-select-lg .rk-select-trigger {
+  height: var(--rk-control-lg);
+  font-size: var(--rk-fs-md);
+}
+
+.rk-select-disabled .rk-select-trigger {
+  color: var(--rk-text-disabled);
+  cursor: not-allowed;
+  background: var(--rk-bg-muted);
+}
+
+.rk-select-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rk-select-value.is-placeholder {
+  color: var(--rk-text-tertiary);
+}
+
+.rk-select-clear,
+.rk-select-prefix,
+.rk-select-chevron {
+  display: inline-flex;
+  color: var(--rk-text-tertiary);
+}
+
+.rk-select-clear {
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.rk-select-open .rk-select-chevron {
+  transform: rotate(180deg);
+}
+
+.rk-select-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 240px;
+  padding: 6px;
+  overflow: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.rk-select-empty {
+  padding: 12px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-secondary);
+  text-align: center;
+}

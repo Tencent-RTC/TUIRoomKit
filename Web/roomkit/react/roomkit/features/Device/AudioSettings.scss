@@ -1,0 +1,145 @@
+.audio-settings-group-title {
+  padding: var(--rk-space-3) 0 var(--rk-space-1);
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  color: var(--rk-text-tertiary);
+  letter-spacing: 0.06em;
+}
+
+.audio-settings-group-title:first-child {
+  padding-top: 0;
+}
+
+/* Every group but the first is fenced off by a hairline above its title. */
+.audio-settings-group-title:not(:first-child) {
+  padding-top: 20px;
+  margin-top: 16px;
+  border-top: 1px solid var(--rk-border);
+}
+
+.audio-settings-row {
+  display: flex;
+  gap: var(--rk-space-4);
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: var(--rk-space-2) 0;
+}
+
+.audio-settings-row-title {
+  min-width: 0;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+}
+
+.audio-settings-row-control {
+  display: flex;
+  flex: 1 1 120px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  max-width: 240px;
+}
+
+.audio-settings-row-control .rk-select {
+  width: 100%;
+  min-width: 0;
+}
+
+.audio-settings-level {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  width: 100%;
+  height: 8px;
+}
+
+.audio-settings-level span {
+  flex: 1;
+  height: 3px;
+  background: var(--rk-bg-hover);
+  border-radius: var(--rk-radius-pill);
+}
+
+.audio-settings-level .is-on {
+  background: var(--rk-success);
+}
+
+.audio-settings-test {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  height: 26px;
+  padding: 0 var(--rk-space-3);
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: var(--rk-bg-muted);
+  border: 0;
+  border-radius: var(--rk-radius-pill);
+}
+
+.audio-settings-test:hover {
+  background: var(--rk-bg-hover);
+}
+
+/* Playing keeps its accent fill on hover; the label already turned into "stop" */
+.audio-settings-test.is-playing,
+.audio-settings-test.is-playing:hover {
+  padding-left: 28px;
+  color: var(--rk-on-accent);
+  background: var(--rk-brand);
+}
+
+/* One bar plus two box-shadow copies; the shadows carry the animation */
+.audio-settings-test.is-playing::before {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 3px;
+  height: 12px;
+  margin-top: -6px;
+  content: '';
+  background: currentcolor;
+  border-radius: 1px;
+  box-shadow: 5px 1px 0 currentcolor, 10px -1px 0 currentcolor;
+  animation: audio-settings-test-wave 0.55s ease-in-out infinite;
+}
+
+@keyframes audio-settings-test-wave {
+  0%,
+  100% {
+    box-shadow: 5px 1px 0 currentcolor, 10px -1px 0 currentcolor;
+  }
+
+  50% {
+    box-shadow: 5px -1px 0 currentcolor, 10px 1px 0 currentcolor;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .audio-settings-test.is-playing::before {
+    animation: none;
+  }
+}
+
+@container settings-dialog (max-width: 560px) {
+  .audio-settings-row {
+    flex-wrap: wrap;
+  }
+
+  .audio-settings-row-control {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  /* Only controls that need the width drop below their label; a button fits beside it. */
+  .audio-settings-row.is-inline .audio-settings-row-control {
+    flex: 0 0 auto;
+  }
+}

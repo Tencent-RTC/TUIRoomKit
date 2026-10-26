@@ -1,0 +1,118 @@
+.rk-input {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border-strong);
+  border-radius: var(--rk-radius-md);
+  transition: border-color var(--rk-duration) var(--rk-ease);
+
+  &:focus-within {
+    border-color: var(--rk-brand);
+  }
+}
+
+.rk-input-sm { min-height: var(--rk-control-sm); }
+.rk-input-md { min-height: var(--rk-control-md); }
+.rk-input-lg { min-height: var(--rk-control-lg); }
+
+.rk-input-error {
+  border-color: var(--rk-danger);
+}
+
+.rk-input-disabled {
+  color: var(--rk-text-disabled);
+  background: var(--rk-bg-muted);
+}
+
+.rk-input-textarea {
+  align-items: stretch;
+  padding: 8px 10px;
+}
+
+.rk-input-field {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 10px;
+  font: inherit;
+  color: inherit;
+  resize: vertical;
+  background: transparent;
+  border: 0;
+  outline: none;
+
+  &::placeholder {
+    color: var(--rk-text-tertiary);
+  }
+}
+
+/* The prefix addon already insets the left edge. */
+.rk-input-addon + .rk-input-field {
+  padding-left: 0;
+}
+
+.rk-input-textarea .rk-input-field {
+  min-height: 72px;
+  padding: 0;
+}
+
+.rk-input-field[type='number'] {
+  appearance: textfield;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+  }
+}
+
+.rk-input-align-left .rk-input-field {
+  text-align: left;
+}
+
+.rk-input-align-center .rk-input-field {
+  text-align: center;
+}
+
+.rk-input-password.rk-input-align-center .rk-input-field {
+  padding-left: 50px;
+}
+
+.rk-input-addon,
+.rk-input-action {
+  display: inline-flex;
+  align-items: center;
+  color: var(--rk-text-secondary);
+}
+
+.rk-input-addon {
+  padding: 0 8px;
+}
+
+.rk-input-action {
+  padding: 0 6px;
+  margin: 0;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.rk-input-password-toggle {
+  flex: none;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin-right: 8px;
+  color: var(--rk-text-tertiary);
+  border-radius: var(--rk-radius-sm);
+
+  &:hover {
+    color: var(--rk-text-primary);
+    background: var(--rk-bg-hover);
+  }
+}

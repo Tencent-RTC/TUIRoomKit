@@ -1,0 +1,17 @@
+.rk-avatar {
+  overflow: hidden;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: var(--rk-avatar-fg);
+  background: var(--rk-avatar-bg);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.rk-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

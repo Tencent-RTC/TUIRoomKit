@@ -1,0 +1,80 @@
+.language-button {
+  display: inline-flex;
+}
+
+.language-button .topbar-button {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+}
+
+.language-button .topbar-button:hover,
+.language-button .topbar-button-active,
+.language-button .topbar-button:focus-visible {
+  color: var(--rk-brand);
+  background: var(--rk-bg-hover);
+  outline: none;
+}
+
+.language-button .rk-icon {
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.language-button .topbar-button:hover .rk-icon,
+.language-button .topbar-button-active .rk-icon {
+  opacity: 1;
+}
+
+.language-caret {
+  transition: transform 0.18s ease;
+}
+
+.language-button .topbar-button-active .language-caret {
+  transform: rotate(180deg);
+}
+
+.rk-popover:has(.language-menu) {
+  min-width: 168px;
+  border-radius: 12px;
+}
+
+.language-menu {
+  min-width: 168px;
+  max-height: 280px;
+  padding: 6px;
+  overflow-y: auto;
+}
+
+.language-menu-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.language-menu-item:hover {
+  background: var(--rk-bg-hover);
+}
+
+.language-menu-item.is-active {
+  color: var(--rk-brand);
+  background: var(--rk-brand-soft);
+}
+
+.language-check {
+  flex: none;
+  color: var(--rk-brand);
+  opacity: 0;
+}
+
+.language-menu-item.is-active .language-check {
+  opacity: 1;
+}

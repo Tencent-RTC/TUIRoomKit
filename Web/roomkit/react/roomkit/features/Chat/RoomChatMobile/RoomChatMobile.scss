@@ -1,0 +1,28 @@
+/*
+ * The mobile chat reuses the global PC classes; `room-chat-mobile` scopes the
+ * mobile-only overrides of `.chat-panel`, `.chat-panel-list` and `.message-input`.
+ */
+.room-chat-mobile.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--rk-text-primary);
+
+  /* A second tap must not be waited on, or the first tap only dismisses the keyboard. */
+  touch-action: manipulation;
+}
+
+.room-chat-mobile .chat-panel-list {
+  flex: 1;
+  min-height: 0;
+
+  /* The PC panel insets the list; mobile keeps the inset on `.message-list-mobile`. */
+  padding: 0;
+  overflow: hidden;
+}
+
+.room-chat-mobile .chat-panel-input {
+  flex-shrink: 0;
+}

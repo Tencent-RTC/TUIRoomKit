@@ -1,33 +1,72 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import dts from 'vite-plugin-dts';
-import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 import { dependencies, peerDependencies } from './package.json';
+import type { Plugin } from 'vite';
+
+const STYLE_FILE_NAME = 'style.css';
+
+// Styles stay in a standalone, overridable style.css, but the entry pulls it in
+// so hosts do not have to import it themselves.
+function importStylesFromEntry(): Plugin {
+  return {
+    name: 'rk-import-styles-from-entry',
+    // Runs after vite:css-post has emitted the stylesheet asset
+    enforce: 'post',
+    generateBundle(options, bundle) {
+      const hasStyles = Object.values(bundle).some(
+        file => file.type === 'asset' && file.fileName === STYLE_FILE_NAME,
+      );
+      if (!hasStyles) {
+        return;
+      }
+
+      for (const file of Object.values(bundle)) {
+        if (file.type === 'chunk' && file.isEntry) {
+          if (options.format !== 'cjs') {
+            file.code = `import './${STYLE_FILE_NAME}';\n${file.code}`;
+          } else {
+            // Keep the directive prologue first so strict mode still applies
+            const prologue = '"use strict";\n';
+            const body = file.code.startsWith(prologue)
+              ? file.code.slice(prologue.length)
+              : file.code;
+            const directive = file.code.startsWith(prologue) ? prologue : '';
+
+            file.code = `${directive}require('./${STYLE_FILE_NAME}');\n${body}`;
+          }
+        }
+      }
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
     minify: false,
+    // One standalone stylesheet keeps every rule interceptable and overridable
+    cssCodeSplit: false,
     rollupOptions: {
       // Support sub-path imports for dependencies and peer dependencies
       external: (id: string) => {
         const externalDeps = [
           ...Object.keys(dependencies || {}),
           ...Object.keys(peerDependencies || {}),
-          // React JSX runtime entries need to stay external as well
           'react/jsx-runtime',
           'react/jsx-dev-runtime',
         ];
         return externalDeps.some(dep => id === dep || id.startsWith(`${dep}/`));
       },
-      input: ['RoomKit/index.ts'],
+      input: ['roomkit/index.ts'],
       output: [
         {
           format: 'es',
           entryFileNames: '[name].mjs',
+          assetFileNames: 'style.css',
           preserveModules: true,
-          preserveModulesRoot: 'RoomKit',
+          preserveModulesRoot: 'roomkit',
           exports: 'named',
           dir: 'es',
           globals: {
@@ -38,8 +77,9 @@ export default defineConfig({
         {
           format: 'cjs',
           entryFileNames: '[name].js',
+          assetFileNames: 'style.css',
           preserveModules: true,
-          preserveModulesRoot: 'RoomKit',
+          preserveModulesRoot: 'roomkit',
           exports: 'named',
           dir: 'lib',
           globals: {
@@ -50,17 +90,18 @@ export default defineConfig({
       ],
     },
     lib: {
-      entry: './RoomKit/index.ts',
+      entry: './roomkit/index.ts',
       name: 'TUIRoomKit',
     },
   },
   plugins: [
     react(),
     viteCommonjs(),
-    cssInjectedByJsPlugin(),
+    importStylesFromEntry(),
     dts({
-      entryRoot: './RoomKit',
+      entryRoot: './roomkit',
       outDir: ['lib/', 'es/'],
+      exclude: ['node_modules/**', 'test/**'],
     }),
   ],
   resolve: {},

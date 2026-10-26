@@ -1,1 +1,0 @@
-export { OverflowBar } from './OverflowBar';

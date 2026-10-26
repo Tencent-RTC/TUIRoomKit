@@ -1,0 +1,42 @@
+.login-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-color-dialog);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  @media screen and (orientation: portrait), (orientation: landscape) {
+    .phone-prefix {
+      min-width: 30px;
+    }
+  }
+}
+
+.login-container.dark {
+  background-image: url('../../assets/background-black.png');
+}
+
+.login-container.light {
+  background-image: url('../../assets/background-white.png');
+}
+
+.login-language {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-color-secondary, #4f586b);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--stroke-color-primary, #d5e0f2);
+  border-radius: 6px;
+}

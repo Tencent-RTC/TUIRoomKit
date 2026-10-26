@@ -1,0 +1,35 @@
+.transcript-mobile {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.transcript-mobile .transcript-list .transcript-log {
+  padding: 8px 16px 4px;
+}
+
+.transcript-mobile .transcript-empty {
+  font-size: var(--rk-fs-sm);
+}
+
+.transcript-mobile .rk-list-jump {
+  color: #fff;
+  background: rgb(44, 44, 46);
+  border: 0;
+  box-shadow: none;
+}
+
+.transcript-mobile .transcript-entry-name,
+.transcript-mobile .transcript-entry-time {
+  font-size: var(--rk-fs-sm);
+  line-height: 16px;
+}
+
+.transcript-mobile .transcript-entry-text {
+  font-size: var(--rk-fs-md);
+}
+
+.transcript-mobile .transcript-entry-trans {
+  font-size: var(--rk-fs-sm);
+}

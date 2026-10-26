@@ -1,0 +1,235 @@
+.settings-dialog-mobile {
+  --settings-dialog-mobile-motion: 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: var(--rk-text-primary);
+  pointer-events: none;
+  visibility: hidden;
+  background: var(--rk-bg-page);
+  transition: transform var(--settings-dialog-mobile-motion), visibility 0s linear 0.42s;
+  transform: translateX(100%);
+}
+
+.settings-dialog-mobile.is-open {
+  pointer-events: auto;
+  visibility: visible;
+  transition: transform var(--settings-dialog-mobile-motion);
+  transform: translateX(0);
+}
+
+.settings-dialog-mobile-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-top: env(safe-area-inset-top);
+  background: var(--rk-bg-page);
+  transition: transform var(--settings-dialog-mobile-motion);
+}
+
+/* Dims the root page as the sub page slides over it. */
+.settings-dialog-mobile-root::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  background: color-mix(in srgb, var(--rk-text-primary) 8%, transparent);
+  opacity: 0;
+  transition: opacity 0.42s ease;
+}
+
+.settings-dialog-mobile-sub {
+  visibility: hidden;
+  transition: transform var(--settings-dialog-mobile-motion), visibility 0s linear 0.42s;
+  transform: translateX(100%);
+}
+
+.settings-dialog-mobile.is-sub .settings-dialog-mobile-root {
+  transform: translateX(-30%);
+}
+
+.settings-dialog-mobile.is-sub .settings-dialog-mobile-root::after {
+  opacity: 1;
+}
+
+.settings-dialog-mobile.is-sub .settings-dialog-mobile-sub {
+  visibility: visible;
+  transition: transform var(--settings-dialog-mobile-motion);
+  transform: translateX(0);
+}
+
+.settings-dialog-mobile-nav {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 72px;
+  background: var(--rk-bg-surface);
+}
+
+.settings-dialog-mobile-back {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  border-radius: 50%;
+  outline: none;
+  transform: translateY(-50%);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.settings-dialog-mobile-back:active {
+  opacity: 0.72;
+}
+
+.settings-dialog-mobile-back-icon {
+  transform: rotate(90deg);
+}
+
+.settings-dialog-mobile-title {
+  margin: 0;
+  overflow: hidden;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--rk-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-dialog-mobile-body {
+  flex: 1;
+  min-height: 0;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.settings-dialog-mobile-body::-webkit-scrollbar {
+  display: none;
+}
+
+.settings-dialog-mobile-group {
+  padding: 0 16px;
+  margin: 4px 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--rk-text-tertiary);
+}
+
+.settings-dialog-mobile-section {
+  margin: 0 0 20px;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: 12px;
+}
+
+.settings-dialog-mobile-row {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 56px;
+  padding: 10px 16px;
+  outline: none;
+}
+
+.settings-dialog-mobile-row + .settings-dialog-mobile-row::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 16px;
+  content: '';
+  border-top: 0.5px solid var(--rk-border);
+}
+
+.settings-dialog-mobile-row.is-pickable {
+  cursor: pointer;
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.settings-dialog-mobile-row.is-pickable:active {
+  background: var(--rk-bg-hover);
+}
+
+.settings-dialog-mobile-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settings-dialog-mobile-row.is-disabled .settings-dialog-mobile-text {
+  opacity: 0.5;
+}
+
+.settings-dialog-mobile-label {
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--rk-text-primary);
+}
+
+.settings-dialog-mobile-desc {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--rk-text-tertiary);
+}
+
+.settings-dialog-mobile-value {
+  max-width: 50%;
+  margin-left: auto;
+  overflow: hidden;
+  font-size: 16px;
+  color: var(--rk-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-dialog-mobile-arrow {
+  flex-shrink: 0;
+  color: var(--rk-text-tertiary);
+  transform: rotate(-90deg);
+}
+
+.settings-dialog-mobile-check {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--rk-brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-dialog-mobile,
+  .settings-dialog-mobile-sub {
+    opacity: 0;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  }
+
+  .settings-dialog-mobile,
+  .settings-dialog-mobile.is-open,
+  .settings-dialog-mobile-page,
+  .settings-dialog-mobile.is-sub .settings-dialog-mobile-root,
+  .settings-dialog-mobile-sub,
+  .settings-dialog-mobile.is-sub .settings-dialog-mobile-sub {
+    transform: none;
+  }
+
+  .settings-dialog-mobile.is-open,
+  .settings-dialog-mobile.is-sub .settings-dialog-mobile-sub {
+    opacity: 1;
+    transition: opacity 0.2s ease, visibility 0s;
+  }
+}

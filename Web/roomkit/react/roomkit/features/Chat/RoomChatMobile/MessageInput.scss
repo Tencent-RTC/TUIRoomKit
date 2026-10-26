@@ -1,0 +1,195 @@
+.room-chat-mobile .message-input {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: flex-end;
+  padding: 8px 16px 12px 8px;
+  touch-action: manipulation;
+  border-top: 1px solid var(--rk-border);
+}
+
+.room-chat-mobile .message-input-disabled {
+  opacity: 0.6;
+}
+
+.room-chat-mobile .message-input-tools {
+  display: flex;
+  flex: none;
+  gap: 6px;
+  align-items: center;
+  height: 34px;
+  color: var(--rk-text-tertiary);
+}
+
+.room-chat-mobile .message-input-tool {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+
+  /* The glyph stays 16px. The hit area fills the bar padding and the gap between the two tools. */
+  &::before {
+    position: absolute;
+    inset: -8px -5px;
+    content: '';
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  &:hover:not(:disabled) {
+    color: inherit;
+  }
+}
+
+.room-chat-mobile .message-input-composer {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  align-items: flex-end;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.room-chat-mobile .message-input-field {
+  flex: 1;
+  min-width: 0;
+  min-height: 34px;
+  max-height: 96px;
+  padding: 7px 14px;
+  overflow-y: auto;
+  font-family: inherit;
+  font-size: var(--rk-fs-md);
+  line-height: 1.4;
+  color: var(--rk-text-primary);
+  resize: none;
+  scrollbar-width: none;
+  background: color-mix(in srgb, var(--rk-text-primary) 6%, transparent);
+  border: 0;
+  border-radius: 17px;
+  outline: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &::placeholder {
+    color: var(--rk-text-tertiary);
+  }
+
+  &:read-only {
+    caret-color: transparent;
+  }
+}
+
+.room-chat-mobile .message-input-disabled .message-input-field {
+  color: var(--rk-text-disabled);
+}
+
+.room-chat-mobile .message-input-send {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: var(--rk-on-accent);
+  cursor: pointer;
+  background: var(--rk-brand);
+  border: 0;
+  border-radius: 50%;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.38;
+  }
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
+}
+
+.room-chat-mobile .message-input-hidden {
+  display: none;
+}
+
+/* Portaled panels repeat room-chat-mobile on their own root. */
+.room-chat-mobile.message-input-emoji {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+  gap: 0;
+  width: calc(100vw - 32px);
+  max-height: 196px;
+  padding: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.room-chat-mobile .message-input-emoji-item {
+  width: 100%;
+  height: 32px;
+  padding: 0;
+  font-size: var(--rk-fs-xl);
+  line-height: 32px;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  -webkit-tap-highlight-color: transparent;
+
+  @media (hover: hover) {
+    &:hover {
+      background: var(--rk-bg-hover);
+    }
+  }
+}
+
+.room-chat-mobile.message-input-attach {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: 132px;
+  padding: 6px;
+}
+
+.room-chat-mobile .message-input-attach-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+  color: var(--rk-text-primary);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+}
+
+.room-chat-mobile .message-input-attach-item .rk-icon {
+  color: var(--rk-text-secondary);
+}
+
+.room-chat-mobile .message-input-attach-item:hover,
+.room-chat-mobile .message-input-attach-item:active {
+  background: var(--rk-bg-hover);
+}

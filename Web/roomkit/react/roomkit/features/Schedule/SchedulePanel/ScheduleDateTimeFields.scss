@@ -1,0 +1,85 @@
+.sch-field.is-datetime {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 8px 16px;
+  align-items: center;
+  min-width: 0;
+}
+
+.sch-field.is-datetime .sch-label {
+  font-size: var(--rk-fs-md);
+  font-weight: 400;
+  line-height: 40px;
+  color: var(--rk-text-primary);
+}
+
+.sch-time-card,
+.sch-select .rk-select-trigger {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+  padding: 6px 10px;
+  cursor: pointer;
+  background: var(--rk-bg-raised, var(--rk-bg-surface));
+  border: 1px solid var(--rk-border);
+  border-radius: 12px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.sch-time-card {
+  gap: 6px;
+  min-width: 0;
+  color: var(--rk-text-primary);
+}
+
+.sch-time-card.is-open,
+.sch-select.rk-select-open .rk-select-trigger {
+  border-color: var(--rk-brand);
+  box-shadow: 0 0 0 1px var(--rk-brand);
+}
+
+.sch-time-card:hover,
+.sch-select .rk-select-trigger:hover {
+  border-color: var(--rk-brand);
+}
+
+.sch-time-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sch-time-icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--rk-text-tertiary);
+}
+
+.sch-time-value-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (width <= 520px) {
+  .sch-field.is-datetime {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .sch-field.is-datetime .sch-label {
+    line-height: 22px;
+  }
+
+  .sch-time-row {
+    grid-template-columns: 1fr;
+  }
+}

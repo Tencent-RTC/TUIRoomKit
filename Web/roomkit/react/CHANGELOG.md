@@ -4,55 +4,13 @@
 
 ---
 
-## [6.1.4] - 2026-08-26
+## [7.0.0] - 2026-10-23
 
 ### Added
 
-- Added H5 (mobile web) conference support: `ConferenceMainViewH5`, `PreConferenceViewH5`, and related H5 controls for camera, microphone, members, chat, invitation, recording, and layout.
-- Exported `useRoomInvitationH5` for handling room invitations on mobile.
-
-## [6.1.3] - 2026-07-20
-
-- Added data reporting for start-recording API calls.
-
-## [6.1.2] - 2026-07-17
-
-### Fixed
-
-- Fixed missing styles in the published build where components such as `ConferenceMainView` and `PreConferenceView` rendered unstyled (CSS was not injected into the main entry during build).
-
-## [6.1.1] - 2026-07-16
-
-### Added
-
-- Exported the `genTestUserSig` helper to align packages and simplify integration and debugging.
-
-### Changed
-
-- `ConferenceMainView` and `PreConferenceView` now fill their parent container (100% width/height) by default instead of the full viewport.
-
-## [6.1.0] - 2026-07-13
-
-### Added
-
-- Added cloud recording support.
-
-### Fixed
-
-- Fixed an issue where the AI noise suppression plugin could not be enabled before the microphone was turned on.
-- Fixed RTC disconnection after the app remains idle for an extended period.
-
-## [6.0.2] - 2026-06-12
-
-* Room: Added `renderParticipantView` prop to `ConferenceMainView`. Fixed an issue where custom overlays configured via `renderParticipantView` failed to reflect participant device status changes immediately.
-
-### 
-
-## [6.0.1] - 2026-06-05
-
-### Added
-
-- Initial release of the `@tencentcloud/roomkit-web-react` npm package, with a public API aligned with `@tencentcloud/roomkit-web-vue3`. Bundled in both ESM and CJS formats with full TypeScript declarations.
-- Added two core conference views: pre-join preview (`PreConferenceView`) and in-meeting main view (`ConferenceMainView`).
-- Supported full in-meeting capabilities: video layout switching, camera/microphone controls, screen sharing, in-room chat, member management, room invitation, and meeting scheduling.
-- Exported `atomicx` state layer `Client` for pure JavaScript / non-React integrations.
+- Initial release of the `@tencentcloud/roomkit-web-react-next` npm package, a fully rebuilt React conference UI kit based on the `atomicx` state layer. Bundled in both ESM and CJS formats with full TypeScript declarations.
+- Added a new class-based imperative core API: `RoomKit`, with `RoomLayoutTemplate`, `ExitReason`, and strongly typed `RoomKitJoinOptions` / `RoomKitEventMap`.
+- Added the `ConferenceView` scene view, covering both PC and mobile (H5) experiences out of the box.
+- Supported full in-meeting capabilities: video layout switching, camera/microphone device management, screen sharing, in-room chat, member management, meeting scheduling, cloud recording, real-time captions (transcription), mini-window mode, and video effects.
+- Added pre-conference assembly features: `SchedulePanel`, `ScheduledListPC` / `ScheduledListMobile`, `MeetingDetailMobile`, `SettingsDialogPC`, `AudioDeviceMenu`, `VideoDeviceMenu`, `LanguageButton`, `ThemeButton`, and `useDeviceFault`.
+- Added theming (`ThemeName`), i18n (`i18n` / `t` / `useI18n`), UI configuration (`RoomKitProvider` / `setUIConfig` / `useUIConfig`) with icon overrides, and a complete set of `TUI*` base components.

@@ -1,0 +1,43 @@
+.rk-slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  cursor: pointer;
+  outline: none;
+}
+
+.rk-slider-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.rk-slider-rail,
+.rk-slider-fill {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 4px;
+  border-radius: var(--rk-radius-pill);
+}
+
+.rk-slider-rail {
+  width: 100%;
+  background: var(--rk-track);
+}
+
+.rk-slider-fill {
+  background: var(--rk-brand);
+}
+
+.rk-slider-thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--rk-knob);
+  border: 2px solid var(--rk-brand);
+  border-radius: 50%;
+  box-shadow: 0 1px 4px color-mix(in srgb, black 16%, transparent);
+  transform: translate(-50%, -50%);
+}

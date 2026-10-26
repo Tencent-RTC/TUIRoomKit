@@ -1,0 +1,17 @@
+/* Sits in the 20px icon box of ToolbarButtonMobile, so it hangs off the glyph's corner. */
+.mic-button-mobile-fault {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  z-index: 2;
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  font: 700 9px / 11px system-ui, sans-serif;
+  color: #000;
+  text-align: center;
+  pointer-events: none;
+  background: var(--rk-warning);
+  border: 1.5px solid var(--rk-bg-surface);
+  border-radius: 50%;
+}

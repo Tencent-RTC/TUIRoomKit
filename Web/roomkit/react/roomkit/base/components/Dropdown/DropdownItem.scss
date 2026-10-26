@@ -1,0 +1,29 @@
+.rk-dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--rk-text-primary);
+  font: inherit;
+  font-size: var(--rk-fs-md);
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+
+  &:hover,
+  &[data-highlighted='true'] {
+    background: var(--rk-option-hover);
+  }
+
+  &[data-danger='true'] {
+    color: var(--rk-danger);
+  }
+
+  &:disabled {
+    color: var(--rk-text-disabled);
+    cursor: not-allowed;
+  }
+}

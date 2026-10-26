@@ -1,0 +1,228 @@
+/* Phone tile chrome. There is no hover on a phone, so the tile carries no more menu:
+   acting on a person happens in the participant list. */
+.participant-view-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: visible;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.participant-view-overlay-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--rk-brand) 1.6%, #f8f7f9);
+  border-radius: inherit;
+}
+
+.rk-root[data-rk-theme='dark'] .participant-view-overlay-mask {
+  background: color-mix(in srgb, var(--rk-brand) 2%, #141414);
+}
+
+.participant-view-overlay-avatar {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--rk-avatar-fg);
+  background: var(--rk-avatar-bg);
+  border-radius: 50%;
+}
+
+.participant-view-overlay-avatar-img {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+  object-fit: cover;
+}
+
+.participant-view-overlay-flip {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: #fff;
+  pointer-events: auto;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.45);
+  border: 0;
+  border-radius: 50%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.participant-view-overlay-flip:active {
+  transform: scale(0.96);
+}
+
+.participant-view-overlay-network {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: inline-flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 12px;
+  color: #ff453a;
+}
+
+.participant-view-overlay-network i {
+  display: block;
+  width: 3px;
+  background: currentcolor;
+  border-radius: 1px;
+}
+
+.participant-view-overlay-network i:nth-child(1) {
+  height: 4px;
+}
+
+.participant-view-overlay-network i:nth-child(2) {
+  height: 8px;
+  opacity: 0.18;
+}
+
+.participant-view-overlay-network i:nth-child(3) {
+  height: 12px;
+  opacity: 0.18;
+}
+
+.participant-view-overlay-stack {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  max-width: calc(100% - 12px);
+}
+
+.participant-view-overlay-pill {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  padding: 2px 6px 2px 4px;
+  overflow: hidden;
+  color: #fff;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 999px;
+}
+
+.participant-view-overlay-mic {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  color: #fff;
+}
+
+.participant-view-overlay-mic-core {
+  position: absolute;
+  top: 12%;
+  left: 34%;
+  z-index: 0;
+  width: 31%;
+  height: 52%;
+  background: #34c759;
+  border-radius: 999px;
+  transition: transform 0.2s ease-out;
+  transform-origin: bottom center;
+}
+
+.participant-view-overlay-mic svg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.participant-view-overlay-name {
+  flex: 0 1 auto;
+  min-width: 1ch;
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  line-height: 16px;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.participant-view-overlay-role-mark {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  line-height: 0;
+  color: #fff;
+  border-radius: 50%;
+}
+
+.participant-view-overlay-role-mark.is-owner {
+  background: var(--rk-brand);
+}
+
+.participant-view-overlay-role-mark.is-admin {
+  background: var(--rk-warning);
+}
+
+.participant-view-overlay-me {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: var(--rk-fs-xs);
+  font-weight: 500;
+  line-height: 1;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.24);
+  border-radius: 50%;
+}
+
+.participant-view-overlay.is-pip .participant-view-overlay-flip {
+  top: 6px;
+  left: 6px;
+  width: 24px;
+  height: 24px;
+}
+
+.participant-view-overlay.is-pip .participant-view-overlay-flip svg {
+  width: 14px;
+  height: 14px;
+}
+
+.participant-view-overlay.is-pip .participant-view-overlay-avatar {
+  width: 48px;
+  height: 48px;
+  font-size: 18px;
+}

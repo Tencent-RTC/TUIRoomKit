@@ -1,0 +1,218 @@
+.preconference-root {
+  height: 100%;
+  min-height: 0;
+}
+
+.preconference-root .rk-root-slot {
+  height: 100%;
+}
+
+.preconference-view {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--rk-bg-page);
+  container-type: size;
+}
+
+.preconference-view [role='button']:focus-visible {
+  outline: 2px solid var(--rk-brand);
+  outline-offset: 3px;
+}
+
+.pre-fault-banner {
+  position: absolute;
+  top: 76px;
+  right: 40px;
+  left: 40px;
+  z-index: 20;
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  padding: 10px 14px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  line-height: 1.45;
+  color: #c24141;
+  background: color-mix(in srgb, var(--rk-danger) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rk-danger) 30%, transparent);
+  border-radius: 12px;
+}
+
+.rk-root[data-rk-theme='dark'] .pre-fault-banner {
+  color: var(--rk-text-primary);
+}
+
+.pre-main {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+
+  /* Vertical padding has to shrink on short viewports. High-DPI laptops report
+     a small CSS viewport height even at 100% browser zoom, and a fixed 76px top
+     and bottom then eats enough of it to starve the schedule list. */
+  padding: clamp(16px, 5vh, 76px) 40px;
+  overflow: hidden auto;
+}
+
+.preview-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 98;
+  cursor: pointer;
+  background: rgb(0 0 0 / 45%);
+}
+
+.pre-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(380px, 1fr);
+  flex: 0 0 auto;
+  gap: 24px;
+
+  width: 75%;
+  height: 95%;
+
+  /* Floor so a short viewport scrolls `.pre-main` instead of compressing the
+     row. `flex-shrink: 0` keeps that floor: the default shrink would squeeze
+     the grid back into the scrollport and the cards would clip again. */
+  min-height: 520px;
+  min-width: 0;
+
+  /* Centers the grid while there is spare room. Auto margins resolve to 0 once
+     the grid is taller than `.pre-main`, so the top stays reachable. */
+  margin-block: auto;
+}
+
+.preview-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+
+  /* Video floor (280) + gap + mic/camera row + padding. `min-height: 0` let the
+     row shrink past that, and `overflow: hidden` then clipped the controls
+     without growing the page scroll height. */
+  min-height: 400px;
+  padding: 20px;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: var(--rk-radius-xl);
+}
+
+.preview-compact-close {
+  display: none;
+}
+
+.join-side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 380px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.join-stack {
+  display: grid;
+  flex: none;
+}
+
+.join-stack > .join-card,
+.join-stack > .refresh-return-card {
+  grid-area: 1 / 1;
+}
+
+.join-stack.is-refresh-return > .join-card {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.join-stack:not(.is-refresh-return) > .refresh-return-card {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.preconference-root[data-rk-theme='dark'] .join-form .join-submit:disabled {
+  background: var(--rk-bg-muted);
+}
+
+.is-compact .pre-main {
+  justify-content: flex-start;
+  padding: 2% 5% 3%;
+}
+
+.is-compact .pre-grid {
+  flex: none;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
+}
+
+.is-compact .preview-card {
+  display: none;
+  min-height: 0;
+}
+
+.is-compact .join-side {
+  min-width: 0;
+  overflow: visible;
+}
+
+.is-preview-open .preview-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 99;
+  display: flex;
+  width: calc(100% - 80px);
+  max-width: 480px;
+  max-height: calc(100% - 80px);
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+}
+
+.is-preview-open .video-preview {
+  min-height: 200px;
+}
+
+.is-preview-open .preview-compact-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: var(--rk-bg-hover);
+  border-radius: 8px;
+}
+
+@media (width <= 520px) {
+  .pre-main,
+  .is-compact .pre-main {
+    padding: 12px 16px 24px;
+  }
+}
+
+@media (width <= 1548px) {
+  .pre-grid {
+    width: 100%;
+    max-width: 1102px;
+  }
+}

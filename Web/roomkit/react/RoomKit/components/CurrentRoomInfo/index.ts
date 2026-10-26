@@ -1,1 +1,0 @@
-export { CurrentRoomInfo } from './CurrentRoomInfo';

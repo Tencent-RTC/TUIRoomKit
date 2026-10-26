@@ -1,0 +1,65 @@
+.general-settings-row {
+  display: flex;
+  gap: var(--rk-space-4);
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: var(--rk-space-2) 0;
+}
+
+.general-settings-row-title {
+  min-width: 0;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+}
+
+.general-settings-row-control {
+  display: flex;
+  flex: 1 1 120px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  max-width: 240px;
+}
+
+.general-settings-row-control .rk-select {
+  width: 100%;
+  min-width: 0;
+}
+
+.general-settings-theme {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--rk-bg-muted);
+  border-radius: var(--rk-radius-pill);
+}
+
+.general-settings-theme-option {
+  padding: 5px 12px;
+  font: inherit;
+  font-size: var(--rk-fs-sm);
+  line-height: 1.2;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--rk-radius-pill);
+}
+
+.general-settings-theme-option.is-selected {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-surface);
+  box-shadow: 0 1px 2px color-mix(in srgb, #000 12%, transparent);
+}
+
+@container settings-dialog (max-width: 560px) {
+  .general-settings-row {
+    flex-wrap: wrap;
+  }
+
+  .general-settings-row-control {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    max-width: none;
+  }
+}

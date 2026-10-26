@@ -1,0 +1,151 @@
+.overflow-menu-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: var(--rk-space-2);
+}
+
+.overflow-menu-icon .rk-icon,
+.overflow-menu-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.rk-dropdown-item.overflow-menu-item-active {
+  color: var(--rk-info);
+  background: color-mix(in srgb, var(--rk-info) 14%, transparent);
+}
+
+.rk-dropdown-item.overflow-menu-item-danger {
+  color: var(--rk-danger);
+  background: color-mix(in srgb, var(--rk-danger) 14%, transparent);
+}
+
+.overflow-menu-entry {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.overflow-menu-entry:hover {
+  background: var(--rk-option-hover);
+}
+
+.overflow-menu-label {
+  min-width: 0;
+}
+
+.overflow-menu-chevron {
+  flex: none;
+  margin-left: auto;
+  color: var(--rk-text-tertiary);
+  transform: rotate(-90deg);
+}
+
+.overflow-menu-sub {
+  display: flex;
+  flex-direction: column;
+}
+
+.overflow-menu-back {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: var(--rk-fs-md);
+  font-weight: 600;
+  color: var(--rk-text-primary);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+}
+
+.overflow-menu-back:hover {
+  background: color-mix(in srgb, var(--rk-text-primary) 5%, transparent);
+}
+
+.overflow-menu-back-icon {
+  flex: none;
+  transform: rotate(90deg);
+}
+
+.overflow-menu-sub-split {
+  height: 1px;
+  margin: 4px 2px;
+  background: var(--rk-border);
+}
+
+.overflow-menu-sub-hint {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  font-size: var(--rk-fs-sm);
+  line-height: 1.4;
+  color: var(--rk-text-secondary);
+  white-space: nowrap;
+}
+
+.overflow-menu-sub-hint svg {
+  flex: none;
+  color: var(--rk-brand);
+}
+
+.overflow-menu-sub-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: var(--rk-fs-md);
+  line-height: 20px;
+  color: var(--rk-text-primary);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+}
+
+.overflow-menu-sub-item:hover {
+  background: color-mix(in srgb, var(--rk-text-primary) 5%, transparent);
+}
+
+.overflow-menu-sub-item.is-on,
+.overflow-menu-sub-item.is-on svg {
+  color: var(--rk-brand);
+}
+
+.overflow-menu-sub-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.overflow-menu-sub-item:disabled:hover {
+  background: transparent;
+}
+
+.rk-dropdown:has(.overflow-menu-sub) {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 0;
+}

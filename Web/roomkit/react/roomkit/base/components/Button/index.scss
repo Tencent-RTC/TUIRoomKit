@@ -1,0 +1,107 @@
+.rk-btn {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-family: inherit;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-radius: var(--rk-radius-md);
+  transition: background-color var(--rk-duration) var(--rk-ease),
+    border-color var(--rk-duration) var(--rk-ease),
+    color var(--rk-duration) var(--rk-ease),
+    opacity var(--rk-duration) var(--rk-ease);
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.rk-btn-sm {
+  height: var(--rk-control-sm);
+  padding: 0 12px;
+  font-size: var(--rk-fs-sm);
+}
+
+.rk-btn-md {
+  height: var(--rk-control-md);
+  padding: 0 20px;
+  font-size: var(--rk-fs-md);
+}
+
+.rk-btn-lg {
+  height: var(--rk-control-lg);
+  padding: 0 20px;
+  font-size: var(--rk-fs-md);
+}
+
+.rk-btn-block {
+  width: 100%;
+}
+
+.rk-btn-primary {
+  color: var(--rk-on-accent);
+  background: var(--rk-brand);
+  border-color: var(--rk-brand);
+
+  &:hover:not(:disabled) {
+    background: var(--rk-brand-hover);
+    border-color: var(--rk-brand-hover);
+  }
+
+  &.is-h5 {
+    border: none;
+    transition: background-color var(--rk-duration) var(--rk-ease),
+      color var(--rk-duration) var(--rk-ease),
+      opacity var(--rk-duration) var(--rk-ease),
+      transform 0.08s ease;
+
+    &:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+  }
+}
+
+.rk-btn-secondary {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-surface);
+  border-color: var(--rk-border);
+
+  &:hover:not(:disabled) {
+    background: var(--rk-bg-hover);
+  }
+}
+
+.rk-btn-ghost {
+  color: var(--rk-text-primary);
+  background: transparent;
+
+  &:hover:not(:disabled) {
+    background: var(--rk-bg-hover);
+  }
+}
+
+.rk-btn-danger {
+  color: var(--rk-on-accent);
+  background: var(--rk-danger);
+  border-color: var(--rk-danger);
+
+  &:hover:not(:disabled) {
+    background: var(--rk-danger-hover);
+    border-color: var(--rk-danger-hover);
+  }
+}
+
+.rk-btn-icon,
+.rk-btn-loading {
+  display: inline-flex;
+}
