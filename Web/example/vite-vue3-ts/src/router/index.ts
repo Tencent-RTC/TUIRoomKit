@@ -1,8 +1,5 @@
-import { TUIMessageBox, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
-import { useRoomState } from 'tuikit-atomicx-vue3/room';
 import { createRouter, createWebHashHistory } from 'vue-router';
-import { isPC } from '../utils/utils';
-import Login from '@/views/login.vue';
+import Login from '@/views/login/LoginView.vue';
 
 const routes = [
   {
@@ -15,11 +12,7 @@ const routes = [
   },
   {
     path: '/home',
-    component: isPC ? () => import('@/views/home.vue') : () => import('@/views/homeH5.vue'),
-  },
-  {
-    path: '/room',
-    component: isPC ? () => import('@/views/room.vue') : () => import('@/views/roomH5.vue'),
+    component: () => import('@/views/home/HomeView.vue'),
   },
 ];
 
@@ -29,38 +22,17 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  const isLoggedIn = Boolean(sessionStorage.getItem('tuiRoom-userInfo'));
   if (to.path === '/login') {
+    if (isLoggedIn) {
+      next({ path: '/home', replace: true });
+      return;
+    }
     next();
     return;
   }
-  const userInfo = sessionStorage.getItem('tuiRoom-userInfo');
-  if (!userInfo) {
-    next({ path: '/login', query: { redirect: to.fullPath } });
-    return;
-  }
-
-  // Room leave confirmation
-  if ((from.path === '/room') && (to.path !== '/room')) {
-    const { currentRoom, leaveRoom } = useRoomState();
-    const { t } = useUIKit();
-    if (!currentRoom.value?.roomId) {
-      next();
-      return;
-    }
-
-    TUIMessageBox.confirm({
-      type: 'warning',
-      title: t('Room.LeaveRoomTitle'),
-      content: t('Room.ConfirmLeavePage'),
-      callback: async (action?: string) => {
-        if (action === 'confirm') {
-          await leaveRoom();
-          next();
-        } else {
-          next(false);
-        }
-      },
-    });
+  if (!isLoggedIn) {
+    next({ path: '/login', query: { redirect: to.fullPath }, replace: true });
     return;
   }
   next();

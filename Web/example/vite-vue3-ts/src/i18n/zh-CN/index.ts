@@ -1,26 +1,29 @@
 export const resource = {
-  // ScreenShare
-  'ScreenShare.StartSharingConfirm': '共享屏幕可能会导致私人信息（如短信验证码、密码等）泄露，造成经济损失。请提高警惕，防范各种形式的诈骗。',
-
-  // Room
-  'Room.TemporaryMeeting': '的临时房间',
-  'Room.Webinar': '的研讨会房间',
-  'Room.LeaveRoomTitle': '离开房间',
-  'Room.ConfirmLeavePage': '您确定要离开当前页面么?离开后将会退出当前房间',
-
-  // login
-  'Login.Expired': '登录已失效',
-  'Login.ExpiredDescription': '您的登录状态已过期，为了保障账号安全，请重新登录。',
-  'Login.KickedOffline': '被踢下线',
-  'Login.KickedOfflineDescription': '您的账号刚刚在其他设备登录，当前设备已下线。若非本人操作，请尽快检查您的账号安全！',
-  'Login.Failed': '登录失败',
   'Login.PhoneLogin': '手机号登录',
   'Login.UserIDLogin': '用户 ID 登录',
   'Login.Error': '错误',
   'Login.PleaseConfigureSDKAPPID': '请在 basic-info-config.js 文件中配置 SDKAPPID 和 SDKSECRETKEY',
-
-  // IntegrationCard
-  'IntegrationCard.Description': '30 分钟即可完成 RoomKit 接入',
-  'IntegrationCard.GuideCTA': '集成指引',
-  'IntegrationCard.FeedbackCTA': '填写反馈',
+  'Login.Expired': '登录已失效',
+  'Login.ExpiredDescription': '您的登录状态已过期，为了保障账号安全，请重新登录。',
+  'Login.KickedOffline': '被踢下线',
+  'Login.KickedOfflineDescription': '您的账号刚刚在其他设备登录，当前设备已下线。若非本人操作，请尽快检查您的账号安全！',
+  'Preconference.CameraOff': '摄像头未开启',
+  'Preconference.JoinSub': '输入会议号',
+  'Preconference.EmptyRoomId': '请输入会议号',
+  'Preconference.RecentMeetings': '近期会议',
+  'Preconference.LogoutConfirm': '确定要退出当前账号吗？',
+  'RoomInvitation.Subtitle': '邀请你加入会议',
+  'RoomInvitation.Topic': '会议主题',
+  'RoomInvitation.Id': '会议号',
+  'RoomInvitation.Reject': '暂不加入',
+  'RoomInvitation.Accept': '接受并加入',
+  'RoomInvitation.Timeout': '邀请已超时，未接听',
+  'RoomInvitation.Rejected': '已拒绝邀请',
+  'RoomInvitation.HandleByOtherDevice': '已在其他设备处理',
+  'RoomInvitation.AcceptFailed': '加入失败，请稍后重试',
+  'RefreshReturn.Title': '是否回到上次会议?',
+  'RefreshReturn.Subtitle': '检测到你从会议中刷新离开，会议仍在进行',
+  'RefreshReturn.Still': '会议仍在进行',
+  'RefreshReturn.Cancel': '取消',
+  'RefreshReturn.Confirm': '回到会议',
 };

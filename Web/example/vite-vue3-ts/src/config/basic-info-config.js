@@ -6,18 +6,15 @@ import LibGenerateTestUserSig from './lib-generate-test-usersig-es.min';
 
 /**
  * Tencent Cloud SDKAppId, which should be replaced with user's SDKAppId.
- * Enter Tencent Cloud TRTC [Console] (https://console.cloud.tencent.com/trtc ) to create an application,
+ * Enter Tencent Cloud TRTC [Console](https://console.cloud.tencent.com/trtc) to create an application,
  * and you will see the SDKAppId.
- * It is a unique identifier used by Tencent Cloud to identify users.
- *
  */
-
 export const SDKAPPID = 0;
 
 /**
  * Encryption key for calculating signature, which can be obtained in the following steps:
  *
- * Step1. Enter Tencent Cloud TRTC [Console](https://console.cloud.tencent.com/rav ),
+ * Step1. Enter Tencent Cloud TRTC [Console](https://console.cloud.tencent.com/rav),
  * and create an application if you don't have one.
  * Step2. Click your application to find "Quick Start".
  * Step3. Click "View Secret Key" to see the encryption key for calculating UserSig,
@@ -27,7 +24,6 @@ export const SDKAPPID = 0;
  * please migrate the UserSig calculation code and key to your backend server to avoid
  * unauthorized traffic use caused by the leakage of encryption key.
  * Document: https://intl.cloud.tencent.com/document/product/647/35166#Server
- *
  */
 export const SDKSECRETKEY = '';
 
@@ -35,7 +31,6 @@ export const SDKSECRETKEY = '';
  * Signature expiration time, which should not be too short
  * Time unit: second
  * Default time: 7 * 24 * 60 * 60 = 604800 = 7days
- *
  */
 export const EXPIRETIME = 604800;
 

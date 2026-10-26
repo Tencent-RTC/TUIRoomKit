@@ -1,0 +1,67 @@
+<template>
+  <div class="room-view-mobile">
+    <GridLayoutMobile>
+      <template #participantViewUI="slotProps">
+        <template v-if="!hideOverlay">
+          <ParticipantViewOverlayMobile
+            v-if="slotProps.streamType !== VideoStreamType.Screen"
+            :participant="slotProps.participant"
+            :stream-type="slotProps.streamType"
+            :in-pip="slotProps.inPip"
+            @flip-camera="handleFlipCamera"
+          />
+        </template>
+        <slot name="participantViewUI" v-bind="slotProps" />
+      </template>
+    </GridLayoutMobile>
+  </div>
+</template>
+
+<script setup lang="ts">
+/* The phone stage is always the 9:16 gallery. It takes no layout template: the
+   speaker and cinema layouts are desktop-only, and a share gets a page of its own
+   inside the gallery instead of switching layouts. */
+import { MirrorType, VideoStreamType, useDeviceState } from 'tuikit-atomicx-vue3/room';
+import ParticipantViewOverlayMobile from '../ParticipantViewOverlayMobile/ParticipantViewOverlayMobile.vue';
+import GridLayoutMobile from './GridLayoutMobile.vue';
+
+defineProps<{
+  /** Drops the built-in overlay so a host-supplied participantViewUI replaces it. */
+  hideOverlay?: boolean;
+}>();
+
+const { isFrontCamera, switchCamera, localMirrorType, switchMirror } = useDeviceState();
+
+/* Same rule as SwitchCameraButton: the back camera never mirrors, and the front
+   camera's setting comes back on the return trip. Held here rather than on the tile,
+   because paging remounts the tile and would drop it. */
+let frontCameraMirror = isFrontCamera.value ? localMirrorType.value : MirrorType.Auto;
+
+async function handleFlipCamera() {
+  await switchCamera({ isFrontCamera: !isFrontCamera.value });
+  if (isFrontCamera.value) {
+    await switchMirror({ mirror: frontCameraMirror });
+    return;
+  }
+  frontCameraMirror = localMirrorType.value;
+  await switchMirror({ mirror: MirrorType.Disable });
+}
+</script>
+
+<style scoped lang="scss">
+.room-view-mobile {
+  /* Tile fill before the first frame lands; the gallery's tiles read it. */
+  --room-view-tile-bg: color-mix(in srgb, var(--rk-brand) 1.6%, #f8f7f9);
+
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  overflow: visible;
+}
+
+.rk-root[data-rk-theme='dark'] .room-view-mobile {
+  --room-view-tile-bg: color-mix(in srgb, var(--rk-brand) 2%, #141414);
+}
+</style>
