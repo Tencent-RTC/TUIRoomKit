@@ -114,8 +114,8 @@ import {
   useOverlay,
 } from '../../../base';
 import UserPicker from '../../Participants/UserPickerPC/UserPickerPC.vue';
-import type { PickedContact } from '../../Participants/UserPickerPC/contactPicker';
-import { useResolvedContacts } from '../../Participants/UserPickerPC/useResolvedContacts';
+import { useResolvedContacts } from '../../Participants/contactData';
+import type { PickedContact } from '../../Participants/contactData';
 import { attendeeChipLabel, attendeeSearchHits, uniqueParticipantIds } from './scheduleForm';
 import type { AttendeeHit } from './scheduleForm';
 

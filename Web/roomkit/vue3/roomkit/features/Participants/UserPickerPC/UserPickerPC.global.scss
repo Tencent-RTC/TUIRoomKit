@@ -1,0 +1,38 @@
+/* Contacts is the prototype's panel modal: no shell padding, each section pads itself,
+   and only the list scrolls. */
+.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) {
+  height: min(560px, calc(100% - 48px));
+  max-height: min(560px, calc(100% - 48px));
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) .rk-dialog-header {
+  padding: 16px 16px 8px;
+  margin-bottom: 0;
+}
+
+.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) .rk-dialog-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+}
+
+.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) .rk-dialog-footer {
+  justify-content: flex-end;
+  padding: 12px 16px 16px;
+  margin-top: 0;
+}
+
+.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) .rk-dialog-footer .rk-btn {
+  flex: 0 0 auto;
+  min-width: 80px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: var(--rk-radius-pill);
+}

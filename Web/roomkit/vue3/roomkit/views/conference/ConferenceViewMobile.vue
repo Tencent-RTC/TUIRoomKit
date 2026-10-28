@@ -45,9 +45,18 @@
         </header>
 
         <main class="conference-mobile-stage">
-          <RoomViewMobile :hide-overlay="Boolean(uiConfig.participantViewUI)">
-            <template v-if="uiConfig.participantViewUI" #participantViewUI="{ participant, streamType }">
-              <component :is="uiConfig.participantViewUI" :participant="participant" :stream-type="streamType" />
+          <RoomViewMobile
+            :hide-overlay="Boolean(uiConfig.participantViewUI)"
+            :share-locked="annotating"
+            :pip-participant="speakerStream?.participant"
+          >
+            <template #participantViewUI="{ participant, streamType }">
+              <component
+                :is="uiConfig.participantViewUI"
+                v-if="uiConfig.participantViewUI"
+                :participant="participant"
+                :stream-type="streamType"
+              />
             </template>
           </RoomViewMobile>
           <CaptionOverlayMobile
@@ -67,9 +76,9 @@
               :is-chat-active="activePanel === 'chat'"
               @click="togglePanel('chat')"
             />
-            <!-- <AnnotationButtonMobile /> -->
             <CaptionEntryMobile :active="capViewOpen" @click="togglePanel('captions')" />
             <CloudRecordingButtonMobile />
+            <AnnotationButtonMobile @update:active="annotating = $event" />
             <SettingButtonMobile @click="settingsOpen = true" />
           </OverflowToolbarMobile>
         </footer>
@@ -189,6 +198,7 @@ import {
   SettingsDialogMobile,
   TranscriptListMobile,
   useASRState,
+  useSingleStageStream,
   useSubtitleViewState,
 } from '../../features';
 import OverflowToolbarMobile from '../../layouts/OverflowToolbarMobile/index.vue';
@@ -204,8 +214,11 @@ const emit = defineEmits<{
 
 const { phase } = roomEntry;
 const { uiConfig } = useUIConfig();
+const annotating = ref(false);
 const { currentRoom } = useRoomState();
 const { participantList } = useRoomParticipantState();
+// The share page's corner window follows the speaker, like the desktop mini window.
+const { speakerStream } = useSingleStageStream();
 const participantCount = computed(() => currentRoom.value?.participantCount || participantList.value.length);
 // Mounted before the join runs, so the recording notice catches the start event a late joiner receives.
 useRoomTips({ onLeave: () => emit('leave') });

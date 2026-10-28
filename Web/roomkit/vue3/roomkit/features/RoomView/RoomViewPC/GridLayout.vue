@@ -13,13 +13,12 @@
           v-for="streamInfo in currentPageStreamInfoList"
           :key="`${streamInfo.participant.userId}_${streamInfo.streamType}`"
           class="grid-layout-tile"
-          :data-tile-role="tileRole"
           :style="streamItemStyle"
           @dblclick="emit('stream-double-click', streamInfo)"
         >
           <RoomParticipantView
             class="grid-layout-video"
-            :class="{ 'is-hidden': isCameraOff(streamInfo) }"
+            :class="{ 'is-hidden': isCameraOff(streamInfo), 'is-screen': streamInfo.streamType === VideoStreamType.Screen }"
             :participant="streamInfo.participant"
             :stream-type="streamInfo.streamType"
             :fill-mode="FillMode.Fit"
@@ -29,6 +28,7 @@
             name="participantViewUI"
             :participant="streamInfo.participant"
             :stream-type="streamInfo.streamType"
+            tile-role="thumb"
           />
         </div>
       </div>
@@ -113,9 +113,6 @@ const gridRows = computed(() => {
   return Math.min(Math.ceil(count / gridColumns.value), maxRow);
 });
 
-/** Same breakpoint as the overlay thumbnail tier: `@container participant-tile (max-width: 320px)`. */
-const THUMBNAIL_TIER_WIDTH = 320;
-
 const streamListContainerRef = ref<HTMLElement | null>(null);
 const { itemStyle: streamItemStyle } = useStreamItemDimensions({
   containerRef: streamListContainerRef,
@@ -129,14 +126,6 @@ const { itemStyle: streamItemStyle } = useStreamItemDimensions({
     () => gridRows.value,
     () => currentPageStreamInfoList.value.length,
   ],
-});
-
-const tileRole = computed(() => {
-  const width = Number.parseInt(streamItemStyle.value.width ?? '', 10);
-  if (!Number.isFinite(width) || width <= 0) {
-    return 'stage';
-  }
-  return width <= THUMBNAIL_TIER_WIDTH ? 'thumb' : 'stage';
 });
 
 const streamListContentStyle = computed(() => {
@@ -199,27 +188,18 @@ const showTurnPageRightArrow = computed(
   justify-content: center;
 }
 
-/* The tile is the one clip for the video and the overlay; the halo below is the tile's
-   own shadow, which its overflow does not cut. */
+/* The tile only sets the corners; the participant view rounds its own video to them.
+   It must not clip, or the overlay's speaking glow would be cut off. The grid's 8px
+   gaps give the glow room to bleed. */
 .grid-layout-tile {
   position: relative;
   flex: 0 0 auto;
-  overflow: hidden;
   background: var(--room-view-tile-bg);
   border-radius: var(--rk-radius-lg);
 }
 
 .grid-layout-video.is-hidden {
   opacity: 0;
-}
-
-/* Same reasoning as the speaker layout: the halo sits outside the tile box, so the
-   layout draws it while the overlay keeps owning the state. The grid's 8px gaps give
-   the glow room to bleed. */
-.grid-layout-tile:has(.participant-view-overlay.is-speaking) {
-  box-shadow:
-    0 0 0 1.5px color-mix(in srgb, #34c759 60%, transparent),
-    0 0 18px color-mix(in srgb, #34c759 18%, transparent);
 }
 
 .grid-layout-pager {

@@ -42,7 +42,7 @@
               >
                 <RoomParticipantView
                   class="grid-layout-mobile-video"
-                  :class="{ 'is-hidden': isCameraOff(streamInfo) }"
+                  :class="{ 'is-hidden': isCameraOff(streamInfo), 'is-screen': streamInfo.streamType === VideoStreamType.Screen }"
                   :participant="streamInfo.participant"
                   :stream-type="streamInfo.streamType"
                   :fill-mode="streamInfo.streamType === VideoStreamType.Screen ? FillMode.Fit : FillMode.Fill"
@@ -130,13 +130,12 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import type { ComponentPublicInstance } from 'vue';
 import {
-  DeviceStatus,
   FillMode,
   RoomParticipantView,
   VideoStreamType,
   useLoginState,
-  useRoomParticipantState,
 } from 'tuikit-atomicx-vue3/room';
+import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 import { IconChevron, IconShare, TUISwiper, TUISwiperItem, t, usePinchZoom } from '../../../base';
 import { isCameraOff, useParticipantStreams } from '../useParticipantStreams';
 import type { StreamInfo } from '../useParticipantStreams';
@@ -147,6 +146,13 @@ import {
   paginateMobileStreams,
 } from './mobileGallery';
 import type { MobilePage } from './mobileGallery';
+
+const props = defineProps<{
+  /** Drawing on the share owns its touches: no zoom, no page swipe. */
+  shareLocked?: boolean;
+  /** Whose camera the share page's corner window shows; no window when omitted. */
+  pipParticipant?: RoomParticipant | null;
+}>();
 
 const gap = 4;
 /** A press that moves less than this is a tap, not a swipe. */
@@ -242,7 +248,7 @@ function bindScreenTile(
 }
 
 const pinchZoom = usePinchZoom(screenTileRef, {
-  enabled: computed(() => view.value.sharePage),
+  enabled: computed(() => view.value.sharePage && !props.shareLocked),
 });
 
 const sharer = computed(() => participantWithScreen.value);
@@ -251,84 +257,7 @@ const sharerName = computed(() =>
   sharer.value?.nameCard || sharer.value?.userName || sharer.value?.userId || '',
 );
 
-/* The share page window follows the same pick as the desktop mini window: the current
-   speaker, held through short silences, and the local user until anyone speaks. */
-const { localParticipant, participantList, speakingUsers } = useRoomParticipantState();
-
-/** Silence grace for the current speaker before the window may move to someone else. */
-const SPEAKER_HOLD = 1000;
-
-const currentSpeakerId = ref('');
-let currentSpeakerLastHeardAt = 0;
-
-function hasVoice(volume: number | undefined): boolean {
-  return volume !== undefined && volume > 0;
-}
-
-function findLoudestId(volumes: Map<string, number>): string {
-  let loudestId = '';
-  let loudest = 0;
-  volumes.forEach((volume, userId) => {
-    if (volume > loudest) {
-      loudest = volume;
-      loudestId = userId;
-    }
-  });
-  return loudestId;
-}
-
-function setCurrentSpeaker(userId: string) {
-  currentSpeakerId.value = userId;
-  currentSpeakerLastHeardAt = Date.now();
-}
-
-function clearCurrentSpeaker() {
-  currentSpeakerId.value = '';
-  currentSpeakerLastHeardAt = 0;
-}
-
-function pickSpeaker(volumes: Map<string, number>) {
-  // People who left the room disappear from speakingUsers; drop a stale id first.
-  if (currentSpeakerId.value && !volumes.has(currentSpeakerId.value)) {
-    clearCurrentSpeaker();
-  }
-
-  // A muted local track still reports volume, so it must not win the window.
-  const candidates = new Map(volumes);
-  if (localParticipant.value?.microphoneStatus === DeviceStatus.Off) {
-    candidates.delete(localParticipant.value.userId);
-  }
-
-  const speakerId = currentSpeakerId.value;
-  if (speakerId && hasVoice(candidates.get(speakerId))) {
-    currentSpeakerLastHeardAt = Date.now();
-    return;
-  }
-
-  const loudestId = findLoudestId(candidates);
-  if (!loudestId) {
-    return;
-  }
-
-  const maySwitch = !speakerId || Date.now() - currentSpeakerLastHeardAt >= SPEAKER_HOLD;
-  if (maySwitch) {
-    setCurrentSpeaker(loudestId);
-  }
-}
-
-watch(speakingUsers, pickSpeaker, { deep: true });
-
-const currentSpeaker = computed(() => {
-  if (!currentSpeakerId.value) {
-    return undefined;
-  }
-  if (localParticipant.value?.userId === currentSpeakerId.value) {
-    return localParticipant.value;
-  }
-  return participantList.value.find(item => item.userId === currentSpeakerId.value);
-});
-
-const pipParticipant = computed(() => currentSpeaker.value ?? localParticipant.value);
+const pipParticipant = computed(() => props.pipParticipant ?? null);
 
 const pipName = computed(() =>
   pipParticipant.value?.nameCard || pipParticipant.value?.userName || pipParticipant.value?.userId || '',
@@ -361,6 +290,13 @@ watch(remoteSharerId, (next, previous) => {
 watch(() => view.value.page, (page) => {
   if (page !== requestedPage.value) {
     requestedPage.value = page;
+  }
+});
+
+/** Drawing only happens on the share page, and a share pages away from stops playing. */
+watch(() => props.shareLocked, (locked) => {
+  if (locked && remoteSharerId.value) {
+    requestedPage.value = 0;
   }
 });
 
@@ -455,26 +391,15 @@ function handlePipPointerUp(event: PointerEvent) {
   }
 }
 
-function isChromeControl(event: Event) {
-  const { target } = event;
-  if (!(target instanceof Element)) {
-    return false;
-  }
-  return !!target.closest(
-    '.grid-layout-mobile-page-btn, .grid-layout-mobile-pip, .participant-view-overlay-flip',
-  );
-}
-
 /** Show the pager and leave it up until the next tap on empty stage. */
 function revealChrome() {
   chromeVisible.value = paged.value;
 }
 
+/* Any control on the stage stops its own pointerdown, so a press on it never reaches
+   here and does not toggle the pager. */
 function onChromePointerDown(event: PointerEvent) {
   if (event.pointerType === 'mouse' && event.button !== 0) {
-    return;
-  }
-  if (isChromeControl(event)) {
     return;
   }
   chromeTap = { x: event.clientX, y: event.clientY, id: event.pointerId };
@@ -487,7 +412,7 @@ function onChromePointerUp(event: PointerEvent) {
   const dx = event.clientX - chromeTap.x;
   const dy = event.clientY - chromeTap.y;
   chromeTap = null;
-  if (isChromeControl(event) || Math.hypot(dx, dy) > tapSlop) {
+  if (Math.hypot(dx, dy) > tapSlop) {
     return;
   }
   if (!paged.value) {
@@ -507,9 +432,9 @@ function shiftPage(direction: number) {
   swiperRef.value?.slideTo(view.value.page + direction);
 }
 
-/** A zoomed share pans under one finger; the swiper must not turn that into a page change. */
+/** A zoomed or annotated share takes one finger; the swiper must not turn that into a page change. */
 function holdZoomedShare(event: PointerEvent) {
-  if (view.value.sharePage && pinchZoom.isZoomed.value) {
+  if (view.value.sharePage && (pinchZoom.isZoomed.value || props.shareLocked)) {
     event.stopPropagation();
   }
 }
@@ -585,12 +510,12 @@ onUnmounted(() => {
   place-content: stretch;
 }
 
-/* The tile is the one clip for the video and the overlay. */
+/* The tile only sets the corners; the participant view rounds its own video to them.
+   It must not clip, or the overlay's speaking glow would be cut off. */
 .grid-layout-mobile-tile {
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: hidden;
   background: var(--room-view-tile-bg);
   isolation: isolate;
   border-radius: 12px;
@@ -610,19 +535,6 @@ onUnmounted(() => {
 .grid-layout-mobile-tile.is-pair-shifted {
   width: var(--grid-layout-mobile-tile-width);
   margin-inline-start: calc((var(--grid-layout-mobile-tile-width) + var(--grid-layout-mobile-gap)) / 2);
-}
-
-/* The ring sits on the tile, which owns the corners and the clip; the 4px gallery gap
-   leaves no room for an outer glow. */
-.grid-layout-mobile-pip:has(.participant-view-overlay.is-speaking)::after,
-.grid-layout-mobile-tile:has(.participant-view-overlay.is-speaking)::after {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  content: '';
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 2px var(--rk-success);
 }
 
 .grid-layout-mobile-content.is-share-page .grid-layout-mobile-tile {
@@ -754,7 +666,6 @@ onUnmounted(() => {
   z-index: 13;
   width: 112px;
   aspect-ratio: 9 / 16;
-  overflow: hidden;
   touch-action: none;
   cursor: grab;
   user-select: none;

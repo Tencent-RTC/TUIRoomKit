@@ -1,6 +1,6 @@
 <template>
   <div class="room-view">
-    <SingleLayout v-if="layoutTemplate === RoomLayoutTemplate.SingleLayout" :hide-screen="hideScreen">
+    <SingleLayout v-if="layoutTemplate === RoomLayoutTemplate.SingleLayout" :stage-stream="stageStream">
       <template #participantViewUI="slotProps">
         <ParticipantViewOverlay
           v-if="!hideOverlay"
@@ -30,6 +30,7 @@
     <SpeakerLayout
       v-else-if="isSpeakerLayout"
       :layout-template="layoutTemplate"
+      :stage-stream="stageStream"
       @stream-double-click="emit('stream-double-click', $event)"
     >
       <template #participantViewUI="slotProps">
@@ -46,6 +47,8 @@
 </template>
 
 <script setup lang="ts">
+/* Renders the template it is given. Which stream takes the stage, and what a double-click
+   does, belong to the host: it passes `stageStream` and listens to `stream-double-click`. */
 import { computed } from 'vue';
 import GridLayout from './GridLayout.vue';
 import SingleLayout from './SingleLayout.vue';
@@ -56,10 +59,10 @@ import type { StreamInfo } from '../useParticipantStreams';
 
 const props = defineProps<{
   layoutTemplate: RoomLayoutTemplate;
+  /** Single and speaker layouts: the stage picture; the first stream in display order when omitted. */
+  stageStream?: StreamInfo | null;
   /** Forwarded to every tile so a read-only surface can drop the more menu. */
   hideActions?: boolean;
-  /** Single layout only: skip the share stream for a surface that cannot render it. */
-  hideScreen?: boolean;
   /** Drops the built-in overlay so a host-supplied participantViewUI replaces it. */
   hideOverlay?: boolean;
 }>();
@@ -89,5 +92,11 @@ const isSpeakerLayout = computed(() =>
 
 .rk-root[data-rk-theme='dark'] .room-view {
   --room-view-tile-bg: color-mix(in srgb, var(--rk-brand) 2%, #141414);
+}
+
+/* The tile overlay lets presses through, so a right-click would open the browser's
+   video menu (save, picture-in-picture) on the stream. */
+.room-view :deep(video) {
+  pointer-events: none;
 }
 </style>

@@ -38,6 +38,8 @@ export { default as LocalNetworkInfoMobile } from './RoomInfo/LocalNetworkInfoMo
 export { default as LayoutButton } from './RoomView/LayoutButton/index.vue';
 export { default as RoomViewPC } from './RoomView/RoomViewPC/RoomViewPC.vue';
 export { default as RoomViewMobile } from './RoomView/RoomViewMobile/RoomViewMobile.vue';
+export { useSingleStageStream } from './RoomView/useParticipantStreams';
+export type { StreamInfo } from './RoomView/useParticipantStreams';
 
 export { default as ScheduledListPC } from './Schedule/ScheduledListPC/ScheduledListPC.vue';
 export { default as ScheduledListMobile } from './Schedule/ScheduledListMobile/ScheduledListMobile.vue';
@@ -51,6 +53,7 @@ export { default as WhiteboardButton } from './Whiteboard/WhiteboardButton/White
 export { default as WhiteboardView } from './Whiteboard/WhiteboardView/WhiteboardView.vue';
 export { default as AnnotationButton } from './Whiteboard/AnnotationButton/AnnotationButton.vue';
 export { default as AnnotationButtonMobile } from './Whiteboard/AnnotationButtonMobile/AnnotationButtonMobile.vue';
+export { useWhiteboardState } from './Whiteboard/WhiteboardState';
 
 export { default as LanguageButton } from './Setting/LanguageButton/LanguageButton.vue';
 export { default as SettingButtonPC } from './Setting/SettingButtonPC/SettingButtonPC.vue';

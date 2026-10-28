@@ -392,6 +392,10 @@ function submitJoin() {
     TUIToast.info(t('Preconference.EmptyRoomId'));
     return;
   }
+  if (!/^\d+$/.test(id)) {
+    TUIToast.info(t('Preconference.InvalidRoomId'));
+    return;
+  }
   emit('join', id);
 }
 

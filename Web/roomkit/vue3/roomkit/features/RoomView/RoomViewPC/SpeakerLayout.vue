@@ -4,10 +4,13 @@
       v-if="enlargeStreamInfo?.participant"
       class="speaker-layout-main"
     >
-      <div class="speaker-layout-tile speaker-layout-tile-main" data-tile-role="stage">
+      <div class="speaker-layout-tile speaker-layout-tile-main">
         <RoomParticipantView
           class="speaker-layout-video"
-          :class="{ 'is-hidden': isCameraOff(enlargeStreamInfo) }"
+          :class="{
+            'is-hidden': isCameraOff(enlargeStreamInfo),
+            'is-screen': enlargeStreamInfo.streamType === VideoStreamType.Screen,
+          }"
           :participant="enlargeStreamInfo.participant"
           :stream-type="enlargeStreamInfo.streamType"
           :fill-mode="FillMode.Fit"
@@ -17,6 +20,7 @@
           name="participantViewUI"
           :participant="enlargeStreamInfo.participant"
           :stream-type="enlargeStreamInfo.streamType"
+          tile-role="stage"
         />
       </div>
     </div>
@@ -27,12 +31,11 @@
           v-for="streamInfo in sideStreamInfoList"
           :key="`${streamInfo.participant.userId}_${streamInfo.streamType}`"
           class="speaker-layout-tile"
-          data-tile-role="thumb"
           @dblclick.capture="handleStreamViewDblclick(streamInfo, $event)"
         >
           <RoomParticipantView
             class="speaker-layout-video"
-            :class="{ 'is-hidden': isCameraOff(streamInfo) }"
+            :class="{ 'is-hidden': isCameraOff(streamInfo), 'is-screen': streamInfo.streamType === VideoStreamType.Screen }"
             :participant="streamInfo.participant"
             :stream-type="streamInfo.streamType"
             :fill-mode="FillMode.Fit"
@@ -41,6 +44,7 @@
             name="participantViewUI"
             :participant="streamInfo.participant"
             :stream-type="streamInfo.streamType"
+            tile-role="thumb"
           />
         </div>
       </div>
@@ -49,62 +53,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue';
+import { computed } from 'vue';
 import {
   FillMode,
-  RoomParticipantEvent,
   RoomParticipantView,
   VideoStreamType,
-  useRoomParticipantState,
 } from 'tuikit-atomicx-vue3/room';
 import { RoomLayoutTemplate } from '../../../core/types';
 import { isCameraOff, useParticipantStreams } from '../useParticipantStreams';
-import type { RoomUser } from 'tuikit-atomicx-vue3/room';
 import type { StreamInfo } from '../useParticipantStreams';
 
 const props = defineProps<{
   layoutTemplate: RoomLayoutTemplate;
+  /** The stage picture; the first stream in display order when omitted. */
+  stageStream?: StreamInfo | null;
 }>();
 
 const emit = defineEmits<{
   'stream-double-click': [streamInfo: StreamInfo];
 }>();
 
-const { sortedParticipantCameraList } = useParticipantStreams();
-const {
-  localParticipant,
-  participantListWithVideo,
-  participantWithScreen,
-  subscribeEvent,
-  unsubscribeEvent,
-} = useRoomParticipantState();
+const { sortedParticipantCameraList, participantStreamList, participantWithScreen } = useParticipantStreams();
 
-const primaryStreamInfo = ref<StreamInfo | null>(null);
-
-const enlargeStreamInfo = computed<StreamInfo | null>(() => {
-  if (primaryStreamInfo.value) {
-    return primaryStreamInfo.value;
-  }
-  if (participantWithScreen.value) {
-    return {
-      participant: participantWithScreen.value,
-      streamType: VideoStreamType.Screen,
-    };
-  }
-  if (participantListWithVideo.value.length > 0) {
-    return {
-      participant: participantListWithVideo.value[0],
-      streamType: VideoStreamType.Camera,
-    };
-  }
-  if (localParticipant.value) {
-    return {
-      participant: localParticipant.value,
-      streamType: VideoStreamType.Camera,
-    };
-  }
-  return null;
-});
+const enlargeStreamInfo = computed<StreamInfo | null>(() =>
+  props.stageStream ?? participantStreamList.value[0] ?? null,
+);
 
 function isSameStream(a: StreamInfo, b: StreamInfo) {
   return a.participant.userId === b.participant.userId
@@ -137,7 +110,6 @@ function handleStreamViewDblclick(streamInfo: StreamInfo, event: MouseEvent) {
   if (target instanceof Element && target.closest('.participant-view-overlay-more')) {
     return;
   }
-  primaryStreamInfo.value = streamInfo;
   emit('stream-double-click', streamInfo);
 }
 
@@ -146,30 +118,6 @@ const streamContainerClass = computed(() => {
     return 'is-cinema';
   }
   return 'is-sidebar';
-});
-
-function handleParticipantLeft({ userInfo }: { userInfo: RoomUser }) {
-  if (userInfo.userId === primaryStreamInfo.value?.participant?.userId) {
-    primaryStreamInfo.value = null;
-  }
-}
-
-watch(participantWithScreen, (val, oldVal) => {
-  if (!primaryStreamInfo.value) {
-    return;
-  }
-  const { streamType, participant } = primaryStreamInfo.value;
-  if (!val && streamType === VideoStreamType.Screen && participant.userId === oldVal?.userId) {
-    primaryStreamInfo.value = null;
-  }
-  if (val && streamType !== VideoStreamType.Screen) {
-    primaryStreamInfo.value = null;
-  }
-}, { immediate: true });
-
-subscribeEvent(RoomParticipantEvent.onParticipantLeft, handleParticipantLeft);
-onUnmounted(() => {
-  unsubscribeEvent(RoomParticipantEvent.onParticipantLeft, handleParticipantLeft);
 });
 </script>
 
@@ -224,11 +172,11 @@ onUnmounted(() => {
   display: none;
 }
 
-/* The tile is the one clip for the video and the overlay. */
+/* The tile only sets the corners; the participant view rounds its own video to them.
+   It must not clip, or the overlay's speaking glow would be cut off. */
 .speaker-layout-tile {
   position: relative;
   flex-shrink: 0;
-  overflow: hidden;
   background: var(--room-view-tile-bg);
   border-radius: var(--speaker-tile-radius);
 }
@@ -245,15 +193,6 @@ onUnmounted(() => {
 .speaker-layout-tile:not(.speaker-layout-tile-main) {
   width: var(--speaker-tile-width);
   height: var(--speaker-tile-height);
-}
-
-/* The speaking halo reads outside the tile box, so the layout that owns the box draws
-   it: a shadow on the tile is not clipped by the tile's own overflow, while anything
-   the overlay could draw would be. The overlay stays the single source of the state. */
-.speaker-layout-tile:has(.participant-view-overlay.is-speaking) {
-  box-shadow:
-    0 0 0 1.5px color-mix(in srgb, #34c759 60%, transparent),
-    0 0 18px color-mix(in srgb, #34c759 18%, transparent);
 }
 
 /* Speaker on the side: the strip is pinned right, the main area takes the rest of the row. */

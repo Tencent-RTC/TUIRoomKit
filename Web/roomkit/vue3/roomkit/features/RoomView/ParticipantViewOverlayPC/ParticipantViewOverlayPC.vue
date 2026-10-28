@@ -33,8 +33,9 @@
       <span>{{ t('RoomView.SharingScreen') }}</span>
     </div>
 
+    <!-- Share tiles, screen or board alike, carry no participant actions; the sharer's camera tile does. -->
     <ParticipantMoreMenu
-      v-if="!hideActions"
+      v-if="!hideActions && !isScreenStream"
       v-slot="{ open }"
       :participant="participant"
       placement="bottom-end"
@@ -60,11 +61,11 @@
           <span
             v-if="isSpeaking"
             class="participant-view-overlay-mic-core"
-            :style="{ transform: `scaleY(${waveScale})` }"
+            :style="{ clipPath: `inset(${waveInset}% 0 0 0)` }"
           />
         </span>
 
-        <span class="participant-view-overlay-name" :title="displayName">{{ displayName }}</span>
+        <span class="participant-view-overlay-name">{{ displayName }}</span>
 
         <span
           v-if="isSelf"
@@ -162,10 +163,11 @@ const isSpeaking = computed(() =>
   !isScreenStream.value && micOn.value && volume.value > 0,
 );
 
-/** How tall the bar stands right now, as a share of the slot it sits in. */
-const waveScale = computed(() => {
+/** How much of the fill is cut away from the top; the rest reads as the level. */
+const waveInset = computed(() => {
   const level = Math.min(volume.value / SPEECH_PEAK, 1);
-  return (WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level).toFixed(2);
+  const scale = WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level;
+  return ((1 - scale) * 100).toFixed(1);
 });
 
 const roleLabel = computed(() => {
@@ -202,17 +204,59 @@ const showNetworkBars = computed(() =>
 /* The overlay fills its tile, so its own inline size is the tile's width. The design
    draws this chrome at two sizes — stage tile and strip thumbnail — so the tiers below
    are container queries instead of a prop each layout would have to pass down.
-   The speaking halo is not here: it sits outside the tile box, so the layout that owns
-   the box draws it. The overlay takes the pointer so its own :hover can reveal the
-   more chip; double-clicks still bubble to the layout's tile. */
+   Only the more chip takes the pointer, so whatever the tile hosts underneath (a board,
+   an annotation) gets every other press; the chip is revealed by the tile's hover
+   instead of the overlay's own. */
 .participant-view-overlay {
   container: participant-tile / inline-size;
   position: absolute;
   inset: 0;
   z-index: 1;
   overflow: visible;
+  pointer-events: none;
   user-select: none;
   border-radius: inherit;
+  transition: box-shadow 0.25s ease-out;
+}
+
+/* Speaking: a 2px ring on the edge, a tight glow, and a faint wide one. The wide glow
+   stays at 16px and faint so two neighbours speaking at once don't merge into one
+   block. The glow paints past the tile, so every box above it must leave it unclipped. */
+.participant-view-overlay.is-speaking {
+  box-shadow:
+    0 0 6px color-mix(in srgb, var(--rk-success) 45%, transparent),
+    0 0 16px color-mix(in srgb, var(--rk-success) 20%, transparent);
+  transition-duration: 0.15s;
+}
+
+.rk-root[data-rk-theme='dark'] .participant-view-overlay.is-speaking {
+  box-shadow:
+    0 0 6px color-mix(in srgb, var(--rk-success) 35%, transparent),
+    0 0 16px color-mix(in srgb, var(--rk-success) 14%, transparent);
+}
+
+.participant-view-overlay::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  content: '';
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--rk-success) 85%, transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+
+.participant-view-overlay.is-speaking::after {
+  opacity: 1;
+  transition-duration: 0.15s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .participant-view-overlay,
+  .participant-view-overlay::after {
+    transition: none;
+  }
 }
 
 /* Camera-off mask — matches design tile: soft gray fill + centered avatar */
@@ -301,6 +345,7 @@ const showNetworkBars = computed(() =>
   width: 32px;
   height: 32px;
   color: #fff;
+  pointer-events: auto;
   cursor: pointer;
   background: rgba(112, 112, 116, 0.62);
   backdrop-filter: blur(12px);
@@ -310,17 +355,14 @@ const showNetworkBars = computed(() =>
   transform: translateY(-4px);
 }
 
-.participant-view-overlay-more:hover {
-  background: rgba(132, 132, 136, 0.78);
-}
-
-.participant-view-overlay:hover .participant-view-overlay-more,
+:global(:hover > .participant-view-overlay .participant-view-overlay-more),
 .participant-view-overlay-more.is-open {
   opacity: 1;
   transform: translateY(0);
 }
 
-.participant-view-overlay:hover .participant-view-overlay-more:hover {
+.participant-view-overlay-more:hover {
+  background: rgba(132, 132, 136, 0.78);
   transform: translateY(0) scale(1.06);
 }
 
@@ -370,19 +412,19 @@ const showNetworkBars = computed(() =>
   color: #fff;
 }
 
-/* Height is driven from the volume inline. Reports land every 300ms, far too coarse to
-   watch as steps, so the bar rides between them on the transition. */
+/* Box is in IconMic's 16-unit viewBox: the capsule's outer edge inset by a quarter
+   stroke, so the stroke hides the fill's edge. Update it if the icon path changes.
+   The level is clipped from the top, since scaling would flatten the round bottom. */
 .participant-view-overlay-mic-core {
   position: absolute;
-  top: 12%;
-  left: 34%;
+  top: calc(1.25 / 16 * 100%);
+  left: calc(4.75 / 16 * 100%);
   z-index: 0;
-  width: 31%;
-  height: 52%;
+  width: calc(6.5 / 16 * 100%);
+  height: calc(10 / 16 * 100%);
   background: #34c759;
   border-radius: 999px;
-  transition: transform 0.2s ease-out;
-  transform-origin: bottom center;
+  transition: clip-path 0.2s ease-out;
 }
 
 /* The icon follows the mic slot so one tier switch resizes both */
@@ -412,13 +454,13 @@ const showNetworkBars = computed(() =>
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  height: 20px;
-  padding: 0 7px;
+  height: 16px;
+  padding: 0 6px;
   overflow: hidden;
-  font-size: var(--rk-fs-sm);
+  font-size: var(--rk-fs-xs);
   font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   white-space: nowrap;
   border-radius: 999px;
 }

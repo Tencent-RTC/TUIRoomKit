@@ -1,20 +1,16 @@
 <template>
-  <!-- Single root: TUITooltip renders two, which would drop the position this anchor takes. -->
-  <div v-if="visible" class="annotation-button-anchor" :class="{ 'is-active': active }">
-    <TUITooltip :content="label" placement="top">
-      <div
-        class="annotation-button"
-        :class="{ 'is-active': active }"
-        role="button"
-        :aria-label="label"
-        :aria-pressed="active"
-        @click.stop="toggle"
-        @dblclick.stop
-      >
-        <IconMark :size="18" />
-      </div>
-    </TUITooltip>
-  </div>
+  <TUIButton
+    v-if="isShareTile"
+    class="annotation-button"
+    variant="primary"
+    size="sm"
+    @click.stop="toggle"
+  >
+    <template #icon>
+      <IconMark :size="10" />
+    </template>
+    {{ isAnnotationOn ? t('Whiteboard.EndAnnotation') : t('Whiteboard.Annotation') }}
+  </TUIButton>
 </template>
 
 <script setup lang="ts">
@@ -26,7 +22,7 @@ import {
   useLoginState,
 } from 'tuikit-atomicx-vue3/room';
 import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
-import { IconMark, TUITooltip, t } from '../../../base';
+import { IconMark, TUIButton, t } from '../../../base';
 import { useWhiteboardState } from '../WhiteboardState';
 
 const props = defineProps<{
@@ -39,57 +35,38 @@ const { screenStatus } = useDeviceState();
 const { isAnnotationOn, startAnnotation, stopAnnotation } = useWhiteboardState();
 
 const isLocal = computed(() => props.participant.userId === loginUserInfo.value?.userId);
-/** A local share tile without a real screen share is the local board, which is always drawable. */
+/** A local share tile without a real screen share is the local board, whose toolbar stays open. */
 const isLocalBoard = computed(() => isLocal.value && screenStatus.value === DeviceStatus.Off);
-const visible = computed(() => props.streamType === VideoStreamType.Screen && !isLocalBoard.value);
-/** The state picks host or guest from who shares, so only this tile's sharer can own the session. */
-const active = computed(() => isAnnotationOn.value && !isLocalBoard.value);
-const label = computed(() => (active.value ? t('Whiteboard.Collapse') : t('Whiteboard.Annotation')));
+const isShareTile = computed(() => props.streamType === VideoStreamType.Screen && !isLocalBoard.value);
 
-async function toggle() {
-  await (active.value ? stopAnnotation() : startAnnotation());
+function toggle() {
+  const run = isAnnotationOn.value ? stopAnnotation() : startAnnotation();
+  run.catch((error: unknown) => {
+    console.warn('[AnnotationButton] toggle annotation failed:', error);
+  });
 }
 </script>
 
 <style scoped lang="scss">
-/* Clears the name pill along the tile's bottom-left edge. */
-.annotation-button-anchor {
-  position: absolute;
-  bottom: 48px;
-  left: 12px;
-  z-index: 5;
-  display: flex;
-}
-
-/* The plugin draws from pointer events on its own root, so while annotating the tile
-   overlay above it lets them through and keeps only its more chip clickable. */
-:global(:has(> .annotation-button-anchor.is-active) > .participant-view-overlay) {
-  pointer-events: none;
-}
-
-:global(:has(> .annotation-button-anchor.is-active) > .participant-view-overlay .participant-view-overlay-more) {
+/* Same chip as the "sharing screen" badge on the opposite corner of the share tile. */
+.rk-btn.annotation-button {
+  gap: 4px;
+  height: auto;
+  padding: 4px 9px;
+  font-size: var(--rk-fs-xs);
+  font-weight: 600;
+  line-height: inherit;
+  color: #fff;
+  white-space: nowrap;
   pointer-events: auto;
-}
+  background: rgba(77, 124, 255, 0.92);
+  backdrop-filter: blur(4px);
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(77, 124, 255, 0.35);
 
-/* Media chrome: it sits on the shared picture, so it does not follow the theme. */
-.annotation-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  color: #34c759;
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.62);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--rk-radius-pill);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transition: background 0.15s ease;
-}
-
-.annotation-button:hover,
-.annotation-button.is-active {
-  background: rgba(0, 0, 0, 0.45);
+  &:hover:not(:disabled) {
+    background: rgba(77, 124, 255, 1);
+  }
 }
 </style>
