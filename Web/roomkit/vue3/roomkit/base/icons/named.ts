@@ -65,7 +65,6 @@ import { IconVirtualBg as OfficialIconVirtualBg } from './official/IconVirtualBg
 import { IconTransferOwner as OfficialIconTransferOwner } from './official/IconTransferOwner';
 import { IconSetAdmin as OfficialIconSetAdmin } from './official/IconSetAdmin';
 import { IconRevokeAdmin as OfficialIconRevokeAdmin } from './official/IconRevokeAdmin';
-import { IconHostRole as OfficialIconHostRole } from './official/IconHostRole';
 import { IconRoleUser as OfficialIconRoleUser } from './official/IconRoleUser';
 import { IconCheck as OfficialIconCheck } from './official/IconCheck';
 import { IconChevron as OfficialIconChevron } from './official/IconChevron';
@@ -157,7 +156,6 @@ export const IconVirtualBg = defineIcon('IconVirtualBg', 'virtual-bg', OfficialI
 export const IconTransferOwner = defineIcon('IconTransferOwner', 'transfer-owner', OfficialIconTransferOwner);
 export const IconSetAdmin = defineIcon('IconSetAdmin', 'set-admin', OfficialIconSetAdmin);
 export const IconRevokeAdmin = defineIcon('IconRevokeAdmin', 'revoke-admin', OfficialIconRevokeAdmin);
-export const IconHostRole = defineIcon('IconHostRole', 'host-role', OfficialIconHostRole);
 export const IconRoleUser = defineIcon('IconRoleUser', 'role-user', OfficialIconRoleUser);
 export const IconCheck = defineIcon('IconCheck', 'check', OfficialIconCheck);
 export const IconChevron = defineIcon('IconChevron', 'chevron', OfficialIconChevron);

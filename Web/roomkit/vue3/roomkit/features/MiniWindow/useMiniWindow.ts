@@ -180,6 +180,13 @@ export function useMiniWindow(root?: Readonly<Ref<HTMLElement | null>>) {
     }
   }
 
+  /* Closes whatever window is up, however it was opened, without moving focus. */
+  function close() {
+    if (minimized.value) {
+      handlePipClosed();
+    }
+  }
+
   function toggle() {
     return minimized.value ? restore() : minimize();
   }
@@ -200,6 +207,7 @@ export function useMiniWindow(root?: Readonly<Ref<HTMLElement | null>>) {
     minimize,
     restore,
     dismissAuto,
+    close,
     toggle,
   };
 }

@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
   DeviceStatus,
   RoomParticipantRole,
@@ -108,4 +108,93 @@ export function useParticipantStreams() {
     participantStreamList,
     participantWithScreen,
   };
+}
+
+/** Silence grace for the current speaker before the picture may move to someone else. */
+const SPEAKER_HOLD = 1000;
+
+function findLoudestId(volumes: Map<string, number>): string {
+  let loudestId = '';
+  let loudest = 0;
+  volumes.forEach((volume, userId) => {
+    if (volume > loudest) {
+      loudest = volume;
+      loudestId = userId;
+    }
+  });
+  return loudestId;
+}
+
+/** The current speaker, held through short silences; nothing until someone speaks. */
+function useCurrentSpeaker() {
+  const { localParticipant, participantList, speakingUsers } = useRoomParticipantState();
+
+  const currentSpeakerId = ref('');
+  let currentSpeakerLastHeardAt = 0;
+
+  function pickSpeaker(volumes: Map<string, number>) {
+    // People who left the room disappear from speakingUsers; drop a stale id first.
+    if (currentSpeakerId.value && !volumes.has(currentSpeakerId.value)) {
+      currentSpeakerId.value = '';
+      currentSpeakerLastHeardAt = 0;
+    }
+
+    // A muted local track still reports volume, so it must not win the picture.
+    const candidates = new Map(volumes);
+    if (localParticipant.value?.microphoneStatus === DeviceStatus.Off) {
+      candidates.delete(localParticipant.value.userId);
+    }
+
+    const speakerId = currentSpeakerId.value;
+    const speakerVolume = candidates.get(speakerId);
+    if (speakerId && speakerVolume !== undefined && speakerVolume > 0) {
+      currentSpeakerLastHeardAt = Date.now();
+      return;
+    }
+
+    const loudestId = findLoudestId(candidates);
+    if (!loudestId) {
+      return;
+    }
+    if (!speakerId || Date.now() - currentSpeakerLastHeardAt >= SPEAKER_HOLD) {
+      currentSpeakerId.value = loudestId;
+      currentSpeakerLastHeardAt = Date.now();
+    }
+  }
+
+  watch(speakingUsers, pickSpeaker, { deep: true });
+
+  const currentSpeaker = computed<RoomParticipant | undefined>(() => {
+    if (!currentSpeakerId.value) {
+      return undefined;
+    }
+    if (localParticipant.value?.userId === currentSpeakerId.value) {
+      return localParticipant.value;
+    }
+    return participantList.value.find(item => item.userId === currentSpeakerId.value);
+  });
+
+  return { currentSpeaker };
+}
+
+/**
+ * Picks for surfaces that hold a single stream.
+ * - speakerStream: the current speaker's camera, or self until anyone speaks.
+ * - stageStream: a screen share first, then speakerStream.
+ */
+export function useSingleStageStream() {
+  const { localParticipant, participantWithScreen } = useRoomParticipantState();
+  const { currentSpeaker } = useCurrentSpeaker();
+
+  const speakerStream = computed<StreamInfo | null>(() => {
+    const participant = currentSpeaker.value ?? localParticipant.value;
+    return participant ? { participant, streamType: VideoStreamType.Camera } : null;
+  });
+
+  const stageStream = computed<StreamInfo | null>(() => {
+    const sharer = participantWithScreen.value;
+    return sharer ? { participant: sharer, streamType: VideoStreamType.Screen } : speakerStream.value;
+  });
+
+  return { speakerStream, stageStream };
 }

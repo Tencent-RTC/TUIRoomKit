@@ -4,6 +4,12 @@
 
 ---
 
+## [7.0.1] - 2026-10-28
+
+### Added
+
+- Added whiteboard annotation feature
+
 ## [7.0.0] - 2026-10-23
 
 ### Added

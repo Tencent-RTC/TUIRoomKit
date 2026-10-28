@@ -71,7 +71,6 @@ export function uniqueParticipantIds(ids: string[]): string[] {
 export interface AttendeeContact {
   userId: string;
   userName: string;
-  initial: string;
   avatarUrl?: string;
 }
 
@@ -89,7 +88,6 @@ export function attendeeChipLabel(userId: string, names: readonly string[]): str
 export interface AttendeeHit {
   userId: string;
   displayName: string;
-  initial: string;
   avatarUrl: string;
 }
 
@@ -115,7 +113,6 @@ export function attendeeSearchHits(
     .map(item => ({
       userId: item.userId,
       displayName: item.userName,
-      initial: item.initial,
       avatarUrl: item.avatarUrl ?? '',
     }));
 }

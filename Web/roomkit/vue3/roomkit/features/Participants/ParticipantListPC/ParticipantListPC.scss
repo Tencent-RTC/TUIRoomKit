@@ -1,0 +1,332 @@
+/* Teleported dropdown is outside this SFC tree, so the panel chrome is unscoped. */
+.rk-dropdown:has(.participant-panel-menu) {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 200px;
+  max-width: 316px;
+  padding: 6px;
+  border-color: var(--rk-border-strong);
+  border-radius: 10px;
+  box-shadow: var(--rk-shadow-dialog);
+}
+
+.participant-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.participant-panel-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 16px 10px;
+}
+
+.participant-panel-toolbar .participant-panel-search {
+  box-sizing: border-box;
+  flex: 1;
+  gap: 6px;
+  width: auto;
+  min-width: 0;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 10px;
+  color: var(--rk-text-secondary);
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: 999px;
+}
+
+.participant-panel-toolbar .participant-panel-search:focus-within {
+  border-color: var(--rk-border-strong);
+}
+
+.participant-panel-search :deep(.rk-input-addon) {
+  padding: 0;
+}
+
+.participant-panel-search :deep(.rk-icon) {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--rk-text-tertiary);
+}
+
+.participant-panel-search :deep(.rk-input-field) {
+  padding: 0;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-primary);
+}
+
+.participant-panel-search :deep(.rk-input-field::placeholder) {
+  color: var(--rk-text-tertiary);
+}
+
+.participant-panel-toolbar .participant-panel-invite.rk-btn {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: 50%;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+}
+
+.participant-panel-toolbar .participant-panel-invite.rk-btn:hover {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-muted);
+  border-color: var(--rk-border-strong);
+}
+
+.participant-panel-toolbar .participant-panel-invite.rk-btn:active {
+  transform: scale(0.96);
+}
+
+.participant-panel-invite :deep(.rk-icon) {
+  width: 16px;
+  height: 16px;
+}
+
+.participant-panel-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 8px 8px;
+  overflow: hidden;
+}
+
+/* Short groups stay content-sized. Tall groups grow with flex:1. */
+.participant-panel-section {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-height: min-content;
+  overflow: hidden;
+}
+
+.participant-panel-section.is-fill {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.participant-panel-rows {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: none;
+
+  > * {
+    flex-shrink: 0;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Force the list to use the flexed leftover and scroll inside it. */
+.participant-panel-section.is-fill .participant-panel-rows {
+  height: 0;
+}
+
+/* Only cap at half when both groups need more than half. */
+.participant-panel-body.is-both-tall .participant-panel-section.is-fill {
+  max-height: 50%;
+}
+
+/* Only the groups below the first one carry the separator. */
+.participant-panel-section + .participant-panel-section {
+  padding-top: 8px;
+  margin-top: 10px;
+  border-top: 1px solid var(--rk-border);
+}
+
+.participant-panel-heading {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+  padding: 0 8px 4px;
+}
+
+.participant-panel-toggle {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.participant-panel-toggle:hover {
+  color: var(--rk-text-primary);
+}
+
+.participant-panel-toggle :deep(.rk-icon) {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  color: var(--rk-text-tertiary);
+  transition: transform 0.16s ease;
+}
+
+.participant-panel-toggle:hover :deep(.rk-icon) {
+  color: var(--rk-text-secondary);
+}
+
+.participant-panel-toggle :deep(.is-collapsed) {
+  transform: rotate(-90deg);
+}
+
+.participant-panel-title {
+  line-height: 1;
+}
+
+.participant-panel-count {
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--rk-text-tertiary);
+}
+
+.participant-panel-call-all {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  margin: 0;
+  font: inherit;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--rk-text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  transition: color 0.15s ease, transform 0.08s ease;
+}
+
+.participant-panel-call-all:hover {
+  color: var(--rk-text-primary);
+}
+
+.participant-panel-call-all:active {
+  transform: scale(0.96);
+}
+
+.participant-panel-call-all:disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.45;
+}
+
+.participant-panel-empty {
+  padding: 24px 8px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-tertiary);
+  text-align: center;
+}
+
+.participant-panel-footer {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: stretch;
+  padding: 10px 12px 12px;
+}
+
+.participant-panel-footer :deep(.rk-dropdown-anchor) {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.participant-panel-footer-btn {
+  display: inline-flex;
+  flex: 1 1 0;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  padding: 0 8px;
+  margin: 0;
+  font: inherit;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  color: var(--rk-text-primary);
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: 999px;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, transform 0.08s ease;
+}
+
+.participant-panel-footer-btn:hover,
+.participant-panel-footer-btn.is-open {
+  background: var(--rk-bg-hover);
+  border-color: var(--rk-border-strong);
+}
+
+.participant-panel-footer-btn:active {
+  transform: scale(0.97);
+}
+
+/* Declared after hover with equal specificity, so a lit button keeps its fill on hover. */
+.participant-panel-footer-btn.is-on {
+  color: var(--rk-brand);
+  background: var(--rk-brand-soft);
+  border-color: color-mix(in srgb, var(--rk-brand) 28%, transparent);
+}
+
+.participant-panel-menu {
+  width: 100%;
+}
+
+.participant-panel-menu :deep(.rk-dropdown-item) {
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: var(--rk-fs-sm);
+  line-height: 1.35;
+  color: var(--rk-text-primary);
+  text-align: left;
+  overflow-wrap: break-word;
+  white-space: normal;
+  border-radius: 7px;
+}
+
+.participant-panel-menu :deep(.rk-dropdown-item:hover),
+.participant-panel-menu :deep(.rk-dropdown-item[data-highlighted='true']) {
+  background: var(--rk-bg-hover);
+}
+
+.participant-panel-menu :deep(.rk-dropdown-item.is-on) {
+  color: var(--rk-brand);
+}

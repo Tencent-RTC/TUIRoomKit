@@ -61,7 +61,6 @@ export const ICON_NAMES = [
   'transfer-owner',
   'set-admin',
   'revoke-admin',
-  'host-role',
   'role-user',
   'check',
   'chevron',

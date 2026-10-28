@@ -44,12 +44,12 @@
     <div class="participant-view-overlay-stack">
       <div class="participant-view-overlay-pill">
         <span class="participant-view-overlay-mic" aria-hidden="true">
-          <IconMic v-if="micOn" :size="12" />
-          <IconMicOff v-else :size="12" />
+          <IconMic v-if="micOn" :size="14" />
+          <IconMicOff v-else :size="14" />
           <span
             v-if="isSpeaking"
             class="participant-view-overlay-mic-core"
-            :style="{ transform: `scaleY(${waveScale})` }"
+            :style="{ clipPath: `inset(${waveInset}% 0 0 0)` }"
           />
         </span>
 
@@ -60,8 +60,7 @@
           role="img"
           :aria-label="roleLabel"
         >
-          <IconHostRole v-if="isOwner" :size="12" />
-          <IconRoleUser v-else :size="11" />
+          <IconRoleUser :size="14" />
         </span>
 
         <span class="participant-view-overlay-name">{{ displayName }}</span>
@@ -82,7 +81,7 @@ import {
   useLoginState,
   useRoomParticipantState,
 } from 'tuikit-atomicx-vue3/room';
-import { IconFlipCamera, IconHostRole, IconMic, IconMicOff, IconRoleUser, t } from '../../../base';
+import { IconFlipCamera, IconMic, IconMicOff, IconRoleUser, t } from '../../../base';
 import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
 const props = defineProps<{
@@ -138,9 +137,11 @@ const WAVE_MAX_SCALE = 1;
 /* A share tile carries the sharer's volume; the halo belongs on their camera tile. */
 const isSpeaking = computed(() => !isScreenStream.value && micOn.value && volume.value > 0);
 
-const waveScale = computed(() => {
+/** How much of the fill is cut away from the top; the rest reads as the level. */
+const waveInset = computed(() => {
   const level = Math.min(volume.value / SPEECH_PEAK, 1);
-  return (WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level).toFixed(2);
+  const scale = WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level;
+  return ((1 - scale) * 100).toFixed(1);
 });
 
 const isOwner = computed(() => props.participant.role === RoomParticipantRole.Owner);
@@ -175,6 +176,42 @@ const showNetworkBars = computed(() => !props.inPip && networkQuality.value >= N
   overflow: visible;
   pointer-events: none;
   border-radius: inherit;
+  transition: box-shadow 0.25s ease-out;
+}
+
+/* Speaking: a 2px ring on the edge and a tight glow only. The gallery gap is 4px, so
+   a wide glow would merge two neighbours speaking at once into one block. */
+.participant-view-overlay.is-speaking {
+  box-shadow: 0 0 6px color-mix(in srgb, var(--rk-success) 45%, transparent);
+  transition-duration: 0.15s;
+}
+
+.rk-root[data-rk-theme='dark'] .participant-view-overlay.is-speaking {
+  box-shadow: 0 0 6px color-mix(in srgb, var(--rk-success) 35%, transparent);
+}
+
+.participant-view-overlay::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  content: '';
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--rk-success) 85%, transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+
+.participant-view-overlay.is-speaking::after {
+  opacity: 1;
+  transition-duration: 0.15s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .participant-view-overlay,
+  .participant-view-overlay::after {
+    transition: none;
+  }
 }
 
 .participant-view-overlay-mask {
@@ -304,22 +341,24 @@ const showNetworkBars = computed(() => !props.inPip && networkQuality.value >= N
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   color: #fff;
 }
 
+/* Box is in IconMic's 16-unit viewBox: the capsule's outer edge inset by a quarter
+   stroke, so the stroke hides the fill's edge. Update it if the icon path changes.
+   The level is clipped from the top, since scaling would flatten the round bottom. */
 .participant-view-overlay-mic-core {
   position: absolute;
-  top: 12%;
-  left: 34%;
+  top: calc(1.25 / 16 * 100%);
+  left: calc(4.75 / 16 * 100%);
   z-index: 0;
-  width: 31%;
-  height: 52%;
+  width: calc(6.5 / 16 * 100%);
+  height: calc(10 / 16 * 100%);
   background: #34c759;
   border-radius: 999px;
-  transition: transform 0.2s ease-out;
-  transform-origin: bottom center;
+  transition: clip-path 0.2s ease-out;
 }
 
 .participant-view-overlay-mic :deep(svg) {
@@ -346,8 +385,8 @@ const showNetworkBars = computed(() => !props.inPip && networkQuality.value >= N
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   line-height: 0;
   color: #fff;
   border-radius: 50%;
@@ -366,9 +405,9 @@ const showNetworkBars = computed(() => !props.inPip && networkQuality.value >= N
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
   font-size: var(--rk-fs-xs);
   font-weight: 500;
   line-height: 1;

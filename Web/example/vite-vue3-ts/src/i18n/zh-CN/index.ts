@@ -10,6 +10,7 @@ export const resource = {
   'Preconference.CameraOff': '摄像头未开启',
   'Preconference.JoinSub': '输入会议号',
   'Preconference.EmptyRoomId': '请输入会议号',
+  'Preconference.InvalidRoomId': '请输入数字会议号',
   'Preconference.RecentMeetings': '近期会议',
   'Preconference.LogoutConfirm': '确定要退出当前账号吗？',
   'RoomInvitation.Subtitle': '邀请你加入会议',

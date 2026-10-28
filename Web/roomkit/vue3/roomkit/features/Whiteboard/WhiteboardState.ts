@@ -1,299 +1,374 @@
-import { computed, effectScope, readonly, ref, watch } from 'vue';
-import type { ComputedRef } from 'vue';
+import { computed, effectScope, nextTick, readonly, ref, watch } from 'vue';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import {
   DeviceStatus,
-  WhiteboardStatus,
   useDeviceState,
-  useLoginState,
   useRoomParticipantState,
   useRoomState,
-  useWhiteboardState as useSharedWhiteboardState,
 } from 'tuikit-atomicx-vue3/room';
-import type { WhiteboardOptions } from 'tuikit-atomicx-vue3/room';
 
-type WhiteboardPluginHost = {
-  updatePlugin(
-    plugin: 'Whiteboard',
-    options: { ui: { toolBar: { enable: boolean } } },
-  ): Promise<unknown>;
+/** Omitted = the local host; set = follow that user's screen share. */
+type SdkSessionOptions = { userId?: string };
+
+type SdkStateEvent = {
+  userId: string;
+  type: string;
+  payload?: { reason?: string };
 };
 
-type SharedWhiteboardState = ReturnType<typeof useSharedWhiteboardState>;
-
-/** True from the click until the local board start settles. The share tile is already up. */
-const whiteboardOpening = ref(false);
-/** The first canvas bind of this open has finished, so a layout remount does not replay the cover. */
-const whiteboardViewReady = ref(false);
-
-let shared: SharedWhiteboardState | null = null;
-let isWhiteboardOn: ComputedRef<boolean> | null = null;
-let isAnnotationOn: ComputedRef<boolean> | null = null;
-let installed = false;
-/** True only until the shared session reports On. Keeps the tile up while start is in flight. */
-let holdBeforeReady = false;
-/** This kit owns the fake local share, so a later Off must clear it and not a real screen share. */
-let localBoardOwned = false;
-
-let toolbarEpoch = 0;
-let toolbarTail: Promise<void> = Promise.resolve();
-
-function requireShared(): SharedWhiteboardState {
-  install();
-  return shared as SharedWhiteboardState;
-}
-
-function setLocalShareStatus(status: DeviceStatus): void {
-  const { localParticipant } = useRoomParticipantState();
-  if (localParticipant.value) {
-    localParticipant.value.screenShareStatus = status;
-  }
-}
-
-function isLocalBoardStart(): boolean {
-  const { screenStatus } = useDeviceState();
-  const { localParticipant, participantWithScreen } = useRoomParticipantState();
-  if (screenStatus.value === DeviceStatus.On) {
-    return false;
-  }
-  const presenterUserId = participantWithScreen.value?.userId;
-  return !presenterUserId || presenterUserId === localParticipant.value?.userId;
-}
-
-/** Annotation needs a real share to draw on: the local screen share or a remote sharer's. */
-function hasAnnotationTarget(): boolean {
-  const { screenStatus } = useDeviceState();
-  const { localParticipant, participantWithScreen } = useRoomParticipantState();
-  if (screenStatus.value === DeviceStatus.On) {
-    return true;
-  }
-  const presenterUserId = participantWithScreen.value?.userId;
-  return !!presenterUserId && presenterUserId !== localParticipant.value?.userId;
-}
-
-function releaseLocalBoard(): void {
-  holdBeforeReady = false;
-  localBoardOwned = false;
-  setLocalShareStatus(DeviceStatus.Off);
-}
+type SdkStateHandler = (event: SdkStateEvent) => void;
 
 /**
- * getUserList reports the local board as not sharing and replaces the row.
- * Put the fake status back in the same tick so the share tile never unmounts.
- * A real screen share, and the shared state's own Off cleanup, are left alone.
+ * trtc-sdk-v5 ships the whiteboard / annotation API untyped, and the instance only
+ * exists as trtc-cloud's private `_trtc`. Everything that leans on it stays in this file.
  */
-function watchLocalBoardShare(status: SharedWhiteboardState['whiteboardStatus']): void {
-  const { localParticipant } = useRoomParticipantState();
-  const { screenStatus } = useDeviceState();
-  watch(
-    () => localParticipant.value?.screenShareStatus,
-    (shareStatus) => {
-      const keep = holdBeforeReady || (localBoardOwned && status.value === WhiteboardStatus.On);
-      if (!keep || screenStatus.value === DeviceStatus.On) {
-        return;
-      }
-      if (shareStatus !== DeviceStatus.On && localParticipant.value) {
-        localParticipant.value.screenShareStatus = DeviceStatus.On;
-      }
-    },
-    { flush: 'sync' },
-  );
-  watch(
-    status,
-    (next) => {
-      if (next === WhiteboardStatus.On) {
-        holdBeforeReady = false;
-      }
-      if (next !== WhiteboardStatus.Off) {
-        return;
-      }
-      holdBeforeReady = false;
-      whiteboardViewReady.value = false;
-      const owned = localBoardOwned;
-      localBoardOwned = false;
-      if (owned && screenStatus.value !== DeviceStatus.On) {
-        setLocalShareStatus(DeviceStatus.Off);
-      }
-    },
-    { flush: 'sync' },
-  );
-}
+type SdkTrtc = {
+  startWhiteboard(options: { view?: HTMLElement }): Promise<void>;
+  stopScreenShare(): Promise<void>;
+  startAnnotation(options?: SdkSessionOptions): Promise<void>;
+  stopAnnotation(options?: SdkSessionOptions): Promise<void>;
+  updatePlugin(
+    plugin: 'Whiteboard',
+    options:
+      | { view?: HTMLElement }
+      | { ui: { toolBar: { enable: boolean; placement?: 'auto' | 'left' | 'right' | 'top' | 'bottom' } } },
+  ): Promise<unknown>;
+  on(event: string, handler: SdkStateHandler): void;
+  off(event: string, handler: SdkStateHandler): void;
+};
+
+type RoomEngineLike = {
+  getTRTCCloud(): { _trtc?: SdkTrtc } | null | undefined;
+  getRoomStoreManager?(): { call(command: string): Promise<unknown> } | null | undefined;
+};
 
 /**
- * The shared whiteboard status is a module singleton and outlives the room, so it
- * stays On after leaving unless stopped here. The SDK session is usually gone with
- * the room already; the stop still resets the state when the SDK call fails.
+ * board-host: a standalone board the local user publishes as its own share.
+ * annotation-host: drawing on the local screen share.
+ * annotation-guest: drawing on a remote user's screen share.
  */
-function watchRoomExit(stop: () => Promise<void>): void {
-  const { currentRoom } = useRoomState();
-  watch(
-    () => currentRoom.value?.roomId,
-    (roomId, previousRoomId) => {
-      if (!previousRoomId || roomId) {
-        return;
-      }
-      whiteboardOpening.value = false;
-      whiteboardViewReady.value = false;
-      stop().catch((error: unknown) => {
-        console.warn('[WhiteboardState] stop whiteboard on room exit failed:', error);
-      });
-    },
-  );
+type SessionKind = 'none' | 'board-host' | 'annotation-host' | 'annotation-guest';
+
+/* Left on PC: the stage tile's top-right corner holds the annotation toggle. */
+const TOOLBAR_PLACEMENT = 'auto';
+
+const SDK_STATE_EVENTS = ['annotation-state-changed', 'whiteboard-state-changed'];
+
+function getEngine(): RoomEngineLike | null {
+  return (TUIRoomEngine.getInstance() as unknown as RoomEngineLike | null) ?? null;
 }
 
-/** The SDK opens the annotation together with a local screen share; confirming it records the session in state. */
-function watchLocalScreenShare(): void {
-  const { screenStatus } = useDeviceState();
-  watch(screenStatus, (status, previousStatus) => {
-    if (status === DeviceStatus.On && previousStatus !== DeviceStatus.On) {
-      startAnnotation().catch((error: unknown) => {
-        console.warn('[WhiteboardState] confirm annotation failed:', error);
-      });
-    }
-  });
+/** trtc-cloud creates `_trtc` in its constructor and drops it on destroy, so read it per call. */
+function findTrtc(): SdkTrtc | null {
+  const trtc = getEngine()?.getTRTCCloud()?._trtc;
+  return trtc?.startWhiteboard ? trtc : null;
 }
 
-function install(): void {
-  if (installed) {
-    return;
-  }
-  installed = true;
-  // Detached so the store subscriptions outlive whichever component first asked for the state.
-  effectScope(true).run(() => {
-    shared = useSharedWhiteboardState();
-    const { whiteboardStatus, stopWhiteboard: sharedStop } = shared;
-    const { screenStatus } = useDeviceState();
-    const { loginUserInfo } = useLoginState();
-    const { participantWithScreen } = useRoomParticipantState();
-    /** A local board is the only whiteboard session that runs without a real screen share. */
-    isWhiteboardOn = computed(() => whiteboardStatus.value === WhiteboardStatus.On
-      && screenStatus.value === DeviceStatus.Off
-      && participantWithScreen.value?.userId === loginUserInfo.value?.userId);
-    isAnnotationOn = computed(() => whiteboardStatus.value === WhiteboardStatus.On && !isWhiteboardOn?.value);
-    watchLocalBoardShare(whiteboardStatus);
-    watchRoomExit(sharedStop);
-    watchLocalScreenShare();
-  });
-}
-
-async function startLocalBoard(options: WhiteboardOptions): Promise<void> {
-  const { whiteboardStatus, startWhiteboard: sharedStart } = requireShared();
-  if (whiteboardStatus.value === WhiteboardStatus.On) {
-    await sharedStart(options);
-    setLocalShareStatus(DeviceStatus.On);
-    return;
-  }
-  // The tile has to exist before the shared call returns, so the view can show a loading cover.
-  localBoardOwned = true;
-  holdBeforeReady = true;
-  setLocalShareStatus(DeviceStatus.On);
-  try {
-    await sharedStart(options);
-  } catch (error) {
-    releaseLocalBoard();
-    throw error;
-  }
-  if (whiteboardStatus.value !== WhiteboardStatus.On) {
-    releaseLocalBoard();
-  }
-}
-
-/** Opens the local board. Does nothing while a screen share is up or a start is in flight. */
-async function startWhiteboard(options: WhiteboardOptions = {}): Promise<void> {
-  if (whiteboardOpening.value || !isLocalBoardStart()) {
-    return;
-  }
-  whiteboardOpening.value = true;
-  whiteboardViewReady.value = false;
-  try {
-    await startLocalBoard(options);
-  } finally {
-    whiteboardOpening.value = false;
-  }
-}
-
-async function stopWhiteboard(): Promise<void> {
-  if (!isWhiteboardOn?.value) {
-    return;
-  }
-  await requireShared().stopWhiteboard();
-}
-
-/** The shared state picks host or guest annotation from who shares. */
-async function startAnnotation(options: WhiteboardOptions = {}): Promise<void> {
-  if (!hasAnnotationTarget()) {
-    return;
-  }
-  await requireShared().startWhiteboard(options);
-}
-
-async function stopAnnotation(): Promise<void> {
-  if (!isAnnotationOn?.value) {
-    return;
-  }
-  await requireShared().stopWhiteboard();
-}
-
-async function applyBuiltinToolbar(enable: boolean): Promise<void> {
-  const cloud = TUIRoomEngine.getInstance()?.getTRTCCloud() as { _trtc?: WhiteboardPluginHost } | null | undefined;
-  const trtc = cloud?._trtc;
+function requireTrtc(): SdkTrtc {
+  const trtc = findTrtc();
   if (!trtc) {
     throw new Error('[WhiteboardState] TRTC instance with the Whiteboard plugin is unavailable');
   }
-  await trtc.updatePlugin('Whiteboard', { ui: { toolBar: { enable } } });
+  return trtc;
 }
 
-/** Binds the canvas element. The cover lifts once it settles, even on failure, so it never sticks. */
-async function bindView(view: HTMLElement): Promise<void> {
-  const { whiteboardStatus, updateWhiteboard } = requireShared();
-  try {
-    await updateWhiteboard({ view });
-  } finally {
-    if (whiteboardStatus.value === WhiteboardStatus.On) {
-      whiteboardViewReady.value = true;
+/** A board publishes behind the engine's back; holding the token keeps anyone else from sharing. */
+async function callRoomStore(command: string): Promise<void> {
+  await getEngine()?.getRoomStoreManager?.()?.call(command);
+}
+
+function createWhiteboard() {
+  const { screenStatus } = useDeviceState();
+  const { localParticipant, participantWithScreen } = useRoomParticipantState();
+  const { currentRoom } = useRoomState();
+
+  const sessionKind = ref<SessionKind>('none');
+  /** An annotation start is in flight; held until the session is on, so the two read as one. */
+  const annotationStarting = ref(false);
+  /** True from the click until the local board start settles. The share tile is already up. */
+  const opening = ref(false);
+  /** The first canvas bind of this board has finished, so a layout remount does not replay the cover. */
+  const viewReady = ref(false);
+  let guestUserId = '';
+  let startPromise: Promise<void> | null = null;
+  let stopPromise: Promise<void> | null = null;
+  /** The local board is shown through a fake local share this kit owns until the board ends. */
+  let holdsLocalShare = false;
+
+  const isWhiteboardOn = computed(() => sessionKind.value === 'board-host');
+  const isAnnotationOn = computed(() => sessionKind.value === 'annotation-host'
+    || sessionKind.value === 'annotation-guest');
+  /** A board or an annotation is starting or running. */
+  const isSessionActive = computed(() => opening.value || annotationStarting.value || sessionKind.value !== 'none');
+
+  function setLocalShare(status: DeviceStatus): void {
+    if (localParticipant.value) {
+      localParticipant.value.screenShareStatus = status;
     }
   }
-}
 
-/**
- * Toolbar updates from every tile share one queue. Only the latest one is sent,
- * so a thumbnail's in-flight disable cannot land after the stage turns the toolbar back on.
- * A view that has left the DOM by the time its turn comes is skipped.
- */
-function applyToolbar(view: HTMLElement, enable: boolean): Promise<void> {
-  const epoch = ++toolbarEpoch;
-  toolbarTail = toolbarTail.then(async () => {
-    if (epoch !== toolbarEpoch || !view.isConnected) {
+  function releaseLocalShare(): void {
+    if (!holdsLocalShare) {
       return;
     }
-    await requireShared().updateWhiteboard({ builtinToolbar: enable });
-    await applyBuiltinToolbar(enable);
-  }).catch((error: unknown) => {
-    console.warn('[WhiteboardState] toolbar update failed:', error);
-  });
-  return toolbarTail;
+    holdsLocalShare = false;
+    if (screenStatus.value !== DeviceStatus.On) {
+      setLocalShare(DeviceStatus.Off);
+    }
+  }
+
+  // getUserList reports the local board as not sharing and replaces the row.
+  // Put the fake status back in the same tick so the share tile never unmounts.
+  watch(
+    () => localParticipant.value?.screenShareStatus,
+    (status) => {
+      if (holdsLocalShare && status !== DeviceStatus.On && screenStatus.value !== DeviceStatus.On) {
+        setLocalShare(DeviceStatus.On);
+      }
+    },
+    { flush: 'sync' },
+  );
+
+  function resetSession(): void {
+    sessionKind.value = 'none';
+    guestUserId = '';
+    viewReady.value = false;
+    releaseLocalShare();
+  }
+
+  async function setBuiltinToolbar(enable: boolean): Promise<void> {
+    await requireTrtc().updatePlugin('Whiteboard', { ui: { toolBar: { enable, placement: TOOLBAR_PLACEMENT } } });
+  }
+
+  /** The SDK breaks on a start issued while a stop is still running, so a start waits for it. */
+  async function runStart(kind: Exclude<SessionKind, 'none'>, start: (trtc: SdkTrtc) => Promise<void>): Promise<void> {
+    if (stopPromise) {
+      await stopPromise.catch(() => {});
+    }
+    const run = (async () => {
+      const annotating = kind !== 'board-host';
+      try {
+        if (annotating) {
+          // The SDK binds the annotation to a view the share already plays in. Any second view
+          // (the mini window) has to unmount first, or the annotation follows it there and
+          // every later screen op hangs once that window closes.
+          annotationStarting.value = true;
+          await nextTick();
+        }
+        await start(requireTrtc());
+        await setBuiltinToolbar(true).catch((error: unknown) => {
+          console.warn('[WhiteboardState] enable toolbar failed:', error);
+        });
+        sessionKind.value = kind;
+      } finally {
+        annotationStarting.value = false;
+      }
+    })();
+    startPromise = run;
+    try {
+      await run;
+    } finally {
+      if (startPromise === run) {
+        startPromise = null;
+      }
+    }
+  }
+
+  function startHostAnnotation(): Promise<void> {
+    return runStart('annotation-host', trtc => trtc.startAnnotation());
+  }
+
+  function isCurrentSession(event: SdkStateEvent): boolean {
+    if (sessionKind.value === 'none') {
+      return false;
+    }
+    return sessionKind.value === 'annotation-guest' ? event.userId === guestUserId : event.userId === '';
+  }
+
+  const onSdkState: SdkStateHandler = (event) => {
+    const reason = event.payload?.reason;
+    // The share stopped or the followed sharer ended it: the SDK already tore the session down.
+    if (event.type === 'unavailable' && reason === 'end' && isCurrentSession(event) && !stopPromise) {
+      resetSession();
+    }
+  };
+
+  // An annotation dies with the share it draws on, and stopScreenShare does not always relay
+  // the SDK's end event, so the session follows the share itself.
+  watch(
+    () => (sessionKind.value === 'annotation-guest'
+      ? participantWithScreen.value?.userId === guestUserId
+      : screenStatus.value === DeviceStatus.On),
+    (sharing) => {
+      if (!sharing && isAnnotationOn.value && !startPromise && !stopPromise) {
+        resetSession();
+      }
+    },
+  );
+
+  async function stopSession(): Promise<void> {
+    if (stopPromise) {
+      return stopPromise;
+    }
+    if (startPromise) {
+      await startPromise.catch(() => {});
+    }
+    const kind = sessionKind.value;
+    if (kind === 'none') {
+      return;
+    }
+    const userId = guestUserId;
+    stopPromise = (async () => {
+      try {
+        const trtc = requireTrtc();
+        if (kind === 'board-host') {
+          // Host stopWhiteboard() re-enters the SDK's screen op queue and throws; stopScreenShare()
+          // runs the same teardown (stop board, unpublish the sub stream) without the reentry.
+          try {
+            await trtc.stopScreenShare();
+          } finally {
+            await callRoomStore('roomStore.releaseScreenSharingToken');
+          }
+        } else {
+          // A stopped share took the annotation with it, so a failed stop leaves nothing behind.
+          await trtc.stopAnnotation(kind === 'annotation-guest' ? { userId } : undefined).catch((error: unknown) => {
+            console.warn('[WhiteboardState] stop annotation failed:', error);
+          });
+        }
+      } finally {
+        resetSession();
+        stopPromise = null;
+      }
+    })();
+    return stopPromise;
+  }
+
+  // The TRTC instance exists once a room is entered, which is always before a screen share.
+  // Leaving ends whatever session is left, since this state outlives the room.
+  let boundTrtc: SdkTrtc | null = null;
+  watch(
+    () => currentRoom.value?.roomId,
+    (roomId, previousRoomId) => {
+      const trtc = roomId ? findTrtc() : null;
+      if (trtc !== boundTrtc) {
+        SDK_STATE_EVENTS.forEach(event => boundTrtc?.off(event, onSdkState));
+        SDK_STATE_EVENTS.forEach(event => trtc?.on(event, onSdkState));
+        boundTrtc = trtc;
+      }
+      if (previousRoomId && !roomId) {
+        opening.value = false;
+        stopSession().catch((error: unknown) => {
+          console.warn('[WhiteboardState] stop whiteboard on room exit failed:', error);
+        });
+      }
+    },
+    { immediate: true },
+  );
+
+  /** Opens the local board. Does nothing while any share or session is up, or a start is in flight. */
+  async function startWhiteboard(): Promise<void> {
+    const sharerId = participantWithScreen.value?.userId;
+    const othersSharing = !!sharerId && sharerId !== localParticipant.value?.userId;
+    if (opening.value || sessionKind.value !== 'none' || screenStatus.value === DeviceStatus.On || othersSharing) {
+      return;
+    }
+    opening.value = true;
+    viewReady.value = false;
+    // The tile has to exist before the start returns, so the view can show a loading cover.
+    holdsLocalShare = true;
+    setLocalShare(DeviceStatus.On);
+    try {
+      await runStart('board-host', async (trtc) => {
+        await callRoomStore('roomStore.requestScreenSharingToken');
+        try {
+          // The canvas is attached later through bindView, once the tile renders it.
+          await trtc.startWhiteboard({});
+        } catch (error) {
+          await callRoomStore('roomStore.releaseScreenSharingToken').catch(() => {});
+          throw error;
+        }
+      });
+    } catch (error) {
+      releaseLocalShare();
+      throw error;
+    } finally {
+      opening.value = false;
+    }
+  }
+
+  async function stopWhiteboard(): Promise<void> {
+    if (isWhiteboardOn.value) {
+      await stopSession();
+    }
+  }
+
+  /** Draws on the local screen share, or on the remote sharer's. */
+  async function startAnnotation(): Promise<void> {
+    if (sessionKind.value !== 'none' || startPromise) {
+      return;
+    }
+    if (screenStatus.value === DeviceStatus.On) {
+      await startHostAnnotation();
+      return;
+    }
+    const sharerId = participantWithScreen.value?.userId;
+    if (!sharerId || sharerId === localParticipant.value?.userId) {
+      return;
+    }
+    await runStart('annotation-guest', async (trtc) => {
+      await trtc.startAnnotation({ userId: sharerId });
+      guestUserId = sharerId;
+    });
+  }
+
+  async function stopAnnotation(): Promise<void> {
+    if (isAnnotationOn.value) {
+      await stopSession();
+    }
+  }
+
+  /** Binds the canvas element. The cover lifts once it settles, even on failure, so it never sticks. */
+  async function bindView(view: HTMLElement): Promise<void> {
+    try {
+      await requireTrtc().updatePlugin('Whiteboard', { view });
+    } finally {
+      if (isWhiteboardOn.value) {
+        viewReady.value = true;
+      }
+    }
+  }
+
+  return {
+    state: {
+      isWhiteboardOn,
+      isAnnotationOn,
+      isSessionActive,
+      startWhiteboard,
+      stopWhiteboard,
+      startAnnotation,
+      stopAnnotation,
+    },
+    binding: {
+      isOpening: readonly(opening),
+      isLoading: computed(() => opening.value || !viewReady.value),
+      bindView,
+    },
+  };
+}
+
+let whiteboard: ReturnType<typeof createWhiteboard> | null = null;
+
+/** Detached so the store subscriptions outlive whichever component first asked for the state. */
+function getWhiteboard(): ReturnType<typeof createWhiteboard> {
+  whiteboard ??= effectScope(true).run(createWhiteboard)!;
+  return whiteboard;
 }
 
 export function useWhiteboardState() {
-  install();
-  return {
-    whiteboardStatus: readonly(requireShared().whiteboardStatus),
-    isWhiteboardOn: isWhiteboardOn as ComputedRef<boolean>,
-    isAnnotationOn: isAnnotationOn as ComputedRef<boolean>,
-    startWhiteboard,
-    stopWhiteboard,
-    startAnnotation,
-    stopAnnotation,
-  };
+  return getWhiteboard().state;
 }
 
-/** Feature-internal: only WhiteboardView binds the canvas and drives the built-in toolbar. */
+/** Feature-internal: only WhiteboardView binds the canvas. */
 export function useWhiteboardViewBinding() {
-  install();
-  return {
-    isOpening: readonly(whiteboardOpening),
-    isLoading: computed(() => whiteboardOpening.value || !whiteboardViewReady.value),
-    bindView,
-    applyToolbar,
-  };
+  return getWhiteboard().binding;
 }

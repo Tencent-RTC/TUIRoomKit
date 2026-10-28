@@ -18,10 +18,6 @@ async function openBoard() {
   }
   try {
     await startWhiteboard();
-    // A repeat click while the first start is in flight resolves early with the board still off.
-    if (isWhiteboardOn.value) {
-      TUIToast.success(t('Whiteboard.Opened'));
-    }
   } catch (error: unknown) {
     console.warn('[WhiteboardButton] open whiteboard failed:', error);
   }

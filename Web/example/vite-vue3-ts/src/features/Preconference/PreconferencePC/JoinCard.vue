@@ -70,6 +70,7 @@ import {
   IconHash,
   TUIButton,
   TUIInput,
+  TUIToast,
   t,
 } from '@tencentcloud/roomkit-web-vue3';
 
@@ -86,6 +87,10 @@ const canJoin = computed(() => Boolean(roomInput.value));
 function join() {
   const id = roomInput.value == null ? '' : String(roomInput.value).trim();
   if (!id) {
+    return;
+  }
+  if (!/^\d+$/.test(id)) {
+    TUIToast.info(t('Preconference.InvalidRoomId'));
     return;
   }
   emit('join', id);

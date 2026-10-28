@@ -14,7 +14,5 @@ export async function confirmStopScreenShare(stop: () => Promise<ScreenShareFail
   const failure = await stop();
   if (failure) {
     TUIToast.error(t(`ScreenShare.Failure.${failure}`));
-    return;
   }
-  TUIToast.success(t('ScreenShare.Stopped'));
 }

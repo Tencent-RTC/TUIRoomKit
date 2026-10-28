@@ -7,8 +7,7 @@
     >
       <div class="mini-window-picture">
         <!-- Info only: the tile chrome reads at this size, its more menu does not. -->
-        <!-- The local board only draws into the stage tile, so its share tile here would be blank. -->
-        <RoomViewPC :layout-template="RoomLayoutTemplate.SingleLayout" hide-actions :hide-screen="isWhiteboardOn" />
+        <RoomViewPC :layout-template="RoomLayoutTemplate.SingleLayout" :stage-stream="stageStream" hide-actions />
       </div>
 
       <div class="mini-window-controls">
@@ -26,26 +25,58 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue';
-import { IconRestore, OVERLAY_CONTEXT_KEY, useUIConfig, t } from '../../base';
+import { computed, inject, watch } from 'vue';
+import { DeviceStatus, useDeviceState } from 'tuikit-atomicx-vue3/room';
+import { IconRestore, OVERLAY_CONTEXT_KEY, TUIToast, useUIConfig, t } from '../../base';
 import { RoomLayoutTemplate } from '../../core/types';
 import ToolbarButtonPC from '../../layouts/ToolbarButtonPC/ToolbarButtonPC.vue';
 import CameraButton from '../Device/CameraButton/index.vue';
 import MicButton from '../Device/MicButton/index.vue';
 import RoomViewPC from '../RoomView/RoomViewPC/RoomViewPC.vue';
+import { useSingleStageStream } from '../RoomView/useParticipantStreams';
 import { useWhiteboardState } from '../Whiteboard/WhiteboardState';
 import { useMiniWindow } from './useMiniWindow';
 
 const { uiConfig } = useUIConfig();
-const { isWhiteboardOn } = useWhiteboardState();
+const { isSessionActive } = useWhiteboardState();
+const { stageStream } = useSingleStageStream();
 /* The picture-in-picture document needs the opener's theme carrier copied onto its
    mount point, and the provider already holds that element. */
 const overlay = inject(OVERLAY_CONTEXT_KEY, null);
-const { minimized, container, minimize, restore, dismissAuto } = useMiniWindow(
+const { screenStatus } = useDeviceState();
+const { minimized, container, minimize: openWindow, restore, dismissAuto, close } = useMiniWindow(
   computed(() => overlay?.root.value ?? null),
 );
 const isPip = computed(() => Boolean(container.value));
 const theme = computed(() => uiConfig.theme);
+
+/* The mini window cannot carry a board or an annotation, so either one keeps it shut from
+   the moment it starts: before the SDK binds an annotation, and while a board is still
+   faking the local share it has no picture for. A local screen share keeps it shut too. */
+const isScreenSharing = computed(() => screenStatus.value === DeviceStatus.On);
+const blockedTip = computed(() => {
+  if (isSessionActive.value) return 'Room.PipUnavailableWithWhiteboard';
+  if (isScreenSharing.value) return 'Room.PipUnavailableWithScreenShare';
+  return '';
+});
+const blocked = computed(() => Boolean(blockedTip.value));
+
+function minimize(options?: Parameters<typeof openWindow>[0]) {
+  if (blocked.value) {
+    if (!options?.auto) {
+      TUIToast.info(t(blockedTip.value));
+    }
+    return;
+  }
+  return openWindow(options);
+}
+
+// Also watches `minimized`, so a window that finishes opening after the session starts still closes.
+watch([blocked, minimized], ([isBlocked, isMinimized]) => {
+  if (isBlocked && isMinimized) {
+    close();
+  }
+});
 
 defineExpose({ minimize, restore, dismissAuto });
 </script>

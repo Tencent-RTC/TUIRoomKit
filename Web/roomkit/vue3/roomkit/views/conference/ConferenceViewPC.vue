@@ -20,16 +20,24 @@
 
         <main class="conference-body">
           <section class="conference-stage" :class="{ 'conference-stage-docked': size === 'wide' && openedPanels.length > 0 }">
-            <RoomViewPC :layout-template="layoutTemplate" :hide-overlay="Boolean(uiConfig.participantViewUI)">
-              <template #participantViewUI="{ participant, streamType }">
-                <!-- <WhiteboardView :participant="participant" :stream-type="streamType" /> -->
+            <RoomViewPC
+              :layout-template="layoutTemplate"
+              :stage-stream="stageStream"
+              :hide-overlay="Boolean(uiConfig.participantViewUI)"
+              @stream-double-click="handleStreamDoubleClick"
+            >
+              <template #participantViewUI="{ participant, streamType, tileRole }">
+                <WhiteboardView :participant="participant" :stream-type="streamType" />
                 <component
                   :is="uiConfig.participantViewUI"
                   v-if="uiConfig.participantViewUI"
                   :participant="participant"
                   :stream-type="streamType"
                 />
-                <!-- <AnnotationButton :participant="participant" :stream-type="streamType" /> -->
+                <!-- A thumbnail is too small to draw on; the room holds the stage while annotating. -->
+                <div v-if="tileRole === 'stage'" class="conference-share-actions">
+                  <AnnotationButton :participant="participant" :stream-type="streamType" />
+                </div>
               </template>
             </RoomViewPC>
             <CaptionOverlay
@@ -50,7 +58,7 @@
                   @click="sidePanelRef?.toggle('chat')"
                 />
                 <ScreenShareButton>
-                  <!-- <WhiteboardButton /> -->
+                  <WhiteboardButton />
                 </ScreenShareButton>
                 <CloudRecordingButtonPC />
                 <CaptionButton
@@ -169,7 +177,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import type { ComponentPublicInstance } from 'vue';
-import { useDeviceState, useLoginState, useRoomParticipantState, useRoomState, DeviceStatus } from 'tuikit-atomicx-vue3/room';
+import { useLoginState, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import {
   IconMembers,
   IconChat,
@@ -232,7 +240,7 @@ const { phase } = roomEntry;
 const hostRef = ref<ComponentPublicInstance | null>(null);
 const rootRef = computed<HTMLElement | null>(() => (hostRef.value?.$el as HTMLElement | null) ?? null);
 
-const { layoutTemplate, setLayoutTemplate } = useRoomLayoutState();
+const { layoutTemplate, stageStream, setLayoutTemplate, handleStreamDoubleClick } = useRoomLayoutState();
 const { uiConfig } = useUIConfig();
 const { currentRoom } = useRoomState();
 const { participantList } = useRoomParticipantState();
@@ -303,14 +311,6 @@ const miniViewRef = ref<{
 } | null>(null);
 // Without Document PiP there is nowhere useful to minimize to, so the menu entry stays hidden.
 const pipSupported = isPictureInPictureSupported();
-const { screenStatus } = useDeviceState();
-watch(screenStatus, (status) => {
-  if (status === DeviceStatus.On) {
-    void miniViewRef.value?.minimize({ auto: true });
-  } else {
-    miniViewRef.value?.dismissAuto();
-  }
-});
 
 const { isCaptionShown } = useASRState();
 
@@ -362,7 +362,11 @@ function toggleTranscriptPanel() {
   height: 100%;
   min-height: 0;
   padding: 0 var(--conference-gutter) var(--conference-gutter);
+
+  /* clip, not hidden: the parked side panel gives a hidden box scroll room, and the caret
+     of a long whiteboard text line scrolls the whole view into it. hidden is the fallback. */
   overflow: hidden;
+  overflow: clip;
   color: var(--rk-text-primary);
   background: var(--rk-bg-page);
 }
@@ -501,6 +505,18 @@ function toggleTranscriptPanel() {
   min-width: 0;
   min-height: 0;
   overflow: visible;
+}
+
+/* Top-right corner of the share tile, mirroring the sharing badge on the left. Only the
+   button takes the pointer, so the board or annotation underneath keeps every other press. */
+.conference-share-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
 }
 
 .conference-toolbar {
