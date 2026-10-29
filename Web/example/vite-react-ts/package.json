@@ -9,15 +9,16 @@
     "lint": "./node_modules/.bin/eslint ./src --ext .ts,.tsx --no-error-on-unmatched-pattern"
   },
   "dependencies": {
-    "@tencentcloud/tuiroom-engine-js": "4.3.0",
+    "@tencentcloud/tuiroom-engine-js": "4.3.1",
     "@tencentcloud/universal-api": "2.4.1",
     "@tencentcloud/roomkit-web-react": "7.0.0",
     "@tencentcloud/uikit-base-component-react": "1.4.4",
     "@tencentcloud/uikit-base-widget-react": "1.2.3",
-    "tuikit-atomicx-react": "6.4.0",
+    "tuikit-atomicx-react": "6.4.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.0"
+    "react-router-dom": "^6.26.0",
+    "vconsole": "^3.15.1"
   },
   "devDependencies": {
     "@tencentcloud/eslint-config-hybrid": "~0.0.1",

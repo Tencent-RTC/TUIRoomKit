@@ -199,6 +199,13 @@ export function useMiniWindow(root?: HTMLElement | null) {
       }
     }
 
+    /* Closes whatever window is up, however it was opened, without moving focus. */
+    function close() {
+      if (minimizedValue) {
+        handlePipClosed();
+      }
+    }
+
     function toggle() {
       return minimizedValue ? restore() : minimize();
     }
@@ -213,6 +220,7 @@ export function useMiniWindow(root?: HTMLElement | null) {
       minimize,
       restore,
       dismissAuto,
+      close,
       toggle,
       releasePipWindow,
       syncTheme,
@@ -236,6 +244,7 @@ export function useMiniWindow(root?: HTMLElement | null) {
     minimize: controller.minimize,
     restore: controller.restore,
     dismissAuto: controller.dismissAuto,
+    close: controller.close,
     toggle: controller.toggle,
   };
 }

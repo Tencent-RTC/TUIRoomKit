@@ -61,7 +61,23 @@ export function MeetingDetailMobile(props: MeetingDetailMobileProps) {
   const [passwordOverride, setPasswordOverride] = useState<string | undefined>(undefined);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  const closedLocallyRef = useRef(false);
+
   const listed = scheduledRoomList.find(room => room.roomId === roomId);
+
+  const previousListedRef = useRef(listed);
+  const onBackRef = useRef(onBack);
+  onBackRef.current = onBack;
+  useEffect(() => {
+    const previous = previousListedRef.current;
+    previousListedRef.current = listed;
+    if (!previous || listed || closedLocallyRef.current) {
+      return;
+    }
+    TUIToast.info(t('Schedule.NotFound'));
+    onBackRef.current?.();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listed]);
   const scheduleAttendees = roster ?? listed?.scheduleAttendees ?? [];
   const selfId = loginUserInfo?.userId ?? '';
   const isSelfHost = !!selfId && listed?.roomOwner?.userId === selfId;
@@ -227,12 +243,14 @@ export function MeetingDetailMobile(props: MeetingDetailMobileProps) {
       return;
     }
     setCancelling(true);
+    closedLocallyRef.current = true;
     try {
       await cancelScheduledRoom({ roomId });
       setCancelOpen(false);
       TUIToast.success(t('Schedule.Cancelled'));
       onCancelled?.(roomId);
     } catch (err) {
+      closedLocallyRef.current = false;
       console.error('[MeetingDetailMobile] Failed to cancel scheduled room:', err);
       TUIToast.error(t('Schedule.CancelFailed'));
     } finally {

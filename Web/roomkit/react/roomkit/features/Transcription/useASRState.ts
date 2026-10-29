@@ -11,6 +11,7 @@ import { t } from '../../i18n';
 import { DEFAULT_SOURCE_LANGUAGE, DEFAULT_TARGET_LANGUAGE } from './constants';
 import {
   presentCaptionHint,
+  resetCaptionForNewSession,
   setCapViewOpen,
   setEmptyDismissed,
   useSubtitleViewState,
@@ -162,7 +163,7 @@ function bindTranscriberEvents(subscribeEvent: ReturnType<typeof useAITranscribe
     // previous session's opt-in must not carry over, the member re-opens the
     // caption window manually. The owner keeps their own window open.
     if (!canManageASRNow) {
-      setCapViewOpen(false);
+      resetCaptionForNewSession();
     }
     setASROn(true);
   });

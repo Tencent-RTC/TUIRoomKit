@@ -24,6 +24,9 @@ export { default as ParticipantButtonPC } from './Participants/ParticipantButton
 export { default as ParticipantButtonMobile } from './Participants/ParticipantButtonMobile/ParticipantButtonMobile';
 export { default as ParticipantListPC } from './Participants/ParticipantListPC/ParticipantListPC';
 export { default as ParticipantListMobile } from './Participants/ParticipantListMobile/ParticipantListMobile';
+export { default as UserPickerPC } from './Participants/UserPickerPC/UserPickerPC';
+export { useResolvedContacts } from './Participants/contactData';
+export type { PickedContact, PickerContact } from './Participants/contactData';
 
 export { default as CloudRecordingButtonPC } from './Recording/CloudRecordingButtonPC/CloudRecordingButtonPC';
 export { default as CloudRecordingButtonMobile } from './Recording/CloudRecordingButtonMobile/CloudRecordingButtonMobile';
@@ -38,6 +41,8 @@ export { default as LocalNetworkInfoMobile } from './RoomInfo/LocalNetworkInfoMo
 export { default as LayoutButton } from './RoomView/LayoutButton/index';
 export { default as RoomViewPC } from './RoomView/RoomViewPC/RoomViewPC';
 export { default as RoomViewMobile } from './RoomView/RoomViewMobile/RoomViewMobile';
+export { useSingleStageStream } from './RoomView/useParticipantStreams';
+export type { StreamInfo } from './RoomView/useParticipantStreams';
 
 export { default as ScheduledListPC } from './Schedule/ScheduledListPC/ScheduledListPC';
 export { default as ScheduledListMobile } from './Schedule/ScheduledListMobile/ScheduledListMobile';
@@ -46,6 +51,12 @@ export { default as SchedulePanel } from './Schedule/SchedulePanel/SchedulePanel
 export type { ScheduleFailure, ScheduleOutcome, ScheduleRoomInput } from './Schedule/SchedulePanel/scheduleForm';
 
 export { default as ScreenShareButton } from './ScreenShare/ScreenShareButton/ScreenShareButton';
+
+export { default as WhiteboardButton } from './Whiteboard/WhiteboardButton/WhiteboardButton';
+export { default as WhiteboardView } from './Whiteboard/WhiteboardView/WhiteboardView';
+export { default as AnnotationButton } from './Whiteboard/AnnotationButton/AnnotationButton';
+export { default as AnnotationButtonMobile } from './Whiteboard/AnnotationButtonMobile/AnnotationButtonMobile';
+export { useShareParticipants, useWhiteboardState } from './Whiteboard/WhiteboardState';
 
 export { default as LanguageButton } from './Setting/LanguageButton/LanguageButton';
 export { default as SettingButtonPC } from './Setting/SettingButtonPC/SettingButtonPC';

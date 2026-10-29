@@ -26,16 +26,16 @@
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0",
     "react-dom": "^18.2.0 || ^19.0.0",
-    "tuikit-atomicx-react": "^6.4.0",
+    "tuikit-atomicx-react": "^6.4.2",
     "@tencentcloud/tui-core-lite": "^1.0.1",
-    "@tencentcloud/tuiroom-engine-js": "^4.3.0",
+    "@tencentcloud/tuiroom-engine-js": "^4.3.1",
     "@tencentcloud/universal-api": "^2.4.1"
   },
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@tencentcloud/eslint-config-hybrid": "~0.0.1",
     "@tencentcloud/tui-core-lite": "^1.0.1",
-    "@tencentcloud/tuiroom-engine-js": "^4.3.0",
+    "@tencentcloud/tuiroom-engine-js": "^4.3.1",
     "@tencentcloud/universal-api": "^2.4.1",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
@@ -43,7 +43,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sass": "^1.72.0",
-    "tuikit-atomicx-react": "^6.4.0",
+    "tuikit-atomicx-react": "^6.4.2",
     "typescript": "^5.5.4",
     "vite": "^5.2.0",
     "vite-plugin-dts": "^3.7.3"

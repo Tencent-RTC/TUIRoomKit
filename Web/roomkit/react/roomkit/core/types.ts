@@ -18,6 +18,12 @@ export enum RoomLayoutTemplate {
   SingleLayout = 'singleLayout',
 }
 
+/** Which scene view RoomKit mounts for a room. */
+export enum RoomScene {
+  Conference = 'conference',
+  Education = 'education',
+}
+
 export interface Credentials {
   sdkAppId: number;
   userId: string;
@@ -36,6 +42,8 @@ export interface RoomKitJoinOptions {
   roomId: string;
   container: RoomContainer;
   password?: string;
+  /** Defaults to `RoomScene.Conference`. */
+  scene?: RoomScene;
 }
 
 export interface CreateAndJoinOptions extends RoomKitJoinOptions, CreateRoomOptions {}

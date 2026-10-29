@@ -1,9 +1,8 @@
 import type { CSSProperties } from 'react';
-import { useRoomParticipantState, useRoomState } from 'tuikit-atomicx-react/room';
 import { IconMembers } from '../../../base';
 import { useI18n } from '../../../i18n';
 import ToolbarButtonPC from '../../../layouts/ToolbarButtonPC/ToolbarButtonPC';
-import { useParticipantList } from '../ParticipantListPC/useParticipant';
+import { useParticipantAutoLoad, useParticipantCount } from '../participantData';
 import './ParticipantButtonPC.scss';
 
 export interface ParticipantButtonPCProps {
@@ -17,11 +16,10 @@ export function ParticipantButtonPC(props: ParticipantButtonPCProps) {
   const { active = false, onClick, className, style } = props;
   const { t } = useI18n();
 
-  const { currentRoom } = useRoomState();
-  const { participantList } = useRoomParticipantState();
-  const { refreshParticipants } = useParticipantList();
-  const count = currentRoom?.participantCount || participantList.length;
+  const { refreshParticipants } = useParticipantAutoLoad();
+  const { count } = useParticipantCount();
 
+  /** The room watch can miss the first empty load if the engine is not ready yet. */
   function handleClick() {
     void refreshParticipants();
     onClick?.();

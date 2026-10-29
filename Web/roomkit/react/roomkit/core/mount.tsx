@@ -1,14 +1,15 @@
 /* eslint-disable class-methods-use-this */
-import { useLayoutEffect } from 'react';
+import { Suspense, useLayoutEffect } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { KickedOutOfRoomReason, LoginStatus, useLoginState, useRoomState } from 'tuikit-atomicx-react/room';
 import { TUIMessageBox } from '../base';
 import { t } from '../i18n';
-import { ConferenceView } from '../views/conference';
+import { SCENE_VIEWS } from '../views';
 import type { RoomEntryKind } from './session';
 import type { RoomEntryFailureReason } from './session/roomEntryError';
+import { RoomScene } from './types';
 import type { RoomContainer } from './types';
 
 /** Session-exit alerts outlive the conference tree. */
@@ -92,6 +93,7 @@ export interface MountOptions {
   mountTarget: HTMLElement;
   container: RoomContainer;
   roomName: string;
+  scene?: RoomScene;
 }
 
 export class RoomKitMount {
@@ -103,7 +105,7 @@ export class RoomKitMount {
     return this.root !== undefined;
   }
 
-  mount({ mountTarget, container, roomName }: MountOptions): void {
+  mount({ mountTarget, container, roomName, scene = RoomScene.Conference }: MountOptions): void {
     this.unmount();
 
     const host = createHostElement(container);
@@ -122,8 +124,13 @@ export class RoomKitMount {
     try {
       const root = createRoot(host);
       this.root = root;
+      const SceneView = SCENE_VIEWS[scene];
       flushSync(() => {
-        root.render(<ConferenceView roomName={roomName} />);
+        root.render(
+          <Suspense fallback={null}>
+            <SceneView roomName={roomName} />
+          </Suspense>,
+        );
       });
     } catch (error) {
       this.unmount();

@@ -147,6 +147,16 @@ export function hideCaptionOverlay() {
   }
 }
 
+/**
+ * Close the caption window without any user-visible side effects (no toast).
+ * Called when the owner starts a NEW transcription session after a real stop:
+ * the previous session's opt-in must not carry over, the member re-opens the
+ * window manually. Personal preferences (font size, bilingual) are kept.
+ */
+export function resetCaptionForNewSession() {
+  setCapViewOpen(false);
+}
+
 let subtitleRoomSeen = false;
 let subtitleRoomId: string | undefined;
 
@@ -190,5 +200,6 @@ export function useSubtitleViewState() {
     setHasCaptionMessages,
     presentCaptionHint,
     hideCaptionOverlay,
+    resetCaptionForNewSession,
   };
 }

@@ -1,0 +1,5 @@
+/* The tile's sharing pill covers the left end of the plugin's window title bar, so the
+   file title is centered. The plugin injects its own styles after ours. */
+.trtc-wb-title-area {
+  justify-content: center !important;
+}

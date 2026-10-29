@@ -1,0 +1,206 @@
+.education-mobile-root {
+  height: 100%;
+}
+
+.education-mobile-root .rk-root-slot {
+  height: 100%;
+}
+
+/* One tree for both orientations; the size container flips the body layout. */
+.education-mobile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-page);
+  container-type: size;
+}
+
+.education-mobile-topbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(48px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 8px 0 2px;
+  background: var(--rk-bg-surface);
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-mobile-topbar-left,
+.education-mobile-topbar-right {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.education-mobile-topbar-left {
+  gap: 4px;
+}
+
+.education-mobile-topbar-right {
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.education-mobile-back {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.education-mobile-back svg {
+  transform: rotate(180deg);
+}
+
+/* Bottom-bar chips shrunk to the classroom topbar's 32px. */
+.education-mobile-topbar .toolbar-button-mobile {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.education-mobile-topbar .toolbar-button-mobile-icon,
+.education-mobile-topbar .toolbar-button-mobile-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.education-mobile-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.education-mobile-seats {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-mobile-stage {
+  flex-shrink: 0;
+  background: var(--rk-bg-surface);
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-mobile-board {
+  position: relative;
+  width: 100%;
+  max-height: 30vh;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.education-mobile-board-stream {
+  width: 100%;
+  height: 100%;
+}
+
+.education-mobile-board-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 24px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--rk-text-tertiary);
+  text-align: center;
+}
+
+.education-mobile-chat {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--rk-bg-surface);
+}
+
+.education-mobile-chat-body {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Landscape: board on the left, seats stacked in a 224px rail. The floating chat is not built yet. */
+@container (orientation: landscape) {
+  .education-mobile-topbar {
+    height: calc(40px + env(safe-area-inset-top));
+  }
+
+  .education-mobile-body {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 224px;
+  }
+
+  .education-mobile-stage {
+    display: flex;
+    grid-row: 1;
+    grid-column: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    background: var(--rk-bg-page);
+    border-bottom: 0;
+    container-type: size;
+  }
+
+  .education-mobile-board {
+    width: min(100cqw, calc(100cqh * 16 / 9));
+    max-height: 100%;
+    background: var(--rk-bg-surface);
+  }
+
+  .education-mobile-seats {
+    display: flex;
+    flex-direction: column;
+    grid-row: 1;
+    grid-column: 2;
+    gap: 6px;
+    padding: 6px;
+    overflow-y: auto;
+    border-bottom: 0;
+    border-left: 1px solid var(--rk-border);
+  }
+
+  .education-mobile-chat {
+    display: none;
+  }
+}
+
+.education-mobile-join-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rk-bg-overlay);
+  backdrop-filter: blur(8px);
+}
+
+.education-mobile-join-error {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--rk-danger);
+  text-align: center;
+}

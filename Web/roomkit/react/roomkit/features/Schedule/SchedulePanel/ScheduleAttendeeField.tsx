@@ -12,8 +12,8 @@ import {
 } from '../../../base';
 import { useI18n } from '../../../i18n';
 import UserPickerPC from '../../Participants/UserPickerPC/UserPickerPC';
-import type { PickedContact } from '../../Participants/UserPickerPC/contactPicker';
-import { useResolvedContacts } from '../../Participants/UserPickerPC/useResolvedContacts';
+import { useResolvedContacts } from '../../Participants/contactData';
+import type { PickedContact } from '../../Participants/contactData';
 import { attendeeChipLabel, attendeeSearchHits, uniqueParticipantIds } from './scheduleForm';
 import type { AttendeeHit } from './scheduleForm';
 import './ScheduleAttendeeField.scss';

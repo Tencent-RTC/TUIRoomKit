@@ -1,18 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
-import { useLoginState } from 'tuikit-atomicx-react/room';
-import { TUIAvatar, TUIButton, TUIDialog, TUIInput, IconCheck, IconClose, IconSearch } from '../../../base';
+import {
+  TUIAvatar,
+  TUIButton,
+  TUIDialog,
+  TUIInput,
+  IconCheck,
+  IconClose,
+  IconSearch,
+} from '../../../base';
 import { useI18n } from '../../../i18n';
-import { filterContacts, pickedContacts, selectedContacts, toggleSelectedId } from './contactPicker';
-import type { PickedContact } from './contactPicker';
-import { useResolvedContacts } from './useResolvedContacts';
+import { useContactPicker } from '../contactData';
+import type { PickedContact } from '../contactData';
 import './UserPickerPC.scss';
+// The dialog shell is teleported, so its panel chrome has to be matched from outside the component.
+import './UserPickerPC.global.scss';
 
 const EMPTY_IDS: string[] = [];
 
 export interface UserPickerPCProps {
   open: boolean;
+  /** Ids already in the room or being called; shown checked and locked. Pass a memoised array. */
   occupiedIds?: string[];
+  /** Ids preselected every time the picker opens. */
   selectedIds?: string[];
   onUpdateOpen?: (open: boolean) => void;
   onConfirm?: (users: PickedContact[]) => void;
@@ -32,48 +42,43 @@ export function UserPickerPC(props: UserPickerPCProps) {
   } = props;
   const { t } = useI18n();
 
-  const [query, setQuery] = useState('');
-  const [pickedIds, setPickedIds] = useState(() => new Set<string>());
   const pickedRef = useRef<HTMLDivElement | null>(null);
-  const { loginUserInfo } = useLoginState();
-  const loginUserId = loginUserInfo?.userId;
-  const occupiedIdSet = useMemo(() => new Set(occupiedIds), [occupiedIds]);
-  const excludeIds = useMemo(() => (loginUserId ? [loginUserId] : []), [loginUserId]);
-  const { contacts, refreshContacts } = useResolvedContacts(occupiedIdSet, excludeIds);
+  const {
+    contacts,
+    searchKeyword,
+    setSearchKeyword,
+    visibleContacts,
+    picked,
+    pickedCount,
+    emptyText,
+    isPicked,
+    toggle,
+    reset,
+    pickedContacts,
+  } = useContactPicker(occupiedIds);
+
+  const confirmText = pickedCount
+    ? t('Participants.ConfirmCount', { count: pickedCount })
+    : t('Participants.Confirm');
 
   const selectedIdsRef = useRef(selectedIds);
   selectedIdsRef.current = selectedIds;
-  const refreshContactsRef = useRef(refreshContacts);
-  refreshContactsRef.current = refreshContacts;
+  const resetRef = useRef(reset);
+  resetRef.current = reset;
   const isFirstOpenRun = useRef(true);
   useEffect(() => {
     if (isFirstOpenRun.current) {
       isFirstOpenRun.current = false;
       return;
     }
-    if (!open) {
-      return;
+    if (open) {
+      resetRef.current(selectedIdsRef.current);
     }
-    setQuery('');
-    setPickedIds(new Set(selectedIdsRef.current));
-    void refreshContactsRef.current();
   }, [open]);
 
-  const visibleContacts = filterContacts(contacts, query);
-
-  const picked = selectedContacts(pickedIds, contacts);
-
-  const confirmText = pickedIds.size
-    ? t('Participants.ConfirmCount', { count: pickedIds.size })
-    : t('Participants.Confirm');
-
-  function toggle(userId: string) {
-    const contact = contacts.find(item => item.userId === userId);
-    if (!contact) {
-      return;
-    }
-    setPickedIds(toggleSelectedId(pickedIds, userId, contact.occupied));
-    /* Chips wrap downwards, so keep the row that was just added in view. */
+  /* Chips wrap downwards, so keep the row that was just added in view. */
+  function togglePick(userId: string) {
+    toggle(userId);
     requestAnimationFrame(() => {
       const element = pickedRef.current;
       if (element) {
@@ -83,7 +88,7 @@ export function UserPickerPC(props: UserPickerPCProps) {
   }
 
   function confirm() {
-    onConfirm?.(pickedContacts([...pickedIds], contacts));
+    onConfirm?.(pickedContacts());
   }
 
   return (
@@ -100,8 +105,8 @@ export function UserPickerPC(props: UserPickerPCProps) {
       >
         <div className="invite-dialog-content">
           <TUIInput
-            modelValue={query}
-            onUpdateModelValue={value => setQuery(String(value ?? ''))}
+            modelValue={searchKeyword}
+            onUpdateModelValue={value => setSearchKeyword(String(value ?? ''))}
             className="invite-dialog-search"
             type="text"
             size="sm"
@@ -116,10 +121,10 @@ export function UserPickerPC(props: UserPickerPCProps) {
                 key={contact.userId}
                 className={[
                   'invite-dialog-row',
-                  contact.occupied || pickedIds.has(contact.userId) ? 'sel' : '',
+                  contact.occupied || isPicked(contact.userId) ? 'sel' : '',
                   contact.occupied ? 'disabled' : '',
                 ].filter(Boolean).join(' ')}
-                onClick={() => toggle(contact.userId)}
+                onClick={() => togglePick(contact.userId)}
               >
                 <TUIAvatar
                   className="invite-dialog-avatar"
@@ -129,7 +134,9 @@ export function UserPickerPC(props: UserPickerPCProps) {
                 />
                 <span className="invite-dialog-meta">
                   <span className="invite-dialog-name">{contact.userName}</span>
-                  {contact.occupied && <span className="invite-dialog-sub">{t('Participants.ContactInvited')}</span>}
+                  {contact.occupied && (
+                    <span className="invite-dialog-sub">{t('Participants.ContactInvited')}</span>
+                  )}
                 </span>
                 <span className="invite-dialog-check">
                   <span className="invite-dialog-check-icon">
@@ -140,7 +147,7 @@ export function UserPickerPC(props: UserPickerPCProps) {
             ))}
             {visibleContacts.length === 0 && (
               <div className="invite-dialog-empty">
-                {query.trim() ? t('Participants.ContactNotFound') : t('Participants.ContactEmpty')}
+                {emptyText}
               </div>
             )}
           </div>
@@ -160,7 +167,7 @@ export function UserPickerPC(props: UserPickerPCProps) {
                   variant="ghost"
                   size="sm"
                   aria-label={t('Participants.ContactDeselect', { name: contact.userName })}
-                  onClick={() => toggle(contact.userId)}
+                  onClick={() => togglePick(contact.userId)}
                 >
                   <IconClose size={10} />
                 </TUIButton>

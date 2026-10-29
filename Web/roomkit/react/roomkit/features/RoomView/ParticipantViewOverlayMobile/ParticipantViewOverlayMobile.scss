@@ -1,15 +1,51 @@
 /* Phone tile chrome. There is no hover on a phone, so the tile carries no more menu:
    acting on a person happens in the participant list. */
-.participant-view-overlay {
+.participant-view-overlay-mobile {
   position: absolute;
   inset: 0;
   z-index: 1;
   overflow: visible;
   pointer-events: none;
   border-radius: inherit;
+  transition: box-shadow 0.25s ease-out;
 }
 
-.participant-view-overlay-mask {
+/* Speaking: a 2px ring on the edge and a tight glow only. The gallery gap is 4px, so
+   a wide glow would merge two neighbours speaking at once into one block. */
+.participant-view-overlay-mobile.is-speaking {
+  box-shadow: 0 0 6px color-mix(in srgb, var(--rk-success) 45%, transparent);
+  transition-duration: 0.15s;
+}
+
+.rk-root[data-rk-theme='dark'] .participant-view-overlay-mobile.is-speaking {
+  box-shadow: 0 0 6px color-mix(in srgb, var(--rk-success) 35%, transparent);
+}
+
+.participant-view-overlay-mobile::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  content: '';
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--rk-success) 85%, transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+
+.participant-view-overlay-mobile.is-speaking::after {
+  opacity: 1;
+  transition-duration: 0.15s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .participant-view-overlay-mobile,
+  .participant-view-overlay-mobile::after {
+    transition: none;
+  }
+}
+
+.participant-view-overlay-mobile-mask {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -21,11 +57,11 @@
   border-radius: inherit;
 }
 
-.rk-root[data-rk-theme='dark'] .participant-view-overlay-mask {
+.rk-root[data-rk-theme='dark'] .participant-view-overlay-mobile-mask {
   background: color-mix(in srgb, var(--rk-brand) 2%, #141414);
 }
 
-.participant-view-overlay-avatar {
+.participant-view-overlay-mobile-avatar {
   display: grid;
   place-items: center;
   width: 72px;
@@ -39,7 +75,7 @@
   border-radius: 50%;
 }
 
-.participant-view-overlay-avatar-img {
+.participant-view-overlay-mobile-avatar-img {
   width: 100%;
   height: 100%;
   pointer-events: none;
@@ -47,7 +83,7 @@
   object-fit: cover;
 }
 
-.participant-view-overlay-flip {
+.participant-view-overlay-mobile-flip {
   position: absolute;
   top: 8px;
   left: 8px;
@@ -67,11 +103,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.participant-view-overlay-flip:active {
+.participant-view-overlay-mobile-flip:active {
   transform: scale(0.96);
 }
 
-.participant-view-overlay-network {
+.participant-view-overlay-mobile-network {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -83,28 +119,28 @@
   color: #ff453a;
 }
 
-.participant-view-overlay-network i {
+.participant-view-overlay-mobile-network i {
   display: block;
   width: 3px;
   background: currentcolor;
   border-radius: 1px;
 }
 
-.participant-view-overlay-network i:nth-child(1) {
+.participant-view-overlay-mobile-network i:nth-child(1) {
   height: 4px;
 }
 
-.participant-view-overlay-network i:nth-child(2) {
+.participant-view-overlay-mobile-network i:nth-child(2) {
   height: 8px;
   opacity: 0.18;
 }
 
-.participant-view-overlay-network i:nth-child(3) {
+.participant-view-overlay-mobile-network i:nth-child(3) {
   height: 12px;
   opacity: 0.18;
 }
 
-.participant-view-overlay-stack {
+.participant-view-overlay-mobile-stack {
   position: absolute;
   bottom: 6px;
   left: 6px;
@@ -116,7 +152,7 @@
   max-width: calc(100% - 12px);
 }
 
-.participant-view-overlay-pill {
+.participant-view-overlay-mobile-pill {
   display: inline-flex;
   gap: 4px;
   align-items: center;
@@ -130,38 +166,40 @@
   border-radius: 999px;
 }
 
-.participant-view-overlay-mic {
+.participant-view-overlay-mobile-mic {
   position: relative;
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   color: #fff;
 }
 
-.participant-view-overlay-mic-core {
+/* Box is in IconMic's 16-unit viewBox: the capsule's outer edge inset by a quarter
+   stroke, so the stroke hides the fill's edge. Update it if the icon path changes.
+   The level is clipped from the top, since scaling would flatten the round bottom. */
+.participant-view-overlay-mobile-mic-core {
   position: absolute;
-  top: 12%;
-  left: 34%;
+  top: calc(1.25 / 16 * 100%);
+  left: calc(4.75 / 16 * 100%);
   z-index: 0;
-  width: 31%;
-  height: 52%;
+  width: calc(6.5 / 16 * 100%);
+  height: calc(10 / 16 * 100%);
   background: #34c759;
   border-radius: 999px;
-  transition: transform 0.2s ease-out;
-  transform-origin: bottom center;
+  transition: clip-path 0.2s ease-out;
 }
 
-.participant-view-overlay-mic svg {
+.participant-view-overlay-mobile-mic svg {
   position: relative;
   z-index: 1;
   width: 100%;
   height: 100%;
 }
 
-.participant-view-overlay-name {
+.participant-view-overlay-mobile-name {
   flex: 0 1 auto;
   min-width: 1ch;
   overflow: hidden;
@@ -173,34 +211,34 @@
   white-space: nowrap;
 }
 
-.participant-view-overlay-role-mark {
+.participant-view-overlay-mobile-role-mark {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   line-height: 0;
   color: #fff;
   border-radius: 50%;
 }
 
-.participant-view-overlay-role-mark.is-owner {
+.participant-view-overlay-mobile-role-mark.is-owner {
   background: var(--rk-brand);
 }
 
-.participant-view-overlay-role-mark.is-admin {
+.participant-view-overlay-mobile-role-mark.is-admin {
   background: var(--rk-warning);
 }
 
-.participant-view-overlay-me {
+.participant-view-overlay-mobile-me {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
   font-size: var(--rk-fs-xs);
   font-weight: 500;
   line-height: 1;
@@ -209,19 +247,19 @@
   border-radius: 50%;
 }
 
-.participant-view-overlay.is-pip .participant-view-overlay-flip {
+.participant-view-overlay-mobile.is-pip .participant-view-overlay-mobile-flip {
   top: 6px;
   left: 6px;
   width: 24px;
   height: 24px;
 }
 
-.participant-view-overlay.is-pip .participant-view-overlay-flip svg {
+.participant-view-overlay-mobile.is-pip .participant-view-overlay-mobile-flip svg {
   width: 14px;
   height: 14px;
 }
 
-.participant-view-overlay.is-pip .participant-view-overlay-avatar {
+.participant-view-overlay-mobile.is-pip .participant-view-overlay-mobile-avatar {
   width: 48px;
   height: 48px;
   font-size: 18px;

@@ -6,17 +6,19 @@ import {
   TUIDropdownItem,
   TUIDropdownSeparator,
   TUIInput,
-  IconMore,
 } from '../../../base';
 import type { Placement } from '../../../base';
 import { useI18n } from '../../../i18n';
-import { useParticipantMoreMenu } from './useParticipantMoreMenu';
+import { useParticipantActions } from '../participantActions';
+import { useParticipantMenu } from '../participantData';
+import type { ParticipantCommand } from '../participantData';
 import type { RoomParticipant } from 'tuikit-atomicx-react/room';
 import './ParticipantMoreMenu.scss';
 
 export interface ParticipantMoreMenuProps {
   participant: RoomParticipant;
   placement?: Placement;
+  /** The trigger; a function receives whether the menu is open. */
   children?: ReactNode | ((scope: { open: boolean }) => ReactNode);
 }
 
@@ -25,69 +27,36 @@ export function ParticipantMoreMenu(props: ParticipantMoreMenuProps) {
   const { t } = useI18n();
 
   const [open, setOpen] = useState(false);
-  const [renameOpen, setRenameOpen] = useState(false);
-  const [renameValue, setRenameValue] = useState('');
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [newName, setNewName] = useState('');
 
-  const {
-    displayName,
-    visible,
-    menuItems,
-    confirmRename,
-    runCommand,
-  } = useParticipantMoreMenu(participant);
+  const { displayName, hasMenu, menuItems } = useParticipantMenu(participant);
+  const { runCommand, rename } = useParticipantActions();
 
-  async function onCommand(command: string | number) {
-    if (command === 'rename') {
-      setRenameValue(displayName);
-      setRenameOpen(true);
+  function onCommand(command: string | number) {
+    const next = command as ParticipantCommand;
+    if (next === 'rename') {
+      setNewName(displayName);
+      setRenameDialogOpen(true);
       return;
     }
-    await runCommand(command);
-  }
-
-  function onRenameOpen(next: boolean) {
-    setRenameOpen(next);
-    if (!next) {
-      setRenameValue('');
-    }
+    void runCommand(next, participant);
   }
 
   async function submitRename() {
-    if (!await confirmRename(renameValue)) {
-      return;
+    if (await rename(participant, newName)) {
+      setRenameDialogOpen(false);
     }
-    setRenameOpen(false);
-    setRenameValue('');
-  }
-
-  let trigger: ReactNode;
-  if (children == null) {
-    trigger = (
-      <button
-        className={['participant-more-trigger', open ? 'is-open' : ''].filter(Boolean).join(' ')}
-        type="button"
-        title={t('Participants.More')}
-        aria-label={t('Participants.More')}
-      >
-        <IconMore size={14} />
-      </button>
-    );
-  } else if (typeof children === 'function') {
-    trigger = children({ open });
-  } else {
-    trigger = children;
   }
 
   return (
     <>
-      {visible && (
+      {hasMenu && (
         <TUIDropdown
           trigger="click"
           placement={placement}
           onUpdateOpen={setOpen}
-          onCommand={(command) => {
-            void onCommand(command);
-          }}
+          onCommand={onCommand}
           menuSlot={(
             <div className="participant-more-menu">
               {menuItems.map((item) => {
@@ -105,30 +74,28 @@ export function ParticipantMoreMenu(props: ParticipantMoreMenuProps) {
             </div>
           )}
         >
-          {trigger}
+          {typeof children === 'function' ? children({ open }) : children}
         </TUIDropdown>
       )}
 
       <TUIDialog
-        open={renameOpen}
+        open={renameDialogOpen}
         title={t('Participants.Rename')}
         confirmText={t('Participants.Confirm')}
         cancelText={t('Participants.Cancel')}
-        confirmDisabled={!renameValue.trim()}
-        onUpdateOpen={onRenameOpen}
+        confirmDisabled={!newName.trim()}
+        onUpdateOpen={setRenameDialogOpen}
         onConfirm={() => {
           void submitRename();
         }}
       >
-        <div
-          className="participant-rename"
-        >
+        <div className="participant-rename">
           <p className="participant-rename-desc">
             {t('Participants.RenameDesc')}
           </p>
           <TUIInput
-            modelValue={renameValue}
-            onUpdateModelValue={value => setRenameValue(String(value ?? ''))}
+            modelValue={newName}
+            onUpdateModelValue={value => setNewName(String(value ?? ''))}
             placeholder={t('Participants.RenamePlaceholder')}
             maxlength={10}
             onEnter={() => {

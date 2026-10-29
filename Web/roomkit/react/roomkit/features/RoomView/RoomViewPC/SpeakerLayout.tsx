@@ -1,22 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, MouseEvent as ReactMouseEvent, ReactNode } from 'react';
 import {
   FillMode,
-  RoomParticipantEvent,
   RoomParticipantView,
   VideoStreamType,
-  useRoomParticipantState,
 } from 'tuikit-atomicx-react/room';
 import { RoomLayoutTemplate } from '../../../core/types';
 import { isCameraOff, useParticipantStreams } from '../useParticipantStreams';
-import type { RoomParticipant, RoomUser } from 'tuikit-atomicx-react/room';
-import type { StreamInfo } from '../useParticipantStreams';
+import type { StreamInfo, TileSlotScope } from '../useParticipantStreams';
 import './SpeakerLayout.scss';
 
 export interface SpeakerLayoutProps {
   layoutTemplate: RoomLayoutTemplate;
+  /** The stage picture; the first stream in display order when omitted. */
+  stageStream?: StreamInfo | null;
   onStreamDoubleClick?: (streamInfo: StreamInfo) => void;
-  participantViewUISlot?: (scope: { participant: RoomParticipant; streamType: VideoStreamType }) => ReactNode;
+  participantViewUISlot?: (scope: TileSlotScope) => ReactNode;
   className?: string;
   style?: CSSProperties;
 }
@@ -26,70 +24,46 @@ function isSameStream(a: StreamInfo, b: StreamInfo) {
     && a.streamType === b.streamType;
 }
 
+function videoClassName(streamInfo: StreamInfo) {
+  return [
+    'speaker-layout-video',
+    isCameraOff(streamInfo) && 'is-hidden',
+    streamInfo.streamType === VideoStreamType.Screen && 'is-screen',
+  ].filter(Boolean).join(' ');
+}
+
 export function SpeakerLayout({
   layoutTemplate,
+  stageStream,
   onStreamDoubleClick,
   participantViewUISlot,
   className,
   style,
 }: SpeakerLayoutProps) {
-  const { sortedParticipantCameraList } = useParticipantStreams();
-  const {
-    localParticipant,
-    participantListWithVideo,
-    participantWithScreen,
-    subscribeEvent,
-    unsubscribeEvent,
-  } = useRoomParticipantState();
+  const { sortedParticipantCameraList, participantStreamList, participantWithScreen } = useParticipantStreams();
 
-  const [primaryStreamInfo, setPrimaryStreamInfo] = useState<StreamInfo | null>(null);
+  const enlargeStreamInfo: StreamInfo | null = stageStream ?? participantStreamList[0] ?? null;
 
-  const enlargeStreamInfo: StreamInfo | null = (() => {
-    if (primaryStreamInfo) {
-      return primaryStreamInfo;
+  const sideStreamInfoList: StreamInfo[] = [];
+  if (participantWithScreen) {
+    const screenStream: StreamInfo = {
+      participant: participantWithScreen,
+      streamType: VideoStreamType.Screen,
+    };
+    if (!enlargeStreamInfo || !isSameStream(screenStream, enlargeStreamInfo)) {
+      sideStreamInfoList.push(screenStream);
     }
-    if (participantWithScreen) {
-      return {
-        participant: participantWithScreen,
-        streamType: VideoStreamType.Screen,
-      };
-    }
-    if (participantListWithVideo.length > 0) {
-      return {
-        participant: participantListWithVideo[0],
-        streamType: VideoStreamType.Camera,
-      };
-    }
-    if (localParticipant) {
-      return {
-        participant: localParticipant,
-        streamType: VideoStreamType.Camera,
-      };
-    }
-    return null;
-  })();
+  }
+  // Keep all camera tiles in the strip, matching AtomicX SpeakerLayout.
+  sideStreamInfoList.push(...sortedParticipantCameraList);
 
-  const sideStreamInfoList = (() => {
-    const result: StreamInfo[] = [];
-    const enlarged = enlargeStreamInfo;
-
-    if (participantWithScreen) {
-      const screenStream: StreamInfo = {
-        participant: participantWithScreen,
-        streamType: VideoStreamType.Screen,
-      };
-      if (!enlarged || !isSameStream(screenStream, enlarged)) {
-        result.push(screenStream);
-      }
+  function handleStreamViewDblclick(streamInfo: StreamInfo, event: ReactMouseEvent) {
+    // Capture runs before a covering whiteboard can stop the click. The more chip
+    // still opts out, so opening that menu does not also swap the stage.
+    const { target } = event;
+    if (target instanceof Element && target.closest('.participant-view-overlay-more')) {
+      return;
     }
-
-    // Keep all camera tiles in the strip, matching AtomicX SpeakerLayout.
-    result.push(...sortedParticipantCameraList);
-    return result;
-  })();
-
-  function handleStreamViewDblclick(streamInfo: StreamInfo) {
-    setPrimaryStreamInfo(streamInfo);
     onStreamDoubleClick?.(streamInfo);
   }
 
@@ -97,46 +71,12 @@ export function SpeakerLayout({
     ? 'is-cinema'
     : 'is-sidebar';
 
-  // Vue watches the participant object identity; the userId is the stable equivalent here.
-  const screenUserId = participantWithScreen?.userId;
-  const prevScreenUserIdRef = useRef<string | undefined>(undefined);
-  useEffect(() => {
-    const oldUserId = prevScreenUserIdRef.current;
-    prevScreenUserIdRef.current = screenUserId;
-    setPrimaryStreamInfo((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      const { streamType, participant } = prev;
-      let next: StreamInfo | null = prev;
-      if (!screenUserId && streamType === VideoStreamType.Screen && participant.userId === oldUserId) {
-        next = null;
-      }
-      if (screenUserId && streamType !== VideoStreamType.Screen) {
-        next = null;
-      }
-      return next;
-    });
-  }, [screenUserId]);
-
-  useEffect(() => {
-    function handleParticipantLeft({ userInfo }: { userInfo: RoomUser }) {
-      setPrimaryStreamInfo(prev => (
-        userInfo.userId === prev?.participant?.userId ? null : prev
-      ));
-    }
-    subscribeEvent(RoomParticipantEvent.onParticipantLeft, handleParticipantLeft);
-    return () => {
-      unsubscribeEvent(RoomParticipantEvent.onParticipantLeft, handleParticipantLeft);
-    };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
     <div className={['speaker-layout', streamContainerClass, className].filter(Boolean).join(' ')} style={style}>
       {enlargeStreamInfo?.participant && (
         <div className="speaker-layout-main">
           <div className="speaker-layout-tile speaker-layout-tile-main">
-            <div className={isCameraOff(enlargeStreamInfo) ? 'speaker-layout-video is-hidden' : 'speaker-layout-video'}>
+            <div className={videoClassName(enlargeStreamInfo)}>
               <RoomParticipantView
                 participant={enlargeStreamInfo.participant}
                 streamType={enlargeStreamInfo.streamType}
@@ -144,7 +84,7 @@ export function SpeakerLayout({
                 lazyLoad={{ enable: false }}
               />
             </div>
-            {participantViewUISlot?.(enlargeStreamInfo)}
+            {participantViewUISlot?.({ ...enlargeStreamInfo, tileRole: 'stage' })}
           </div>
         </div>
       )}
@@ -155,16 +95,16 @@ export function SpeakerLayout({
             <div
               key={`${streamInfo.participant.userId}_${streamInfo.streamType}`}
               className="speaker-layout-tile"
-              onDoubleClick={() => handleStreamViewDblclick(streamInfo)}
+              onDoubleClickCapture={event => handleStreamViewDblclick(streamInfo, event)}
             >
-              <div className={isCameraOff(streamInfo) ? 'speaker-layout-video is-hidden' : 'speaker-layout-video'}>
+              <div className={videoClassName(streamInfo)}>
                 <RoomParticipantView
                   participant={streamInfo.participant}
                   streamType={streamInfo.streamType}
                   fillMode={FillMode.Fit}
                 />
               </div>
-              {participantViewUISlot?.(streamInfo)}
+              {participantViewUISlot?.({ ...streamInfo, tileRole: 'thumb' })}
             </div>
           ))}
         </div>

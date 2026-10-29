@@ -10,6 +10,7 @@ export const resource = {
   'Preconference.CameraOff': 'Camera is off',
   'Preconference.JoinSub': 'Enter meeting ID',
   'Preconference.EmptyRoomId': 'Please enter a meeting ID',
+  'Preconference.InvalidRoomId': 'Please enter a numeric meeting ID',
   'Preconference.RecentMeetings': 'Recent meetings',
   'Preconference.LogoutConfirm': 'Are you sure you want to log out of the current account?',
   'RoomInvitation.Subtitle': 'invites you to join the meeting',

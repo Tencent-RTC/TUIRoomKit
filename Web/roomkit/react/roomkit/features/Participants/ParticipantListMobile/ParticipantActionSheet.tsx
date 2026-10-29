@@ -1,51 +1,31 @@
-import type { ComponentType, CSSProperties, KeyboardEvent } from 'react';
+import type { KeyboardEvent } from 'react';
 import { TUIPopup } from '../../../base';
-import type { IconProps } from '../../../base';
+import type { ParticipantSheetItem } from '../participantData';
 import './ParticipantActionSheet.scss';
-
-export interface ParticipantActionItem {
-  key: string;
-  label: string;
-  /** Member actions carry an icon; the host's room-wide toggles are text only. */
-  icon?: ComponentType<IconProps>;
-  danger?: boolean;
-  /** A room-wide toggle that is currently on reads in the accent colour. */
-  active?: boolean;
-}
 
 export interface ParticipantActionSheetProps {
   open: boolean;
-  groups: ParticipantActionItem[][];
+  groups: ParticipantSheetItem[][];
   /** Rule between rows, for the host's text-only list. */
   split?: boolean;
-  onSelect?: (key: string) => void;
   onUpdateOpen?: (open: boolean) => void;
-  className?: string;
-  style?: CSSProperties;
+  onSelect?: (key: string) => void;
 }
 
 export function ParticipantActionSheet(props: ParticipantActionSheetProps) {
-  const { open, groups, split = false, onSelect, onUpdateOpen, className, style } = props;
-
-  function select(key: string) {
-    onSelect?.(key);
-  }
+  const { open, groups, split = false, onUpdateOpen, onSelect } = props;
 
   function onItemKeyDown(event: KeyboardEvent<HTMLDivElement>, key: string) {
     if (event.key !== 'Enter') {
       return;
     }
     event.preventDefault();
-    select(key);
+    onSelect?.(key);
   }
 
   return (
     <TUIPopup open={open} height="auto" onUpdateOpen={value => onUpdateOpen?.(value)}>
-      <div
-        className={['participant-action-sheet', className ?? ''].filter(Boolean).join(' ')}
-        style={style}
-        role="menu"
-      >
+      <div className="participant-action-sheet" role="menu">
         {groups.map((group, groupIndex) => (
           <div
             key={groupIndex}
@@ -63,7 +43,7 @@ export function ParticipantActionSheet(props: ParticipantActionSheetProps) {
                   ].filter(Boolean).join(' ')}
                   role="menuitem"
                   tabIndex={0}
-                  onClick={() => select(item.key)}
+                  onClick={() => onSelect?.(item.key)}
                   onKeyDown={event => onItemKeyDown(event, item.key)}
                 >
                   {ItemIcon && <ItemIcon size={15} />}

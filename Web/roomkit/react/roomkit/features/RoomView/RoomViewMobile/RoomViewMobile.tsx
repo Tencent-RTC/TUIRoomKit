@@ -9,6 +9,10 @@ import './RoomViewMobile.scss';
 export interface RoomViewMobileProps {
   /** Drops the built-in overlay so a host-supplied participantViewUI replaces it. */
   hideOverlay?: boolean;
+  /** Drawing on the share owns its touches: no zoom, no page swipe. */
+  shareLocked?: boolean;
+  /** Whose camera the share page's corner window shows; no window when omitted. */
+  pipParticipant?: RoomParticipant | null;
   participantViewUISlot?: (scope: {
     participant: RoomParticipant;
     streamType: VideoStreamType;
@@ -21,10 +25,13 @@ export interface RoomViewMobileProps {
 /**
  * The phone stage is always the 9:16 gallery. It takes no layout template: the
  * speaker and cinema layouts are desktop-only, and a share gets a page of its own
- * inside the gallery instead of switching layouts.
+ * inside the gallery instead of switching layouts. Who the share page's corner
+ * window follows is the host's call, passed in as `pipParticipant`.
  */
 export function RoomViewMobile({
   hideOverlay,
+  shareLocked,
+  pipParticipant,
   participantViewUISlot,
   className,
   style,
@@ -75,7 +82,11 @@ export function RoomViewMobile({
 
   return (
     <div className={['room-view-mobile', className].filter(Boolean).join(' ')} style={style}>
-      <GridLayoutMobile participantViewUISlot={renderParticipantViewUI} />
+      <GridLayoutMobile
+        shareLocked={shareLocked}
+        pipParticipant={pipParticipant}
+        participantViewUISlot={renderParticipantViewUI}
+      />
     </div>
   );
 }

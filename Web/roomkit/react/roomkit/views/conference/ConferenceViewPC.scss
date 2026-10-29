@@ -19,7 +19,11 @@
   height: 100%;
   min-height: 0;
   padding: 0 var(--conference-gutter) var(--conference-gutter);
+
+  /* clip, not hidden: the parked side panel gives a hidden box scroll room, and the caret
+     of a long whiteboard text line scrolls the whole view into it. hidden is the fallback. */
   overflow: hidden;
+  overflow: clip;
   color: var(--rk-text-primary);
   background: var(--rk-bg-page);
 }
@@ -158,6 +162,18 @@
   min-width: 0;
   min-height: 0;
   overflow: visible;
+}
+
+/* Top-right corner of the share tile, mirroring the sharing badge on the left. Only the
+   button takes the pointer, so the board or annotation underneath keeps every other press. */
+.conference-share-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
 }
 
 .conference-toolbar {

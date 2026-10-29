@@ -275,13 +275,17 @@ export function PreconferenceMobile(props: PreconferenceMobileProps) {
   }
 
   function onRoomId(value: string | number | null) {
-    setRoomInput(String(value ?? '').replace(/\D/g, '').slice(0, 6));
+    setRoomInput(String(value ?? ''));
   }
 
   function submitJoin() {
     const id = String(roomInput ?? '').trim();
     if (!id) {
       TUIToast.info(t('Preconference.EmptyRoomId'));
+      return;
+    }
+    if (!/^\d+$/.test(id)) {
+      TUIToast.info(t('Preconference.InvalidRoomId'));
       return;
     }
     onJoin?.(id);
@@ -485,6 +489,7 @@ export function PreconferenceMobile(props: PreconferenceMobileProps) {
         >
           <TUIInput
             className="pre-join-input"
+            type="number"
             size="lg"
             maxlength={6}
             modelValue={roomInput}

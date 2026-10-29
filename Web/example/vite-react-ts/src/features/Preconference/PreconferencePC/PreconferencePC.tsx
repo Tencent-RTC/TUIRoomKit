@@ -172,7 +172,7 @@ export function PreconferencePC(props: PreconferencePCProps) {
 
   async function updateMeeting(meeting: ScheduledMeeting, input: ScheduleRoomInput): Promise<ScheduleOutcome> {
     const { roomId } = meeting;
-    const before = (meeting.scheduleAttendees ?? []).map(user => user.userId);
+    const before = meeting.attendees.map(user => user.userId);
     const after = input.scheduleAttendees;
     const added = after.filter(userId => !before.includes(userId));
     const removed = before.filter(userId => !after.includes(userId));

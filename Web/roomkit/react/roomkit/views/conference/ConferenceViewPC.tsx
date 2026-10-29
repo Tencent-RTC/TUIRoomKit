@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
-import { useDeviceState, useLoginState, useRoomParticipantState, useRoomState, DeviceStatus } from 'tuikit-atomicx-react/room';
+import { useLoginState, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-react/room';
 import {
   IconMembers,
   IconChat,
@@ -22,6 +22,7 @@ import { useI18n } from '../../i18n';
 import { roomEntry } from '../../core/session';
 import type { RoomEntryPhase } from '../../core/session';
 import {
+  AnnotationButton,
   CameraButton,
   CaptionButton,
   CaptionOverlay,
@@ -43,6 +44,8 @@ import {
   SettingsDialogPC,
   TranscriptList,
   useASRState,
+  WhiteboardButton,
+  WhiteboardView,
 } from '../../features';
 import type { SettingsTab } from '../../features';
 import type { MiniWindowExpose } from '../../features/MiniWindow/MiniWindow';
@@ -75,7 +78,7 @@ export function ConferenceViewPC(props: ConferenceViewPCProps) {
     },
   }), []);
 
-  const { layoutTemplate, setLayoutTemplate } = useRoomLayoutState();
+  const { layoutTemplate, stageStream, setLayoutTemplate, handleStreamDoubleClick } = useRoomLayoutState();
   const { uiConfig } = useUIConfig();
   const ParticipantViewUI = uiConfig.participantViewUI;
   const { currentRoom } = useRoomState();
@@ -144,19 +147,6 @@ export function ConferenceViewPC(props: ConferenceViewPCProps) {
   const miniViewRef = useRef<MiniWindowExpose | null>(null);
   // Without Document PiP there is nowhere useful to minimize to, so the menu entry stays hidden.
   const [pipSupported] = useState(() => isPictureInPictureSupported());
-  const { screenStatus } = useDeviceState();
-  const screenStatusWatchedRef = useRef(false);
-  useEffect(() => {
-    if (!screenStatusWatchedRef.current) {
-      screenStatusWatchedRef.current = true;
-      return;
-    }
-    if (screenStatus === DeviceStatus.On) {
-      void miniViewRef.current?.minimize({ auto: true });
-    } else {
-      miniViewRef.current?.dismissAuto();
-    }
-  }, [screenStatus]);
 
   const { isCaptionShown } = useASRState();
 
@@ -238,12 +228,21 @@ export function ConferenceViewPC(props: ConferenceViewPCProps) {
               <section className={['conference-stage', size === 'wide' && openedPanels.length > 0 ? 'conference-stage-docked' : ''].filter(Boolean).join(' ')}>
                 <RoomViewPC
                   layoutTemplate={layoutTemplate}
+                  stageStream={stageStream}
                   hideOverlay={Boolean(ParticipantViewUI)}
-                  participantViewUISlot={ParticipantViewUI
-                    ? ({ participant, streamType }) => (
-                      <ParticipantViewUI participant={participant} streamType={streamType} />
-                    )
-                    : undefined}
+                  onStreamDoubleClick={handleStreamDoubleClick}
+                  participantViewUISlot={({ participant, streamType, tileRole }) => (
+                    <>
+                      <WhiteboardView participant={participant} streamType={streamType} />
+                      {ParticipantViewUI && <ParticipantViewUI participant={participant} streamType={streamType} />}
+                      {/* A thumbnail is too small to draw on; the room holds the stage while annotating. */}
+                      {tileRole === 'stage' && (
+                        <div className="conference-share-actions">
+                          <AnnotationButton participant={participant} streamType={streamType} />
+                        </div>
+                      )}
+                    </>
+                  )}
                 />
                 {isCaptionShown && (
                   <CaptionOverlay
@@ -272,7 +271,9 @@ export function ConferenceViewPC(props: ConferenceViewPCProps) {
                       isChatActive={activePanel === 'chat'}
                       onClick={() => sidePanelRef.current?.toggle('chat')}
                     />
-                    <ScreenShareButton />
+                    <ScreenShareButton>
+                      <WhiteboardButton />
+                    </ScreenShareButton>
                     <CloudRecordingButtonPC />
                     <CaptionButton
                       active={isCaptionShown || openedPanels.includes('transcript')}

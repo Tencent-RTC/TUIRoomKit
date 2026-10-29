@@ -86,32 +86,26 @@
   background: var(--rk-bg-surface);
 }
 
-/* Header bars and body pages slide together: main view exits left, the picked view enters from the right. */
+/* Header bars and body pages slide together: main view exits left, the picked view enters from the right.
+   A page that leaves keeps visibility until the slide ends. */
+$user-picker-slide: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease;
+
 .user-picker-mobile-bar,
 .user-picker-mobile-page {
-  transition:
-    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.28s ease,
-    visibility 0s;
+  transition: $user-picker-slide, visibility 0s;
 }
 
 .user-picker-mobile-bar.is-picked,
 .user-picker-mobile-page.is-picked {
   visibility: hidden;
-  transition:
-    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.28s ease,
-    visibility 0s linear 0.28s;
+  transition: $user-picker-slide, visibility 0s linear 0.28s;
   transform: translateX(100%);
 }
 
 .user-picker-mobile-header.is-picked-view .user-picker-mobile-bar.is-picked,
 .user-picker-mobile.is-picked-view .user-picker-mobile-page.is-picked {
   visibility: visible;
-  transition:
-    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.28s ease,
-    visibility 0s;
+  transition: $user-picker-slide, visibility 0s;
   transform: none;
 }
 
@@ -119,10 +113,7 @@
 .user-picker-mobile.is-picked-view .user-picker-mobile-page:not(.is-picked) {
   visibility: hidden;
   opacity: 0;
-  transition:
-    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.28s ease,
-    visibility 0s linear 0.28s;
+  transition: $user-picker-slide, visibility 0s linear 0.28s;
   transform: translateX(-24%);
 }
 

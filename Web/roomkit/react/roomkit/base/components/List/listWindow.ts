@@ -46,7 +46,11 @@ export function nextStickToBottom(options: {
   offset: number;
   previousOffset: number;
 }): boolean {
-  if (options.nearBottom) {
+  // Reaching the bottom resumes the pin, but only when the user is moving
+  // down (or resting). An upward move inside the at-bottom zone must not
+  // re-arm follow: pins keep resetting the offset to the absolute bottom, so
+  // small trackpad steps could never cross the threshold otherwise.
+  if (options.nearBottom && options.offset + 0.5 >= options.previousOffset) {
     return true;
   }
   if (options.offset + 0.5 < options.previousOffset) {

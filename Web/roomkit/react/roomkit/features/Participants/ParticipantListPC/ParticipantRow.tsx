@@ -1,5 +1,3 @@
-import type { CSSProperties } from 'react';
-import { DeviceStatus, RoomParticipantRole } from 'tuikit-atomicx-react/room';
 import {
   IconCam,
   IconCamOff,
@@ -10,67 +8,41 @@ import {
   TUIAvatar,
 } from '../../../base';
 import { useI18n } from '../../../i18n';
-import ParticipantMoreMenu from './ParticipantMoreMenu.tsx';
-import { useParticipantMoreMenu } from './useParticipantMoreMenu';
-import type { RoomParticipant } from 'tuikit-atomicx-react/room';
+import { useParticipantActions } from '../participantActions';
+import type { JoinedRowData } from '../participantData';
+import ParticipantMoreMenu from './ParticipantMoreMenu';
 import './ParticipantRow.scss';
 
 export interface ParticipantRowProps {
-  participant: RoomParticipant;
-  className?: string;
-  style?: CSSProperties;
+  row: JoinedRowData;
 }
 
 export function ParticipantRow(props: ParticipantRowProps) {
-  const { participant, className, style } = props;
+  const { row } = props;
   const { t } = useI18n();
-
-  const {
-    isSelf,
-    displayName,
-    isMicOn,
-    isCamOn,
-    canOperateMedia,
-    micTitle,
-    camTitle,
-    toggleMic,
-    toggleCam,
-  } = useParticipantMoreMenu(participant);
-
-  const isSharing = participant.screenShareStatus === DeviceStatus.On;
-  const roleLabel = (() => {
-    if (participant.role === RoomParticipantRole.Owner) {
-      return t('Participants.Owner');
-    }
-    if (participant.role === RoomParticipantRole.Admin) {
-      return t('Participants.Admin');
-    }
-    return '';
-  })();
-  const roleClass = participant.role === RoomParticipantRole.Owner ? 'is-owner' : 'is-admin';
-
-  const MediaTag = canOperateMedia ? 'button' : 'span';
+  const { toggleMic, toggleCam } = useParticipantActions();
+  const MediaTag = row.canOperateMedia ? 'button' : 'span';
+  const mediaType = row.canOperateMedia ? 'button' : undefined;
 
   return (
-    <div className={['participant-row', className ?? ''].filter(Boolean).join(' ')} style={style}>
+    <div className="participant-row">
       <TUIAvatar
         className="participant-row-avatar"
-        src={participant.avatarUrl}
-        alt={displayName}
+        src={row.avatarUrl}
+        alt={row.name}
         size={32}
       />
       <div className="participant-row-info">
         <div className="participant-row-name">
-          <span className="participant-row-name-text">{displayName}</span>
-          {isSelf && <span className="participant-row-tag is-self">{t('Participants.Me')}</span>}
-          {roleLabel && (
-            <span
-              className={['participant-row-tag', roleClass].join(' ')}
-            >
-              {roleLabel}
-            </span>
+          <span className="participant-row-name-text">{row.name}</span>
+          {row.isSelf && <span className="participant-row-tag is-self">{t('Participants.Me')}</span>}
+          {row.roleTag === 'owner' && (
+            <span className="participant-row-tag is-owner">{t('Participants.Owner')}</span>
           )}
-          {isSharing && (
+          {row.roleTag === 'admin' && (
+            <span className="participant-row-tag is-admin">{t('Participants.Admin')}</span>
+          )}
+          {row.isSharing && (
             <span className="participant-row-tag is-sharing">
               <IconShare size={10} />
               {t('Participants.Sharing')}
@@ -80,29 +52,27 @@ export function ParticipantRow(props: ParticipantRowProps) {
       </div>
       <div className="participant-row-icons">
         <MediaTag
-          className={['participant-row-icon', isMicOn ? 'on' : '', !isMicOn ? 'muted' : ''].filter(Boolean).join(' ')}
-          type={canOperateMedia ? 'button' : undefined}
-          title={micTitle}
+          className="participant-row-icon"
+          type={mediaType}
+          title={row.micTooltip}
           onClick={() => {
-            void toggleMic();
+            void toggleMic(row.participant);
           }}
         >
-          {isMicOn ? <IconMic size={14} /> : <IconMicOff size={14} />}
+          {row.isMicOn ? <IconMic size={14} /> : <IconMicOff size={14} />}
         </MediaTag>
         <MediaTag
-          className={['participant-row-icon', isCamOn ? 'on' : '', !isCamOn ? 'muted' : ''].filter(Boolean).join(' ')}
-          type={canOperateMedia ? 'button' : undefined}
-          title={camTitle}
+          className="participant-row-icon"
+          type={mediaType}
+          title={row.camTooltip}
           onClick={() => {
-            void toggleCam();
+            void toggleCam(row.participant);
           }}
         >
-          {isCamOn ? <IconCam size={14} /> : <IconCamOff size={14} />}
+          {row.isCamOn ? <IconCam size={14} /> : <IconCamOff size={14} />}
         </MediaTag>
       </div>
-      <ParticipantMoreMenu
-        participant={participant}
-      >
+      <ParticipantMoreMenu participant={row.participant}>
         {({ open }) => (
           <button
             className={['participant-row-more', open ? 'is-open' : ''].filter(Boolean).join(' ')}

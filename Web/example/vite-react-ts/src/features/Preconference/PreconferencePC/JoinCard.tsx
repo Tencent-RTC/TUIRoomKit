@@ -6,6 +6,7 @@ import {
   IconHash,
   TUIButton,
   TUIInput,
+  TUIToast,
   useI18n,
 } from '@tencentcloud/roomkit-web-react';
 import './JoinCard.scss';
@@ -34,6 +35,10 @@ export function JoinCard(props: JoinCardProps) {
     event.preventDefault();
     const id = roomInput == null ? '' : String(roomInput).trim();
     if (!id) {
+      return;
+    }
+    if (!/^\d+$/.test(id)) {
+      TUIToast.info(t('Preconference.InvalidRoomId'));
       return;
     }
     onJoin?.(id);

@@ -1,0 +1,21 @@
+/* Same chip as the "sharing screen" badge on the opposite corner of the share tile. */
+.rk-btn.annotation-button {
+  gap: 4px;
+  height: auto;
+  padding: 4px 9px;
+  font-size: var(--rk-fs-xs);
+  font-weight: 600;
+  line-height: inherit;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: auto;
+  background: rgba(77, 124, 255, 0.92);
+  backdrop-filter: blur(4px);
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(77, 124, 255, 0.35);
+
+  &:hover:not(:disabled) {
+    background: rgba(77, 124, 255, 1);
+  }
+}

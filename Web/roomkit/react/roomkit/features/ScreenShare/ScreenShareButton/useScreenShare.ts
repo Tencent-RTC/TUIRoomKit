@@ -1,4 +1,5 @@
-import { useRef, useSyncExternalStore } from 'react';
+import { createContext, useRef, useSyncExternalStore } from 'react';
+import type { ComponentType } from 'react';
 import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import {
   DeviceError,
@@ -6,10 +7,11 @@ import {
   RoomParticipantRole,
   useDeviceState,
   useLoginState,
-  useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-react/room';
+import type { IconProps } from '../../../base';
 import { useDeviceFault } from '../../Device/useDeviceFault';
+import { useShareParticipants } from '../../Whiteboard/WhiteboardState';
 
 /** Webinar speaker-count ceiling from RoomEngine; kept named so it is not a magic number. */
 const ERROR_SPEAKER_LIMIT_EXCEEDED = 100253;
@@ -23,6 +25,27 @@ export type ScreenShareFailure =
   | 'speaker-limit'
   | 'capture'
   | 'failed';
+
+/** Another kind of share that rides on the share control, registered from its children. */
+export interface ScreenShareEntry {
+  act: string;
+  label: string;
+  icon: ComponentType<IconProps>;
+  /** This entry is the share in progress; the control then ends it instead of opening the menu. */
+  active: boolean;
+  stopLabel: string;
+  run: () => void;
+  stop: () => void;
+}
+
+export interface ScreenShareEntryRegistry {
+  /** Adds an entry read through `source` on every render; returns the unregister. */
+  register: (source: () => ScreenShareEntry) => () => void;
+  /** An entry's fields changed, so the control has to render again. */
+  refresh: () => void;
+}
+
+export const ScreenShareEntryContext = createContext<ScreenShareEntryRegistry | null>(null);
 
 /** Module scoped so toolbar, overflow, and the stage overlay share one in-flight guard. */
 let isBusy = false;
@@ -100,7 +123,7 @@ export function useScreenShare() {
     startScreenShare: start,
     stopScreenShare: stop,
   } = useDeviceState();
-  const { localParticipant, participantWithScreen } = useRoomParticipantState();
+  const { localParticipant, participantWithScreen } = useShareParticipants();
   const { handleScreenShareError } = useDeviceFault();
   const busy = useSyncExternalStore(subscribeBusy, getBusy, getBusy);
 

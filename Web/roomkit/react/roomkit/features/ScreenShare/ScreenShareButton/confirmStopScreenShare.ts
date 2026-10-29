@@ -3,7 +3,7 @@ import { t } from '../../../i18n';
 import type { ScreenShareFailure } from './useScreenShare';
 
 export async function confirmStopScreenShare(stop: () => Promise<ScreenShareFailure | undefined>) {
-  const confirmed = await TUIMessageBox.confirm({
+  const confirmed = await TUIMessageBox.danger({
     title: t('ScreenShare.StopTitle'),
     message: t('ScreenShare.StopMessage'),
     confirmText: t('ScreenShare.StopConfirm'),
@@ -15,7 +15,5 @@ export async function confirmStopScreenShare(stop: () => Promise<ScreenShareFail
   const failure = await stop();
   if (failure) {
     TUIToast.error(t(`ScreenShare.Failure.${failure}`));
-    return;
   }
-  TUIToast.success(t('ScreenShare.Stopped'));
 }

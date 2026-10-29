@@ -1,13 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode, SyntheticEvent } from 'react';
+import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 
 import {
-  DeviceStatus,
   FillMode,
   RoomParticipantView,
   VideoStreamType,
   useLoginState,
-  useRoomParticipantState,
 } from 'tuikit-atomicx-react/room';
 import { IconChevron, IconShare, TUISwiper, TUISwiperItem, usePinchZoom } from '../../../base';
 import type { SwiperExpose } from '../../../base/components/Swiper/Swiper';
@@ -25,6 +23,10 @@ import type { MobilePage } from './mobileGallery';
 import './GridLayoutMobile.scss';
 
 export interface GridLayoutMobileProps {
+  /** Drawing on the share owns its touches: no zoom, no page swipe. */
+  shareLocked?: boolean;
+  /** Whose camera the share page's corner window shows; no window when omitted. */
+  pipParticipant?: RoomParticipant | null;
   participantViewUISlot?: (scope: {
     participant: RoomParticipant;
     streamType: VideoStreamType;
@@ -42,26 +44,9 @@ const pipInset = 16;
 /** Matches the `.is-snapping` transition, in case `transitionend` never fires. */
 const pipSnapDuration = 220;
 
-/** Silence grace for the current speaker before the window may move to someone else. */
-const SPEAKER_HOLD = 1000;
-
-function hasVoice(volume: number | undefined): boolean {
-  return volume !== undefined && volume > 0;
-}
-
-function findLoudestId(volumes: Map<string, number>): string {
-  let loudestId = '';
-  let loudest = 0;
-  volumes.forEach((volume, userId) => {
-    if (volume > loudest) {
-      loudest = volume;
-      loudestId = userId;
-    }
-  });
-  return loudestId;
-}
-
 export function GridLayoutMobile({
+  shareLocked = false,
+  pipParticipant = null,
   participantViewUISlot,
   className,
   style,
@@ -160,7 +145,7 @@ export function GridLayoutMobile({
   }
 
   const pinchZoom = usePinchZoom(screenTileRef, {
-    enabled: view.sharePage,
+    enabled: view.sharePage && !shareLocked,
   });
   /* `reset` gets a new identity every render; keep it behind a ref so the
      stage measure effect stays mount-once, like the Vue original's observers. */
@@ -170,79 +155,6 @@ export function GridLayoutMobile({
   const sharer = participantWithScreen;
 
   const sharerName = sharer?.nameCard || sharer?.userName || sharer?.userId || '';
-
-  /* The share page window follows the same pick as the desktop mini window: the current
-     speaker, held through short silences, and the local user until anyone speaks. */
-  const { localParticipant, participantList, speakingUsers } = useRoomParticipantState();
-
-  const [currentSpeakerId, setCurrentSpeakerIdState] = useState('');
-  const currentSpeakerIdRef = useRef('');
-  const currentSpeakerLastHeardAtRef = useRef(0);
-  const localParticipantRef = useRef(localParticipant);
-  localParticipantRef.current = localParticipant;
-
-  function setCurrentSpeaker(userId: string) {
-    currentSpeakerIdRef.current = userId;
-    setCurrentSpeakerIdState(userId);
-    currentSpeakerLastHeardAtRef.current = Date.now();
-  }
-
-  function clearCurrentSpeaker() {
-    currentSpeakerIdRef.current = '';
-    setCurrentSpeakerIdState('');
-    currentSpeakerLastHeardAtRef.current = 0;
-  }
-
-  function pickSpeaker(volumes: Map<string, number>) {
-    // People who left the room disappear from speakingUsers; drop a stale id first.
-    if (currentSpeakerIdRef.current && !volumes.has(currentSpeakerIdRef.current)) {
-      clearCurrentSpeaker();
-    }
-
-    // A muted local track still reports volume, so it must not win the window.
-    const candidates = new Map(volumes);
-    const local = localParticipantRef.current;
-    if (local?.microphoneStatus === DeviceStatus.Off) {
-      candidates.delete(local.userId);
-    }
-
-    const speakerId = currentSpeakerIdRef.current;
-    if (speakerId && hasVoice(candidates.get(speakerId))) {
-      currentSpeakerLastHeardAtRef.current = Date.now();
-      return;
-    }
-
-    const loudestId = findLoudestId(candidates);
-    if (!loudestId) {
-      return;
-    }
-
-    const maySwitch = !speakerId || Date.now() - currentSpeakerLastHeardAtRef.current >= SPEAKER_HOLD;
-    if (maySwitch) {
-      setCurrentSpeaker(loudestId);
-    }
-  }
-
-  const isFirstSpeakingWatchRef = useRef(true);
-  useEffect(() => {
-    if (isFirstSpeakingWatchRef.current) {
-      isFirstSpeakingWatchRef.current = false;
-      return;
-    }
-    pickSpeaker(speakingUsers);
-  }, [speakingUsers]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const currentSpeaker = (() => {
-    if (!currentSpeakerId) {
-      return undefined;
-    }
-    if (localParticipant?.userId === currentSpeakerId) {
-      return localParticipant;
-    }
-    return participantList.find(item => item.userId === currentSpeakerId);
-  })();
-
-  const pipParticipant = currentSpeaker ?? localParticipant;
 
   const pipName = pipParticipant?.nameCard || pipParticipant?.userName || pipParticipant?.userId || '';
 
@@ -285,6 +197,14 @@ export function GridLayoutMobile({
   useEffect(() => {
     setRequestedPage(requested => (view.page !== requested ? view.page : requested));
   }, [view.page]);
+
+  /** Drawing only happens on the share page, and a share pages away from stops playing. */
+  useEffect(() => {
+    if (shareLocked && remoteSharerId) {
+      setRequestedPage(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shareLocked]);
 
   useEffect(() => {
     if (!paged) {
@@ -383,26 +303,15 @@ export function GridLayoutMobile({
     }
   }
 
-  function isChromeControl(event: ReactPointerEvent<HTMLDivElement> | SyntheticEvent) {
-    const { target } = event;
-    if (!(target instanceof Element)) {
-      return false;
-    }
-    return !!target.closest(
-      '.grid-layout-mobile-page-btn, .grid-layout-mobile-pip, .participant-view-overlay-flip',
-    );
-  }
-
   /** Show the pager and leave it up until the next tap on empty stage. */
   function revealChrome() {
     setChromeVisible(pagedRef.current);
   }
 
+  /* Any control on the stage stops its own pointerdown, so a press on it never reaches
+     here and does not toggle the pager. */
   function onChromePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (event.pointerType === 'mouse' && event.button !== 0) {
-      return;
-    }
-    if (isChromeControl(event)) {
       return;
     }
     chromeTapRef.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
@@ -416,7 +325,7 @@ export function GridLayoutMobile({
     const dx = event.clientX - chromeTap.x;
     const dy = event.clientY - chromeTap.y;
     chromeTapRef.current = null;
-    if (isChromeControl(event) || Math.hypot(dx, dy) > tapSlop) {
+    if (Math.hypot(dx, dy) > tapSlop) {
       return;
     }
     if (!pagedRef.current) {
@@ -436,9 +345,9 @@ export function GridLayoutMobile({
     swiperRef.current?.slideTo(view.page + direction);
   }
 
-  /** A zoomed share pans under one finger; the swiper must not turn that into a page change. */
+  /** A zoomed or annotated share takes one finger; the swiper must not turn that into a page change. */
   function holdZoomedShare(event: ReactPointerEvent<HTMLDivElement>) {
-    if (view.sharePage && pinchZoom.isZoomed.current) {
+    if (view.sharePage && (pinchZoom.isZoomed.current || shareLocked)) {
       event.stopPropagation();
     }
   }
@@ -520,11 +429,11 @@ export function GridLayoutMobile({
                       ].filter(Boolean).join(' ')}
                     >
                       <div
-                        className={
-                          isCameraOff(streamInfo)
-                            ? 'grid-layout-mobile-video is-hidden'
-                            : 'grid-layout-mobile-video'
-                        }
+                        className={[
+                          'grid-layout-mobile-video',
+                          isCameraOff(streamInfo) && 'is-hidden',
+                          streamInfo.streamType === VideoStreamType.Screen && 'is-screen',
+                        ].filter(Boolean).join(' ')}
                       >
                         <RoomParticipantView
                           participant={streamInfo.participant}

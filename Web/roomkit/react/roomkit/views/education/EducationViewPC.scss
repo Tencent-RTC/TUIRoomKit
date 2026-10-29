@@ -1,0 +1,246 @@
+.education-root {
+  height: 100%;
+}
+
+.education-root .rk-root-slot {
+  height: 100%;
+}
+
+.education-view {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-page);
+}
+
+.education-topbar {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 12px 0 16px;
+  background: var(--rk-bg-surface);
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-topbar-left,
+.education-topbar-right,
+.education-topbar-group {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.education-topbar-left {
+  gap: 8px;
+}
+
+.education-topbar-right {
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.education-topbar-group {
+  gap: 10px;
+}
+
+.education-topbar-divider {
+  width: 1px;
+  height: 14px;
+  margin: 0 4px;
+  background: var(--rk-border);
+}
+
+/* Toolbar chips are sized for the bottom bar; the classroom topbar runs them at 28px. */
+.education-topbar .toolbar-button {
+  min-width: 28px;
+  height: 28px;
+  background: transparent;
+  border-radius: 7px;
+}
+
+.education-topbar .toolbar-button:hover {
+  background: color-mix(in srgb, var(--rk-text-primary) 8%, transparent);
+}
+
+.education-topbar .toolbar-button-main {
+  min-width: 28px;
+  padding: 0;
+}
+
+.education-topbar .toolbar-button-icon,
+.education-topbar .toolbar-button-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Device chips with a menu keep a tinted split surface, 30px tall. */
+.education-topbar .toolbar-button-with-menu {
+  min-width: 44px;
+  height: 30px;
+  padding: 1px;
+  background: color-mix(in srgb, var(--rk-text-primary) 8%, transparent);
+  border-radius: 8px;
+}
+
+.education-topbar .toolbar-button-with-menu .toolbar-button-main {
+  min-width: 28px;
+  padding: 0;
+}
+
+.education-topbar .toolbar-button-caret {
+  width: 14px;
+  padding: 0;
+}
+
+.education-topbar .toolbar-button-active {
+  background: color-mix(in srgb, var(--rk-brand) 14%, transparent);
+}
+
+.education-topbar .toolbar-button-active .toolbar-button-icon {
+  color: var(--rk-brand);
+}
+
+.education-leave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--rk-danger);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+}
+
+.education-leave:hover,
+.education-leave.is-open {
+  background: color-mix(in srgb, var(--rk-danger) 14%, transparent);
+}
+
+.education-leave-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 176px;
+  padding: 8px;
+}
+
+.education-leave-menu > .rk-btn {
+  height: 40px;
+  font-weight: 500;
+  border: none;
+  border-radius: 10px;
+}
+
+.education-leave-menu > .rk-btn-ghost {
+  background: color-mix(in srgb, var(--rk-text-primary) 6%, transparent);
+}
+
+.education-workspace {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 20%);
+  gap: 10px;
+  min-height: 0;
+  padding: 10px;
+  background: var(--rk-bg-page);
+}
+
+/* The board keeps 16:9 and letterboxes inside whatever the stage leaves. */
+.education-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  container-type: size;
+}
+
+.education-board {
+  position: relative;
+  width: min(100cqw, calc(100cqh * 16 / 9));
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: 12px;
+}
+
+.education-board-stream {
+  width: 100%;
+  height: 100%;
+}
+
+.education-board-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-tertiary);
+}
+
+.education-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.education-chat {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: 12px;
+}
+
+.education-chat-title {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-chat-body {
+  flex: 1;
+  min-height: 0;
+}
+
+.education-join-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rk-bg-overlay);
+  backdrop-filter: blur(8px);
+}
+
+.education-join-error {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--rk-danger);
+  text-align: center;
+}

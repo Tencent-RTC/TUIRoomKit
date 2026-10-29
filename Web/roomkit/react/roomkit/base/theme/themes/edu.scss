@@ -1,0 +1,36 @@
+/**
+ * EDU scene token pack.
+ *
+ * The design keeps one semantic token axis for both scenes: the scene only
+ * swaps the brand accent, while the theme axis (data-rk-theme light / dark)
+ * keeps controlling surfaces and text. Education renders the green accent
+ * (accent pack `green` in the interaction design views-edu tokens);
+ * conference keeps the default blue.
+ *
+ * Everything brand-derived follows var(--rk-brand) automatically
+ * (--rk-brand-soft, --rk-brand-hover, --rk-avatar-bg, --rk-focus-ring and
+ * the chat self bubble), so overriding the brand is the whole pack.
+ * Host custom primaryColor still wins: inline custom properties outrank
+ * the scene class token block.
+ */
+.rk-root.rk-scene-education {
+  --rk-brand: #00c853;
+  --rk-brand-strong: #34c759;
+  --rk-brand-fg: #7dffb3;
+}
+
+/* EDU avatars follow the interaction design:
+ * dark keeps the base-component default (--rk-avatar-bg: var(--rk-brand),
+ * solid accent + white initial, per base/Avatar spec.md) so the dark face
+ * renders solid green; light overrides with the pale green pair from the
+ * edu-avatar-light spec in views-edu/web/page.css (#d7ecd3 bg + #4ea05a fg).
+ * Camera-off tiles keep the design's neutral camera background. */
+.rk-root.rk-scene-education[data-rk-theme='dark'] {
+  --rk-bg-camera-off: #161616;
+}
+
+.rk-root.rk-scene-education[data-rk-theme='light'] {
+  --rk-avatar-bg: #d7ecd3;
+  --rk-avatar-fg: #4ea05a;
+  --rk-bg-camera-off: #f1f0f2;
+}

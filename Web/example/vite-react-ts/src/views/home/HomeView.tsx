@@ -115,6 +115,7 @@ export function HomeView() {
   return (
     <RoomKitProvider
       className="home-host"
+      scene="conference"
     >
       <div className="home-view">
         {!showConference && (

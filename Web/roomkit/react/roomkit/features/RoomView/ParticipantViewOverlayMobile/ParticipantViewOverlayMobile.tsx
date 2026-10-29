@@ -7,7 +7,7 @@ import {
   useLoginState,
   useRoomParticipantState,
 } from 'tuikit-atomicx-react/room';
-import { IconFlipCamera, IconHostRole, IconMic, IconMicOff, IconRoleUser } from '../../../base';
+import { IconFlipCamera, IconMic, IconMicOff, IconRoleUser } from '../../../base';
 import { useI18n } from '../../../i18n';
 import type { RoomParticipant } from 'tuikit-atomicx-react/room';
 import './ParticipantViewOverlayMobile.scss';
@@ -67,9 +67,11 @@ export function ParticipantViewOverlayMobile({
   /* A share tile carries the sharer's volume; the halo belongs on their camera tile. */
   const isSpeaking = !isScreenStream && micOn && volume > 0;
 
-  const waveScale = (() => {
+  /** How much of the fill is cut away from the top; the rest reads as the level. */
+  const waveInset = (() => {
     const level = Math.min(volume / SPEECH_PEAK, 1);
-    return (WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level).toFixed(2);
+    const scale = WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level;
+    return ((1 - scale) * 100).toFixed(1);
   })();
 
   const isOwner = participant.role === RoomParticipantRole.Owner;
@@ -94,7 +96,6 @@ export function ParticipantViewOverlayMobile({
   return (
     <div
       className={[
-        'participant-view-overlay',
         'participant-view-overlay-mobile',
         isSpeaking ? 'is-speaking' : '',
         inPip ? 'is-pip' : '',
@@ -104,14 +105,14 @@ export function ParticipantViewOverlayMobile({
     >
       {showCameraOffMask && (
         <div
-          className="participant-view-overlay-mask"
+          className="participant-view-overlay-mobile-mask"
           aria-hidden="true"
         >
-          <div className="participant-view-overlay-avatar">
+          <div className="participant-view-overlay-mobile-avatar">
             {avatarUrl
               ? (
                 <img
-                  className="participant-view-overlay-avatar-img"
+                  className="participant-view-overlay-mobile-avatar-img"
                   src={avatarUrl}
                   alt=""
                   draggable="false"
@@ -124,7 +125,7 @@ export function ParticipantViewOverlayMobile({
 
       {showFlipCamera && (
         <button
-          className="participant-view-overlay-flip"
+          className="participant-view-overlay-mobile-flip"
           type="button"
           aria-label={t('Device.FlipCamera')}
           onClick={(event) => {
@@ -139,7 +140,7 @@ export function ParticipantViewOverlayMobile({
 
       {showNetworkBars && (
         <span
-          className="participant-view-overlay-network"
+          className="participant-view-overlay-mobile-network"
           aria-hidden="true"
         >
           <i />
@@ -148,31 +149,31 @@ export function ParticipantViewOverlayMobile({
         </span>
       )}
 
-      <div className="participant-view-overlay-stack">
-        <div className="participant-view-overlay-pill">
-          <span className="participant-view-overlay-mic" aria-hidden="true">
-            {micOn ? <IconMic size={12} /> : <IconMicOff size={12} />}
+      <div className="participant-view-overlay-mobile-stack">
+        <div className="participant-view-overlay-mobile-pill">
+          <span className="participant-view-overlay-mobile-mic" aria-hidden="true">
+            {micOn ? <IconMic size={14} /> : <IconMicOff size={14} />}
             {isSpeaking && (
               <span
-                className="participant-view-overlay-mic-core"
-                style={{ transform: `scaleY(${waveScale})` }}
+                className="participant-view-overlay-mobile-mic-core"
+                style={{ clipPath: `inset(${waveInset}% 0 0 0)` }}
               />
             )}
           </span>
 
           {roleLabel && (
             <span
-              className={['participant-view-overlay-role-mark', roleClass].filter(Boolean).join(' ')}
+              className={['participant-view-overlay-mobile-role-mark', roleClass].filter(Boolean).join(' ')}
               role="img"
               aria-label={roleLabel}
             >
-              {isOwner ? <IconHostRole size={12} /> : <IconRoleUser size={11} />}
+              <IconRoleUser size={14} />
             </span>
           )}
 
-          <span className="participant-view-overlay-name">{displayName}</span>
+          <span className="participant-view-overlay-mobile-name">{displayName}</span>
 
-          {isSelf && <span className="participant-view-overlay-me">{t('Participants.Me')}</span>}
+          {isSelf && <span className="participant-view-overlay-mobile-me">{t('Participants.Me')}</span>}
         </div>
       </div>
     </div>

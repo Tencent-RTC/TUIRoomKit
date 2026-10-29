@@ -5,17 +5,16 @@ import {
   RoomParticipantView,
   VideoStreamType,
 } from 'tuikit-atomicx-react/room';
-import type { RoomParticipant } from 'tuikit-atomicx-react/room';
 import { IconChevron } from '../../../base/icons';
 import { useI18n } from '../../../i18n';
 import { isCameraOff, useParticipantStreams } from '../useParticipantStreams';
 import { useStreamItemDimensions } from './useStreamItemDimensions';
-import type { StreamInfo } from '../useParticipantStreams';
+import type { StreamInfo, TileSlotScope } from '../useParticipantStreams';
 import './GridLayout.scss';
 
 export interface GridLayoutProps {
   onStreamDoubleClick?: (streamInfo: StreamInfo) => void;
-  participantViewUISlot?: (scope: { participant: RoomParticipant; streamType: VideoStreamType }) => ReactNode;
+  participantViewUISlot?: (scope: TileSlotScope) => ReactNode;
   className?: string;
   style?: CSSProperties;
 }
@@ -119,7 +118,13 @@ export function GridLayout({
               style={streamItemStyle}
               onDoubleClick={() => onStreamDoubleClick?.(streamInfo)}
             >
-              <div className={isCameraOff(streamInfo) ? 'grid-layout-video is-hidden' : 'grid-layout-video'}>
+              <div
+                className={[
+                  'grid-layout-video',
+                  isCameraOff(streamInfo) && 'is-hidden',
+                  streamInfo.streamType === VideoStreamType.Screen && 'is-screen',
+                ].filter(Boolean).join(' ')}
+              >
                 <RoomParticipantView
                   participant={streamInfo.participant}
                   streamType={streamInfo.streamType}
@@ -127,7 +132,7 @@ export function GridLayout({
                   lazyLoad={streamInfo.streamType === VideoStreamType.Screen ? { enable: false } : undefined}
                 />
               </div>
-              {participantViewUISlot?.(streamInfo)}
+              {participantViewUISlot?.({ ...streamInfo, tileRole: 'thumb' })}
             </div>
           ))}
         </div>

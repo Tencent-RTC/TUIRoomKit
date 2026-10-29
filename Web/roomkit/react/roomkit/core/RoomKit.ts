@@ -117,14 +117,15 @@ export class RoomKit {
 
   @validateParameters('createAndJoin')
   createAndJoin(options: CreateAndJoinOptions): Promise<void> {
-    const { container, roomId, ...roomOptions } = options;
-    return this.enter('create', { roomId, container }, () => roomClient.createAndJoinRoom({ roomId, options: roomOptions }));
+    // scene picks the view; it is not a CreateRoomOptions field.
+    const { container, roomId, scene, ...roomOptions } = options;
+    return this.enter('create', { roomId, container, scene }, () => roomClient.createAndJoinRoom({ roomId, options: roomOptions }));
   }
 
   @validateParameters('join')
   join(options: RoomKitJoinOptions): Promise<void> {
-    const { roomId, container, password } = options;
-    return this.enter('join', { roomId, container }, session => this.joinWithPasswordChallenge(session, password));
+    const { roomId, container, password, scene } = options;
+    return this.enter('join', { roomId, container, scene }, session => this.joinWithPasswordChallenge(session, password));
   }
 
   @validateParameters('leave')
@@ -192,7 +193,7 @@ export class RoomKit {
 
   private enter(
     kind: RoomEntryKind,
-    options: Pick<RoomKitJoinOptions, 'roomId' | 'container'>,
+    options: Pick<RoomKitJoinOptions, 'roomId' | 'container' | 'scene'>,
     operation: (session: RoomSession) => Promise<void>,
   ): Promise<void> {
     const mountTarget = resolveMountTarget(options.container.appendTo);
@@ -209,7 +210,7 @@ export class RoomKit {
 
       try {
         roomEntry.begin(kind, 'login');
-        this.view.mount({ mountTarget, container, roomName: session.roomId });
+        this.view.mount({ mountTarget, container, roomName: session.roomId, scene: options.scene });
         await Promise.resolve();
         this.assertCurrentSession(session);
 

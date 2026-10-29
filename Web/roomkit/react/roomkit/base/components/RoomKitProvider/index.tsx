@@ -18,6 +18,8 @@ export interface RoomKitProviderProps extends Omit<HTMLAttributes<HTMLDivElement
   baseZ?: number;
   /** Theme to apply; omitted keeps the stored theme. */
   theme?: ThemeName;
+  /** Appended to the root as an `rk-scene-*` class; defaults to `conference`, `education` renders the edu token pack. */
+  scene?: string;
   /** Register this host for command TUIToast / TUIMessageBox. */
   command?: boolean;
   /** Transparent cover used by appendTo. */
@@ -89,6 +91,7 @@ export const RoomKitProvider = forwardRef<RoomKitProviderExpose, RoomKitProvider
   const {
     baseZ = 0,
     theme,
+    scene = 'conference',
     command = true,
     cover = false,
     onUpdateTheme,
@@ -190,7 +193,7 @@ export const RoomKitProvider = forwardRef<RoomKitProviderExpose, RoomKitProvider
     <div
       {...rootAttrs}
       ref={rootRef}
-      className={[cover ? 'rk-root rk-root-cover' : 'rk-root', isH5 ? 'is-h5' : '', className].filter(Boolean).join(' ')}
+      className={[cover ? 'rk-root rk-root-cover' : 'rk-root', isH5 ? 'is-h5' : '', `rk-scene-${scene}`, className].filter(Boolean).join(' ')}
       style={rootStyle}
       data-rk-theme={currentTheme}
     >

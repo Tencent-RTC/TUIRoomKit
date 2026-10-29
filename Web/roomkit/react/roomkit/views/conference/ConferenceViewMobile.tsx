@@ -15,6 +15,7 @@ import { useI18n } from '../../i18n';
 import { roomEntry } from '../../core/session';
 import type { RoomEntryPhase } from '../../core/session';
 import {
+  AnnotationButtonMobile,
   CameraButtonMobile,
   CaptionConfirmDialog,
   CaptionEntryMobile,
@@ -35,6 +36,7 @@ import {
   SettingsDialogMobile,
   TranscriptListMobile,
   useASRState,
+  useSingleStageStream,
   useSubtitleViewState,
 } from '../../features';
 import OverflowToolbarMobile from '../../layouts/OverflowToolbarMobile';
@@ -58,6 +60,9 @@ export function ConferenceViewMobile(props: ConferenceViewMobileProps) {
   const ParticipantViewUI = uiConfig.participantViewUI;
   const { currentRoom } = useRoomState();
   const { participantList } = useRoomParticipantState();
+  const [annotating, setAnnotating] = useState(false);
+  // The share page's corner window follows the speaker, like the desktop mini window.
+  const { speakerStream } = useSingleStageStream();
   const participantCount = currentRoom?.participantCount || participantList.length;
   // Mounted before the join runs, so the recording notice catches the start event a late joiner receives.
   useRoomTips({ onLeave: () => onLeave?.() });
@@ -178,6 +183,8 @@ export function ConferenceViewMobile(props: ConferenceViewMobileProps) {
             <main className="conference-mobile-stage">
               <RoomViewMobile
                 hideOverlay={Boolean(ParticipantViewUI)}
+                shareLocked={annotating}
+                pipParticipant={speakerStream?.participant}
                 participantViewUISlot={ParticipantViewUI
                   ? ({ participant, streamType }) => (
                     <ParticipantViewUI participant={participant} streamType={streamType} />
@@ -210,6 +217,7 @@ export function ConferenceViewMobile(props: ConferenceViewMobileProps) {
                   onClick={() => togglePanel('captions')}
                 />
                 <CloudRecordingButtonMobile />
+                <AnnotationButtonMobile onUpdateActive={setAnnotating} />
                 <SettingButtonMobile onClick={() => setSettingsOpen(true)} />
               </OverflowToolbarMobile>
             </footer>
