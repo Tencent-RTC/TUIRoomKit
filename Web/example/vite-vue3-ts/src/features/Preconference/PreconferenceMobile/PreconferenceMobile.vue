@@ -165,7 +165,7 @@
         <TUIInput
           v-model="roomInput"
           class="pre-join-input"
-          type="number"
+          inputmode="numeric"
           size="lg"
           :maxlength="6"
           :placeholder="t('Preconference.RoomIdPlaceholder')"

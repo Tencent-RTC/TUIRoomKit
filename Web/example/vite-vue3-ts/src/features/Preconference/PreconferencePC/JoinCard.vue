@@ -32,7 +32,7 @@
     <form class="join-form" @submit.prevent="join">
       <TUIInput
         v-model="roomInput"
-        type="number"
+        inputmode="numeric"
         class="join-input-row"
         :aria-label="t('Preconference.RoomIdLabel')"
         :placeholder="t('Preconference.RoomIdPlaceholder')"
