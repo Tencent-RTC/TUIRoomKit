@@ -2,6 +2,7 @@ import { computed, effectScope, nextTick, readonly, ref, watch } from 'vue';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
 import {
   DeviceStatus,
+  RoomParticipantRole,
   useDeviceState,
   useRoomParticipantState,
   useRoomState,
@@ -263,6 +264,22 @@ function createWhiteboard() {
       }
     },
     { immediate: true },
+  );
+
+  // A board is a share the engine cannot see, so the share ban has to end it here.
+  watch(
+    () => currentRoom.value?.isAllScreenShareDisabled,
+    (disabled, previousDisabled) => {
+      if (
+        disabled && !previousDisabled
+        && (isWhiteboardOn.value || opening.value)
+        && localParticipant.value?.role === RoomParticipantRole.GeneralUser
+      ) {
+        stopSession().catch((error: unknown) => {
+          console.warn('[WhiteboardState] stop whiteboard on share ban failed:', error);
+        });
+      }
+    },
   );
 
   /** Opens the local board. Does nothing while any share or session is up, or a start is in flight. */

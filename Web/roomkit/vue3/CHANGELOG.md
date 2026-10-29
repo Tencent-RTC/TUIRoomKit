@@ -4,6 +4,18 @@
 
 ---
 
+## [7.0.2] - 2026-10-29
+
+### Changed
+
+- Upgraded `tuikit-atomicx-vue3` to 6.6.3.
+
+### Fixed
+
+- Fixed the remote camera video on H5 switching from cover to contain after a screen share ends.
+- Fixed the microphone button on H5 showing as on, not responding to taps, and giving no disabled hint after joining a room where all microphones are muted.
+- Fixed rounded video corners not taking effect in Safari, and the speaking halo on video tiles being clipped.
+
 ## [7.0.1] - 2026-10-28
 
 ### Added

@@ -18,6 +18,7 @@
       :placeholder="placeholder"
       :disabled="disabled"
       :maxlength="maxlength"
+      :inputmode="inputmode"
       :rows="rows"
       @input="onInput"
       @change="onChange"
@@ -36,6 +37,7 @@
       :placeholder="placeholder"
       :disabled="disabled"
       :maxlength="maxlength"
+      :inputmode="inputmode"
       @input="onInput"
       @change="onChange"
       @focus="onFocus"
@@ -81,6 +83,7 @@ const props = withDefaults(defineProps<{
   clearable?: boolean;
   showPassword?: boolean;
   maxlength?: number;
+  inputmode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
   rows?: number;
   size?: 'sm' | 'md' | 'lg';
   status?: 'default' | 'error';
