@@ -39,6 +39,8 @@ export function measureAvailableWidth(
 export interface OverflowMenuEntry {
   id: string;
   label: string;
+  /** Locale-proof identity (data-overflow-key) scraped with the label. */
+  overflowKey?: string;
   icon: string;
   /** The collapsed control paints its own menu inside the more menu. */
   hasSubmenu?: boolean;

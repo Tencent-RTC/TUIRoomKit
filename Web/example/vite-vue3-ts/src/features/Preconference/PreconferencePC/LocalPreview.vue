@@ -58,7 +58,6 @@
         class="media-btn"
         :class="{
           'is-off': !isMicrophoneTesting,
-          'is-abnormal': hasMicrophoneError,
         }"
       >
         <button
@@ -70,7 +69,7 @@
           <span class="media-btn-icon-wrap">
             <MicLevelIcon v-if="isMicrophoneTesting" :size="20" />
             <IconMicOff v-else :size="20" />
-            <IconUnSupport v-if="hasMicrophoneError" class="media-btn-badge" :size="10" />
+            <span v-if="hasMicrophoneError" class="media-btn-badge" aria-hidden="true">!</span>
           </span>
         </button>
         <i class="media-btn-divider" />
@@ -99,7 +98,6 @@
         class="media-btn"
         :class="{
           'is-off': !isCameraTesting,
-          'is-abnormal': hasCameraError,
         }"
       >
         <button
@@ -112,7 +110,7 @@
           <span class="media-btn-icon-wrap">
             <IconCam v-if="isCameraTesting" :size="20" />
             <IconCamOff v-else :size="20" />
-            <IconUnSupport v-if="hasCameraError" class="media-btn-badge" :size="10" />
+            <span v-if="hasCameraError" class="media-btn-badge" aria-hidden="true">!</span>
           </span>
         </button>
         <i class="media-btn-divider" />
@@ -142,7 +140,7 @@
       :open="settingsOpen"
       :active-tab="settingsTab"
       @select="settingsTab = $event"
-      @close="settingsOpen = false"
+      @close="handleSettingsClose"
     />
   </div>
 </template>
@@ -159,7 +157,6 @@ import {
   IconChevronUp,
   IconImage,
   IconMicOff,
-  IconUnSupport,
   AudioDeviceMenu,
   MicLevelIcon,
   SettingsDialogPC,
@@ -255,9 +252,26 @@ function toggleMicrophone() {
   }
 }
 
+// Snapshot at open time: at close-handler time the panel's own test stream is
+// still running, so isCameraTesting there cannot tell this fact apart.
+let cameraOnBeforeSettings = false;
+
 function openSettings(tab: SettingsTab = 'videoEffect') {
+  cameraOnBeforeSettings = isCameraTesting.value;
   settingsTab.value = tab;
   settingsOpen.value = true;
+}
+
+function handleSettingsClose() {
+  settingsOpen.value = false;
+  // Respect the camera state the user had before opening the panel: a camera
+  // that was off started the panel's own test stream and stops with it.
+  if (!cameraOnBeforeSettings) {
+    return;
+  }
+  // The effect panel borrowed the shared camera test's render view; the
+  // stream is still ours, take the view back.
+  startCameraPreview().catch(() => {});
 }
 
 onMounted(() => {
@@ -450,11 +464,11 @@ function leaveForSetting(tab: SettingsTab) {
   background: rgba(70, 100, 150, 0.075);
 }
 
-:global(.rk-root[data-rk-theme='dark']) .media-btn {
+:global(.rk-root[data-rk-theme='dark'] .media-btn) {
   background: rgba(140, 170, 230, 0.035);
 }
 
-:global(.rk-root[data-rk-theme='dark']) .media-btn:hover {
+:global(.rk-root[data-rk-theme='dark'] .media-btn:hover) {
   background: rgba(140, 170, 230, 0.07);
 }
 
@@ -513,16 +527,23 @@ function leaveForSetting(tab: SettingsTab) {
   transform: rotate(180deg);
 }
 
-.media-btn.is-abnormal {
-  background: color-mix(in srgb, var(--rk-danger) 10%, transparent);
-}
-
 .media-btn-badge {
   position: absolute;
-  right: -1px;
-  bottom: 0;
-  color: var(--rk-danger);
+  top: -4px;
+  right: -6px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
   pointer-events: none;
+  background: var(--rk-warning);
+  border: 1.5px solid var(--rk-bg-surface);
+  border-radius: 50%;
 }
 
 .preview-fault-overlay {
@@ -564,25 +585,25 @@ function leaveForSetting(tab: SettingsTab) {
   color: var(--rk-text-secondary);
 }
 
-:global(.rk-root[data-rk-theme='dark']) .local-preview .preview-fault-overlay {
+:global(.rk-root[data-rk-theme='dark'] .local-preview .preview-fault-overlay) {
   background: var(--rk-bg-camera-off);
 }
 
-:global(.rk-root[data-rk-theme='dark']) .local-preview.has-fault-overlay .video-preview {
+:global(.rk-root[data-rk-theme='dark'] .local-preview.has-fault-overlay .video-preview) {
   background: var(--rk-bg-camera-off);
 }
 
-:global(.rk-root[data-rk-theme='dark']) .local-preview .preview-fault-overlay-icon {
+:global(.rk-root[data-rk-theme='dark'] .local-preview .preview-fault-overlay-icon) {
   color: var(--rk-text-primary);
   background: var(--rk-border);
   border-color: var(--rk-border-strong);
 }
 
-:global(.rk-root[data-rk-theme='dark']) .local-preview .preview-fault-overlay-title {
+:global(.rk-root[data-rk-theme='dark'] .local-preview .preview-fault-overlay-title) {
   color: var(--rk-text-primary);
 }
 
-:global(.rk-root[data-rk-theme='dark']) .local-preview .preview-fault-overlay-desc {
+:global(.rk-root[data-rk-theme='dark'] .local-preview .preview-fault-overlay-desc) {
   color: var(--rk-text-secondary);
 }
 

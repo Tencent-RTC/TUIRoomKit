@@ -11,6 +11,7 @@
         'toolbar-button-with-menu': hasMenu,
       }"
       :data-menu-open="menuOpen ? '1' : undefined"
+      :data-overflow-key="overflowKey || undefined"
     >
       <button
         class="toolbar-button-main"
@@ -22,7 +23,7 @@
       >
         <span class="toolbar-button-icon">
           <slot name="icon">
-            <component :is="icon" :size="22" v-if="icon && typeof icon !== 'string'" />
+            <component :is="icon" v-if="icon && typeof icon !== 'string'" :size="22" />
             <template v-else>{{ icon }}</template>
           </slot>
           <IconUnSupport v-if="notice" class="toolbar-button-notice" :size="12" />
@@ -64,6 +65,12 @@ defineOptions({ inheritAttrs: false });
 const props = withDefaults(defineProps<{
   label: string;
   icon?: string | Component;
+  /**
+   * Stable i18n key identifying this control for the overflow more-menu, so the
+   * menu can re-translate and re-icon entries regardless of when they were
+   * scraped off the DOM. Locale-proof alternative to matching display text.
+   */
+  overflowKey?: string;
   /** Accessible name for the menu trigger, defaults to the button label */
   menuLabel?: string;
   active?: boolean;
@@ -83,6 +90,7 @@ const props = withDefaults(defineProps<{
   hideMenu?: boolean;
 }>(), {
   icon: undefined,
+  overflowKey: '',
   menuLabel: '',
   active: false,
   danger: false,

@@ -169,14 +169,26 @@ function matches(label: string, ...keys: string[]) {
 interface OverflowMenuItem {
   id: string;
   label: string;
+  overflowKey?: string;
   icon?: Component;
   danger?: boolean;
   active?: boolean;
   hasSubmenu?: boolean;
 }
 
+/** Key-based icon identity, immune to the locale the label was scraped in. */
+const OVERFLOW_KEY_ICONS: Record<string, Component> = {
+  'Participants.Panel': IconMembers,
+  'Chat.Title': IconChat,
+  'AITools.Entry': IconAISubtitles,
+  'Settings.Title': IconSettings,
+};
+
 function resolveItem(action: OverflowMenuEntry): OverflowMenuItem {
-  if (matches(action.label, 'ScreenShare.Share', 'ScreenShare.Stop')) {
+  if (
+    action.overflowKey === 'ScreenShare.Share'
+    || matches(action.label, 'ScreenShare.Share', 'ScreenShare.Stop')
+  ) {
     return {
       ...action,
       label: t(isLocalSharing.value ? 'ScreenShare.Stop' : 'ScreenShare.Share'),
@@ -184,13 +196,23 @@ function resolveItem(action: OverflowMenuEntry): OverflowMenuItem {
       active: isLocalSharing.value,
     };
   }
-  if (matches(action.label, 'CloudRecording.RecordLabel', 'CloudRecording.RecordingLabel')) {
+  if (
+    action.overflowKey === 'CloudRecording.RecordLabel'
+    || matches(action.label, 'CloudRecording.RecordLabel', 'CloudRecording.RecordingLabel')
+  ) {
     return {
       ...action,
       label: t(isRecording.value ? 'CloudRecording.RecordingLabel' : 'CloudRecording.RecordLabel'),
       icon: isRecording.value ? IconRecording : IconRecord,
       active: isRecording.value,
       danger: isRecording.value,
+    };
+  }
+  if (action.overflowKey) {
+    return {
+      ...action,
+      label: t(action.overflowKey),
+      icon: OVERFLOW_KEY_ICONS[action.overflowKey] ?? iconFor(action.label),
     };
   }
   return {

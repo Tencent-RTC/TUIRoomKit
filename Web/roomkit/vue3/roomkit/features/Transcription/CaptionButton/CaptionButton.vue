@@ -9,6 +9,7 @@
   >
     <ToolbarButtonPC
       :label="t('AITools.Entry')"
+      overflow-key="AITools.Entry"
       :icon="IconAISubtitles"
       :active="active"
       hide-menu

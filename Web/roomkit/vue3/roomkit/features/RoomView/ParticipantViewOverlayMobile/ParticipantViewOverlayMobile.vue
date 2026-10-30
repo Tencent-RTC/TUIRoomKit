@@ -25,7 +25,9 @@
     <button
       v-if="showFlipCamera"
       class="participant-view-overlay-flip"
+      :class="{ 'is-pending': flipPending }"
       type="button"
+      :disabled="flipPending"
       :aria-label="t('Device.FlipCamera')"
       @click.stop="emit('flip-camera')"
       @pointerdown.stop
@@ -89,6 +91,8 @@ const props = defineProps<{
   streamType: VideoStreamType;
   /** The camera window on the share page: no signal bars, and a smaller flip. */
   inPip?: boolean;
+  /** A camera flip is still running; the flip button stays dimmed until it lands. */
+  flipPending?: boolean;
 }>();
 
 /* The stage owns the flip: it outlives the tile, which paging remounts, so the front
@@ -274,6 +278,12 @@ const showNetworkBars = computed(() => !props.inPip && networkQuality.value >= N
 
 .participant-view-overlay-flip:active {
   transform: scale(0.96);
+}
+
+.participant-view-overlay-flip.is-pending {
+  cursor: default;
+  opacity: 0.45;
+  transform: none;
 }
 
 .participant-view-overlay-network {

@@ -48,7 +48,9 @@
         >
           <IconFlipCamera :size="16" />
         </button>
-        <span class="pre-name-tag">{{ displayUserName || t('Preconference.PreviewFallbackName') }}</span>
+        <span class="pre-name-tag">
+          <span class="pre-name-tag-text">{{ displayUserName || t('Preconference.PreviewFallbackName') }}</span>
+        </span>
         <div class="pre-controls">
           <button
             type="button"
@@ -588,7 +590,11 @@ input:focus-visible {
   z-index: 8;
   display: inline-flex;
   align-items: center;
+  /* Cap by the LiveKit seat-widget precedent (120px), and never cross the
+     centered mic/camera cluster (74px wide) plus the 10px inset on narrow screens. */
+  max-width: min(120px, calc(50% - 47px));
   padding: 3px 10px;
+  overflow: hidden;
   font-family: inherit;
   font-size: var(--rk-fs-sm);
   font-weight: 500;
@@ -597,6 +603,12 @@ input:focus-visible {
   white-space: nowrap;
   background: rgba(0, 0, 0, 0.45);
   border-radius: var(--rk-radius-pill);
+}
+
+.pre-name-tag-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pre-controls {

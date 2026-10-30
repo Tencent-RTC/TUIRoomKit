@@ -82,6 +82,11 @@ const setASROn = (next: boolean) => {
   // the fact that transcription just started or stopped. Whether captions are
   // shown stays each participant's own choice.
   emptyDismissed.value = false;
+
+  // Announce a fresh start to the room audience; the host started it themselves.
+  if (next && !canManageASR.value) {
+    TUIToast.info({ message: t('AITools.RecordStatusOn') });
+  }
 };
 
 const resetASRState = () => {

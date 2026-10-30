@@ -14,6 +14,14 @@ export const splitGraphemes = (value: string): string[] => {
   return Array.from(value);
 };
 
+/**
+ * nowrap only guards Latin tokens ("keep English words on one line"). A
+ * space-less CJK/Hangul/Kana/Thai run is a single "word" for the segmenter;
+ * nowrap on such a run builds an unbreakable line that overflows the
+ * one-line caption window and pushes the visible text out of view.
+ */
+const LATIN_TOKEN_RE = /^[\p{Script=Latin}\p{Nd}'’-]+$/u;
+
 export const splitWordSegments = (value: string): Array<{ text: string; nowrap: boolean }> => {
   if (!value) {
     return [];
@@ -22,12 +30,12 @@ export const splitWordSegments = (value: string): Array<{ text: string; nowrap: 
     return [...new Intl.Segmenter(undefined, { granularity: 'word' }).segment(value)]
       .map(part => ({
         text: part.segment,
-        nowrap: Boolean(part.isWordLike),
+        nowrap: Boolean(part.isWordLike) && LATIN_TOKEN_RE.test(part.segment),
       }));
   }
   return value.split(/(\s+)/).filter(Boolean).map(text => ({
     text,
-    nowrap: !/^\s+$/.test(text),
+    nowrap: !/^\s+$/.test(text) && LATIN_TOKEN_RE.test(text),
   }));
 };
 

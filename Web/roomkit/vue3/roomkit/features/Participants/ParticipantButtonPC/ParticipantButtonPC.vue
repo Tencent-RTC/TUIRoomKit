@@ -1,6 +1,7 @@
 <template>
   <ToolbarButtonPC
-    :label="t('Participants.Panel')"
+    :label="label || t('Participants.Panel')"
+    overflow-key="Participants.Panel"
     :active="active"
     @click="handleClick"
   >
