@@ -4,6 +4,21 @@
 
 ---
 
+## [7.0.3] - 2026-10-30
+
+### Changed
+
+- Upgraded `@tencentcloud/tuiroom-engine-js` to 4.3.2, which fixes a local video mirroring issue.
+- Removed the microphone test and speaker test from the audio device menu.
+- A general participant's whiteboard is now closed automatically when the host disables screen sharing for everyone.
+
+### Fixed
+
+- Fixed rapidly tapping the flip camera button on H5 leaving the camera or mirror in the wrong state. The button is now disabled until the switch completes.
+- Fixed participants not being notified when the host starts real-time transcription.
+- Fixed CJK captions overflowing the single-line caption window and pushing the text out of view.
+- Fixed items in the PC toolbar "More" menu showing the wrong icon, or a stale label after switching languages.
+
 ## [7.0.2] - 2026-10-29
 
 ### Changed

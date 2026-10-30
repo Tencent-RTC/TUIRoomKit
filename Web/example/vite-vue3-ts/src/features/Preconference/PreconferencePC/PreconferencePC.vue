@@ -297,7 +297,7 @@ function openSchedule(meeting?: RoomInfo) {
   border-radius: 12px;
 }
 
-:global(.rk-root[data-rk-theme='dark']) .pre-fault-banner {
+:global(.rk-root[data-rk-theme='dark'] .pre-fault-banner) {
   color: var(--rk-text-primary);
 }
 

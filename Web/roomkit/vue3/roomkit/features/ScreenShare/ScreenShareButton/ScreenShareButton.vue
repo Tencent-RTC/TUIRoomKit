@@ -11,6 +11,7 @@
   >
     <ToolbarButtonPC
       :label="label"
+      overflow-key="ScreenShare.Share"
       :icon="IconShare"
       :active="isSharing"
       :blocked="isShareBlocked"
@@ -31,6 +32,7 @@
   <ToolbarButtonPC
     v-else
     :label="label"
+    overflow-key="ScreenShare.Share"
     :icon="IconShare"
     :active="isSharing"
     :blocked="isShareBlocked"

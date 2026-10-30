@@ -2,6 +2,7 @@
   <div class="chat-button">
     <ToolbarButtonPC
       :label="t('Chat.Title')"
+      overflow-key="Chat.Title"
       :active="active"
       @click="$emit('click')"
     >

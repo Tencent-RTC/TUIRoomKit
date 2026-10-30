@@ -8,6 +8,7 @@
             :participant="slotProps.participant"
             :stream-type="slotProps.streamType"
             :in-pip="slotProps.inPip"
+            :flip-pending="isPending"
             @flip-camera="handleFlipCamera"
           />
         </template>
@@ -22,6 +23,7 @@
    speaker and cinema layouts are desktop-only, and a share gets a page of its own
    inside the gallery instead of switching layouts. Who the share page's corner
    window follows is the host's call, passed in as `pipParticipant`. */
+import { ref } from 'vue';
 import { MirrorType, VideoStreamType, useDeviceState } from 'tuikit-atomicx-vue3/room';
 import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 import ParticipantViewOverlayMobile from '../ParticipantViewOverlayMobile/ParticipantViewOverlayMobile.vue';
@@ -43,14 +45,41 @@ const { isFrontCamera, switchCamera, localMirrorType, switchMirror } = useDevice
    because paging remounts the tile and would drop it. */
 let frontCameraMirror = isFrontCamera.value ? localMirrorType.value : MirrorType.Auto;
 
+/* isFrontCamera only updates once switchCamera resolves, so overlapping flips would
+   all aim the same way and save the back camera's Disable as the front setting.
+   A flip that never settles frees the button after FLIP_TIMEOUT_MS; once a newer
+   flip has started, the stale one neither applies its mirror nor clears the lock. */
+const FLIP_TIMEOUT_MS = 5000;
+const isPending = ref(false);
+let flipId = 0;
+
 async function handleFlipCamera() {
-  await switchCamera({ isFrontCamera: !isFrontCamera.value });
-  if (isFrontCamera.value) {
-    await switchMirror({ mirror: frontCameraMirror });
+  if (isPending.value) {
     return;
   }
-  frontCameraMirror = localMirrorType.value;
-  await switchMirror({ mirror: MirrorType.Disable });
+  const id = ++flipId;
+  isPending.value = true;
+  const timer = setTimeout(() => {
+    if (id === flipId) {
+      isPending.value = false;
+    }
+  }, FLIP_TIMEOUT_MS);
+  try {
+    const toFront = !isFrontCamera.value;
+    if (!toFront) {
+      frontCameraMirror = localMirrorType.value;
+    }
+    await switchCamera({ isFrontCamera: toFront });
+    if (id !== flipId) {
+      return;
+    }
+    await switchMirror({ mirror: toFront ? frontCameraMirror : MirrorType.Disable });
+  } finally {
+    clearTimeout(timer);
+    if (id === flipId) {
+      isPending.value = false;
+    }
+  }
 }
 </script>
 

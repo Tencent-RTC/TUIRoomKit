@@ -1,7 +1,7 @@
 <template>
   <div class="device-menu">
     <div class="device-menu-title">
-    {{ t('Device.Microphone') }}
+      {{ t('Device.Microphone') }}
     </div>
     <div v-if="microphoneList.length" ref="microphoneListRef" class="device-menu-list">
       <button
@@ -26,20 +26,10 @@
       {{ t('Device.NoMicrophone') }}
     </div>
 
-    <div class="device-menu-level">
-      <div class="device-menu-bars" :aria-label="t('Device.MicLevel')">
-        <span
-          v-for="index in LEVEL_BAR_COUNT"
-          :key="index"
-          :class="{ 'device-menu-bar-on': index <= activeBarCount }"
-        />
-      </div>
-    </div>
-
     <div class="device-menu-divider" />
 
     <div class="device-menu-title">
-    {{ t('Device.Speaker') }}
+      {{ t('Device.Speaker') }}
     </div>
     <div v-if="speakerList.length" ref="speakerListRef" class="device-menu-list">
       <button
@@ -63,32 +53,13 @@
     <div v-else class="device-menu-empty">
       {{ t('Device.NoSpeaker') }}
     </div>
-
-    <div class="device-menu-row">
-      <span class="device-menu-label">
-        <span>{{ t('Device.SpeakerTest') }}</span>
-        <span class="device-menu-sub">{{ t('Device.SpeakerTestHint') }}</span>
-      </span>
-      <button
-        class="device-menu-test"
-        :class="{ 'is-playing': isSpeakerTesting }"
-        type="button"
-        @click="toggleSpeakerTest"
-      >
-        {{ isSpeakerTesting ? t('Device.Stop') : t('Device.Test') }}
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 import { useDeviceState } from 'tuikit-atomicx-vue3/room';
 import { IconCheck, TUIToast, t } from '../../../base';
-
-const SPEAKER_TEST_URL
-  = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
-const LEVEL_BAR_COUNT = 16;
 
 const microphoneListRef = ref<HTMLElement | null>(null);
 const speakerListRef = ref<HTMLElement | null>(null);
@@ -96,29 +67,13 @@ const speakerListRef = ref<HTMLElement | null>(null);
 const {
   microphoneList,
   currentMicrophone,
-  currentMicVolume,
-  testingMicVolume,
-  isMicrophoneTesting,
   speakerList,
   currentSpeaker,
-  isSpeakerTesting,
   getMicrophoneList,
   getSpeakerList,
   setCurrentMicrophone,
   setCurrentSpeaker,
-  startSpeakerTest,
-  stopSpeakerTest,
 } = useDeviceState();
-
-/** Device test reports its own volume; the published-mic value is empty before a room. */
-const micVolume = computed(() =>
-  isMicrophoneTesting.value ? testingMicVolume.value : currentMicVolume.value,
-);
-
-const activeBarCount = computed(() => {
-  const volume = Math.min(100, Math.max(0, micVolume.value));
-  return Math.round((volume / 100) * LEVEL_BAR_COUNT);
-});
 
 async function selectMicrophone(deviceId: string) {
   try {
@@ -136,18 +91,6 @@ async function selectSpeaker(deviceId: string) {
   }
 }
 
-async function toggleSpeakerTest() {
-  try {
-    if (isSpeakerTesting.value) {
-      await stopSpeakerTest();
-      return;
-    }
-    await startSpeakerTest({ filePath: SPEAKER_TEST_URL });
-  } catch {
-    TUIToast.error(t('Device.SpeakerTestFailed'));
-  }
-}
-
 /** A long list often keeps the current device below the fold; open with it in view. */
 function revealCurrentDevice(list: HTMLElement | null) {
   list?.querySelector('.device-menu-item-active')?.scrollIntoView({ block: 'nearest' });
@@ -158,12 +101,6 @@ onMounted(async () => {
   await nextTick();
   revealCurrentDevice(microphoneListRef.value);
   revealCurrentDevice(speakerListRef.value);
-});
-
-onBeforeUnmount(() => {
-  if (isSpeakerTesting.value) {
-    stopSpeakerTest();
-  }
 });
 </script>
 
@@ -312,123 +249,5 @@ onBeforeUnmount(() => {
   height: 1px;
   margin: 3px 0;
   background: color-mix(in srgb, var(--rk-text-primary) 9%, transparent);
-}
-
-.device-menu-row {
-  display: flex;
-  flex: none;
-  gap: 7px;
-  align-items: center;
-  justify-content: space-between;
-  /* Padding-sized like the design row, not a 36px single-line slot */
-  min-height: 0;
-  padding: 8px 12px;
-  font-size: var(--rk-fs-md);
-  line-height: 20px;
-  color: var(--rk-text-primary);
-  border-radius: var(--rk-radius-md);
-}
-
-.device-menu-label {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-
-.device-menu-sub {
-  font-size: var(--rk-fs-sm);
-  line-height: 14px;
-  color: var(--rk-text-tertiary);
-}
-
-.device-menu-level {
-  flex: none;
-  padding: 8px 12px 10px;
-}
-
-.device-menu-bars {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-  height: 8px;
-}
-
-/* Bars split the row evenly, so the meter spans the menu at any width */
-.device-menu-bars span {
-  flex: 1;
-  min-width: 0;
-  height: 3px;
-  background: color-mix(in srgb, var(--rk-text-primary) 9%, transparent);
-  border-radius: var(--rk-radius-pill);
-}
-
-/* Needs the parent to outweigh the `.device-menu-bars span` base colour */
-.device-menu-bars .device-menu-bar-on {
-  background: var(--rk-green-500);
-}
-
-.device-menu-test {
-  position: relative;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  min-width: 36px;
-  height: 18px;
-  padding: 0 7px;
-  overflow: hidden;
-  font-size: var(--rk-fs-xs);
-  font-weight: 600;
-  line-height: 1;
-  color: var(--rk-text-primary);
-  cursor: pointer;
-  background: color-mix(in srgb, var(--rk-text-primary) 9%, transparent);
-  border: 0;
-  border-radius: var(--rk-radius-pill);
-}
-
-.device-menu-test:hover {
-  background: color-mix(in srgb, var(--rk-text-primary) 16%, transparent);
-}
-
-/* Playing keeps its accent fill on hover; the label already turned into "stop" */
-.device-menu-test.is-playing,
-.device-menu-test.is-playing:hover {
-  padding-left: 22px;
-  color: var(--rk-on-accent);
-  background: var(--rk-brand);
-}
-
-/* One bar plus two box-shadow copies; the shadows carry the animation */
-.device-menu-test.is-playing::before {
-  position: absolute;
-  top: 50%;
-  left: 6px;
-  width: 2px;
-  height: 8px;
-  margin-top: -4px;
-  content: '';
-  background: currentcolor;
-  border-radius: 1px;
-  box-shadow: 4px 1px 0 currentcolor, 8px -1px 0 currentcolor;
-  animation: device-menu-test-wave 0.55s ease-in-out infinite;
-}
-
-@keyframes device-menu-test-wave {
-  0%,
-  100% {
-    box-shadow: 4px 1px 0 currentcolor, 8px -1px 0 currentcolor;
-  }
-
-  50% {
-    box-shadow: 4px -1px 0 currentcolor, 8px 1px 0 currentcolor;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .device-menu-test.is-playing::before {
-    animation: none;
-  }
 }
 </style>
