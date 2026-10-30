@@ -62,7 +62,7 @@ function iconOf(type: ToastType) {
   align-items: center;
   justify-content: center;
   min-width: 200px;
-  padding: 16px 28px;
+  padding: 10px 20px;
   font-weight: 500;
   color: var(--rk-text-primary);
   background: var(--rk-bg-surface);

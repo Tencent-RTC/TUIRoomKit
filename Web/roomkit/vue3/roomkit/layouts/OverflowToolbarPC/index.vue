@@ -14,7 +14,6 @@
         @drill="drill"
         @leave="leaveSubmenu"
         @close="leaveSubmenu"
-        @open="refreshOnMenuOpen"
         @minimize="emit('minimize')"
         @fullscreen="emit('fullscreen')"
       />
@@ -71,16 +70,6 @@ function readLabel(element: HTMLElement): string {
     || element.querySelector<HTMLElement>('[aria-label]')?.getAttribute('aria-label')
     || element.querySelector('.toolbar-button-label')?.textContent?.trim()
     || element.querySelector('.participant-button-tip')?.textContent?.trim()
-    || '';
-}
-
-/**
- * Locale-proof identity scraped off the collapsed control (data-overflow-key).
- * Falls back to '' for items that do not expose one.
- */
-function readOverflowKey(element: HTMLElement): string {
-  return element.dataset.overflowKey
-    || element.querySelector<HTMLElement>('[data-overflow-key]')?.dataset.overflowKey
     || '';
 }
 
@@ -170,7 +159,6 @@ function layout() {
     overflow.push({
       id: String(index),
       label: readLabel(element) || `Item ${index + 1}`,
-      overflowKey: readOverflowKey(element),
       icon: '',
       hasSubmenu: hasOverflowSubmenu(element),
     });
@@ -189,16 +177,6 @@ function scheduleLayout() {
     layoutFrame = 0;
     layout();
   });
-}
-
-/**
- * Snapshot labels/keys right before the more menu is shown: a locale switch or
- * an aria-label change does not resize anything, so the observers would not
- * fire and the menu would render whatever was scraped earlier.
- */
-function refreshOnMenuOpen() {
-  lastVisibleCount = -1;
-  layout();
 }
 
 function submenuFlagsStale(items: HTMLElement[]): boolean {

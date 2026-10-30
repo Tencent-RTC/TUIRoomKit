@@ -61,7 +61,7 @@ function keepCollapsedClosed(event: MouseEvent) {
 }
 
 /** TUIDropdown is multi-root, so `$el` is the fragment comment, not the anchor. */
-function resolveDropdownAnchor(root: Node | null | undefined): HTMLElement | null {
+function resolveDropdownAnchor(root: ChildNode | null | undefined): HTMLElement | null {
   const nested = (node: HTMLElement) => {
     if (node.classList.contains('rk-dropdown-anchor')) {
       return node;

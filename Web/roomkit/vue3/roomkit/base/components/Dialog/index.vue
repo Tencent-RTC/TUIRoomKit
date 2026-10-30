@@ -14,7 +14,7 @@
         role="dialog"
         aria-modal="true"
         tabindex="-1"
-        :style="{ width: panelWidth, left: `${x}px`, top: `${y}px` }"
+        :style="panelStyle"
       >
         <div class="rk-dialog-header">
           <slot name="header">
@@ -64,6 +64,7 @@
 <script setup lang="ts">
 import { getPlatform } from '@tencentcloud/universal-api';
 import { computed, ref, toRef } from 'vue';
+import type { CSSProperties } from 'vue';
 import { useModality } from '../../headless/useModality';
 import { useOverlay } from '../../headless/useOverlay';
 import { IconClose } from '../../icons';
@@ -76,6 +77,8 @@ const props = withDefaults(defineProps<{
   open: boolean;
   title?: string;
   width?: number | string;
+  /** Panel height; auto-sized from content when unset (max-height still applies). */
+  height?: number | string;
   closable?: boolean;
   closeOnOverlay?: boolean;
   closeOnEsc?: boolean;
@@ -86,6 +89,12 @@ const props = withDefaults(defineProps<{
   confirmDisabled?: boolean;
   cancelDisabled?: boolean;
   confirmLoading?: boolean;
+  /**
+   * Extra inline styles bound to the panel, merged after width / height so
+   * callers win. The panel teleports outside the caller's DOM, so this is the
+   * sanctioned way to deliver per-instance overrides such as `--rk-dialog-padding`.
+   */
+  style?: CSSProperties;
 }>(), {
   closable: true,
   closeOnOverlay: true,
@@ -94,6 +103,8 @@ const props = withDefaults(defineProps<{
   confirmText: 'OK',
   cancelText: 'Cancel',
   confirmVariant: 'primary',
+  height: undefined,
+  style: undefined,
 });
 
 const emit = defineEmits<{
@@ -125,6 +136,21 @@ const panelWidth = computed(() => {
   return typeof props.width === 'number' ? `${props.width}px` : props.width;
 });
 
+const panelHeight = computed(() => {
+  if (props.height == null) {
+    return undefined;
+  }
+  return typeof props.height === 'number' ? `${props.height}px` : props.height;
+});
+
+const panelStyle = computed(() => ({
+  width: panelWidth.value,
+  height: panelHeight.value,
+  left: `${x.value}px`,
+  top: `${y.value}px`,
+  ...(props.style ?? {}),
+}));
+
 function onClose() {
   emit('update:open', false);
   emit('close');
@@ -148,7 +174,11 @@ function onOverlay() {
   overscroll-behavior: contain;
   pointer-events: auto;
   background: var(--rk-bg-overlay);
-  backdrop-filter: blur(6px);
+
+  /* The conference design blurs the mask; the edu design drops the blur
+   * (views-edu rk-set-mask / ClassRoster-edu backdrop), so the effect rides
+   * a token the scene packs can override. */
+  backdrop-filter: var(--rk-dialog-mask-blur, blur(6px));
 }
 
 .rk-dialog-mask-bare {
@@ -162,7 +192,8 @@ function onOverlay() {
   flex-direction: column;
   max-width: calc(100% - 48px);
   max-height: min(calc(100% - 48px), calc(100vh - 48px));
-  padding: 24px 24px 20px;
+  padding: var(--rk-dialog-padding, 24px 24px 20px);
+  overflow: hidden;
   overscroll-behavior: contain;
   background: var(--rk-bg-surface);
   border: var(--rk-dialog-border, 1px solid var(--rk-border));
@@ -176,7 +207,7 @@ function onOverlay() {
   gap: 12px;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: var(--rk-dialog-header-gap, 6px);
 }
 
 .rk-dialog-title {
@@ -205,13 +236,15 @@ function onOverlay() {
 }
 
 .rk-dialog-body {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
-  scrollbar-width: none;
   font-size: var(--rk-fs-sm);
   font-weight: 400;
   line-height: 1.45;
   color: var(--rk-text-secondary);
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
     display: none;
@@ -221,7 +254,7 @@ function onOverlay() {
 .rk-dialog-footer {
   display: flex;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: var(--rk-dialog-footer-gap, 16px);
 }
 
 .rk-dialog-footer :deep(.rk-btn) {
@@ -281,14 +314,14 @@ function onOverlay() {
 }
 
 .rk-dialog.is-h5:has(.rk-dialog-close) .rk-dialog-header,
-.rk-dialog.is-h5:has(textarea, select, input:not([type='checkbox']):not([type='radio'])) .rk-dialog-header {
+.rk-dialog.is-h5:has(textarea, select, input:not([type='checkbox'], [type='radio'])) .rk-dialog-header {
   justify-content: space-between;
 }
 
 .rk-dialog.is-h5:has(.rk-dialog-close) .rk-dialog-title,
 .rk-dialog.is-h5:has(.rk-dialog-close) .rk-dialog-body,
-.rk-dialog.is-h5:has(textarea, select, input:not([type='checkbox']):not([type='radio'])) .rk-dialog-title,
-.rk-dialog.is-h5:has(textarea, select, input:not([type='checkbox']):not([type='radio'])) .rk-dialog-body {
+.rk-dialog.is-h5:has(textarea, select, input:not([type='checkbox'], [type='radio'])) .rk-dialog-title,
+.rk-dialog.is-h5:has(textarea, select, input:not([type='checkbox'], [type='radio'])) .rk-dialog-body {
   text-align: start;
 }
 

@@ -3,27 +3,35 @@
   --rk-text-primary: #1c1b1c;
   --rk-text-secondary: #636263;
   --rk-text-tertiary: #8e8d8e;
-  --rk-text-inverse: #ffffff;
+  --rk-text-inverse: #fff;
   --rk-text-disabled: #c7c6c7;
   --rk-bg-page: #f5f4f5;
-  --rk-bg-surface: #ffffff;
+  --rk-bg-surface: #fff;
   --rk-bg-muted: color-mix(in srgb, #1c1b1c 6%, transparent);
   --rk-bg-hover: color-mix(in srgb, #1c1b1c 10%, transparent);
-  --rk-bg-raised: #ffffff;
+  --rk-bg-raised: #fff;
   --rk-option-hover: color-mix(in srgb, #1c1b1c 10%, transparent);
-  --rk-bg-overlay: rgba(0, 0, 0, 0.55);
+  --rk-bg-overlay: rgba(20, 19, 20, 0.32);
   --rk-bg-camera-off: var(--rk-bg-surface);
   --rk-border: color-mix(in srgb, #1c1b1c 9%, transparent);
-  --rk-border-strong: color-mix(in srgb, #1c1b1c 18%, transparent);
+  --rk-border-subtle: color-mix(in srgb, #1c1b1c 6%, transparent);
+  --rk-border-strong: color-mix(in srgb, #1c1b1c 14%, transparent);
   --rk-avatar-bg: var(--rk-brand);
-  --rk-avatar-fg: #ffffff;
+  --rk-avatar-fg: #fff;
+  --rk-bg-inset: #f2f1f2;
   --rk-toggle-off: #e5e5ea;
-  --rk-knob: #ffffff;
+  --rk-knob: #fff;
   --rk-track: var(--rk-gray-200);
-  --rk-on-accent: #ffffff;
-  --rk-focus-ring: color-mix(in srgb, var(--rk-brand) 22%, transparent);
-  --rk-focus-ring-danger: color-mix(in srgb, var(--rk-danger) 22%, transparent);
+  --rk-on-accent: #fff;
+  --rk-focus-ring: color-mix(in srgb, var(--rk-brand) 55%, transparent);
+  --rk-focus-ring-danger: color-mix(in srgb, var(--rk-danger) 55%, transparent);
   --rk-brand: #0071e3;
+
+  /* Design accent pack companions: strong for pressed/active solid fills,
+   * fg for brand-colored text on dark surfaces. Components may adopt them;
+   * existing --rk-brand-hover derivations keep their behavior. */
+  --rk-brand-strong: #147ce5;
+  --rk-brand-fg: #8ab4ff;
   --rk-bubble-self-bg: color-mix(in srgb, var(--rk-brand) 12%, var(--rk-bg-surface));
   --rk-bubble-self-fg: var(--rk-text-primary);
   --rk-bubble-other-bg: color-mix(in srgb, var(--rk-text-primary) 4%, var(--rk-bg-surface));
@@ -33,7 +41,14 @@
   --rk-danger: #ff453a;
   --rk-danger-hover: color-mix(in srgb, var(--rk-danger) 94%, #0d0d0d);
   --rk-warning: #ff9f0a;
-  --rk-info: #0071e3;
+
+  /* The conference design has no standalone info blue: every "info" surface
+   * (toolbar active chip, side panel tab, badge info, toast info) routes
+   * through the accent via --primary. EDU rides the same route — its views
+   * read --accent for active chips and roster tabs — so the palette blue
+   * stays reserved for the roster stage tag, which the kit does not render. */
+  --rk-info: var(--rk-brand);
+
   /* Calling affordances stay green in both themes, so no dark override. */
   --rk-success: var(--rk-green-400);
   --rk-success-soft: color-mix(in srgb, var(--rk-success) 14%, transparent);

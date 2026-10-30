@@ -4,8 +4,9 @@
     :class="{
       'chat-message-mobile': mobile,
       'chat-message-recalled': isRecalled,
-      'chat-message-self': !isRecalled && message.isSentBySelf,
-      'chat-message-compact': !isRecalled && compact,
+      'chat-message-notice': !isRecalled && bubbleKind === 'notice',
+      'chat-message-self': !isRecalled && bubbleKind !== 'notice' && message.isSentBySelf,
+      'chat-message-owner': !isRecalled && bubbleKind !== 'notice' && isOwnerMessage,
     }"
   >
     <template v-if="isRecalled">
@@ -19,23 +20,22 @@
         {{ t('RoomChat.reedit') }}
       </button>
     </template>
+    <span v-else-if="bubbleKind === 'notice'" class="chat-message-notice-text">
+      {{ noticeText }}
+    </span>
     <template v-else>
       <TUIAvatar
-        v-if="!compact"
         class="chat-message-avatar"
         :src="senderAvatar"
         :alt="senderName"
         :size="mobile ? 28 : 32"
       />
-      <span
-        v-else
-        class="chat-message-avatar-spacer"
-        aria-hidden="true"
-      />
       <div class="chat-message-body">
-        <div v-if="!compact" class="chat-message-meta">
+        <div class="chat-message-meta">
           <span class="chat-message-name">{{ senderName }}</span>
-          <span v-if="timeText" class="chat-message-time">{{ timeText }}</span>
+          <slot name="meta" :message="message" :time-text="timeText">
+            <span v-if="timeText && !isHideTimestamp" class="chat-message-time">{{ timeText }}</span>
+          </slot>
         </div>
         <div class="chat-message-row">
           <span
@@ -163,13 +163,17 @@ import type { MessageAction } from './useMessageActions';
 
 const props = withDefaults(defineProps<{
   message: MessageInfo;
-  actions?: MessageAction[];
-  compact?: boolean;
+  actions?: readonly MessageAction[];
   mobile?: boolean;
+  /** Hides the message timestamp. */
+  isHideTimestamp?: boolean;
+  /** Tints the room owner's bubbles with the self-message accent. */
+  isHighlightOwner?: boolean;
 }>(), {
   actions: () => [],
-  compact: false,
   mobile: false,
+  isHideTimestamp: false,
+  isHighlightOwner: false,
 });
 
 const {
@@ -178,6 +182,7 @@ const {
   recalledText,
   senderAvatar,
   senderName,
+  isOwnerMessage,
   timeText,
   isFailed,
   isSending,
@@ -193,6 +198,7 @@ const {
   videoPoster,
   videoDurationText,
   fallbackText,
+  noticeText,
   reeditRecalled,
   retrySend,
   onActionCommand,
@@ -214,12 +220,7 @@ const {
   flex-direction: row-reverse;
 }
 
-.chat-message-compact {
-  padding-top: 4px;
-}
-
-.chat-message-avatar,
-.chat-message-avatar-spacer {
+.chat-message-avatar {
   flex: 0 0 32px;
   width: 32px;
   height: 32px;
@@ -246,6 +247,23 @@ const {
   font-size: var(--rk-fs-sm);
   line-height: 16px;
   color: var(--rk-text-tertiary);
+}
+
+.chat-message-notice {
+  gap: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.chat-message-notice-text {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  line-height: 18px;
+  color: var(--rk-text-tertiary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chat-message-reedit {
@@ -368,6 +386,14 @@ const {
   border-top-right-radius: 4px;
 }
 
+/* Owner-highlighted bubbles share the self-message tint but keep the
+ * other-side radius, so the owner stands out while staying left-aligned. */
+.chat-message-owner .chat-message-bubble-text,
+.chat-message-owner .chat-message-bubble-unknown {
+  color: var(--rk-bubble-self-fg);
+  background: var(--rk-bubble-self-bg);
+}
+
 .chat-message-text {
   font-size: var(--rk-fs-md);
   line-height: 1.5;
@@ -466,13 +492,7 @@ const {
   margin-left: auto;
 }
 
-.chat-message-mobile.chat-message-compact {
-  padding-top: 0;
-  padding-bottom: 8px;
-}
-
-.chat-message-mobile .chat-message-avatar,
-.chat-message-mobile .chat-message-avatar-spacer {
+.chat-message-mobile .chat-message-avatar {
   flex-basis: 28px;
   width: 28px;
   height: 28px;
@@ -539,6 +559,12 @@ const {
   color: var(--rk-h5-bubble-self-fg);
   background: var(--rk-h5-bubble-self-bg);
   border-radius: 12px;
+}
+
+.chat-message-mobile.chat-message-owner .chat-message-bubble-text,
+.chat-message-mobile.chat-message-owner .chat-message-bubble-unknown {
+  color: var(--rk-h5-bubble-self-fg);
+  background: var(--rk-h5-bubble-self-bg);
 }
 
 .chat-message-mobile .chat-message-text {

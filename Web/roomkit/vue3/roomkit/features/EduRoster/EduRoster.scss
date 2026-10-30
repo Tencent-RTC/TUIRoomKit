@@ -1,0 +1,302 @@
+/* EDU 1v1 roster dialog content: head, tools, header row, footer and empty
+ * state. Row styling lives with EduRosterRow. */
+
+.edu-roster-head {
+  display: flex;
+
+  /* Fill the dialog header row: as the header slot's only flex item it
+   * shrink-wraps to content width otherwise, pulling the close button
+   * next to the title instead of the far right. */
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  height: 38px;
+  padding: 10px 14px 0 16px;
+}
+
+.edu-roster-title {
+  margin: 0;
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--rk-text-primary);
+}
+
+.edu-roster-close {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--rk-radius-sm);
+
+  &:hover {
+    color: var(--rk-text-primary);
+    background: var(--rk-bg-hover);
+  }
+}
+
+.edu-roster-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.edu-roster-tools {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 41px;
+  padding: 4px 16px 0 18px;
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.edu-roster-tab {
+  position: relative;
+  height: 36px;
+  padding: 0 2px 10px;
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--rk-text-primary);
+}
+
+/* The design's tab-on marker: a 2px accent bar flush with the tools row's
+   bottom border (ClassRoster-edu .edu-roster__tab.is-on::after). */
+.edu-roster-tab::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  content: '';
+  background: var(--rk-brand);
+  border-radius: 2px 2px 0 0;
+}
+
+.edu-roster-count {
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  color: var(--rk-text-secondary);
+}
+
+.edu-roster-search {
+  width: 168px;
+  margin-bottom: 8px;
+}
+
+/* The design shrinks the stock input to a compact 28px pill riding the inset
+ * surface with a subtle border; focus only strengthens the border
+ * (ClassRoster-edu .edu-roster__search rules). The fallthrough class lands
+ * on the input root itself, so match it on the same element. */
+.edu-roster-search.rk-input {
+  gap: 6px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 10px;
+  background: var(--rk-bg-inset);
+  border-color: var(--rk-border-subtle);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.edu-roster-search :deep(.rk-input-addon) {
+  padding: 0;
+}
+
+.edu-roster-search.rk-input:focus-within {
+  border-color: var(--rk-border-strong);
+}
+
+/* Header row + rows sit inside a padded table container, per the design. */
+.edu-roster-table {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 8px 8px;
+}
+
+/* Header row shares the row grid; labels center inside their columns. */
+.edu-roster-row.is-head {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) repeat(var(--edu-roster-cols, 5), 56px);
+  column-gap: 4px;
+  align-items: center;
+  height: 31px;
+  padding: 8px 10px 6px;
+  font-size: var(--rk-fs-sm);
+  line-height: 16px;
+  color: var(--rk-text-tertiary);
+
+  &:hover {
+    background: none;
+  }
+}
+
+.edu-roster-head-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.edu-roster-sort {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+
+  &.is-active {
+    color: var(--rk-text-secondary);
+  }
+
+  i {
+    font-size: var(--rk-fs-xs);
+    font-style: normal;
+    opacity: 0.8;
+  }
+}
+
+.edu-roster-sort-wrap {
+  position: relative;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  .edu-roster-sort {
+    width: auto;
+  }
+}
+
+.edu-roster-sort-carets {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.edu-roster-sort-caret {
+  width: 10px;
+  height: 7px;
+  padding: 0;
+  color: var(--rk-text-disabled);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+
+  &::before {
+    display: block;
+    width: 0;
+    height: 0;
+    margin: 0 auto;
+    content: '';
+    border-right: 3.5px solid transparent;
+    border-bottom: 4px solid currentcolor;
+    border-left: 3.5px solid transparent;
+  }
+
+  &.is-desc::before {
+    border-top: 4px solid currentcolor;
+    border-bottom: 0;
+  }
+
+  &:hover,
+  &.is-on {
+    color: var(--rk-text-primary);
+  }
+}
+
+.edu-roster-list {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* The design centers the empty state in the whole space below the head row,
+   so the list's empty block fills the scroller instead of hugging the top. */
+.edu-roster-list :deep(.rk-list-empty) {
+  min-height: 100%;
+  padding: 0;
+}
+
+.edu-roster-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 24px 16px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-secondary);
+  text-align: center;
+
+  &.is-search {
+    gap: 0;
+  }
+}
+
+.edu-roster-empty-icon {
+  color: var(--rk-text-tertiary);
+}
+
+.edu-roster-empty-clear {
+  height: 30px;
+  padding: 0 14px;
+  margin-top: 16px;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: var(--rk-radius-sm);
+
+  &:hover {
+    background: var(--rk-bg-hover);
+    border-color: var(--rk-text-disabled);
+  }
+}
+
+.edu-roster-foot {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  height: 45px;
+  padding: 10px 16px;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-secondary);
+  background: var(--rk-bg-raised);
+  border-top: 1px solid var(--rk-border);
+}
+
+.edu-roster-foot-attend {
+  font-variant-numeric: tabular-nums;
+  color: var(--rk-text-secondary);
+}
+
+/* The roster footer face rides the neutral classroom pair (views-edu
+   ClassRoster-edu rk-avatar rules), not the base avatar's solid accent. */
+.edu-roster-foot .rk-avatar {
+  color: #4ea05a;
+  background: #d7ecd3;
+}

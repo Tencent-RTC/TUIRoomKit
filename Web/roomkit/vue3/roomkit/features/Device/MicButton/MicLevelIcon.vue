@@ -1,5 +1,5 @@
 <template>
-  <span class="mic-level-icon">
+  <span class="mic-level-icon" :style="{ width: `${size}px`, height: `${size}px` }">
     <!-- Green bar shows through the hollow mic capsule and grows from its bottom -->
     <span class="mic-level-icon-track">
       <span class="mic-level-icon-fill" :style="{ height: `${levelPercent}%` }" />
@@ -28,6 +28,7 @@ const levelPercent = computed(() => {
 .mic-level-icon {
   position: relative;
   display: inline-flex;
+  overflow: hidden;
 }
 
 /* Percentages map to the capsule cavity of IconMic (16x16 viewBox) */

@@ -1,0 +1,30 @@
+{
+  "name": "@tencentcloud/roomkit-web-vue3-next-education-sample",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite --force",
+    "dev:deep": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
+  },
+  "dependencies": {
+    "@tencentcloud/tuiroom-engine-js": "4.3.2",
+    "@tencentcloud/roomkit-web-vue3": "7.1.0",
+    "@tencentcloud/universal-api": "2.4.1",
+    "@tencentcloud/uikit-base-component-vue3": "1.5.0",
+    "@tencentcloud/uikit-base-widget-vue3": "1.1.4",
+    "tuikit-atomicx-vue3": "6.7.0",
+    "vconsole": "^3.15.1",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14"
+  },
+  "devDependencies": {
+    "@tencentcloud/eslint-config-hybrid": "~0.0.1",
+    "@types/node": "^18.19.31",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "sass": "^1.50.0",
+    "typescript": "^4.5.4",
+    "vite": "^5.2.8"
+  }
+}

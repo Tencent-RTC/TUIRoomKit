@@ -11,6 +11,7 @@
         'toolbar-button-with-menu': hasMenu,
       }"
       :data-menu-open="menuOpen ? '1' : undefined"
+      :data-caret-direction="caretDirection"
       :data-overflow-key="overflowKey || undefined"
     >
       <button
@@ -26,7 +27,11 @@
             <component :is="icon" v-if="icon && typeof icon !== 'string'" :size="22" />
             <template v-else>{{ icon }}</template>
           </slot>
-          <IconUnSupport v-if="notice" class="toolbar-button-notice" :size="12" />
+          <span
+            v-if="notice"
+            class="toolbar-button-fault-badge"
+            aria-hidden="true"
+          >!</span>
         </span>
       </button>
 
@@ -58,7 +63,7 @@
 <script setup lang="ts">
 import { computed, ref, useSlots } from 'vue';
 import type { Component } from 'vue';
-import { IconChevronUp, IconUnSupport, TUIPopover, TUITooltip } from '../../base';
+import { IconChevronUp, TUIPopover, TUITooltip } from '../../base';
 
 defineOptions({ inheritAttrs: false });
 
@@ -81,6 +86,11 @@ const props = withDefaults(defineProps<{
   blocked?: boolean;
   loading?: boolean;
   notice?: boolean;
+  /**
+   * The device-fault notice: a "!" round tag hung on the icon's top-right
+   * corner. Sizing of the badge reads the `--rk-fault-badge*` custom
+   * properties so scenes can scale it per chip.
+   */
   showTooltip?: boolean;
   /**
    * Drops the caret and its popover while keeping the toggle. Overlays teleport to the
@@ -88,6 +98,8 @@ const props = withDefaults(defineProps<{
    * document — the picture-in-picture mini window — would open the menu out of sight.
    */
   hideMenu?: boolean;
+  /** Resting direction of the caret glyph; the menu-open state always points the opposite way. */
+  caretDirection?: 'up' | 'down';
 }>(), {
   icon: undefined,
   overflowKey: '',
@@ -101,6 +113,7 @@ const props = withDefaults(defineProps<{
   notice: false,
   showTooltip: true,
   hideMenu: false,
+  caretDirection: 'up',
 });
 
 defineEmits<{
@@ -217,18 +230,26 @@ function closeMenu() {
   height: 22px;
 }
 
-.toolbar-button-notice {
+/* The device-fault badge: a "!" round tag hung on the icon's top-right corner.
+   Sizes read custom properties so a compact scene (education topbar) can scale
+   it without re-styling. */
+.toolbar-button-fault-badge {
   position: absolute;
-  right: -1px;
-  bottom: 0;
-  color: var(--rk-danger);
+  top: var(--rk-fault-badge-top, -4px);
+  right: var(--rk-fault-badge-right, -6px);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--rk-fault-badge, 14px);
+  height: var(--rk-fault-badge, 14px);
+  font-size: var(--rk-fault-badge-font, 9px);
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
   pointer-events: none;
-}
-
-/* The rule above sizes every icon in the chip to 22px; the badge keeps its own box. */
-.toolbar-button-notice :deep(svg) {
-  width: 100%;
-  height: 100%;
+  background: var(--rk-warning);
+  border: 1.5px solid var(--rk-bg-surface);
+  border-radius: 50%;
 }
 
 /* The popover wraps the caret in its own anchor, so the stretch has to start there
@@ -266,8 +287,8 @@ function closeMenu() {
 .toolbar-button-caret :deep(svg) {
   width: 9px;
   height: 9px;
-  transform-origin: center;
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center;
 }
 
 .toolbar-button[data-menu-open='1'] .toolbar-button-caret {
@@ -276,5 +297,14 @@ function closeMenu() {
 
 .toolbar-button[data-menu-open='1'] .toolbar-button-caret :deep(svg) {
   transform: rotate(180deg);
+}
+
+/* Down variant rests pointing down and flips up while the menu is open */
+.toolbar-button[data-caret-direction='down'] .toolbar-button-caret :deep(svg) {
+  transform: rotate(180deg);
+}
+
+.toolbar-button[data-caret-direction='down'][data-menu-open='1'] .toolbar-button-caret :deep(svg) {
+  transform: none;
 }
 </style>

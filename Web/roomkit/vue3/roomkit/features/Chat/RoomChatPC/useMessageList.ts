@@ -2,6 +2,7 @@ import { computed, nextTick, onUnmounted, provide, ref, toRef, watch } from 'vue
 import type { MessageInfo } from 'tuikit-atomicx-vue3/chat';
 import { MessageStatus, MessageType, useChatContext } from 'tuikit-atomicx-vue3/chat';
 import { t } from '../../../base';
+import { EDU_CLASS_EVENT_ID, EDU_TROPHY_EVENT_ID, isProtocolMessage } from '../customMessage';
 import {
   historyWasPrepended,
   isInFlightMessage,
@@ -15,6 +16,8 @@ import { provideMessageOverlay } from './useMessageOverlay';
 export interface MessageListProps {
   readonly channel: string;
   readonly messageActionList: readonly MessageAction[];
+  /** Whether member notices render in this list. */
+  readonly isShowMemberNotice?: boolean;
 }
 
 export function useMessageList(props: MessageListProps) {
@@ -53,6 +56,10 @@ export function useMessageList(props: MessageListProps) {
     const messages = (messageList.value ?? []).filter((message) => {
       if (overlay.statusOf(message) === MessageStatus.Deleted) return false;
       if (message.messageType === MessageType.Tips) return false;
+      // Member notices render only in chats that opt in.
+      if (isProtocolMessage(message, EDU_CLASS_EVENT_ID) && !props.isShowMemberNotice) return false;
+      // Trophy awards are pure celebration signals; they never render as bubbles.
+      if (isProtocolMessage(message, EDU_TROPHY_EVENT_ID)) return false;
       return true;
     });
     return keepInFlightAtEnd(messages, message => (
@@ -62,30 +69,8 @@ export function useMessageList(props: MessageListProps) {
   const emptyText = computed(() => (
     loadError.value ? t('RoomChat.not_ready') : t('RoomChat.empty')
   ));
-  const MINUTE_MS = 60 * 1000;
   const HISTORY_SUPPRESS_MS = 2000;
   let suppressHistoryUntil = 0;
-
-  function isCompact(index: number) {
-    const messages = visibleMessages.value;
-    const current = messages[index];
-    const previous = messages[index - 1];
-    if (!current || !previous) {
-      return false;
-    }
-    if (
-      overlay.statusOf(current) === MessageStatus.Recalled
-      || overlay.statusOf(previous) === MessageStatus.Recalled
-    ) {
-      return false;
-    }
-    if ((current.from?.userID || '') !== (previous.from?.userID || '')) {
-      return false;
-    }
-    const currentTime = overlay.timestampOf(current)?.getTime() ?? 0;
-    const previousTime = overlay.timestampOf(previous)?.getTime() ?? 0;
-    return Math.floor(currentTime / MINUTE_MS) === Math.floor(previousTime / MINUTE_MS);
-  }
 
   function isNearBottom() {
     return listRef.value?.isNearBottom() ?? true;
@@ -201,6 +186,5 @@ export function useMessageList(props: MessageListProps) {
     visibleMessages,
     actions,
     onScroll,
-    isCompact,
   };
 }

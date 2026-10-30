@@ -51,7 +51,9 @@
             >
               <IconChevron :size="16" />
             </button>
-            <h3 class="settings-content-title">{{ t(currentTab.titleKey) }}</h3>
+            <h3 class="settings-content-title">
+              {{ t(currentTab.titleKey) }}
+            </h3>
             <button
               class="settings-close"
               type="button"
@@ -62,7 +64,7 @@
             </button>
           </header>
           <div class="settings-body">
-            <component :is="currentTab.component" />
+            <component :is="currentTab.component" v-bind="tabProps" />
           </div>
         </section>
       </div>
@@ -90,6 +92,8 @@ import AudioSettings from '../../Device/AudioSettings.vue';
 import VideoSettings from '../../Device/VideoSettings/index.vue';
 import ShareSettings from '../../ScreenShare/ShareSettings/ShareSettings.vue';
 import GeneralSettings from '../GeneralSettings/GeneralSettings.vue';
+import type { SettingsItem } from '../GeneralSettings/GeneralSettings.vue';
+import type { BackgroundPhoto } from '../../VideoEffect/VirtualBackgroundSettings/virtualBackground';
 import VideoEffectSettings from './VideoEffectSettings.vue';
 
 export type SettingsTab = 'audio' | 'video' | 'videoEffect' | 'share' | 'general';
@@ -111,10 +115,16 @@ const TABS: SettingsTabConfig[] = [
   { id: 'general', icon: IconSettings, labelKey: 'Settings.TabGeneral', titleKey: 'Settings.GeneralTitle', component: GeneralSettings },
 ];
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   open: boolean;
   activeTab: SettingsTab;
-}>();
+  hiddenItems?: SettingsItem[];
+  /** Replaces the built-in virtual background photos on the video effect tab. */
+  virtualBackgroundImgList?: BackgroundPhoto[];
+}>(), {
+  hiddenItems: () => [],
+  virtualBackgroundImgList: undefined,
+});
 
 const emit = defineEmits<{
   close: [];
@@ -130,6 +140,17 @@ const compactNav = ref(false);
 const currentTab = computed(() =>
   TABS.find(tab => tab.id === props.activeTab) ?? TABS[0],
 );
+
+// Only the owning tab gets each prop, so others don't inherit it as a root attribute.
+const tabProps = computed(() => {
+  if (currentTab.value.id === 'general') {
+    return { hiddenItems: props.hiddenItems };
+  }
+  if (currentTab.value.id === 'videoEffect') {
+    return { virtualBackgroundImgList: props.virtualBackgroundImgList };
+  }
+  return {};
+});
 
 let navCompactObserver: ResizeObserver | null = null;
 
@@ -161,7 +182,7 @@ function selectTab(id: SettingsTab) {
   }
 }
 
-watch(panelRef, (el) => bindNavCompactObserver(el), { immediate: true });
+watch(panelRef, el => bindNavCompactObserver(el), { immediate: true });
 
 watch(openRef, (open) => {
   if (!open) {

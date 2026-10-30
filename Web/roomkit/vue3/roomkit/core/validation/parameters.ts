@@ -1,5 +1,6 @@
 import { t } from '../../base';
 import type { UIConfig } from '../../base';
+import { RoomScene } from '../types';
 import type { Credentials } from '../types';
 
 function throwInvalidParameter(api: string, reason: string, solution: string, field?: string): never {
@@ -91,6 +92,7 @@ const nonEmptyString = check('NonEmptyString', isNonEmptyString, 'string');
 const positiveInteger = check('PositiveInteger', value => typeof value === 'number' && Number.isSafeInteger(value) && value > 0, 'number');
 const roomId = check('RoomId', value => isNonEmptyString(value) && /^[a-zA-Z0-9 !#$%&()+\-:;<=>?@[\]^_{|}~,.]{1,64}$/.test(value), 'string');
 const password = check('Password', value => typeof value === 'string' && /^\d{6}$/.test(value), 'string');
+const scene = check('Scene', value => Object.values(RoomScene).includes(value as RoomScene), 'string');
 
 function isValidCSSValue(value: unknown, property: string): boolean {
   return isNonEmptyString(value) && typeof CSS !== 'undefined' && CSS.supports(property, value);
@@ -140,6 +142,7 @@ const uiConfigFields: FieldTable = {
 const joinFields: FieldTable = {
   roomId,
   password: optional(password),
+  scene: optional(scene),
   container: (value, api, field) => validateFields(value, containerFields, api, field),
 };
 

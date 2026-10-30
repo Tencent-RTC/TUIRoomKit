@@ -63,7 +63,7 @@
           </h3>
           <div class="settings-dialog-mobile-section">
             <div
-              v-for="key in GENERAL_PICKS"
+              v-for="key in generalPicks"
               :key="key"
               class="settings-dialog-mobile-row is-pickable"
               role="button"
@@ -136,6 +136,7 @@ import {
   t,
 } from '../../../base';
 import type { ThemeName, Language } from '../../../base';
+import type { SettingsItem } from '../GeneralSettings/GeneralSettings.vue';
 
 type PickKey = 'resolution' | 'language' | 'theme';
 type PickValue = VideoQuality | Language | ThemeName;
@@ -171,14 +172,19 @@ const PICKS: Record<PickKey, PickConfig> = {
   },
 };
 
-const GENERAL_PICKS: PickKey[] = ['language', 'theme'];
+const GENERAL_PICKS: SettingsItem[] = ['language', 'theme'];
 
 /** Long enough for the check mark to register before the list slides back. */
 const AUTO_BACK_DELAY = 180;
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   open: boolean;
-}>();
+  hiddenItems?: SettingsItem[];
+}>(), {
+  hiddenItems: () => [],
+});
+
+const generalPicks = computed(() => GENERAL_PICKS.filter(key => !props.hiddenItems.includes(key)));
 
 const emit = defineEmits<{
   close: [];

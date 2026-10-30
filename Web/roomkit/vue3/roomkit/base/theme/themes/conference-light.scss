@@ -23,8 +23,9 @@
     --rk-fs-xl: 17px;
 
     -webkit-tap-highlight-color: transparent;
+
     --rk-h5-popover-bg: rgba(255, 255, 255, 0.99);
-    --rk-h5-popup-bg: #ffffff;
+    --rk-h5-popup-bg: #fff;
     --rk-h5-bubble-self-bg: color-mix(in srgb, var(--rk-brand) 12%, var(--rk-bg-surface));
     --rk-h5-bubble-self-fg: var(--rk-text-primary);
     --rk-h5-bubble-other-bg: color-mix(in srgb, var(--rk-text-primary) 4%, var(--rk-bg-surface));
@@ -87,6 +88,13 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
+}
+
+/* PC toasts stack from the top, flush below the 36px conference topbar.
+   The edu scene overrides the offset to its own 44px topbar. */
+.rk-root:not(.is-h5) .rk-overlay-toast {
+  align-items: flex-start;
+  padding-top: 36px;
 }
 
 .rk-float {

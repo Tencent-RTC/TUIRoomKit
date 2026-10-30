@@ -8,7 +8,7 @@ import {
 import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import { getPlatform } from '@tencentcloud/universal-api';
 import { DeviceError, DeviceType, useDeviceState } from 'tuikit-atomicx-vue3/room';
-import { TUIToast, t, ensureAppendHost } from '../../base';
+import { TUIToast, t, resolveOverlayHost } from '../../base';
 import DeviceFaultDialog from './DeviceFaultDialog.vue';
 import DeviceFaultSheet from './DeviceFaultSheet.vue';
 
@@ -492,9 +492,10 @@ function renderDialog() {
     }
     return;
   }
-  /* The dialog belongs to no room or page, so it goes to a host on the body. That host
-     is a RoomKitProvider of its own, which is what carries the theme tokens. */
-  const host = ensureAppendHost(document.body).host.value;
+  /* Stay on the mounted scene provider so education green (or a host primaryColor)
+     reaches the lock and the primary button. Fall back to a body host only when
+     no RoomKitProvider is on the page. */
+  const host = resolveOverlayHost().host.value;
   if (!host) {
     return;
   }

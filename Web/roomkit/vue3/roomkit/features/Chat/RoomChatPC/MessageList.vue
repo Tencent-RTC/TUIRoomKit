@@ -3,6 +3,7 @@
     <TUIList
       v-if="historyReady"
       ref="listRef"
+      v-model:stick-to-bottom="stickToBottom"
       class="message-list-scroller"
       variant="plain"
       item-size="auto"
@@ -10,7 +11,6 @@
       :scrollbar="false"
       :item-height="72"
       :overscan="6"
-      v-model:stick-to-bottom="stickToBottom"
       jump-to-end
       :jump-label="t('RoomChat.jump_to_latest')"
       :empty-text="emptyText"
@@ -28,13 +28,18 @@
         </div>
       </template>
       <ChatMessage
-        v-for="(message, index) in visibleMessages"
+        v-for="message in visibleMessages"
         :key="message.id"
         :message="message"
         :actions="actions"
-        :compact="isCompact(index)"
         :mobile="mobile"
-      />
+        :is-hide-timestamp="isHideTimestamp"
+        :is-highlight-owner="isHighlightOwner"
+      >
+        <template v-if="$slots.meta" #meta="slotProps">
+          <slot name="meta" v-bind="slotProps" />
+        </template>
+      </ChatMessage>
     </TUIList>
   </div>
 </template>
@@ -49,10 +54,19 @@ const props = withDefaults(defineProps<{
   channel?: string;
   messageActionList?: MessageAction[];
   mobile?: boolean;
+  /** Whether member notices render in this list. */
+  isShowMemberNotice?: boolean;
+  /** Hides each message's timestamp. */
+  isHideTimestamp?: boolean;
+  /** Tints the room owner's bubbles with the self-message accent. */
+  isHighlightOwner?: boolean;
 }>(), {
   channel: 'default',
   messageActionList: () => [],
   mobile: false,
+  isShowMemberNotice: false,
+  isHideTimestamp: false,
+  isHighlightOwner: false,
 });
 
 const {
@@ -63,7 +77,6 @@ const {
   visibleMessages,
   actions,
   onScroll,
-  isCompact,
 } = useMessageList(props);
 </script>
 

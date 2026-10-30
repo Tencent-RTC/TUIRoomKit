@@ -1,14 +1,20 @@
 <template>
   <ToolbarButtonPC
     :label="microphoneOn ? t('Device.MicClose') : t('Device.MicOpen')"
-    :icon="microphoneOn ? MicLevelIcon : IconMicOff"
     :menu-label="t('Device.MicSettings')"
     :blocked="isMicrophoneDisabled"
     :loading="isProcessing"
     :notice="hasDeviceError"
     :hide-menu="hideMenu"
+    :caret-direction="caretDirection"
     @click="toggleMicrophone"
   >
+    <template #icon>
+      <!-- Sized via prop (not the toolbar CSS) so the level overlay matches the glyph -->
+      <MicLevelIcon v-if="microphoneOn && !hasDeviceError" :size="iconSize" />
+      <IconMic v-else-if="microphoneOn" :size="iconSize" />
+      <IconMicOff v-else :size="iconSize" />
+    </template>
     <template #menu>
       <AudioDeviceMenu />
     </template>
@@ -26,7 +32,7 @@ import {
   useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
-import { TUIToast, IconMicOff, t } from '../../../base';
+import { TUIToast, IconMic, IconMicOff, t } from '../../../base';
 import ToolbarButtonPC from '../../../layouts/ToolbarButtonPC/ToolbarButtonPC.vue';
 import AudioDeviceMenu from '../AudioDeviceMenu/index.vue';
 import MicLevelIcon from './MicLevelIcon.vue';
@@ -34,8 +40,14 @@ import { useDeviceFault } from '../useDeviceFault';
 
 withDefaults(defineProps<{
   hideMenu?: boolean;
+  /** Icon size in px; the level overlay follows it. Compact scenes (education topbar) pass 16. */
+  iconSize?: number;
+  /** Resting caret direction, forwarded to ToolbarButtonPC */
+  caretDirection?: 'up' | 'down';
 }>(), {
   hideMenu: false,
+  iconSize: 22,
+  caretDirection: 'up',
 });
 
 const { microphoneStatus, microphoneLastError, openLocalMicrophone } = useDeviceState();

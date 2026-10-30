@@ -19,15 +19,23 @@ type SdkStateEvent = {
 
 type SdkStateHandler = (event: SdkStateEvent) => void;
 
+/** `backgroundColor` is also the composite's fill, so remote viewers see it too. */
+type WhiteboardOption = {
+  backgroundColor?: string;
+  theme?: 'dark' | 'light';
+};
+
 /**
  * trtc-sdk-v5 ships the whiteboard / annotation API untyped, and the instance only
  * exists as trtc-cloud's private `_trtc`. Everything that leans on it stays in this file.
  */
 type SdkTrtc = {
-  startWhiteboard(options: { view?: HTMLElement }): Promise<void>;
+  startWhiteboard(options: { view?: HTMLElement; option?: WhiteboardOption }): Promise<void>;
   stopScreenShare(): Promise<void>;
   startAnnotation(options?: SdkSessionOptions): Promise<void>;
   stopAnnotation(options?: SdkSessionOptions): Promise<void>;
+  updateWhiteboard(options: SdkSessionOptions & { option: { interactive: boolean } }): Promise<void>;
+  updateAnnotation(options: SdkSessionOptions & { option: { interactive: boolean } }): Promise<void>;
   updatePlugin(
     plugin: 'Whiteboard',
     options:
@@ -95,6 +103,8 @@ function createWhiteboard() {
   let stopPromise: Promise<void> | null = null;
   /** The local board is shown through a fake local share this kit owns until the board ends. */
   let holdsLocalShare = false;
+  /** Whether the local user may draw. The SDK resets it to true on every session start. */
+  let interactive = true;
 
   const isWhiteboardOn = computed(() => sessionKind.value === 'board-host');
   const isAnnotationOn = computed(() => sessionKind.value === 'annotation-host'
@@ -161,6 +171,9 @@ function createWhiteboard() {
           console.warn('[WhiteboardState] enable toolbar failed:', error);
         });
         sessionKind.value = kind;
+        if (!interactive) {
+          await applyInteractive();
+        }
       } finally {
         annotationStarting.value = false;
       }
@@ -258,6 +271,7 @@ function createWhiteboard() {
       }
       if (previousRoomId && !roomId) {
         opening.value = false;
+        interactive = true;
         stopSession().catch((error: unknown) => {
           console.warn('[WhiteboardState] stop whiteboard on room exit failed:', error);
         });
@@ -283,7 +297,7 @@ function createWhiteboard() {
   );
 
   /** Opens the local board. Does nothing while any share or session is up, or a start is in flight. */
-  async function startWhiteboard(): Promise<void> {
+  async function startWhiteboard(option?: WhiteboardOption): Promise<void> {
     const sharerId = participantWithScreen.value?.userId;
     const othersSharing = !!sharerId && sharerId !== localParticipant.value?.userId;
     if (opening.value || sessionKind.value !== 'none' || screenStatus.value === DeviceStatus.On || othersSharing) {
@@ -299,7 +313,7 @@ function createWhiteboard() {
         await callRoomStore('roomStore.requestScreenSharingToken');
         try {
           // The canvas is attached later through bindView, once the tile renders it.
-          await trtc.startWhiteboard({});
+          await trtc.startWhiteboard(option ? { option } : {});
         } catch (error) {
           await callRoomStore('roomStore.releaseScreenSharingToken').catch(() => {});
           throw error;
@@ -344,6 +358,31 @@ function createWhiteboard() {
     }
   }
 
+  /** A read-only session hides its toolbar too. A guest stays read-only without leaving the session. */
+  async function applyInteractive(): Promise<void> {
+    const kind = sessionKind.value;
+    if (kind === 'none') {
+      return;
+    }
+    const option = { interactive };
+    try {
+      const trtc = requireTrtc();
+      if (kind === 'board-host') {
+        await trtc.updateWhiteboard({ option });
+      } else {
+        await trtc.updateAnnotation(kind === 'annotation-guest' ? { userId: guestUserId, option } : { option });
+      }
+    } catch (error) {
+      console.warn('[WhiteboardState] update interactive failed:', error);
+    }
+  }
+
+  /** Allows or blocks local drawing now and for later sessions, e.g. while the board sits in a small seat. */
+  async function setInteractive(enable: boolean): Promise<void> {
+    interactive = enable;
+    await applyInteractive();
+  }
+
   /** Binds the canvas element. The cover lifts once it settles, even on failure, so it never sticks. */
   async function bindView(view: HTMLElement): Promise<void> {
     try {
@@ -364,6 +403,7 @@ function createWhiteboard() {
       stopWhiteboard,
       startAnnotation,
       stopAnnotation,
+      setInteractive,
     },
     binding: {
       isOpening: readonly(opening),

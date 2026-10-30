@@ -41,7 +41,7 @@
           {{ t('Participants.SearchEmpty') }}
         </div>
         <div class="participant-list-mobile-empty-desc">
-          {{ searchEmptyParts.before }}<mark>{{ searchEmptyParts.query }}</mark>{{ searchEmptyParts.after }}
+          {{ t('Participants.SearchEmptyDesc', { query: searchKeyword.trim() }) }}
         </div>
         <div class="participant-list-mobile-empty-actions">
           <div class="participant-list-mobile-empty-btn" role="button" tabindex="0" @click="searchKeyword = ''">
@@ -171,7 +171,6 @@ const {
   searchKeyword,
   isSearching,
   isSearchEmpty,
-  searchEmptyParts,
   joinedRows,
   pendingRows,
   joinedCount,
