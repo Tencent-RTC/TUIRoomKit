@@ -61,7 +61,12 @@ export async function runParticipantAction(action: () => Promise<unknown>): Prom
 
 type MediaDevice = DeviceType.Microphone | DeviceType.Camera;
 
-export function useParticipantActions() {
+export interface ParticipantActionOptions {
+  /** Use the education-specific copy for classroom member operations. */
+  education?: boolean;
+}
+
+export function useParticipantActions(options: ParticipantActionOptions = {}) {
   const { currentRoom } = useRoomState();
   const participantState = useRoomParticipantState();
   const {
@@ -112,9 +117,9 @@ export function useParticipantActions() {
     }
     const name = participantDisplayName(participant);
     if (deviceType === DeviceType.Microphone) {
-      TUIToast.success(t('Participants.MuteDone', { name }));
+      TUIToast.success(t(options.education ? 'Education.Toast.MicOffTeacher' : 'Participants.MuteDone', { name }));
     } else {
-      TUIToast.success(t('Participants.CamStopDone', { name }));
+      TUIToast.success(t(options.education ? 'Education.Toast.CamOffTeacher' : 'Participants.CamStopDone', { name }));
     }
   }
 
@@ -129,9 +134,9 @@ export function useParticipantActions() {
     }
     const name = participantDisplayName(participant);
     if (device === DeviceType.Microphone) {
-      TUIToast.success(t('Participants.UnmuteRequested', { name }));
+      TUIToast.success(t(options.education ? 'Education.Toast.InviteMicTeacher' : 'Participants.UnmuteRequested', { name }));
     } else {
-      TUIToast.success(t('Participants.CamRequested', { name }));
+      TUIToast.success(t(options.education ? 'Education.Toast.InviteCamTeacher' : 'Participants.CamRequested', { name }));
     }
   }
 

@@ -1,0 +1,155 @@
+/**
+ * EDU scene token pack.
+ *
+ * The design keeps one semantic token axis for both scenes: the scene only
+ * swaps the brand accent, while the theme axis (data-rk-theme light / dark)
+ * keeps controlling surfaces and text. Education renders the green accent
+ * (accent pack `green` in the interaction design views-edu tokens);
+ * conference keeps the default blue.
+ *
+ * Everything brand-derived follows var(--rk-brand) automatically
+ * (--rk-brand-soft, --rk-brand-hover, --rk-avatar-bg, --rk-focus-ring and
+ * the chat self bubble), so overriding the brand is the whole pack.
+ * Host custom primaryColor still wins: inline custom properties outrank
+ * the scene class token block.
+ */
+.rk-root.rk-scene-education {
+  --rk-brand: #00c853;
+  --rk-brand-strong: #34c759;
+  --rk-brand-fg: #7dffb3;
+
+  /* EDU dialogs drop the conference mask blur, per the interaction design
+   * (views-edu rk-set-mask and ClassRoster-edu backdrop both render the
+   * overlay as a plain color with `backdrop-filter: none`). */
+  --rk-dialog-mask-blur: none;
+
+  /* EDU dialog footers (ClassRoster-edu kick dialog): borderless buttons,
+   * cancel on an 8% neutral fill that deepens to 12% on hover. */
+  --rk-dialog-cancel-bg: color-mix(in srgb, var(--rk-text-primary) 8%, transparent);
+  --rk-dialog-cancel-border: 0;
+  --rk-dialog-cancel-hover: color-mix(in srgb, var(--rk-text-primary) 12%, transparent);
+
+  /* EDU class chat (views-edu [classroom] rules): own and teacher bubbles are
+   * a 16% accent wash over the surface carrying theme text — not the solid
+   * brand the meeting scene uses — and other bubbles ride the neutral 6%
+   * hover tint. PC chat only; the mobile chat reads the --rk-h5-* pair. */
+  --rk-bubble-self-bg: color-mix(in srgb, var(--rk-brand) 16%, var(--rk-bg-surface));
+  --rk-bubble-self-fg: var(--rk-text-primary);
+  --rk-bubble-other-bg: color-mix(in srgb, var(--rk-text-primary) 6%, transparent);
+  --rk-bubble-other-fg: var(--rk-text-primary);
+}
+
+/* Theme-axis EDU overrides. Light keeps the base default avatar (solid
+ * accent + white initial) for chat, pickers and the roster rows; the stage
+ * tiles and the roster footer still set the neutral classroom pair
+ * (light #d7ecd3/#4ea05a) locally like the views-edu .video__face rule
+ * does. Dark drops both pairs: every avatar reads the preclass
+ * accent-tinted pair below, and the tile / footer overrides defer to the
+ * --rk-avatar-* tokens in dark. Camera-off tiles keep the neutral camera
+ * background in both themes. */
+.rk-root.rk-scene-education[data-rk-theme='dark'] {
+  --rk-bg-camera-off: #161616;
+
+  /* The one EDU dark avatar pair: brand-tinted raised surface with brand
+   * text, same as the preclass stage avatar (views-edu .edu-pre__stage-av). */
+  --rk-avatar-bg: color-mix(in srgb, var(--rk-brand) 18%, var(--rk-bg-raised));
+  --rk-avatar-fg: var(--rk-brand);
+}
+
+.rk-root.rk-scene-education[data-rk-theme='light'] {
+  --rk-bg-camera-off: #f1f0f2;
+}
+
+/* EDU class toasts (views-edu .toasts): stacked right below the 44px topbar,
+ * compact text-only capsules — no icon, fs-sm text, 10px radius. PC only;
+ * the H5 pill keeps its own centered form. */
+.rk-root.rk-scene-education:not(.is-h5) .rk-overlay-toast {
+  /* The base PC rule top-aligns; the edu topbar is 44px tall. */
+  padding-top: 44px;
+}
+
+.rk-root.rk-scene-education:not(.is-h5) .rk-toast-viewport {
+  gap: 4px;
+  /* Size by content, not by the flex-item shrink-to-fit dance: a percentage
+     max-width on the text inside an indefinite-width ancestor collapses the
+     capsule to a fraction of its message and ellipsizes it mid-sentence. */
+  width: max-content;
+  max-width: min(480px, calc(100% - 32px));
+}
+
+.rk-root.rk-scene-education:not(.is-h5) .rk-toast {
+  flex: 0 0 auto;
+  width: fit-content;
+  min-width: 0;
+  padding: 8px 14px;
+  margin: 0;
+  font-size: var(--rk-fs-sm);
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.rk-root.rk-scene-education:not(.is-h5) .rk-toast-text {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rk-root.rk-scene-education:not(.is-h5) .rk-toast-icon {
+  display: none;
+}
+
+/* EDU device-fault lock chip: a condition to act on, rendered as the green
+ * accent fill without the outline the conference info chip keeps. */
+.rk-root.rk-scene-education .rk-dialog-footer .rk-btn {
+  border: 0;
+}
+
+.rk-root.rk-scene-education .device-fault-dialog-icon.is-lock {
+  color: var(--rk-brand);
+  background: var(--rk-brand-soft);
+  border-color: transparent;
+}
+
+/* EDU overlay radii (views-edu): floating panels (dropdown / popover) read
+ * 14px, dialogs and message boxes (the message box is a dialog) read 12px.
+ * PC only; the H5 shells keep their own compact radii. */
+.rk-root.rk-scene-education:not(.is-h5) {
+  /* Escape hatch the arrowed dropdown body already reads. */
+  --rk-dropdown-radius: 14px;
+}
+
+.rk-root.rk-scene-education:not(.is-h5) .rk-float {
+  border-radius: 14px;
+}
+
+.rk-root.rk-scene-education:not(.is-h5) .rk-float.rk-popover.has-arrow .rk-popover-body,
+.rk-root.rk-scene-education:not(.is-h5) .rk-float.rk-popover.has-arrow.rk-popover-flush .rk-popover-body {
+  border-radius: 14px;
+}
+
+.rk-root.rk-scene-education:not(.is-h5) .rk-dialog {
+  border-radius: 12px;
+}
+
+/* The settings dialog is its own shell (not TUIDialog), so it needs the same override. */
+.rk-root.rk-scene-education:not(.is-h5) .settings-dialog {
+  border-radius: 12px;
+}
+
+/* EDU whiteboard: the TRTC Whiteboard plugin themes its toolbar, panels and
+ * text layer through --trtc-wb-accent* tokens declared on .trtc-wb (blue by
+ * default). Remap them to the scene brand so the plugin UI follows green. */
+.rk-root.rk-scene-education .trtc-wb {
+  --trtc-wb-accent: var(--rk-brand);
+  --trtc-wb-accent-solid: var(--rk-brand);
+  --trtc-wb-accent-bg: var(--rk-brand-soft);
+  --trtc-wb-focus-ring: color-mix(in srgb, var(--rk-brand) 15%, transparent);
+}

@@ -233,13 +233,6 @@
   font-size: var(--rk-fs-sm);
   line-height: 1.5;
   overflow-wrap: anywhere;
-
-  mark {
-    padding: 0;
-    font-weight: 500;
-    color: var(--rk-text-primary);
-    background: none;
-  }
 }
 
 .participant-list-mobile-empty-actions {

@@ -2,7 +2,7 @@
   <div
     ref="messageInputRef"
     class="message-input"
-    :class="{ 'message-input-disabled': disabled }"
+    :class="{ 'message-input-disabled': disabled, 'message-input-bare': isHideOperator }"
   >
     <div class="message-input-toolbar">
       <TUITooltip :content="t('RoomChat.emoji')" :disabled="disabled">
@@ -120,11 +120,14 @@ const props = withDefaults(defineProps<{
   disabled?: boolean;
   placeholder?: string;
   maxLength?: number;
+  /** Hides the toolbar row; the tools stay mounted but hidden. */
+  isHideOperator?: boolean;
 }>(), {
   channel: 'default',
   disabled: false,
   placeholder: undefined,
   maxLength: 1000,
+  isHideOperator: false,
 });
 
 const {
@@ -156,6 +159,11 @@ const {
   align-items: center;
   padding: 6px 12px 0;
   color: var(--rk-text-tertiary);
+}
+
+/* The bare composer keeps only the input line; the tools stay mounted (tooltips counted) but hidden. */
+.message-input-bare .message-input-toolbar {
+  display: none;
 }
 
 .message-input-tool {
@@ -237,6 +245,25 @@ const {
     cursor: not-allowed;
     opacity: 0.38;
   }
+}
+
+/* EDU class chat (views-edu [classroom] rules): the input rides the neutral
+   hover tint instead of the brand-tinted page wash, and the send button is
+   the soft accent chip instead of the solid brand disc. */
+:global(.rk-scene-education .message-input-field) {
+  background: var(--rk-bg-hover);
+}
+
+:global(.rk-scene-education .message-input-send) {
+  box-sizing: border-box;
+  color: var(--rk-brand);
+  background: var(--rk-brand-soft);
+  border: 1px solid color-mix(in srgb, var(--rk-brand) 28%, transparent);
+}
+
+:global(.rk-scene-education .message-input-send:hover:not(:disabled)) {
+  background: color-mix(in srgb, var(--rk-brand) 16%, transparent);
+  border-color: var(--rk-brand);
 }
 
 .message-input-hidden {

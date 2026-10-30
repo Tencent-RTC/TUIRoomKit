@@ -1,0 +1,144 @@
+/* One EDU roster line: name column plus the 1v1 action columns. */
+
+.edu-roster-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) repeat(var(--edu-roster-cols, 5), 56px);
+  column-gap: 4px;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  padding: 6px 10px;
+
+  &:hover {
+    background: var(--rk-bg-hover);
+  }
+}
+
+.edu-roster-name {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.edu-roster-name-text {
+  overflow: hidden;
+  font-size: var(--rk-fs-md);
+  line-height: 20px;
+  color: var(--rk-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edu-roster-tag {
+  flex-shrink: 0;
+  padding: 2px 5px;
+  font-size: var(--rk-fs-xs);
+  font-style: normal;
+  font-weight: 500;
+  line-height: 14px;
+  border-radius: 3px;
+
+  &.is-me {
+    color: var(--rk-text-secondary);
+    background: var(--rk-bg-hover);
+  }
+
+  &.is-teacher {
+    color: var(--rk-info);
+    background: color-mix(in srgb, var(--rk-info) 12%, transparent);
+  }
+}
+
+/* The plain dash standing in for non-actionable cells on the teacher row */
+.edu-roster-cell-dash {
+  color: var(--rk-text-tertiary);
+  line-height: 1;
+}
+
+.edu-roster-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  place-self: center center;
+  width: 32px;
+  height: 28px;
+  padding: 0;
+  color: var(--rk-text-tertiary);
+  text-align: center;
+  cursor: default;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+
+  /* Only real buttons change on hover; spans are status displays. The
+   * trophy is exempt — its hover keeps the gold and adds no wash
+   * (design: the generic cell hover selector excludes .is-star). */
+  &:is(button) {
+    cursor: pointer;
+
+    &:hover:not(.is-on, .is-trophy) {
+      color: var(--rk-text-primary);
+      background: var(--rk-bg-hover);
+    }
+  }
+
+  &.is-on.is-mic,
+  &.is-on.is-cam {
+    color: var(--rk-text-primary);
+    background: color-mix(in srgb, var(--rk-brand) 16%, transparent);
+
+    &:is(button):hover {
+      background: color-mix(in srgb, var(--rk-brand) 24%, transparent);
+    }
+  }
+
+  /* The trophy keeps its gold at rest and on hover alike. Not-yet-awarded
+   * hovers change nothing but the color re-assertion (design: is-star:hover);
+   * an awarded trophy carries the gold wash permanently, hover included. */
+  &.is-trophy {
+    color: #f5c14a;
+
+    &:is(button):hover {
+      color: #f5c14a;
+      background: transparent;
+    }
+
+    &.is-on {
+      color: #f5c14a;
+      background: color-mix(in srgb, #f5c14a 16%, transparent);
+
+      &:is(button):hover {
+        color: #f5c14a;
+        background: color-mix(in srgb, #f5c14a 16%, transparent);
+      }
+    }
+  }
+
+  /* A muted line is a status first: the warning wash stays on at rest,
+   * no hover-only highlight. */
+  &.is-on.is-mute {
+    color: var(--rk-warning);
+    background: color-mix(in srgb, var(--rk-warning) 22%, transparent);
+  }
+
+  &.is-kick {
+    color: var(--rk-danger);
+
+    &:is(button):hover {
+      background: color-mix(in srgb, var(--rk-danger) 14%, transparent);
+    }
+  }
+}
+
+.edu-roster-cell-badge {
+  position: absolute;
+  right: -1px;
+  bottom: 0;
+  font-size: var(--rk-fs-xs);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 14px;
+  color: #f5c14a;
+  pointer-events: none;
+}

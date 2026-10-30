@@ -373,12 +373,6 @@ export function useParticipantList() {
   const isSearchEmpty = computed(() => (
     isSearching.value && joinedRows.value.length === 0 && pendingRows.value.length === 0
   ));
-  /** The no-result copy split around the query, so the view can highlight it. */
-  const searchEmptyParts = computed(() => {
-    const marker = '\u0000';
-    const [before = '', after = ''] = t('Participants.SearchEmptyDesc', { query: marker }).split(marker);
-    return { before, query: searchKeyword.value.trim(), after };
-  });
   /** Members already in the room or being rung cannot be picked again. */
   const occupiedIds = computed(() => [...new Set([
     ...joinedParticipants.value.map(item => item.userId),
@@ -406,7 +400,6 @@ export function useParticipantList() {
     searchKeyword,
     isSearching,
     isSearchEmpty,
-    searchEmptyParts,
     joinedRows,
     pendingRows,
     joinedCount,

@@ -1,0 +1,9 @@
+/* Dark-theme overrides that reach through the scene root; kept unscoped per
+   the repo's global-stylesheet pattern. */
+
+/* Dark defers to the --rk-avatar-* tokens — the EDU scene overrides them to
+   the preclass accent-tinted pair, so the footer keeps no pair of its own. */
+.rk-root[data-rk-theme='dark'] .edu-roster-foot .rk-avatar {
+  color: var(--rk-avatar-fg);
+  background: var(--rk-avatar-bg);
+}

@@ -24,6 +24,11 @@ export { default as ParticipantButtonPC } from './Participants/ParticipantButton
 export { default as ParticipantButtonMobile } from './Participants/ParticipantButtonMobile/ParticipantButtonMobile.vue';
 export { default as ParticipantListPC } from './Participants/ParticipantListPC/ParticipantListPC.vue';
 export { default as ParticipantListMobile } from './Participants/ParticipantListMobile/ParticipantListMobile.vue';
+export { default as Trophy } from './EduTools/Trophy/Trophy.vue';
+export { default as EduRoster } from './EduRoster/EduRoster.vue';
+export { default as UserPickerPC } from './Participants/UserPickerPC/UserPickerPC.vue';
+export { useResolvedContacts } from './Participants/contactData';
+export type { PickedContact, PickerContact } from './Participants/contactData';
 
 export { default as CloudRecordingButtonPC } from './Recording/CloudRecordingButtonPC/CloudRecordingButtonPC.vue';
 export { default as CloudRecordingButtonMobile } from './Recording/CloudRecordingButtonMobile/CloudRecordingButtonMobile.vue';
@@ -31,6 +36,7 @@ export { default as CloudRecordingStatusPC } from './Recording/CloudRecordingSta
 export { default as CloudRecordingStatusMobile } from './Recording/CloudRecordingStatusMobile/CloudRecordingStatusMobile.vue';
 
 export { default as CurrentRoomInfoPC } from './RoomInfo/CurrentRoomInfoPC/CurrentRoomInfoPC.vue';
+export { default as CurrentEduRoomInfoPC } from './RoomInfo/CurrentRoomInfoPC/CurrentEduRoomInfoPC.vue';
 export { default as CurrentRoomInfoMobile } from './RoomInfo/CurrentRoomInfoMobile/CurrentRoomInfoMobile.vue';
 export { default as LocalNetworkInfoPC } from './RoomInfo/LocalNetworkInfoPC/LocalNetworkInfoPC.vue';
 export { default as LocalNetworkInfoMobile } from './RoomInfo/LocalNetworkInfoMobile/LocalNetworkInfoMobile.vue';
@@ -61,6 +67,8 @@ export { default as SettingButtonMobile } from './Setting/SettingButtonMobile/Se
 export { default as SettingsDialogPC } from './Setting/SettingsDialogPC/SettingsDialogPC.vue';
 export { default as SettingsDialogMobile } from './Setting/SettingsDialogMobile/SettingsDialogMobile.vue';
 export type { SettingsTab } from './Setting/SettingsDialogPC/SettingsDialogPC.vue';
+export type { SettingsItem } from './Setting/GeneralSettings/GeneralSettings.vue';
+export type { BackgroundPhoto } from './VideoEffect/VirtualBackgroundSettings/virtualBackground';
 export { default as ThemeButton } from './Setting/ThemeButton/ThemeButton.vue';
 
 export { default as CaptionButton } from './Transcription/CaptionButton/CaptionButton.vue';

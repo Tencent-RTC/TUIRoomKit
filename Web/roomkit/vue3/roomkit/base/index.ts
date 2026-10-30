@@ -37,7 +37,7 @@ export type { MessageBoxHandle } from './components/MessageBox';
 export { TUIToast } from './components/Toast';
 export { i18n, t, useI18n } from './i18n';
 export type { Language } from './i18n';
-export { ensureAppendHost } from './command/appendTo';
+export { ensureAppendHost, resolveOverlayHost } from './command/appendTo';
 export * from './icons';
 export * from './headless';
 export * from './tokens';

@@ -53,12 +53,14 @@ import {
   toVirtualBackgroundParams,
   VIRTUAL_BACKGROUND_ASSETS_PATH,
 } from './virtualBackground';
-import type { BackgroundOption, VirtualBackgroundParams } from './virtualBackground';
+import type { BackgroundOption, BackgroundPhoto, VirtualBackgroundParams } from './virtualBackground';
 
 defineOptions({ name: 'VirtualBackgroundSettings' });
 
 const props = withDefaults(defineProps<{
   previewReady?: boolean;
+  /** Replaces the built-in photo set. Ids must be unique across sets: the image cache is keyed by id. */
+  virtualBackgroundImgList?: BackgroundPhoto[];
 }>(), {
   previewReady: true,
 });
@@ -73,7 +75,7 @@ const {
   unsubscribeEvent,
 } = useVirtualBackgroundState();
 
-const BACKGROUND_PHOTOS = [
+const BACKGROUND_PHOTOS: BackgroundPhoto[] = [
   { id: 'g1', imagePath: meetingRoom },
   { id: 'g2', imagePath: cafe },
   { id: 'g3', imagePath: cityscape },
@@ -82,7 +84,8 @@ const BACKGROUND_PHOTOS = [
   { id: 'g6', imagePath: backdrop },
 ];
 
-const options = ref<BackgroundOption[]>(hydratePhotoPaths(createDefaultBackgroundOptions(BACKGROUND_PHOTOS)));
+const backgroundPhotos = props.virtualBackgroundImgList ?? BACKGROUND_PHOTOS;
+const options = ref<BackgroundOption[]>(hydratePhotoPaths(createDefaultBackgroundOptions(backgroundPhotos)));
 const selectedId = ref('none');
 const isReady = ref(false);
 
@@ -233,6 +236,11 @@ onUnmounted(() => {
   transition: border-color var(--rk-duration) var(--rk-ease);
 }
 
+.virtual-background-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .virtual-background-item:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--rk-brand) 35%, transparent);
 }
@@ -240,11 +248,6 @@ onUnmounted(() => {
 .virtual-background-item.is-active,
 .virtual-background-item.is-active:hover {
   border-color: var(--rk-brand);
-}
-
-.virtual-background-item:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
 }
 
 .virtual-background-face {

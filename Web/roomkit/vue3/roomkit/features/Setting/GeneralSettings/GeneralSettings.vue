@@ -1,6 +1,6 @@
 <template>
   <div class="general-settings">
-    <div class="general-settings-row">
+    <div v-if="!hiddenItems.includes('theme')" class="general-settings-row">
       <span class="general-settings-row-title">{{ t('Settings.Theme') }}</span>
       <span class="general-settings-row-control">
         <div class="general-settings-theme" role="radiogroup" :aria-label="t('Settings.Theme')">
@@ -20,7 +20,7 @@
       </span>
     </div>
 
-    <div class="general-settings-row">
+    <div v-if="!hiddenItems.includes('language')" class="general-settings-row">
       <span class="general-settings-row-title">{{ t('Settings.Language') }}</span>
       <span class="general-settings-row-control">
         <TUISelect :model-value="i18n.language" size="sm" @change="selectLanguage">
@@ -40,6 +40,14 @@
 import { computed } from 'vue';
 import { TUIOption, TUISelect, useUIConfig, i18n, t } from '../../../base';
 import type { Language } from '../../../base';
+
+export type SettingsItem = 'theme' | 'language';
+
+withDefaults(defineProps<{
+  hiddenItems?: SettingsItem[];
+}>(), {
+  hiddenItems: () => [],
+});
 
 const LANGUAGE_OPTIONS: Array<{ value: Language; labelKey: string }> = [
   { value: 'zh-CN', labelKey: 'Settings.LanguageZhCN' },

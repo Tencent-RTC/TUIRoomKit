@@ -4,6 +4,13 @@
 
 ---
 
+## [7.1.0] - 2026-10-30
+
+### Changed
+
+- Upgraded `tuikit-atomicx-vue3` to 6.7.0.
+- Added support for 1-on-1 educational scenarios.
+
 ## [7.0.3] - 2026-10-30
 
 ### Changed

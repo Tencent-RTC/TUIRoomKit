@@ -7,6 +7,7 @@
     :loading="isProcessing"
     :notice="hasDeviceError"
     :hide-menu="hideMenu"
+    :caret-direction="caretDirection"
     @click="toggleCamera"
   >
     <template #menu="{ close }">
@@ -34,8 +35,11 @@ import { useDeviceFault } from '../useDeviceFault';
 
 withDefaults(defineProps<{
   hideMenu?: boolean;
+  /** Resting caret direction, forwarded to ToolbarButtonPC */
+  caretDirection?: 'up' | 'down';
 }>(), {
   hideMenu: false,
+  caretDirection: 'up',
 });
 
 /** The shell owns the settings dialog; the button only forwards which tab was asked for. */

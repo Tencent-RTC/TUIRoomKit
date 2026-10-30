@@ -5,8 +5,10 @@ import {
   MessageType,
   useLoginStore,
 } from 'tuikit-atomicx-vue3/chat';
+import { useRoomState } from 'tuikit-atomicx-vue3/room';
 import { TUIMessageBox, TUIToast, t } from '../../../base';
 import { formatTimestampToTime } from '../../../utils/formatTimestamp';
+import { EDU_CLASS_EVENT_ID, parseCustomEnvelope } from '../customMessage';
 import { emojiBaseUrl, emojiUrlMap } from './emoji';
 import { getSendErrorMessage } from './getSendErrorMessage';
 import { useChatComposer } from './useChatComposer';
@@ -14,10 +16,31 @@ import type { MessageAction } from './useMessageActions';
 import { useMessageOverlay } from './useMessageOverlay';
 import { useSenderProfile } from './useSenderName';
 
+/**
+ * Notice-line copy for known custom protocols: education class events
+ * announce joins and leaves on the timeline.
+ */
+function eduClassEventCopy(message: MessageInfo): { key: string; params: Record<string, string> } | undefined {
+  const envelope = parseCustomEnvelope(message);
+  if (!envelope || envelope.businessID !== EDU_CLASS_EVENT_ID) {
+    return undefined;
+  }
+  const name = String(envelope.data.targetName ?? '');
+  switch (envelope.event) {
+    case 'member-enter':
+      return { key: 'Education.Sync.EnteredRoom', params: { name } };
+    case 'member-leave':
+      return { key: 'Education.Sync.LeftRoom', params: { name } };
+    default:
+      return undefined;
+  }
+}
+
 export interface ChatMessageProps {
   readonly message: MessageInfo;
   readonly actions: readonly MessageAction[];
-  readonly compact: boolean;
+  /** Tints the room owner's bubbles with the self-message accent. */
+  readonly isHighlightOwner?: boolean;
 }
 
 export function useChatMessage(props: ChatMessageProps) {
@@ -32,6 +55,7 @@ export function useChatMessage(props: ChatMessageProps) {
   const composer = useChatComposer();
   const lastTextPayload = ref('');
   let retryLocked = false;
+  const { currentRoom } = useRoomState();
 
   watch(() => props.message.status, (status) => {
     if (status !== MessageStatus.Recalled && status !== MessageStatus.Deleted) return;
@@ -51,6 +75,14 @@ export function useChatMessage(props: ChatMessageProps) {
   const senderProfile = computed(() => resolveProfile(props.message));
   const senderName = computed(() => senderProfile.value.name);
   const senderAvatar = computed(() => senderProfile.value.avatarUrl);
+  /* Only when the panel opts in: the design paints the room owner's bubbles
+   * with the same accent tint as one's own messages, so the owner stands out
+   * while staying left-aligned. */
+  const isOwnerMessage = computed(() => (
+    Boolean(props.isHighlightOwner)
+    && Boolean(props.message.from?.userID)
+    && props.message.from?.userID === currentRoom.value?.roomOwner?.userId
+  ));
   const displayStatus = computed(() => {
     // Read the map size so this computed refreshes when an overlay is patched.
     Number(overlay?.overlays.size);
@@ -96,9 +128,17 @@ export function useChatMessage(props: ChatMessageProps) {
         return 'image';
       case MessageType.Video:
         return 'video';
+      case MessageType.Custom:
+        // Known custom protocols render as centered notice lines.
+        return eduClassEventCopy(props.message) !== undefined ? 'notice' : 'unknown';
       default:
         return 'unknown';
     }
+  });
+  const noticeText = computed(() => {
+    if (bubbleKind.value !== 'notice') return '';
+    const copy = eduClassEventCopy(props.message);
+    return copy ? t(copy.key, copy.params) : '';
   });
   const textParts = computed(() => splitTextWithEmoji(
     props.message.messageType === MessageType.Text ? props.message.messagePayload.text : '',
@@ -243,6 +283,7 @@ export function useChatMessage(props: ChatMessageProps) {
     recalledText,
     senderAvatar,
     senderName,
+    isOwnerMessage,
     timeText,
     isFailed,
     isSending,
@@ -258,6 +299,7 @@ export function useChatMessage(props: ChatMessageProps) {
     videoPoster,
     videoDurationText,
     fallbackText,
+    noticeText,
     reeditRecalled,
     retrySend,
     onActionCommand,

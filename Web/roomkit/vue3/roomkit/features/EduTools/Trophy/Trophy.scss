@@ -1,0 +1,317 @@
+/* Trophy celebration fx, ported from the interaction design
+ * (features/Participants/ClassRoster-edu). The component teleports into the
+ * provider overlay host, so it plays above open dialogs; within that host
+ * this z-index outranks dialog masks, and the toast viewport above it still
+ * stays on top. */
+
+$trophy-fx-duration: 2.9s;
+
+.trophy-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.trophy-fx-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.16) 0%, transparent 56%);
+  animation: trophy-fx-veil $trophy-fx-duration ease forwards;
+}
+
+.trophy-fx-burst {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 320px;
+  height: 320px;
+  animation: trophy-fx-burst $trophy-fx-duration cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Awarded member not on the stage: skip the flight, fade out where it popped. */
+.trophy-fx.is-idle .trophy-fx-burst {
+  animation-name: trophy-fx-burst-idle;
+}
+
+.trophy-fx-glow {
+  position: absolute;
+  z-index: 0;
+  width: 108px;
+  height: 108px;
+  background: radial-gradient(circle, rgba(255, 220, 150, 0.28) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: trophy-fx-glow $trophy-fx-duration ease-out forwards;
+}
+
+.trophy-fx-base {
+  position: absolute;
+  top: 80px;
+  left: 80px;
+  z-index: 2;
+  width: 160px;
+  height: 160px;
+  background: #fffdf4;
+  border: 6px solid #f4bd33;
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px #ffe7a3, 0 10px 18px rgba(120, 70, 0, 0.18);
+  animation: trophy-fx-pop $trophy-fx-duration cubic-bezier(0.16, 0.9, 0.22, 1) forwards;
+}
+
+.trophy-fx-cup {
+  position: absolute;
+  top: 80px;
+  left: 80px;
+  z-index: 4;
+  width: 160px;
+  height: 160px;
+  animation: trophy-fx-pop $trophy-fx-duration cubic-bezier(0.16, 0.9, 0.22, 1) forwards;
+}
+
+.trophy-fx-spark {
+  position: absolute;
+  top: 125px;
+  left: 50%;
+  z-index: 5;
+  width: var(--sz, 6px);
+  height: var(--sz, 6px);
+  margin: calc(var(--sz, 6px) / -2) 0 0 calc(var(--sz, 6px) / -2);
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 4px 1px var(--c, #ffd7a1);
+  animation: trophy-fx-spark $trophy-fx-duration ease-out forwards;
+
+  &.is-star {
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    background: #fff6d8;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  &.is-square {
+    width: calc(var(--sz, 6px) * 2.8);
+    height: calc(var(--sz, 6px) * 0.8);
+    margin: calc(var(--sz, 6px) * -0.4) 0 0 calc(var(--sz, 6px) * -1.4);
+    background: var(--c, #ffb020);
+    border-radius: 2px;
+    box-shadow: none;
+  }
+}
+
+.trophy-fx-ribbon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  width: calc(48px * var(--sc, 1));
+  height: calc(16px * var(--sc, 1));
+  margin: calc(16px * var(--sc, 1) / -2) 0 0 calc(48px * var(--sc, 1) / -2);
+  overflow: visible;
+  background: none;
+  animation: trophy-fx-ribbon $trophy-fx-duration cubic-bezier(0.16, 0.8, 0.3, 1) forwards;
+}
+
+.trophy-fx-side-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  width: var(--sz, 4px);
+  height: var(--sz, 4px);
+  margin: calc(var(--sz, 4px) / -2) 0 0 calc(var(--sz, 4px) / -2);
+  background: #fff8c9;
+  border-radius: 50%;
+  box-shadow: 0 0 5px 2px rgba(255, 220, 100, 0.78);
+  animation: trophy-fx-side-dot $trophy-fx-duration ease-out forwards;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes trophy-fx-veil {
+  0% {
+    opacity: 0;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  24%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The awarded member is on the stage: fly to their trophy badge and fade into it. */
+@keyframes trophy-fx-burst {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.82);
+  }
+
+  10% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  51% {
+    opacity: 1;
+    transform: translate(var(--fly-x, 0), var(--fly-y, 0)) scale(0.1);
+  }
+
+  82% {
+    opacity: 1;
+    transform: translate(var(--fly-x, 0), var(--fly-y, 0)) scale(0.1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(var(--fly-x, 0), var(--fly-y, 0)) scale(0.08);
+  }
+}
+
+/* Nobody on stage to fly to: celebrate in place, shrink and fade out. */
+@keyframes trophy-fx-burst-idle {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.82);
+  }
+
+  10% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  82% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.5);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+}
+
+@keyframes trophy-fx-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.76);
+  }
+
+  18% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes trophy-fx-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  10% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  22% {
+    opacity: 0.4;
+    transform: scale(1.04);
+  }
+
+  32%,
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes trophy-fx-spark {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg) scale(0.4);
+  }
+
+  6% {
+    opacity: 1;
+    transform: translate(calc(var(--sx) * 0.45), calc(var(--sy) * 0.45)) rotate(var(--turn, 20deg)) scale(1);
+  }
+
+  18%,
+  25% {
+    opacity: 1;
+    transform: translate(var(--sx), var(--sy)) rotate(calc(var(--turn, 20deg) * 1.8)) scale(0.75);
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--sx), var(--sy)) rotate(calc(var(--turn, 20deg) * 1.8)) scale(0.75);
+  }
+}
+
+@keyframes trophy-fx-ribbon {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(var(--rot, 0deg)) scale(0.35);
+  }
+
+  8% {
+    opacity: 1;
+    transform: translate(calc(var(--sx) * 0.55), calc(var(--sy) * 0.55)) rotate(var(--rot, 0deg)) scale(0.9);
+  }
+
+  20%,
+  25% {
+    opacity: 1;
+    transform: translate(var(--sx), var(--sy)) rotate(var(--rot, 0deg)) scale(1);
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--sx), var(--sy)) rotate(var(--rot, 0deg)) scale(1);
+  }
+}
+
+@keyframes trophy-fx-side-dot {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+
+  8% {
+    opacity: 1;
+    transform: translate(calc(var(--sx) * 0.55), calc(var(--sy) * 0.55)) scale(1);
+  }
+
+  20%,
+  25% {
+    opacity: 1;
+    transform: translate(var(--sx), var(--sy)) scale(0.8);
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--sx), var(--sy)) scale(0.8);
+  }
+}

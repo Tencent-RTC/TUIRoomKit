@@ -3,7 +3,7 @@ import './base/theme/index.scss';
 import './i18n';
 
 // Core API
-export { RoomKit, ExitReason, RoomLayoutTemplate, genTestUserSig } from './core';
+export { RoomKit, ExitReason, RoomLayoutTemplate, RoomScene, genTestUserSig } from './core';
 export type {
   CreateAndJoinOptions,
   Credentials,
@@ -33,6 +33,8 @@ export {
   TUIAvatar,
   TUIBadge,
   TUIButton,
+  TUICheckbox,
+  TUIDatePicker,
   TUIDialog,
   TUIDropdown,
   TUIDropdownItem,
@@ -85,9 +87,13 @@ export {
   SettingsDialogPC,
   ThemeButton,
   useDeviceFault,
+  useResolvedContacts,
+  UserPickerPC,
   VideoDeviceMenu,
 } from './features';
 export type {
+  PickedContact,
+  PickerContact,
   ScheduleFailure,
   ScheduleOutcome,
   ScheduleRoomInput,
