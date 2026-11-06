@@ -1,0 +1,724 @@
+.preclass-mobile-root,
+.preclass-mobile-root :deep(.rk-root-slot) {
+  width: 100%;
+  height: 100%;
+}
+
+.preclass-mobile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--rk-text-primary);
+  /* Same gradient + glass look as the PC lobby; cards nearly fill the phone, so no shadow. */
+  background:
+    radial-gradient(420px 320px at 0% -6%, color-mix(in srgb, var(--rk-brand) 11%, transparent), transparent 62%),
+    radial-gradient(380px 300px at 106% 104%, color-mix(in srgb, #ba68c8 9%, transparent), transparent 60%),
+    var(--rk-bg-page);
+  container: preclass / size;
+}
+
+.preclass-mobile-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.preclass-mobile-bar {
+  display: flex;
+  flex: none;
+  gap: 10px;
+  align-items: center;
+  height: calc(56px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 16px 0;
+}
+
+.preclass-mobile-brand {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.preclass-mobile-mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  color: var(--rk-on-accent);
+  background: var(--rk-brand);
+  border-radius: 7px;
+}
+
+.preclass-mobile-brand-name {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preclass-mobile-brand-name em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--rk-brand);
+}
+
+/* Read-only: H5 is student-only, so this mirrors the selected item of the PC role switch. */
+.preclass-mobile-role {
+  flex: none;
+  padding: 4px 12px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  color: var(--rk-text-primary);
+  background: color-mix(in srgb, var(--rk-text-primary) 9%, transparent);
+  border-radius: 999px;
+}
+
+.preclass-mobile-user {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+}
+
+.preclass-mobile-user[aria-expanded='true'] {
+  box-shadow: 0 0 0 2px var(--rk-brand);
+}
+
+.preclass-mobile-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 4px 12px 12px;
+  overflow: hidden;
+}
+
+.preclass-mobile-ready,
+.preclass-mobile-list {
+  background: color-mix(in srgb, var(--rk-bg-surface) 82%, transparent);
+  backdrop-filter: blur(24px);
+  border-radius: 18px;
+}
+
+.preclass-mobile-ready {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+}
+
+.preclass-mobile-ready-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 26px;
+}
+
+.preclass-mobile-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.preclass-mobile-tabs {
+  flex: none;
+  align-self: center;
+  margin: 12px 0 4px;
+  background: var(--rk-bg-page);
+}
+
+.preclass-mobile-tabs :deep(.rk-segmented-item) {
+  padding: 0 16px;
+  font-weight: 400;
+}
+
+.preclass-mobile-tabs :deep(.rk-segmented-item.is-active) {
+  font-weight: 600;
+}
+
+.preclass-mobile-cards {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  padding: 8px 12px 12px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.preclass-mobile-cards::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.preclass-mobile-empty,
+.preclass-mobile-member-empty {
+  margin: 0;
+  font-size: var(--rk-fs-md);
+  line-height: 20px;
+  color: var(--rk-text-tertiary);
+  text-align: center;
+}
+
+.preclass-mobile-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  padding: 28px 8px;
+}
+
+.preclass-mobile-empty-art {
+  width: 120px;
+  height: 96px;
+}
+
+.preclass-mobile-member-empty {
+  padding: 16px 0;
+}
+
+.preclass-mobile-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preclass-mobile-day {
+  margin: 0 2px 8px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  color: var(--rk-text-tertiary);
+}
+
+.preclass-mobile-card {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--rk-text-primary) 4%, var(--rk-bg-surface));
+  border-radius: 12px;
+}
+
+.preclass-mobile-card:active {
+  opacity: 0.92;
+}
+
+.preclass-mobile-when {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  background: var(--rk-bg-hover);
+  border-radius: 8px;
+}
+
+.preclass-mobile-card.is-live .preclass-mobile-when {
+  background: color-mix(in srgb, var(--rk-brand) 12%, transparent);
+}
+
+.preclass-mobile-when b {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: -0.02em;
+}
+
+.preclass-mobile-when em:not(.preclass-mobile-mode) {
+  font-size: var(--rk-fs-sm);
+  font-style: normal;
+  color: var(--rk-text-tertiary);
+}
+
+.preclass-mobile-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.preclass-mobile-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.preclass-mobile-title strong,
+.preclass-mobile-meta-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preclass-mobile-title strong {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.preclass-mobile-status {
+  display: inline-flex;
+  flex: none;
+  gap: 4px;
+  align-items: center;
+  font-size: var(--rk-fs-sm);
+  font-style: normal;
+  color: var(--rk-text-tertiary);
+}
+
+.preclass-mobile-card.is-live .preclass-mobile-status {
+  color: var(--rk-brand);
+}
+
+.preclass-mobile-card.is-live .preclass-mobile-status::before {
+  width: 5px;
+  height: 5px;
+  content: "";
+  background: currentcolor;
+  border-radius: 50%;
+}
+
+.preclass-mobile-meta {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  font-size: var(--rk-fs-sm);
+  line-height: 18px;
+  color: var(--rk-text-tertiary);
+}
+
+.preclass-mobile-meta .preclass-mobile-face {
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+}
+
+.preclass-mobile-copy-id {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin-left: -2px;
+  color: var(--rk-text-tertiary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+}
+
+.preclass-mobile-mode {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 650;
+  line-height: 1;
+  color: var(--rk-orange-500);
+  letter-spacing: 0.02em;
+  background: color-mix(in srgb, var(--rk-orange-500) 14%, transparent);
+  border-radius: 4px;
+}
+
+.preclass-mobile-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.preclass-mobile-action {
+  height: 32px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: color-mix(in srgb, var(--rk-text-primary) 9%, transparent);
+  border: 0;
+  border-radius: 9px;
+}
+
+.preclass-mobile-action.is-primary {
+  font-weight: 600;
+}
+
+.preclass-mobile-card.is-live .preclass-mobile-action.is-primary {
+  color: var(--rk-on-accent);
+  background: var(--rk-brand);
+}
+
+.preclass-mobile-detail {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  visibility: hidden;
+  pointer-events: none;
+  background: var(--rk-bg-page);
+  transform: translateX(100%);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s 0.32s;
+}
+
+.preclass-mobile-detail[data-screen='detail'],
+.preclass-mobile-detail[data-screen='members'] {
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s;
+}
+
+.preclass-mobile-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--rk-bg-page);
+}
+
+.preclass-mobile-page[data-page='members'] {
+  transform: translateX(100%);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.preclass-mobile-detail[data-screen='members'] .preclass-mobile-page[data-page='members'] {
+  transform: none;
+}
+
+.preclass-mobile-nav {
+  display: grid;
+  flex: none;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  height: calc(52px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 6px 0;
+}
+
+.preclass-mobile-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.preclass-mobile-back :deep(svg) {
+  transform: rotate(180deg);
+}
+
+.preclass-mobile-nav-title {
+  overflow: hidden;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preclass-mobile-sheet {
+  flex: 1;
+  min-height: 0;
+  padding: 12px 16px 16px;
+  overflow: auto;
+}
+
+.preclass-mobile-block {
+  padding: 4px 16px;
+  margin: 0 0 12px;
+  background: var(--rk-bg-surface);
+  border-radius: 12px;
+}
+
+.preclass-mobile-line {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
+}
+
+button.preclass-mobile-line {
+  cursor: pointer;
+}
+
+button.preclass-mobile-line:disabled {
+  cursor: default;
+}
+
+.preclass-mobile-line > span {
+  flex: none;
+  width: 80px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+  white-space: nowrap;
+}
+
+.preclass-mobile-line > b {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  font-size: var(--rk-fs-md);
+  font-weight: 450;
+  color: var(--rk-text-secondary);
+}
+
+.preclass-mobile-line > b > span:not(.preclass-mobile-faces) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preclass-mobile-face,
+.preclass-mobile-member i,
+.preclass-mobile-faces i {
+  display: grid;
+  flex: none;
+  place-items: center;
+  font-style: normal;
+  font-weight: 650;
+  color: var(--rk-avatar-fg, var(--rk-brand));
+  background: var(--rk-avatar-bg, color-mix(in srgb, var(--rk-brand) 18%, transparent));
+  border-radius: 999px;
+}
+
+.preclass-mobile-face,
+.preclass-mobile-faces i {
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+}
+
+.preclass-mobile-faces {
+  display: flex;
+  flex: none;
+}
+
+.preclass-mobile-faces i {
+  margin-left: -6px;
+  box-shadow: 0 0 0 1.5px var(--rk-bg-surface);
+}
+
+.preclass-mobile-faces i:first-child {
+  margin-left: 0;
+}
+
+.preclass-mobile-chev {
+  flex: none;
+  color: var(--rk-text-tertiary);
+}
+
+.preclass-mobile-copy {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: var(--rk-text-tertiary);
+  cursor: pointer;
+  background: var(--rk-bg-surface);
+  border: 0;
+  border-radius: 8px;
+  transition: transform 0.12s ease;
+}
+
+.preclass-mobile-copy:active {
+  transform: scale(0.88);
+}
+
+.preclass-mobile-copy.is-copied {
+  color: var(--rk-brand);
+}
+
+.preclass-mobile-foot {
+  display: flex;
+  flex: none;
+  gap: 12px;
+  padding: 8px 16px calc(20px + env(safe-area-inset-bottom));
+}
+
+.preclass-mobile-go {
+  flex: 1;
+  height: 48px;
+  font: inherit;
+  font-size: var(--rk-fs-lg);
+  font-weight: 600;
+  color: var(--rk-text-on-brand, #fff);
+  cursor: pointer;
+  background: var(--rk-brand);
+  border: 0;
+  border-radius: 12px;
+}
+
+.preclass-mobile-go.is-secondary {
+  font-weight: 500;
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-surface);
+}
+
+.preclass-mobile-member {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 52px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+}
+
+.preclass-mobile-member i {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+
+.preclass-mobile-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  background: rgb(0 0 0 / 45%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.preclass-mobile-mask.is-open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.preclass-mobile-account {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 31;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 calc(16px + env(safe-area-inset-bottom));
+  pointer-events: none;
+  background: var(--rk-bg-surface);
+  border-top: 1px solid var(--rk-border);
+  border-radius: 16px 16px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.preclass-mobile-account.is-open {
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.preclass-mobile-account.is-dragging {
+  transition: none;
+  touch-action: none;
+}
+
+.preclass-mobile-handle {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.preclass-mobile-handle i {
+  width: 36px;
+  height: 4px;
+  background: var(--rk-border);
+  border-radius: 2px;
+}
+
+.preclass-mobile-logout {
+  display: block;
+  height: 44px;
+  margin: 4px 16px 8px;
+  font: inherit;
+  font-size: var(--rk-fs-lg);
+  font-weight: 600;
+  color: var(--rk-danger);
+  cursor: pointer;
+  background: color-mix(in srgb, var(--rk-danger) 14%, transparent);
+  border: 0;
+  border-radius: 12px;
+}
+
+.preclass-mobile-logout:active {
+  background: color-mix(in srgb, var(--rk-danger) 22%, transparent);
+}
+
+@container preclass (min-aspect-ratio: 1) {
+  .preclass-mobile-bar {
+    height: calc(48px + env(safe-area-inset-top));
+  }
+
+  .preclass-mobile-main :deep(.preclass-resume.is-h5) {
+    padding-block: 6px;
+    margin-top: 0;
+  }
+
+  .preclass-mobile-body {
+    flex-direction: row;
+    padding-top: 0;
+  }
+
+  .preclass-mobile-ready {
+    width: 42%;
+  }
+
+  .preclass-mobile-ready :deep(.preclass-preview) {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+  }
+}
