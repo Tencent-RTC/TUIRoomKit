@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 180" fill="none">
+  <path d="M16 164h348" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  <rect x="24" y="144" width="88" height="20" rx="3" fill="#f6c445" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M34 144v20" stroke="currentColor" stroke-width="1.4"/>
+  <rect x="30" y="126" width="78" height="18" rx="3" fill="#fff" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M98 126v18" stroke="currentColor" stroke-width="1.4"/>
+  <rect x="26" y="110" width="80" height="16" rx="3" fill="color-mix(in srgb, var(--rk-brand) 30%, white)" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M36 110v16" stroke="currentColor" stroke-width="1.4"/>
+  <path d="M68 108c-9 0-14-7-14-15 0-9 6-14 12-14 3 0 5 1 8 1s5-1 8-1c6 0 12 5 12 14 0 8-5 15-14 15-2 0-4-1-6-1s-4 1-6 1z" fill="#ef8a78" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M74 80c0-6 2-10 6-12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M76 74c6-6 12-6 16-2-5 4-11 5-16 2z" fill="#7dcea0" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+  <g transform="translate(150 50) rotate(-14)">
+    <rect width="11" height="56" rx="2" fill="#fff4d6" stroke="currentColor" stroke-width="1.5"/>
+    <rect width="11" height="9" fill="#f6c445" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M0 56h11l-5.5 10z" fill="color-mix(in srgb, var(--rk-brand) 28%, white)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(170 44) rotate(10)">
+    <rect width="14" height="62" rx="2" fill="color-mix(in srgb, var(--rk-brand) 42%, white)" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M0 10h6M0 20h9M0 30h6M0 40h9M0 50h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  </g>
+  <path d="M140 104h56l-6 60h-44z" fill="#fff" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M143 122h50" stroke="currentColor" stroke-width="1.4"/>
+  <circle cx="160" cy="140" r="3.4" fill="var(--rk-brand)"/>
+  <circle cx="176" cy="140" r="3.4" fill="#f6c445"/>
+  <path d="M214 164h132l-9-16h-114l-9 16z" fill="#fff" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+  <rect x="228" y="60" width="104" height="88" rx="8" fill="#fff" stroke="currentColor" stroke-width="1.6"/>
+  <rect x="236" y="68" width="88" height="68" rx="5" fill="var(--rk-brand)"/>
+  <rect x="242" y="74" width="76" height="56" rx="4" fill="#fff"/>
+  <path d="M250 104h44M272 84v40" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+  <ellipse cx="272" cy="104" rx="18" ry="11" stroke="var(--rk-brand)" stroke-width="2"/>
+  <circle cx="262" cy="104" r="1.8" fill="var(--rk-brand)"/>
+  <circle cx="282" cy="104" r="1.8" fill="var(--rk-brand)"/>
+  <rect x="296" y="106" width="18" height="20" rx="3" fill="color-mix(in srgb, var(--rk-brand) 34%, white)" stroke="currentColor" stroke-width="1.2"/>
+  <circle cx="305" cy="113" r="3" fill="#fff" stroke="currentColor" stroke-width="1.1"/>
+  <path d="M299 126c0-4 3-7 6-7s6 3 6 7" fill="#fff" stroke="currentColor" stroke-width="1.1"/>
+  <path d="M340 164h24l-4-16h-16l-4 16z" fill="color-mix(in srgb, var(--rk-brand) 42%, white)" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M352 148v-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  <ellipse cx="340" cy="132" rx="11" ry="6" fill="#7dcea0" stroke="currentColor" stroke-width="1.4" transform="rotate(-30 340 132)"/>
+  <ellipse cx="364" cy="130" rx="11" ry="6" fill="#3fa36a" stroke="currentColor" stroke-width="1.4" transform="rotate(26 364 130)"/>
+  <circle cx="300" cy="32" r="10" fill="#f6c445" stroke="currentColor" stroke-width="1.6"/>
+</svg>

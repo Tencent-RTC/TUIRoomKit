@@ -1,0 +1,16 @@
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  /* Nested to outrank the TUIButton base weight */
+  .login-submit,
+  .login-secondary {
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .login-submit {
+    margin-top: 8px;
+  }
+}
