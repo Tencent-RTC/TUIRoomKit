@@ -52,13 +52,19 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+        if (mUserList == null || position < 0 || position >= mUserList.size()) {
+            return;
+        }
         UserState.UserInfo user = mUserList.get(position);
+        if (user == null || user.userId == null) {
+            return;
+        }
         holder.bindData(user);
     }
 
     @Override
     public int getItemCount() {
-        return mUserList.size();
+        return mUserList == null ? 0 : mUserList.size();
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
@@ -109,7 +115,13 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
         }
 
         private boolean hasAbilityToManageUser(UserState.UserInfo user) {
+            if (user == null) {
+                return false;
+            }
             UserState.UserInfo localUser = ConferenceController.sharedInstance().getUserState().selfInfo.get();
+            if (localUser == null) {
+                return false;
+            }
             if (TextUtils.equals(localUser.userId, user.userId) || localUser.role.get() == TUIRoomDefine.Role.ROOM_OWNER) {
                 return true;
             }
