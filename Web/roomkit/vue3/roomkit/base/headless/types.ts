@@ -9,6 +9,8 @@ export interface UseOverlayOptions {
   closeOnOutside?: boolean;
   closeOnEsc?: boolean;
   modal?: boolean;
+  /** The overlay's anchor, used to keep picture-in-picture popovers in their window. */
+  reference?: Ref<HTMLElement | null | undefined>;
   onClose?: () => void;
 }
 

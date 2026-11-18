@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import { inject, onBeforeUnmount } from 'vue';
-import { DeviceStatus, useDeviceState } from 'tuikit-atomicx-vue3/room';
-import { IconWhiteboard, TUIMessageBox, TUIToast, t } from '../../../base';
+import { IconWhiteboard, TUIMessageBox, t } from '../../../base';
 import { useWhiteboardState } from '../WhiteboardState';
-import { SCREEN_SHARE_ENTRY_KEY } from '../../ScreenShare/ScreenShareButton/useScreenShare';
+import { SCREEN_SHARE_ENTRY_KEY, useScreenShare } from '../../ScreenShare/useScreenShare';
 
 /** Only works inside the default slot of `ScreenShareButton`; renders nothing of its own. */
 defineOptions({ render: () => null });
 
-const { screenStatus } = useDeviceState();
-const { isWhiteboardOn, startWhiteboard, stopWhiteboard } = useWhiteboardState();
+const { holder } = useScreenShare();
+const { startWhiteboard, stopWhiteboard } = useWhiteboardState();
 
+/** The share control only offers the board while the slot is free and the user may take it. */
 async function openBoard() {
-  if (screenStatus.value === DeviceStatus.On || isWhiteboardOn.value) {
-    TUIToast.warning(t('Whiteboard.CloseScreenShareFirst'));
-    return;
-  }
   try {
     await startWhiteboard();
   } catch (error: unknown) {
@@ -40,10 +36,11 @@ if (!register) {
   console.warn('[WhiteboardButton] place it inside <ScreenShareButton>.');
 }
 const unregister = register?.(() => ({
-  act: 'whiteboard',
+  command: 'whiteboard',
   label: t('ScreenShare.TabWhiteboard'),
   icon: IconWhiteboard,
-  active: isWhiteboardOn.value,
+  // From the click on, like every other reader of the slot, so the control and the more menu agree.
+  active: holder.value === 'local-board',
   stopLabel: t('Whiteboard.Close'),
   run: () => void openBoard(),
   stop: () => void closeBoard(),

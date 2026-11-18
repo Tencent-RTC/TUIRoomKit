@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import type { App, ComponentPublicInstance } from 'vue';
 import RoomKitProvider from '../components/RoomKitProvider/index.vue';
+import { getActiveOverlayContext } from '../overlayRegistry';
 import { requireOverlayContext } from './requireOverlay';
 import type { OverlayContext } from '../tokens';
 
@@ -15,6 +16,11 @@ export function resolveAppendTo(target: AppendTo): HTMLElement | null {
     return document.querySelector(target);
   }
   return target;
+}
+
+/** Prefer the mounted scene provider so teleported chrome keeps its brand tokens. */
+export function resolveOverlayHost(): OverlayContext {
+  return getActiveOverlayContext() ?? ensureAppendHost(document.body);
 }
 
 export function ensureAppendHost(target: HTMLElement): OverlayContext {
@@ -40,6 +46,8 @@ export function ensureAppendHost(target: HTMLElement): OverlayContext {
   const app = createApp(RoomKitProvider, {
     command: false,
     cover: true,
+    /* 'auto' mirrors the mounted scene so appended notices keep its brand. */
+    scene: 'auto',
   });
   const vm = app.mount(shell) as HostExpose;
   const ctx = vm.context;

@@ -13,10 +13,12 @@ import { setUIConfig as applyUIConfig, t } from '../base';
 import type { UIConfig } from '../base';
 import { createAbortError, isAbortError } from './abort';
 import { addInterceptor } from './interceptors';
+import { applyMediaPreference } from './mediaPreference';
 import { roomEntry } from './session';
-import { getPasswordChallenge, getRoomEntryFailureReason, RoomCleanupError } from './session/roomEntryError';
+import { getPasswordChallenge, getRoomEntryFailureKey, RoomCleanupError } from './session/roomEntryError';
 import { RoomKitMount, resolveMountTarget } from './mount';
-import { ExitReason } from './types';
+import { dataReport, SCENE_METRICS_KEYS } from './report';
+import { ExitReason, RoomScene } from './types';
 import { validateParameters } from './validation';
 import type {
   Credentials,
@@ -117,14 +119,23 @@ export class RoomKit {
 
   @validateParameters('createAndJoin')
   createAndJoin(options: CreateAndJoinOptions): Promise<void> {
-    const { container, roomId, ...roomOptions } = options;
-    return this.enter('create', { roomId, container }, () => useRoomState().createAndJoinRoom({ roomId, options: roomOptions }));
+    // scene and mediaPreference are RoomKit options, not CreateRoomOptions fields.
+    const { container, roomId, scene, mediaPreference, ...roomOptions } = options;
+    return this.enter(
+      'create',
+      { roomId, container, scene, mediaPreference },
+      () => useRoomState().createAndJoinRoom({ roomId, options: roomOptions }),
+    );
   }
 
   @validateParameters('join')
   join(options: RoomKitJoinOptions): Promise<void> {
-    const { roomId, container, password } = options;
-    return this.enter('join', { roomId, container }, session => this.joinWithPasswordChallenge(session, password));
+    const { roomId, container, password, scene, mediaPreference } = options;
+    return this.enter(
+      'join',
+      { roomId, container, scene, mediaPreference },
+      session => this.joinWithPasswordChallenge(session, password),
+    );
   }
 
   @validateParameters('leave')
@@ -192,7 +203,7 @@ export class RoomKit {
 
   private enter(
     kind: RoomEntryKind,
-    options: Pick<RoomKitJoinOptions, 'roomId' | 'container'>,
+    options: Pick<RoomKitJoinOptions, 'roomId' | 'container' | 'scene' | 'mediaPreference'>,
     operation: (session: RoomSession) => Promise<void>,
   ): Promise<void> {
     const mountTarget = resolveMountTarget(options.container.appendTo);
@@ -209,7 +220,7 @@ export class RoomKit {
 
       try {
         roomEntry.begin(kind, 'login');
-        this.view.mount({ mountTarget, container, roomName: session.roomId });
+        this.view.mount({ mountTarget, container, roomName: session.roomId, scene: options.scene });
         await nextTick();
         this.assertCurrentSession(session);
 
@@ -227,6 +238,9 @@ export class RoomKit {
         // would otherwise keep previous invitees in the process-wide pending map.
         session.unsubscribeParticipantExit = this.subscribeToParticipantExit(session);
         roomEntry.finish();
+        dataReport.reportCount(SCENE_METRICS_KEYS[options.scene ?? RoomScene.Conference]);
+        // Not awaited: a permission prompt must not hold the entry or the operation queue.
+        void applyMediaPreference(options.mediaPreference, session.controller.signal);
       } catch (error) {
         throw await this.handleEnterFailure(session, error);
       }
@@ -276,7 +290,7 @@ export class RoomKit {
       if (!isAbortError(failure) && this.view.isMounted) {
         this.view.notifyEnterFailed(
           roomEntry.kind.value,
-          getRoomEntryFailureReason(failure, roomEntry.phase.value),
+          getRoomEntryFailureKey(failure, roomEntry.phase.value),
         );
       }
     } finally {

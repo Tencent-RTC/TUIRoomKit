@@ -1,19 +1,20 @@
-/* Contacts is the prototype's panel modal: no shell padding, each section pads itself,
-   and only the list scrolls. */
-.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) {
-  height: min(560px, calc(100% - 48px));
-  max-height: min(560px, calc(100% - 48px));
+/* Two-column panel modal: no shell padding, each section pads itself, and only the lists scroll. */
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) {
+  height: min(520px, 80%);
+  max-height: min(520px, 80%);
   padding: 0;
   overflow: hidden;
-  border-radius: 16px;
+  background: var(--rk-bg-surface);
+  border: 0;
+  border-radius: var(--rk-radius-dialog);
 }
 
-.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) .rk-dialog-header {
-  padding: 16px 16px 8px;
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) .rk-dialog-header {
+  padding: 22px 24px 14px;
   margin-bottom: 0;
 }
 
-.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) .rk-dialog-body {
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) .rk-dialog-body {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -23,16 +24,17 @@
   color: var(--rk-text-primary);
 }
 
-.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) .rk-dialog-footer {
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) .rk-dialog-footer {
+  gap: 10px;
   justify-content: flex-end;
-  padding: 12px 16px 16px;
+  padding: 10px 24px 12px;
   margin-top: 0;
+  border-top: 1px solid var(--rk-border);
 }
 
-.rk-dialog-mask .rk-dialog:has(.invite-dialog-list) .rk-dialog-footer .rk-btn {
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) .rk-dialog-footer .rk-btn {
   flex: 0 0 auto;
   min-width: 80px;
-  height: 32px;
+  height: 36px;
   padding: 0 16px;
-  border-radius: var(--rk-radius-pill);
 }

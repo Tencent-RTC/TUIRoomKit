@@ -6,21 +6,15 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
-import { TUIMessageBox, t, useI18n } from '@tencentcloud/roomkit-web-vue3';
+import { TUIMessageBox, t } from '@tencentcloud/roomkit-web-vue3';
 import { LoginEvent, useLoginState } from 'tuikit-atomicx-vue3/room';
 import { useRoute, useRouter } from 'vue-router';
 
 const EXIT_OVERLAY_TARGET = 'body';
 
-const savedLanguage = localStorage.getItem('tuiRoom-language') || '';
-const { setLanguage } = useI18n();
 const { subscribeEvent, unsubscribeEvent } = useLoginState();
 const router = useRouter();
 const route = useRoute();
-
-if (savedLanguage) {
-  setLanguage(savedLanguage);
-}
 
 function goToLogin() {
   sessionStorage.removeItem('tuiRoom-userInfo');

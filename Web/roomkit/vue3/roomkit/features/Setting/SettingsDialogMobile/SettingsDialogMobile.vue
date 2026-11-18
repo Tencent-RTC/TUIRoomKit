@@ -63,7 +63,7 @@
           </h3>
           <div class="settings-dialog-mobile-section">
             <div
-              v-for="key in GENERAL_PICKS"
+              v-for="key in generalPicks"
               :key="key"
               class="settings-dialog-mobile-row is-pickable"
               role="button"
@@ -132,10 +132,12 @@ import {
   TUIToast,
   useOverlay,
   useUIConfig,
+  useI18n,
   i18n,
   t,
 } from '../../../base';
 import type { ThemeName, Language } from '../../../base';
+import type { SettingsItem } from '../GeneralSettings/GeneralSettings.vue';
 
 type PickKey = 'resolution' | 'language' | 'theme';
 type PickValue = VideoQuality | Language | ThemeName;
@@ -171,14 +173,19 @@ const PICKS: Record<PickKey, PickConfig> = {
   },
 };
 
-const GENERAL_PICKS: PickKey[] = ['language', 'theme'];
+const GENERAL_PICKS = ['language', 'theme'] as const;
 
 /** Long enough for the check mark to register before the list slides back. */
 const AUTO_BACK_DELAY = 180;
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   open: boolean;
-}>();
+  hiddenItems?: SettingsItem[];
+}>(), {
+  hiddenItems: () => [],
+});
+
+const generalPicks = computed(() => GENERAL_PICKS.filter(key => !props.hiddenItems.includes(key)));
 
 const emit = defineEmits<{
   close: [];
@@ -186,6 +193,7 @@ const emit = defineEmits<{
 
 const { isFrontCamera, localMirrorType, localVideoQuality, switchMirror, updateVideoQuality } = useDeviceState();
 const { uiConfig, setUIConfig } = useUIConfig();
+const { language } = useI18n();
 
 const rootRef = ref<HTMLElement | null>(null);
 const pick = ref<PickKey | null>(null);
@@ -214,7 +222,7 @@ function currentValue(key: PickKey): PickValue | undefined {
     return localVideoQuality.value;
   }
   if (key === 'language') {
-    return i18n.language as Language;
+    return language.value as Language;
   }
   return uiConfig.theme;
 }

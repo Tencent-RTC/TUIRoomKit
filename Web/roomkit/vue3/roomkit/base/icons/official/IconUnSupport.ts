@@ -7,5 +7,5 @@ import { svgFromHtml } from '../createIcon';
 export const IconUnSupport = svgFromHtml(
   'IconUnSupport',
   '0 0 14 14',
-  "<circle cx=\"7\" cy=\"7\" r=\"7\" fill=\"currentColor\"/><path d=\"M10 4 4 10M4 4l6 6\" stroke=\"#fff\" stroke-width=\"1.5\"/>",
+  '<circle cx="7" cy="7" r="7" fill="currentColor"/><path d="M10 4 4 10M4 4l6 6" stroke="#fff" stroke-width="1.5"/>',
 );

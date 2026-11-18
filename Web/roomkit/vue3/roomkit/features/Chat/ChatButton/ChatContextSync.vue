@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue';
 import { MessageStatus, MessageType, useChatContext } from 'tuikit-atomicx-vue3/chat';
-import { clearSenderNameCache } from '../RoomChatPC/useSenderName';
+import { clearSenderNameCache } from '../RoomChat/useSenderName';
 
 const props = withDefaults(defineProps<{
   channel: string;
@@ -19,7 +19,7 @@ const emit = defineEmits<{
   unreadChange: [count: number];
 }>();
 
-const { setActiveConversation, messageListOnEvent, loadMessages } = useChatContext(props.channel);
+const { setActiveConversation, messageListOnEvent } = useChatContext(props.channel);
 const unreadCount = ref(0);
 let unsubscribeEvent: (() => void) | null = null;
 
@@ -48,7 +48,8 @@ function subscribeMessageEvent() {
     if (event.message.isSentBySelf || props.isActive) {
       return;
     }
-    if (event.message.messageType === MessageType.Tips) {
+    // Tips and custom protocols (class events, silence, trophy) are not chat to catch up on.
+    if (event.message.messageType === MessageType.Tips || event.message.messageType === MessageType.Custom) {
       return;
     }
     if (event.message.status === MessageStatus.Recalled || event.message.status === MessageStatus.Deleted) {
@@ -70,7 +71,9 @@ watch(
       return;
     }
     setActiveConversation(`GROUP${channel}`);
-    void loadMessages().catch(() => {});
+    // No history pull here: MessageListStore subscribes to message events at
+    // store creation, so the unread tally works once the conversation is
+    // active; the visible list loads its own history in useMessageList.
     subscribeMessageEvent();
   },
   { immediate: true },

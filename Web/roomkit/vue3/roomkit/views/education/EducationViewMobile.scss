@@ -1,0 +1,507 @@
+.education-mobile-root {
+  --edu-safe-top: env(safe-area-inset-top);
+  --edu-safe-right: env(safe-area-inset-right);
+  --edu-safe-bottom: env(safe-area-inset-bottom);
+  --edu-safe-left: env(safe-area-inset-left);
+
+  height: 100%;
+}
+
+.education-mobile-root :deep(.rk-root-slot) {
+  height: 100%;
+}
+
+/* One tree for both orientations; data-orient picks the body layout. */
+.education-mobile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  /* clip, not hidden: a hidden box is still a scroll container, so the caret of a long
+     annotation text line scrolls it and shifts the whole view. hidden is the fallback. */
+  overflow: hidden;
+  overflow: clip;
+
+  /* Query container for the board cap. A turned classroom is taller than the viewport. */
+  container-type: size;
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-page);
+}
+
+.education-mobile-topbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(48px + var(--edu-safe-top));
+  padding: var(--edu-safe-top) calc(8px + var(--edu-safe-right)) 0 calc(2px + var(--edu-safe-left));
+  background: var(--rk-bg-surface);
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-mobile-topbar-left,
+.education-mobile-topbar-right {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.education-mobile-topbar-left {
+  gap: 4px;
+}
+
+.education-mobile-topbar-right {
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.education-mobile-back {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.education-mobile-back :deep(svg) {
+  transform: rotate(180deg);
+}
+
+/* Bottom-bar chips shrunk to the classroom topbar's 32px.
+   Glyphs use the secondary ink (views-edu .h5-av / .h5-orient), not the primary white. */
+.education-mobile-topbar :deep(.toolbar-button-mobile) {
+  width: 32px;
+  height: 32px;
+  color: var(--rk-text-secondary);
+  border-radius: 6px;
+}
+
+/* 18px matches MicButtonMobile :size. The level is drawn in that box;
+   a svg sized apart from it shifts the green off the capsule. */
+.education-mobile-topbar :deep(.toolbar-button-mobile-icon),
+.education-mobile-topbar :deep(.toolbar-button-mobile-icon svg) {
+  width: 18px;
+  height: 18px;
+}
+
+/* The swap exchanges the board and the teacher between the main area and the teacher
+   seat; the student seat never moves. One grid serves both orientations, so the swap
+   only reassigns grid areas and neither the video element nor the board canvas is rebuilt. */
+.education-mobile-body {
+  display: grid;
+  flex: 1;
+  grid-template:
+    'rail-teacher rail-student' auto
+    'main main' auto
+    'chat chat' minmax(0, 1fr) / minmax(0, 1fr) minmax(0, 1fr);
+
+  /* Portrait bands are cards on the page canvas, separated by 6px seams
+     (views-edu onetoone portrait: --paper under, --sheet cards, no hairlines). */
+  column-gap: 6px;
+  min-height: 0;
+  background: var(--rk-bg-page);
+}
+
+.education-mobile-body .is-main {
+  grid-area: main;
+
+  /* Portrait: the width is the fixed axis, the height is calculated from it.
+     The track spans both columns, and the 6px margins below sit outside this
+     percentage, so the content box is the track minus those seams — the same
+     outer edges as the two rail tiles. width: auto is not fixed; the aspect
+     ratio would still be free to size the box from its height. */
+  width: calc(100% - 12px);
+
+  /* The share video's intrinsic size is the item's min-content, and an auto
+     min-width would refuse to shrink below it. Zero it so the fixed width wins. */
+  min-width: 0;
+  height: auto;
+  aspect-ratio: 16 / 9;
+
+  /* 6px seam to the chat below; the rail tiles' bottom margins carry the seam above. */
+  margin: 0 6px 6px;
+}
+
+/* Portrait onetoone rail cells are 4:3 (views-edu h5 .h5-video-rail .stu-tile).
+   Width stays auto so the 6px outer margins come out of the 1fr column:
+   each cell is (row − 6px gap − 12px insets) / 2. The tile's own width: 100%
+   would ignore those margins and close the gap. */
+.education-mobile-body .is-side {
+  grid-area: rail-teacher;
+  width: auto;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  margin: 6px 0 6px 6px;
+  border-radius: 8px;
+}
+
+.education-mobile-body .education-mobile-seat-student {
+  grid-area: rail-student;
+  width: auto;
+  min-width: 0;
+  margin: 6px 6px 6px 0;
+}
+
+.education-mobile-board {
+  position: relative;
+  width: 100%;
+
+  /* clip, not hidden: a hidden box is still a scroll container, so the caret of a long
+     annotation text line scrolls it and shifts the share out of place. hidden is the fallback. */
+  overflow: hidden;
+  overflow: clip;
+  background: var(--rk-bg-surface);
+  border-radius: 8px;
+}
+
+/* Fills the board everywhere except small-class landscape, where the cell is
+   stretched and this frame becomes the centered 16:9 card. */
+.education-mobile-board-frame {
+  position: absolute;
+  inset: 0;
+}
+
+/* Out of flow so the share video's intrinsic size never feeds the card's sizing:
+   the card gets its height from the grid (aspect off the track width), and the
+   player fills that box instead of driving it. In-flow, the 16:9 capture size
+   pushed the row height and aspect-ratio re-derived the width from it. */
+.education-mobile-board-stream {
+  position: absolute;
+  inset: 0;
+}
+
+/* Same stage empty as PC: the shared EduStageEmptyArt above the line of text.
+   Out of flow, like the share: an in-flow placeholder would feed the card's
+   height and the 16:9 ratio would re-derive a full-bleed width from it. */
+.education-mobile-board-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  margin: 0;
+  color: var(--rk-text-tertiary);
+}
+
+.education-mobile-board-empty-text {
+  max-width: 240px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--rk-text-secondary);
+  text-align: center;
+}
+
+.education-mobile .education-mobile-barrage {
+  display: none;
+}
+
+/* Portrait chat card (views-edu onetoone side-rail): same 6px seams and 8px corners
+   as the board and the rail tiles, no divider line above it. */
+.education-mobile-chat {
+  display: flex;
+  flex-direction: column;
+  grid-area: chat;
+  min-height: 0;
+  margin: 0 6px 6px;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: 8px;
+}
+
+.education-mobile-chat-body {
+  flex: 1;
+  min-height: 0;
+}
+
+/* While typing the box is frozen (useKeyboardAvoidance) and the keyboard top
+   is published as --rk-keyboard-offset. The scene slides up by exactly that
+   distance so the page bottom lands on the keyboard edge: the chat card with
+   its composer rides above the keyboard (the composer stays in flow), and
+   the board bottom shows at the top of the band. The transform is scoped to
+   the scene box so teleported overlays stay put — a transform would drag
+   fixed-position descendants along anyway. */
+.education-mobile-root.is-editing .education-mobile {
+  transform: translateY(calc(-1 * var(--rk-keyboard-offset, 0)));
+}
+
+/* Portrait small-class notice (views-edu h5 classroom .rk-chat-notice). */
+.education-mobile-chat :deep(.chat-notice-card) {
+  border: 0;
+}
+
+.education-mobile-chat :deep(.chat-notice-badge) {
+  font-size: 9px;
+}
+
+.education-mobile-chat :deep(.chat-notice-title) {
+  font-size: 12px;
+}
+
+.education-mobile-chat :deep(.chat-notice-list-scroll) {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+[data-rk-theme='light'] .education-mobile-chat :deep(.chat-notice-list) {
+  color: var(--rk-text-primary);
+}
+
+[data-rk-theme='light'] .education-mobile-chat :deep(.chat-notice-badge) {
+  color: var(--rk-brand);
+  background: color-mix(in srgb, var(--rk-brand) 16%, var(--rk-bg-raised));
+}
+
+/* Portrait class chat jump control (views-edu rk-chat-jump, H5 borderless). */
+.education-mobile .education-mobile-chat :deep(.rk-list-jump) {
+  color: #3a393a;
+  background: var(--rk-bg-raised);
+  border: 0;
+  box-shadow: 0 2px 8px color-mix(in srgb, #1c1b1c 18%, transparent);
+}
+
+[data-rk-theme='dark'] .education-mobile .education-mobile-chat :deep(.rk-list-jump) {
+  color: #c6c6c6;
+  box-shadow: 0 2px 8px color-mix(in srgb, #000 18%, transparent);
+}
+
+.education-mobile-teacher-tag {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 16px;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  color: var(--rk-brand);
+  letter-spacing: 0.02em;
+  background: color-mix(in srgb, var(--rk-brand) 18%, transparent);
+  border-radius: 4px;
+}
+
+/* Landscape onetoone (views-edu h5): board is 16:9, the two videos are 4:3 cards
+   separated by a 6px gap, and the leftover canvas shows through.
+   Design width is clamp(160px, (100dvh - bar - 18px) * 2/3, 260px): the 18px is
+   6px padding on both edges plus the 6px gap, so two 4:3 tiles fill the band
+   beside the board. A custom property cannot resolve against the body's own
+   container, so the cq units below read the root container and the bar plus
+   the body's chrome are subtracted in --edu-ls-body-h. Landscape drops the
+   bottom safe-area inset from that chrome and from the body's bottom padding. */
+.education-mobile[data-orient='landscape'] {
+  /* Chrome on iOS already insets the page into the notch gutters itself, so
+     the env() side insets would double with ours; drop them there. The token
+     is bound in EducationViewMobile.vue from the CriOS UA check. Top stays:
+     it is 0 in landscape anyway, and the design already drops the bottom. */
+  &[data-browser='ios-chrome'] {
+    --edu-safe-left: 0px;
+    --edu-safe-right: 0px;
+  }
+
+  .education-mobile-topbar {
+    height: calc(40px + var(--edu-safe-top));
+  }
+
+  .education-mobile-body {
+    /* cq units read the ROOT container, which still holds the bar, so the 40px
+       landscape bar and the body's vertical padding are subtracted by hand.
+       The 12px is the 6px padding on both edges. Landscape drops the bottom
+       safe-area inset, so it is not part of this height. The rail then drops
+       its own 6px tile seam. The top inset stays out: in landscape it is 0,
+       and the bar height used here is the 40px bar. */
+    --edu-ls-body-h: calc(100cqh - 40px - 12px);
+    --edu-ls-rail-w: clamp(0px, calc((var(--edu-ls-body-h) - 6px) * 2 / 3), 260px);
+
+    position: relative;
+    display: grid;
+
+    /* The two 1fr spacer rows absorb the leftover and collapse to zero at the design
+       width, so the rail tiles fill the band beside the board like the rail flex
+       column did; rows carry no gap, the student tile's top margin is the 6px seam. */
+    grid-template:
+      'main .' minmax(0, 1fr)
+      'main rail-teacher' auto
+      'main rail-student' auto
+      'main .' minmax(0, 1fr) / minmax(0, 1fr) var(--edu-ls-rail-w);
+    padding: 0px calc(6px + var(--edu-safe-right)) 6px calc(6px + var(--edu-safe-left));
+    background: var(--rk-bg-page);
+    container-type: size;
+  }
+
+  .education-mobile-body .is-main {
+    place-self: center;
+
+    /* Resolved on this descendant, so 100cqh reads the BODY container: the bar
+       and the padding are already excluded. Do not reuse --edu-ls-body-h here;
+       that var subtracts them again and shrinks the board twice. */
+    width: min(100%, calc(100cqh * 16 / 9));
+    height: auto;
+    max-height: 100%;
+
+    /* Portrait seams do not apply; the body padding carries the landscape 6px. */
+    margin: 0;
+    border-radius: 8px;
+  }
+
+  .education-mobile-body .is-side {
+    margin: 0;
+  }
+
+  .education-mobile-body .education-mobile-seat-student {
+    margin: 6px 0 0;
+  }
+
+  .education-mobile-chat {
+    display: none;
+  }
+
+  .education-mobile-barrage {
+    position: absolute;
+
+    /* The old stage wrapper is gone; anchor to the body's padding box instead.
+       Landscape drops the bottom safe-area, so this offset is the 16px alone. */
+    bottom: 16px;
+    left: calc(16px + var(--edu-safe-left));
+    z-index: 21;
+    display: flex;
+    width: 220px;
+    max-width: calc(100% - 20px);
+  }
+}
+
+.education-mobile-join-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rk-bg-overlay);
+  backdrop-filter: blur(8px);
+}
+
+.education-mobile-join-error {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--rk-danger);
+  text-align: center;
+}
+
+.education-mobile[data-mode='small'] .education-mobile-body {
+  grid-template: 'rail' auto 'main' auto 'chat' minmax(0, 1fr) / minmax(0, 1fr);
+}
+
+.education-mobile-rail {
+  display: flex;
+  grid-area: rail;
+  gap: 6px;
+  align-items: center;
+  padding: 6px;
+  background: var(--rk-bg-page);
+}
+
+.education-mobile-rail :deep(.edu-tile-mobile) {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+}
+
+/* Portrait small class always uses this grid, however many students are in.
+   Three 6px column gaps plus the 8px a 4:3 teacher needs to cover two
+   student rows and the row gap. fr cannot share a calc() with px here. */
+.education-mobile[data-mode='small'][data-orient='portrait'] .education-mobile-rail {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns:
+    calc((100% - 26px) * 2 / 5 + 8px)
+    calc((100% - 26px) / 5)
+    calc((100% - 26px) / 5)
+    calc((100% - 26px) / 5);
+  align-items: start;
+}
+
+.education-mobile[data-mode='small'][data-orient='portrait'] .education-mobile-rail :deep(.edu-tile-mobile) {
+  width: auto;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+  align-self: start;
+}
+
+.education-mobile[data-mode='small'][data-orient='portrait'] .education-mobile-rail :deep(.is-teacher) {
+  grid-row: 1 / span 2;
+}
+
+/* Portrait seats are too small for the "on the way" line under the figure. */
+.education-mobile[data-mode='small'][data-orient='portrait'] .education-mobile-rail :deep(.edu-tile-mobile-wait-label) {
+  display: none;
+}
+
+.education-mobile-rail :deep(.edu-tile-mobile.is-speaking) {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--rk-success) 32%, transparent),
+    0 0 18px color-mix(in srgb, var(--rk-success) 28%, transparent);
+}
+
+.education-mobile[data-mode='small'][data-orient='landscape'] .education-mobile-body {
+  grid-template: 'rail' auto 'main' minmax(0, 1fr) / minmax(0, 1fr);
+}
+
+.education-mobile[data-mode='small'][data-orient='landscape'] .education-mobile-rail {
+  justify-content: center;
+  padding: 8px;
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-mobile[data-mode='small'][data-orient='landscape'] .education-mobile-rail :deep(.edu-tile-mobile) {
+  flex: 0 0 calc((100% - 36px) / 7);
+  width: calc((100% - 36px) / 7);
+  aspect-ratio: 16 / 9;
+}
+
+/* The cell fills the band under the rail and is the query container. The frame
+   inside is the same 16:9 card the live board uses, centered on the page canvas.
+   100cqh here is this cell, not the body: the body container still includes the rail. */
+.education-mobile[data-mode='small'][data-orient='landscape'] .education-mobile-body .is-main {
+  display: flex;
+  place-self: stretch;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
+  background: transparent;
+  border-radius: 0;
+  container-type: size;
+}
+
+.education-mobile[data-mode='small'][data-orient='landscape'] .education-mobile-board.is-main .education-mobile-board-frame {
+  position: relative;
+  flex: none;
+  width: min(100cqw, calc(100cqh * 16 / 9));
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  overflow: clip;
+  background: var(--rk-bg-surface);
+  border-radius: 8px;
+}
+

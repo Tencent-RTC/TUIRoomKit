@@ -1,6 +1,6 @@
 import { markRaw, reactive } from 'vue';
 import type { Component } from 'vue';
-import { setLanguage } from './i18n';
+import { i18n } from './i18n';
 import type { IconOverrides } from './icons/names';
 
 export type ThemeName = 'light' | 'dark';
@@ -27,6 +27,23 @@ export type ContactListProvider = () => RoomKitContact[] | Promise<RoomKitContac
 
 export type ShareLink = string | ((roomId: string) => string);
 
+/** Built-in controls whose visibility `widgetVisible` can turn off in the conference and education scenes; names match the previous RoomKit package. */
+export enum RoomWidget {
+  MicWidget = 'MicWidget',
+  CameraWidget = 'CameraWidget',
+  ScreenShareWidget = 'ScreenShareWidget',
+  WhiteboardWidget = 'WhiteboardWidget',
+  AnnotationWidget = 'AnnotationWidget',
+  RoomChatWidget = 'RoomChatWidget',
+  MemberWidget = 'MemberWidget',
+  RecordingWidget = 'RecordingWidget',
+  AIToolsWidget = 'AIToolsWidget',
+  SettingsWidget = 'SettingsWidget',
+  LeaveRoomWidget = 'LeaveRoomWidget',
+}
+
+export type WidgetVisible = Partial<Record<RoomWidget, boolean>>;
+
 export interface UIConfig {
   /**
    * A theme name, or the theme object accepted by the previous RoomKit package.
@@ -46,6 +63,14 @@ export interface UIConfig {
   shareLink?: ShareLink;
   /** Replaces the IM friend list in invite and schedule pickers; `undefined` restores the friend list. */
   contactList?: ContactListProvider;
+  /**
+   * `false` hides a built-in control; calls merge, and `undefined` shows every control again.
+   * `true` only lifts this hiding: a control still follows its own rules, such as role checks.
+   * Hiding `LeaveRoomWidget` leaves exiting to the host page.
+   * The education scene has no `WhiteboardWidget`, `RecordingWidget` or `AIToolsWidget` control,
+   * and on mobile no `ScreenShareWidget`, `MemberWidget` or `SettingsWidget` control, so those keys do nothing there.
+   */
+  widgetVisible?: WidgetVisible;
 }
 
 export interface ResolvedUIConfig {
@@ -56,24 +81,18 @@ export interface ResolvedUIConfig {
   participantViewUI?: Component;
   shareLink?: ShareLink;
   contactList?: ContactListProvider;
-}
-
-const THEME_STORAGE_KEY = 'tuiRoom-theme';
-
-function readStoredTheme(): ThemeName {
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === 'dark' ? 'dark' : 'light';
+  widgetVisible: WidgetVisible;
 }
 
 export const uiConfig: ResolvedUIConfig = reactive({
-  theme: readStoredTheme(),
+  theme: 'light',
   colors: {},
   icons: {} as IconOverrides,
+  widgetVisible: {},
 });
 
 function applyThemeName(theme: ThemeName): void {
   uiConfig.theme = theme;
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
 }
 
 function applyThemeOptions({ themeStyle, ...colors }: ThemeOptions): void {
@@ -96,7 +115,7 @@ export function setUIConfig(options: UIConfig): void {
     uiConfig.fontFamily = options.fontFamily;
   }
   if (options.language !== undefined) {
-    setLanguage(options.language);
+    i18n.changeLanguage(options.language);
   }
   if (options.icons !== undefined) {
     uiConfig.icons = { ...uiConfig.icons, ...options.icons };
@@ -110,6 +129,9 @@ export function setUIConfig(options: UIConfig): void {
   }
   if ('contactList' in options) {
     uiConfig.contactList = options.contactList;
+  }
+  if ('widgetVisible' in options) {
+    uiConfig.widgetVisible = options.widgetVisible ? { ...uiConfig.widgetVisible, ...options.widgetVisible } : {};
   }
 }
 

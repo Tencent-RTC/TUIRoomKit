@@ -51,17 +51,25 @@ export function getToastStore(ctx: OverlayContext): ToastStore {
 
   const add = (options: ToastOptions): ToastHandle => {
     const id = ++seed;
-    const duration = options.duration ?? (getPlatform() === 'pc' ? 3000 : 2000);
-    timers.forEach(timer => window.clearTimeout(timer));
-    timers.clear();
-    items.value = [{
+    const isPC = getPlatform() === 'pc';
+    const duration = options.duration ?? (isPC ? 3000 : 2000);
+    const next: ToastItem = {
       id,
       type: options.type ?? 'info',
       message: options.message,
       duration,
       showIcon: options.showIcon !== false,
       appendTo: options.appendTo,
-    }];
+    };
+    // PC stacks from the top and the newest toast lands underneath.
+    // H5 keeps a single centered toast, so a new one replaces the old.
+    if (isPC) {
+      items.value = [...items.value, next];
+    } else {
+      timers.forEach(timer => window.clearTimeout(timer));
+      timers.clear();
+      items.value = [next];
+    }
     if (duration > 0) {
       timers.set(id, window.setTimeout(() => remove(id), duration));
     }

@@ -8,7 +8,8 @@ import {
 import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import { getPlatform } from '@tencentcloud/universal-api';
 import { DeviceError, DeviceType, useDeviceState } from 'tuikit-atomicx-vue3/room';
-import { TUIToast, t, ensureAppendHost } from '../../base';
+import { TUIToast, t, resolveOverlayHost } from '../../base';
+import { Orientation, resolveOrientation } from '../../base/headless/useOrientation';
 import DeviceFaultDialog from './DeviceFaultDialog.vue';
 import DeviceFaultSheet from './DeviceFaultSheet.vue';
 
@@ -386,6 +387,14 @@ const H5_COPY: Record<DeviceFaultKind, Record<'camera' | 'microphone', FaultCopy
   'start-failed': h5Pair(H5_START_CAM_TEXT, H5_START_MIC_TEXT, H5_RETRY),
 };
 
+/** Landscape H5 uses the centered dialog. Portrait H5 keeps the sheet. */
+function isH5Landscape(root: HTMLElement | null): boolean {
+  if (!isH5 || !root) {
+    return false;
+  }
+  return resolveOrientation(root.clientWidth, root.clientHeight) === Orientation.Landscape;
+}
+
 export function resolveDeviceFaultView(
   kind: DeviceFaultKind,
   target: DeviceFaultTarget,
@@ -406,11 +415,6 @@ function faultText(key: string, target: DeviceFaultTarget): string {
     device: t(mic ? 'Device.Fault.NameMic' : 'Device.Fault.NameCam'),
     devicePane: t(mic ? 'Device.Fault.PaneMic' : 'Device.Fault.PaneCam'),
   });
-}
-
-function openFaultView(): DeviceFaultView | null {
-  const fault = dialogFault.value;
-  return fault ? resolveDeviceFaultView(fault.kind, fault.target) : null;
 }
 
 function openFaultDialog(fault: { kind: DeviceFaultKind; target: DeviceFaultTarget }) {
@@ -484,32 +488,62 @@ function clearDeviceFault(deviceType: DeviceType.Camera | DeviceType.Microphone)
 }
 
 let dialogContainer: HTMLElement | null = null;
+let orientationObserver: ResizeObserver | null = null;
+
+function stopOrientationWatch() {
+  orientationObserver?.disconnect();
+  orientationObserver = null;
+}
+
+/** A turn while the fault is open swaps the sheet and the dialog. */
+function watchOrientation(host: HTMLElement) {
+  if (orientationObserver) {
+    return;
+  }
+  if (typeof ResizeObserver === 'undefined') {
+    return;
+  }
+  orientationObserver = new ResizeObserver(() => renderDialog());
+  orientationObserver.observe(host);
+}
+
 function renderDialog() {
-  const faultView = openFaultView();
-  if (!faultDialogOpen.value || !faultView) {
+  const fault = dialogFault.value;
+  if (!faultDialogOpen.value || !fault) {
+    stopOrientationWatch();
     if (dialogContainer) {
       render(null, dialogContainer);
     }
     return;
   }
-  /* The dialog belongs to no room or page, so it goes to a host on the body. That host
-     is a RoomKitProvider of its own, which is what carries the theme tokens. */
-  const host = ensureAppendHost(document.body).host.value;
+  /* Stay on the mounted scene provider so education green (or a host primaryColor)
+     reaches the lock and the primary button. Fall back to a body host only when
+     no RoomKitProvider is on the page. */
+  const ctx = resolveOverlayHost();
+  const root = ctx.root.value;
+  const host = ctx.host.value;
   if (!host) {
     return;
   }
+  if (root) {
+    watchOrientation(root);
+  }
+  const faultView = resolveDeviceFaultView(fault.kind, fault.target);
   dialogContainer ??= document.createElement('div');
-  /* Screen share stays a centered dialog. Camera and microphone faults on H5 use the
-     bottom sheet from the mobile design. */
-  const sheet = isH5 && faultView.target !== 'screen';
-  const vnode = h(sheet ? DeviceFaultSheet : DeviceFaultDialog, {
+  /* Microphone and camera faults on H5 use the bottom sheet. Landscape H5
+     uses the compact dialog, with the same phone copy. */
+  const useSheet = isH5 && !isH5Landscape(root);
+  const shared = {
     open: true,
     faultView,
     host,
     title: errorTitle.value,
     description: errorDesc.value,
     close: closeDialog,
-  });
+  };
+  const vnode = useSheet
+    ? h(DeviceFaultSheet, shared)
+    : h(DeviceFaultDialog, { ...shared, compact: isH5Landscape(root) });
   render(vnode, dialogContainer);
 }
 

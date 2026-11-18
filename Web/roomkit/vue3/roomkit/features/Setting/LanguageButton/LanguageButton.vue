@@ -26,22 +26,20 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { IconCheck, IconChevron, IconGlobe, useI18n } from '../../../base';
+import { IconCheck, IconChevron, IconGlobe, i18n, useI18n } from '../../../base';
 import TopbarButton from '../../../layouts/TopbarButton.vue';
 
-const LANGUAGE_STORAGE_KEY = 'tuiRoom-language';
 const options = [
   { code: 'zh-CN', label: '中文' },
   { code: 'en-US', label: 'English' },
 ];
 
-const { language, setLanguage, t } = useI18n();
+const { language, t } = useI18n();
 const label = computed(() => (language.value === 'en-US' ? 'English' : '中文'));
 
 function selectLanguage(code: string, close: () => void) {
   if (code !== language.value) {
-    setLanguage(code);
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
+    i18n.changeLanguage(code);
   }
   close();
 }

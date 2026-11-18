@@ -32,14 +32,8 @@ const credentials = { sdkAppId: user.SDKAppID, userId: user.userID, userSig: use
 const route = useRoute();
 const router = useRouter();
 const { login, logout: logoutUser, loginStatus, loginUserInfo } = useLoginState();
-const { currentRoom, getRoomInfo } = useRoomState();
-const {
-  isCameraTesting,
-  isMicrophoneTesting,
-  openLocalCamera,
-  openLocalMicrophone,
-  unmuteLocalAudio,
-} = useDeviceState();
+const { getRoomInfo } = useRoomState();
+const { isCameraTesting, isMicrophoneTesting } = useDeviceState();
 
 const roomContainer = ref<HTMLElement>();
 const showConference = ref(false);
@@ -50,8 +44,13 @@ const offExited = roomKit.on('exited', async () => {
   showConference.value = false;
 });
 
+/** Carry the preconference preview into the room. */
+function getMediaPreference() {
+  return { preferCameraOn: isCameraTesting.value, preferMicrophoneOn: isMicrophoneTesting.value };
+}
+
 async function createMeeting() {
-  const devices = { camera: isCameraTesting.value, microphone: isMicrophoneTesting.value };
+  const mediaPreference = getMediaPreference();
   showConference.value = true;
 
   const roomId = await generateRoomId(candidate => getRoomInfo({ roomId: candidate }));
@@ -59,37 +58,23 @@ async function createMeeting() {
     showConference.value = false;
     return;
   }
-  const name = loginUserInfo.value?.userName || credentials.userId;
+  // Cap the name so a long nickname can't push roomName past the create limit.
+  const name = [...(loginUserInfo.value?.userName || credentials.userId)].slice(0, 10).join('');
   await roomKit.createAndJoin({
     roomId,
     roomName: t('Schedule.DefaultTopic', { name }),
     container: { appendTo: roomContainer.value! },
+    mediaPreference,
   });
   await router.replace({ query: { ...route.query, roomId } });
-  await openPreviewDevices(devices);
 }
 
 async function joinMeeting(roomId: string, password?: string) {
-  const devices = { camera: isCameraTesting.value, microphone: isMicrophoneTesting.value };
+  const mediaPreference = getMediaPreference();
   showConference.value = true;
 
-  await roomKit.join({ roomId, password, container: { appendTo: roomContainer.value! } });
+  await roomKit.join({ roomId, password, container: { appendTo: roomContainer.value! }, mediaPreference });
   await router.replace({ query: { ...route.query, roomId } });
-  await openPreviewDevices(devices);
-}
-
-async function openPreviewDevices(devices: { camera: boolean; microphone: boolean }) {
-  if (!currentRoom.value) {
-    return;
-  }
-  if (devices.camera) {
-    await openLocalCamera().catch(error => console.error('Failed to open camera:', error));
-  }
-  if (devices.microphone) {
-    await openLocalMicrophone()
-      .then(() => unmuteLocalAudio())
-      .catch(error => console.error('Failed to open microphone:', error));
-  }
 }
 
 async function logout() {

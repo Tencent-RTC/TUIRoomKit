@@ -1,4 +1,9 @@
-import { i18n, t } from '../../../base';
+import { t, useI18n } from '../../../base';
+
+/** Reactive, so a computed or template calling these helpers re-renders on a language switch. */
+function isChinese(): boolean {
+  return useI18n().language.value === 'zh-CN';
+}
 
 export const TIMEZONE_VALUES = [
   'UTC-12:00',
@@ -31,10 +36,7 @@ export const TIMEZONE_VALUES = [
 
 export type TimezoneValue = (typeof TIMEZONE_VALUES)[number];
 
-export const DURATION_MINUTES = [
-  15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840, 900, 960, 1020,
-  1080, 1140, 1200, 1260, 1320, 1380, 1440,
-] as const;
+export const DURATION_MINUTES = [15, 30, 45, 60, 120, 180] as const;
 
 export const WEEKDAY_SHORT_KEYS = [
   'Schedule.CalSun',
@@ -98,7 +100,7 @@ export function formatScheduleDate(date: string): string {
   if (!year || !month || !day) {
     return date;
   }
-  if (i18n.language === 'zh-CN') {
+  if (isChinese()) {
     return `${year}年${month}月${day}日`;
   }
   return new Date(year, month - 1, day).toLocaleDateString('en-US', {
@@ -109,7 +111,7 @@ export function formatScheduleDate(date: string): string {
 }
 
 export function formatScheduleMonth(year: number, month: number): string {
-  if (i18n.language === 'zh-CN') {
+  if (isChinese()) {
     return `${year}年${month}月`;
   }
   return new Date(year, month - 1, 1).toLocaleDateString('en-US', {

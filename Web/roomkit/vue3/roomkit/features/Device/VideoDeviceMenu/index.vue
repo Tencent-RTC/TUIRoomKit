@@ -205,6 +205,7 @@ onMounted(async () => {
   padding: 6px 12px 2px;
   font-size: var(--rk-fs-sm);
   font-weight: 600;
+
   /* Same step as design `--text-3` / `--fg-tertiary` */
   color: var(--rk-text-tertiary);
   letter-spacing: 0.06em;
@@ -234,9 +235,11 @@ onMounted(async () => {
   background: color-mix(in srgb, var(--rk-text-primary) 5%, transparent);
 }
 
+/* One brand axis for text and background keeps the selected pair in sync
+   in every scene (edu green, host custom primaryColor), matching Select/Option */
 .device-menu-item-active,
 .device-menu-item-active:hover {
-  color: var(--rk-info);
+  color: var(--rk-brand);
   background: var(--rk-brand-soft);
 }
 
@@ -287,7 +290,7 @@ onMounted(async () => {
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  color: var(--rk-info);
+  color: var(--rk-brand);
 }
 
 .device-menu-empty {

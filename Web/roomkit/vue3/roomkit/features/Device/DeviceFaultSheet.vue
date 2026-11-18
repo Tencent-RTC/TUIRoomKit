@@ -63,7 +63,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .device-fault-sheet-root {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 80;
   overflow: hidden;
@@ -77,7 +77,7 @@ onMounted(() => {
 .device-fault-sheet-mask {
   position: absolute;
   inset: 0;
-  background: rgb(0 0 0 / 40%);
+  background: rgba(0, 0, 0, 0.4);
   opacity: 0;
   transition: opacity 0.25s ease;
 }
@@ -97,8 +97,8 @@ onMounted(() => {
   text-align: center;
   background: var(--rk-bg-surface);
   border-radius: 16px 16px 0 0;
-  transform: translateY(100%);
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(100%);
 }
 
 .device-fault-sheet-root.is-open .device-fault-sheet {

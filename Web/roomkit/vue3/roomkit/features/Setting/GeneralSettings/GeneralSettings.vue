@@ -1,6 +1,6 @@
 <template>
   <div class="general-settings">
-    <div class="general-settings-row">
+    <div v-if="!hiddenItems.includes('theme')" class="general-settings-row">
       <span class="general-settings-row-title">{{ t('Settings.Theme') }}</span>
       <span class="general-settings-row-control">
         <div class="general-settings-theme" role="radiogroup" :aria-label="t('Settings.Theme')">
@@ -20,10 +20,10 @@
       </span>
     </div>
 
-    <div class="general-settings-row">
+    <div v-if="!hiddenItems.includes('language')" class="general-settings-row">
       <span class="general-settings-row-title">{{ t('Settings.Language') }}</span>
       <span class="general-settings-row-control">
-        <TUISelect :model-value="i18n.language" size="sm" @change="selectLanguage">
+        <TUISelect :model-value="language" size="sm" @change="selectLanguage">
           <TUIOption
             v-for="option in LANGUAGE_OPTIONS"
             :key="option.value"
@@ -38,8 +38,17 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { TUIOption, TUISelect, useUIConfig, i18n, t } from '../../../base';
+import { TUIOption, TUISelect, useUIConfig, i18n, t, useI18n } from '../../../base';
 import type { Language } from '../../../base';
+
+/** 'share' hides the whole share tab on the PC settings dialog. */
+export type SettingsItem = 'theme' | 'language' | 'share';
+
+withDefaults(defineProps<{
+  hiddenItems?: SettingsItem[];
+}>(), {
+  hiddenItems: () => [],
+});
 
 const LANGUAGE_OPTIONS: Array<{ value: Language; labelKey: string }> = [
   { value: 'zh-CN', labelKey: 'Settings.LanguageZhCN' },
@@ -52,14 +61,15 @@ const THEME_OPTIONS = [
 ];
 
 const { uiConfig, setUIConfig } = useUIConfig();
+const { language } = useI18n();
 const theme = computed(() => uiConfig.theme);
 
 function selectTheme(nextTheme: typeof THEME_OPTIONS[number]['value']) {
   setUIConfig({ theme: nextTheme });
 }
 
-function selectLanguage(language: string | number | null) {
-  const next = LANGUAGE_OPTIONS.find(option => option.value === language);
+function selectLanguage(value: string | number | null) {
+  const next = LANGUAGE_OPTIONS.find(option => option.value === value);
   if (!next) {
     return;
   }

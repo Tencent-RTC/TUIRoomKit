@@ -1,8 +1,9 @@
-/* Float the count outside the glyph so the rear person stays visible. */
+/* Left edge stays put, so a second digit grows away from the glyph.
+   Right-anchoring let "12" cover the person on the 16px classroom icon. */
 .participant-button-badge {
   position: absolute;
   top: -6px;
-  right: -10px;
+  left: calc(100% - 4px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -14,4 +15,5 @@
   font-variant-numeric: tabular-nums;
   line-height: 1;
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }

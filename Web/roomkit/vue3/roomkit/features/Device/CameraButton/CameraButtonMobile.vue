@@ -17,12 +17,11 @@ import {
   DeviceError,
   DeviceStatus,
   DeviceType,
-  RoomParticipantRole,
   useDeviceState,
-  useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
 import { IconCam, IconCamOff, TUIToast, t } from '../../../base';
+import { useParticipantPermission } from '../../Participants/participantData';
 import ToolbarButtonMobile from '../../../layouts/ToolbarButtonMobile/ToolbarButtonMobile.vue';
 import { useDeviceFault } from '../useDeviceFault';
 
@@ -33,7 +32,6 @@ const {
   closeLocalCamera,
 } = useDeviceState();
 const { currentRoom } = useRoomState();
-const { localParticipant } = useRoomParticipantState();
 const { handleDeviceError, cameraFault } = useDeviceFault();
 
 const isProcessing = ref(false);
@@ -41,10 +39,7 @@ const cameraOn = computed(() => cameraStatus.value === DeviceStatus.On);
 const hasDeviceError = computed(() =>
   cameraLastError.value !== DeviceError.NoError || !!cameraFault.value,
 );
-const isPrivileged = computed(() =>
-  localParticipant.value?.role === RoomParticipantRole.Owner
-  || localParticipant.value?.role === RoomParticipantRole.Admin,
-);
+const { isHostOrAdmin: isPrivileged } = useParticipantPermission();
 
 /** Host and admin keep control; others cannot open the camera while the room disables video. */
 const isCameraDisabled = computed(() => {

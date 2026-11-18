@@ -7,6 +7,7 @@
     :loading="isProcessing"
     :notice="hasDeviceError"
     :hide-menu="hideMenu"
+    :caret-direction="caretDirection"
     @click="toggleCamera"
   >
     <template #menu="{ close }">
@@ -21,12 +22,11 @@ import {
   DeviceError,
   DeviceStatus,
   DeviceType,
-  RoomParticipantRole,
   useDeviceState,
-  useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
 import { IconCam, IconCamOff, TUIToast, t } from '../../../base';
+import { useParticipantPermission } from '../../Participants/participantData';
 import type { SettingsTab } from '../../Setting/SettingsDialogPC/SettingsDialogPC.vue';
 import ToolbarButtonPC from '../../../layouts/ToolbarButtonPC/ToolbarButtonPC.vue';
 import VideoDeviceMenu from '../VideoDeviceMenu/index.vue';
@@ -34,8 +34,11 @@ import { useDeviceFault } from '../useDeviceFault';
 
 withDefaults(defineProps<{
   hideMenu?: boolean;
+  /** Resting caret direction, forwarded to ToolbarButtonPC */
+  caretDirection?: 'up' | 'down';
 }>(), {
   hideMenu: false,
+  caretDirection: 'up',
 });
 
 /** The shell owns the settings dialog; the button only forwards which tab was asked for. */
@@ -48,7 +51,6 @@ const {
   closeLocalCamera,
 } = useDeviceState();
 const { currentRoom } = useRoomState();
-const { localParticipant } = useRoomParticipantState();
 const { handleDeviceError } = useDeviceFault();
 
 const isProcessing = ref(false);
@@ -56,10 +58,7 @@ const cameraOn = computed(() => cameraStatus.value === DeviceStatus.On);
 const hasDeviceError = computed(() =>
   cameraLastError.value !== DeviceError.NoError,
 );
-const isPrivileged = computed(() =>
-  localParticipant.value?.role === RoomParticipantRole.Owner
-  || localParticipant.value?.role === RoomParticipantRole.Admin,
-);
+const { isHostOrAdmin: isPrivileged } = useParticipantPermission();
 
 /** Host and admin keep control; others cannot open the camera while the room disables video */
 const isCameraDisabled = computed(() => {

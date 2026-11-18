@@ -1,44 +1,57 @@
 <template>
-  <div
-    class="local-network-info-mobile"
-    role="button"
-    tabindex="0"
-    :aria-label="t(displayState.label)"
-    aria-haspopup="dialog"
-    :aria-expanded="isOpen"
-    @click="isOpen = !isOpen"
-    @keydown.enter.prevent="isOpen = !isOpen"
-    @keydown.space.prevent="isOpen = !isOpen"
-  >
-    <span class="local-network-info-mobile-bars" :class="`local-network-info-mobile-${displayState.level}`">
-      <i /><i /><i />
-    </span>
-  </div>
+  <!-- Landscape opens the same popover as PC. Portrait keeps the bottom sheet. -->
+  <LocalNetworkInfoPC v-if="orientation === Orientation.Landscape" show-when-unknown />
 
-  <TUIPopup v-model:open="isOpen" height="auto" :title="t(displayState.label)">
-    <div class="local-network-sheet-metrics">
-      <div v-for="metric in metrics" :key="metric.id" class="local-network-sheet-metric">
-        <span class="local-network-sheet-label">
-          {{ t(metric.label) }}
-          <IconArrowRight
-            v-if="metric.direction"
-            :size="14"
-            class="local-network-sheet-arrow"
-            :class="`local-network-sheet-arrow-${metric.direction}`"
-          />
-        </span>
-        <span class="local-network-sheet-value">
-          {{ metric.value }}<span class="local-network-sheet-unit">{{ metric.unit }}</span>
-        </span>
-      </div>
+  <template v-else>
+    <div
+      class="local-network-info-mobile"
+      role="button"
+      tabindex="0"
+      :aria-label="t(displayState.label)"
+      aria-haspopup="dialog"
+      :aria-expanded="isOpen"
+      @click="isOpen = !isOpen"
+      @keydown.enter.prevent="isOpen = !isOpen"
+      @keydown.space.prevent="isOpen = !isOpen"
+    >
+      <span class="local-network-info-mobile-bars" :class="`local-network-info-mobile-${displayState.level}`">
+        <i /><i /><i />
+      </span>
     </div>
-  </TUIPopup>
+
+    <TUIPopup v-model:open="isOpen" height="auto" :title="t(displayState.label)">
+      <div class="local-network-sheet-metrics">
+        <div v-for="metric in metrics" :key="metric.id" class="local-network-sheet-metric">
+          <span class="local-network-sheet-label">
+            {{ t(metric.label) }}
+            <IconArrowRight
+              v-if="metric.direction"
+              :size="14"
+              class="local-network-sheet-arrow"
+              :class="`local-network-sheet-arrow-${metric.direction}`"
+            />
+          </span>
+          <span class="local-network-sheet-value">
+            {{ metric.value }}<span class="local-network-sheet-unit">{{ metric.unit }}</span>
+          </span>
+        </div>
+      </div>
+    </TUIPopup>
+  </template>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { NetworkQuality, useDeviceState } from 'tuikit-atomicx-vue3/room';
-import { IconArrowRight, TUIPopup, t } from '../../../base';
+import { IconArrowRight, Orientation, TUIPopup, t } from '../../../base';
+import LocalNetworkInfoPC from '../LocalNetworkInfoPC/LocalNetworkInfoPC.vue';
+
+const props = withDefaults(defineProps<{
+  /** Education H5 passes this. Conference leaves it portrait and keeps the sheet. */
+  orientation?: Orientation;
+}>(), {
+  orientation: Orientation.Portrait,
+});
 
 const LEVELS = {
   [NetworkQuality.Excellent]: { level: 'stability', label: 'Network.Stability' },
@@ -68,6 +81,10 @@ const metrics = computed(() => [
 ]);
 
 const isOpen = ref(false);
+
+watch(() => props.orientation, () => {
+  isOpen.value = false;
+});
 </script>
 
 <style scoped lang="scss">

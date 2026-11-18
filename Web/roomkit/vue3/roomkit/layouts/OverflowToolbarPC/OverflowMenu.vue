@@ -14,75 +14,41 @@
     />
 
     <template #menu>
-      <div v-if="submenu" class="overflow-menu-sub">
-        <button
-          ref="backRef"
-          class="overflow-menu-back"
-          type="button"
-          @click="emit('leave')"
-        >
-          <IconChevron class="overflow-menu-back-icon" :size="12" />
-          <span>{{ submenu.title }}</span>
-        </button>
-        <div class="overflow-menu-sub-split" />
-        <div
-          v-if="submenu.hint"
-          class="overflow-menu-sub-hint"
-          role="note"
-        >
-          <IconInfo :size="14" />
-          <span>{{ submenu.hint }}</span>
-        </div>
-        <template v-for="(item, index) in submenu.items" :key="item.act ?? `split-${index}`">
-          <div v-if="item.divider" class="overflow-menu-sub-split" />
-          <button
-            v-else
-            class="overflow-menu-sub-item"
-            :class="{ 'is-on': item.on }"
-            type="button"
-            :disabled="item.disabled"
-            @click="runSubmenu(item.act)"
-          >
-            <component :is="item.icon" v-if="item.icon" :size="14" />
-            <span>{{ item.label }}</span>
-          </button>
-        </template>
-      </div>
+      <OverflowSubmenuPanel
+        v-if="submenu"
+        :submenu="submenu"
+        @back="drilledId = null"
+        @close="onOpen(false)"
+      />
 
       <template v-else>
-        <template v-for="item in menuItems" :key="item.id">
+        <template v-for="entry in entries" :key="entry.id">
           <button
-            v-if="item.hasSubmenu"
+            v-if="'submenu' in entry.behavior"
             class="overflow-menu-entry"
             type="button"
-            @click="emit('drill', item.id)"
+            :disabled="entry.disabled"
+            @click="drilledId = entry.id"
           >
             <span class="overflow-menu-icon">
-              <component :is="item.icon" v-if="item.icon" :size="16" />
+              <component :is="entry.icon" v-if="entry.icon" :size="16" />
             </span>
-            <span class="overflow-menu-label">{{ item.label }}</span>
+            <span class="overflow-menu-label">{{ entry.label }}</span>
             <IconChevron class="overflow-menu-chevron" :size="12" />
           </button>
           <TUIDropdownItem
             v-else
-            :command="item.id"
-            :class="{
-              'overflow-menu-item-active': item.active,
-              'overflow-menu-item-danger': item.danger,
-            }"
+            :command="entry.id"
+            :disabled="entry.disabled"
           >
             <span class="overflow-menu-icon">
-              <component
-                :is="item.icon"
-                v-if="item.icon"
-                :size="16"
-              />
+              <component :is="entry.icon" v-if="entry.icon" :size="16" />
             </span>
-            {{ item.label }}
+            {{ entry.label }}
           </TUIDropdownItem>
         </template>
 
-        <TUIDropdownSeparator v-if="menuItems.length" />
+        <TUIDropdownSeparator v-if="entries.length" />
 
         <TUIDropdownItem v-if="minimizable" :command="SHELL_COMMANDS.minimize">
           <span class="overflow-menu-icon">
@@ -102,158 +68,55 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue';
-import type { Component } from 'vue';
-import { RecordingStatus, useRoomState } from 'tuikit-atomicx-vue3/room';
+import { computed, provide, ref } from 'vue';
 import {
   TUIDropdown,
   TUIDropdownItem,
   TUIDropdownSeparator,
-  IconAISubtitles,
-  IconChat,
   IconChevron,
-  IconInfo,
   IconMaximize,
-  IconMembers,
   IconMore,
   IconPip,
-  IconRecord,
-  IconRecording,
-  IconSettings,
-  IconShare,
-  IconShareStop,
   t,
 } from '../../base';
-import { useScreenShare } from '../../features/ScreenShare/ScreenShareButton/useScreenShare';
 import ToolbarButtonPC from '../ToolbarButtonPC/ToolbarButtonPC.vue';
-import type { OverflowSubmenu } from './overflowSubmenu';
-import type { OverflowMenuEntry } from './useToolbarOverflow';
+import OverflowSubmenuPanel from './OverflowSubmenuPanel.vue';
+import { OVERFLOW_ITEM_KEY } from './overflowItem';
+import type { OverflowMenuEntry } from './overflowItem';
 
-// Namespaced so shell entries never collide with a toolbar action id
+// Namespaced so shell entries never collide with a toolbar entry id
 const SHELL_COMMANDS = {
   minimize: 'shell:minimize',
   fullscreen: 'shell:fullscreen',
 } as const;
 
 const props = defineProps<{
-  actions: OverflowMenuEntry[];
-  submenu?: OverflowSubmenu | null;
+  entries: OverflowMenuEntry[];
   fullscreen: boolean;
   minimizable?: boolean;
 }>();
 
 const emit = defineEmits<{
-  action: [id: string];
-  drill: [id: string];
-  leave: [];
-  close: [];
   minimize: [];
   fullscreen: [];
-  open: [];
 }>();
 
+// The More button is the menu itself, not an item that can collapse into it.
+provide(OVERFLOW_ITEM_KEY, null);
+
 const open = ref(false);
-const backRef = ref<HTMLButtonElement | null>(null);
-const { isLocalSharing } = useScreenShare();
-const { currentRoom } = useRoomState();
-const isRecording = computed(
-  () => currentRoom.value?.recordingInfo?.status === RecordingStatus.Recording,
-);
+const drilledId = ref<string | null>(null);
 
-const menuItems = computed(() => props.actions.map(resolveItem));
-
-function matches(label: string, ...keys: string[]) {
-  return keys.some(key => t(key) === label);
-}
-
-interface OverflowMenuItem {
-  id: string;
-  label: string;
-  overflowKey?: string;
-  icon?: Component;
-  danger?: boolean;
-  active?: boolean;
-  hasSubmenu?: boolean;
-}
-
-/** Key-based icon identity, immune to the locale the label was scraped in. */
-const OVERFLOW_KEY_ICONS: Record<string, Component> = {
-  'Participants.Panel': IconMembers,
-  'Chat.Title': IconChat,
-  'AITools.Entry': IconAISubtitles,
-  'Settings.Title': IconSettings,
-};
-
-function resolveItem(action: OverflowMenuEntry): OverflowMenuItem {
-  if (
-    action.overflowKey === 'ScreenShare.Share'
-    || matches(action.label, 'ScreenShare.Share', 'ScreenShare.Stop')
-  ) {
-    return {
-      ...action,
-      label: t(isLocalSharing.value ? 'ScreenShare.Stop' : 'ScreenShare.Share'),
-      icon: isLocalSharing.value ? IconShareStop : IconShare,
-      active: isLocalSharing.value,
-    };
-  }
-  if (
-    action.overflowKey === 'CloudRecording.RecordLabel'
-    || matches(action.label, 'CloudRecording.RecordLabel', 'CloudRecording.RecordingLabel')
-  ) {
-    return {
-      ...action,
-      label: t(isRecording.value ? 'CloudRecording.RecordingLabel' : 'CloudRecording.RecordLabel'),
-      icon: isRecording.value ? IconRecording : IconRecord,
-      active: isRecording.value,
-      danger: isRecording.value,
-    };
-  }
-  if (action.overflowKey) {
-    return {
-      ...action,
-      label: t(action.overflowKey),
-      icon: OVERFLOW_KEY_ICONS[action.overflowKey] ?? iconFor(action.label),
-    };
-  }
-  return {
-    ...action,
-    icon: iconFor(action.label),
-  };
-}
-
-function iconFor(label: string): Component | undefined {
-  const icons: Array<[string, Component]> = [
-    [t('Participants.Panel'), IconMembers],
-    [t('Chat.Title'), IconChat],
-    [t('AITools.Entry'), IconAISubtitles],
-    [t('Settings.Title'), IconSettings],
-  ];
-  return icons.find(([text]) => text === label)?.[1];
-}
+/** Read live, so a control that stops offering its submenu (a share starts) drops the drill. */
+const submenu = computed(() => {
+  const behavior = props.entries.find(entry => entry.id === drilledId.value)?.behavior;
+  return behavior && 'submenu' in behavior ? behavior.submenu : null;
+});
 
 function onOpen(next: boolean) {
   open.value = next;
-  if (next) {
-    emit('open');
-    return;
-  }
-  emit('close');
+  drilledId.value = null;
 }
-
-function runSubmenu(act?: string) {
-  if (!act || !props.submenu?.run(act)) {
-    return;
-  }
-  open.value = false;
-  emit('close');
-}
-
-watch(() => props.submenu, (menu) => {
-  if (!menu || !open.value) {
-    return;
-  }
-  void nextTick(() => backRef.value?.focus());
-});
 
 function handleCommand(command: string | number) {
   const id = String(command);
@@ -267,7 +130,10 @@ function handleCommand(command: string | number) {
     return;
   }
 
-  emit('action', id);
+  const behavior = props.entries.find(entry => entry.id === id)?.behavior;
+  if (behavior && 'select' in behavior) {
+    void behavior.select();
+  }
 }
 </script>
 
@@ -288,25 +154,15 @@ function handleCommand(command: string | number) {
   height: 16px;
 }
 
-:deep(.overflow-menu-item-active) {
-  background: color-mix(in srgb, var(--rk-info) 14%, transparent);
-  color: var(--rk-info);
-}
-
-:deep(.overflow-menu-item-danger) {
-  background: color-mix(in srgb, var(--rk-danger) 14%, transparent);
-  color: var(--rk-danger);
-}
-
 .overflow-menu-entry {
   display: flex;
   align-items: center;
   width: 100%;
   min-height: 32px;
   padding: 0 12px;
-  color: var(--rk-text-primary);
   font: inherit;
   font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
   text-align: left;
   cursor: pointer;
   background: transparent;
@@ -327,102 +183,5 @@ function handleCommand(command: string | number) {
   margin-left: auto;
   color: var(--rk-text-tertiary);
   transform: rotate(-90deg);
-}
-
-.overflow-menu-sub {
-  display: flex;
-  flex-direction: column;
-}
-
-.overflow-menu-back {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  width: 100%;
-  padding: 8px 10px;
-  color: var(--rk-text-primary);
-  font: inherit;
-  font-size: var(--rk-fs-md);
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  border-radius: 12px;
-}
-
-.overflow-menu-back:hover {
-  background: color-mix(in srgb, var(--rk-text-primary) 5%, transparent);
-}
-
-.overflow-menu-back-icon {
-  flex: none;
-  transform: rotate(90deg);
-}
-
-.overflow-menu-sub-split {
-  height: 1px;
-  margin: 4px 2px;
-  background: var(--rk-border);
-}
-
-.overflow-menu-sub-hint {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 6px 10px;
-  color: var(--rk-text-secondary);
-  font-size: var(--rk-fs-sm);
-  line-height: 1.4;
-  white-space: nowrap;
-}
-
-.overflow-menu-sub-hint :deep(svg) {
-  flex: none;
-  color: var(--rk-brand);
-}
-
-.overflow-menu-sub-item {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  width: 100%;
-  padding: 8px 12px;
-  color: var(--rk-text-primary);
-  font: inherit;
-  font-size: var(--rk-fs-md);
-  line-height: 20px;
-  text-align: left;
-  white-space: nowrap;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  border-radius: 12px;
-}
-
-.overflow-menu-sub-item:hover {
-  background: color-mix(in srgb, var(--rk-text-primary) 5%, transparent);
-}
-
-.overflow-menu-sub-item.is-on,
-.overflow-menu-sub-item.is-on :deep(svg) {
-  color: var(--rk-brand);
-}
-
-.overflow-menu-sub-item:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-.overflow-menu-sub-item:disabled:hover {
-  background: transparent;
-}
-</style>
-
-<style lang="scss">
-.rk-dropdown:has(.overflow-menu-sub) {
-  box-sizing: border-box;
-  width: max-content;
-  min-width: 0;
 }
 </style>

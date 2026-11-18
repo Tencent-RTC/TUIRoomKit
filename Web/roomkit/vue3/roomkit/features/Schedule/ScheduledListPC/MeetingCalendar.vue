@@ -46,7 +46,7 @@
           'has-event': eventDays.has(day.key),
         }"
         :aria-pressed="selected === day.key"
-        :aria-label="day.date.toLocaleDateString(i18n.language)"
+        :aria-label="day.date.toLocaleDateString(language)"
         @click="selectVisibleDay(day.key)"
       >
         <span class="cal-day-wk">{{
@@ -198,8 +198,8 @@ import {
   TUIDropdown,
   TUIDropdownItem,
   TUILoading,
-  i18n,
   t,
+  useI18n,
 } from '../../../base';
 import {
   addDays,
@@ -244,6 +244,8 @@ const emit = defineEmits<{
   edit: [meeting: ScheduledMeeting];
   cancel: [meeting: ScheduledMeeting];
 }>();
+
+const { language } = useI18n();
 const listNow = computed(() => new Date(props.now));
 const listRange = computed(() => scheduleSelectableRange(listNow.value));
 const selected = ref(dateKey(listNow.value));

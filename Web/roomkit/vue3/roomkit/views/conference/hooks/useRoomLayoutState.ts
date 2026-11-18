@@ -68,12 +68,13 @@ export function useRoomLayoutState() {
         { immediate: true },
       );
 
-      /* Template: standard rooms switch to the sidebar when a share starts, and back to
-         the grid once a single stream is left. */
+      /* Template: standard rooms switch to the sidebar when a share starts, unless a speaker
+         layout (sidebar or cinema) is already picked, and back to the grid once a single
+         stream is left. */
       const stopShareSwitch = watch(
         [() => currentRoom.value?.roomType, participantWithScreen],
         ([roomType, sharer]) => {
-          if (roomType === RoomType.Standard && sharer) {
+          if (roomType === RoomType.Standard && sharer && !isSpeakerTemplate(layoutTemplate.value)) {
             layoutTemplate.value = RoomLayoutTemplate.SidebarLayout;
           }
         },

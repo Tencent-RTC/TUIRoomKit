@@ -10,7 +10,8 @@ import {
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
 import { TUIMessageBox, TUIToast, t } from '../../base';
-import { useScreenShare } from '../ScreenShare/ScreenShareButton/useScreenShare';
+import { EDU_CLASS_EVENT_ID, MIC_MUTE_ALL_EVENT_ID, sendNotice } from '../Chat/customMessage';
+import { toastRoomError } from '../../utils/roomError';
 import type { PickedContact } from './contactData';
 import {
   clearNoAnswer,
@@ -22,8 +23,6 @@ import {
 import type { ParticipantCommand } from './participantData';
 import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 
-/** The TUIErrorCode re-exported by atomicx has no admin-limit member, so the engine code is used directly. */
-const ERROR_CODE_ADMIN_COUNT_LIMIT = 100020;
 const DEVICE_REQUEST_TIMEOUT_SECONDS = 30;
 const CALL_TIMEOUT_SECONDS = 60;
 
@@ -47,12 +46,8 @@ export async function runParticipantAction(action: () => Promise<unknown>): Prom
     await action();
     return true;
   } catch (error) {
-    if ((error as { code?: number }).code === ERROR_CODE_ADMIN_COUNT_LIMIT) {
-      TUIToast.warning(t('Participants.ActionFailure.admin-limit'));
-    } else {
-      console.error('[RoomKit.participant] action failed:', error);
-      TUIToast.error(t('Participants.ActionFailure.failed'));
-    }
+    console.error('[RoomKit.participant] action failed:', error);
+    toastRoomError(error, { fallback: 'Participants.ActionFailure.failed' });
     return false;
   } finally {
     isBusy.value = false;
@@ -61,7 +56,12 @@ export async function runParticipantAction(action: () => Promise<unknown>): Prom
 
 type MediaDevice = DeviceType.Microphone | DeviceType.Camera;
 
-export function useParticipantActions() {
+export interface ParticipantActionOptions {
+  /** Use the education-specific copy for classroom member operations. */
+  education?: boolean;
+}
+
+export function useParticipantActions(options: ParticipantActionOptions = {}) {
   const { currentRoom } = useRoomState();
   const participantState = useRoomParticipantState();
   const {
@@ -72,7 +72,6 @@ export function useParticipantActions() {
     openLocalCamera,
     closeLocalCamera,
   } = useDeviceState();
-  const { isLocalSharing, stopScreenShare } = useScreenShare();
   const { isLocal, isHostOrAdmin, canManageParticipant } = useParticipantPermission();
 
   async function toggleLocalMic() {
@@ -110,6 +109,11 @@ export function useParticipantActions() {
     if (!await runParticipantAction(() => participantState.closeParticipantDevice({ userId, deviceType }))) {
       return;
     }
+    // Education keeps the operator silent on a member mic/camera close; the
+    // student reads the closure from their own device toast (useRoomTips).
+    if (options.education) {
+      return;
+    }
     const name = participantDisplayName(participant);
     if (deviceType === DeviceType.Microphone) {
       TUIToast.success(t('Participants.MuteDone', { name }));
@@ -129,9 +133,9 @@ export function useParticipantActions() {
     }
     const name = participantDisplayName(participant);
     if (device === DeviceType.Microphone) {
-      TUIToast.success(t('Participants.UnmuteRequested', { name }));
+      TUIToast.success(t(options.education ? 'Education.Toast.InviteMicTeacher' : 'Participants.UnmuteRequested', { name }));
     } else {
-      TUIToast.success(t('Participants.CamRequested', { name }));
+      TUIToast.success(t(options.education ? 'Education.Toast.InviteCamTeacher' : 'Participants.CamRequested', { name }));
     }
   }
 
@@ -167,9 +171,13 @@ export function useParticipantActions() {
 
   async function toggleChat(participant: RoomParticipant) {
     const { userId, isMessageDisabled } = participant;
-    const name = participantDisplayName(participant);
     if (await runParticipantAction(() => participantState.disableUserMessage({ userId, disable: !isMessageDisabled }))) {
-      TUIToast.success(t(isMessageDisabled ? 'Participants.ChatUnmuted' : 'Participants.ChatMuted', { name }));
+      // Education keeps the operator silent on a per-member chat mute; the student
+      // reads the change from their own composer (design: no teacher-side toast).
+      if (!options.education) {
+        const name = participantDisplayName(participant);
+        TUIToast.success(t(isMessageDisabled ? 'Participants.ChatUnmuted' : 'Participants.ChatMuted', { name }));
+      }
     }
   }
 
@@ -196,13 +204,8 @@ export function useParticipantActions() {
       confirmText: t('Participants.TransferOwnerConfirm'),
       cancelText: t('Participants.Cancel'),
     });
-    // An owner-only share would outlive the new owner's right to stop it.
-    const done = confirmed && await runParticipantAction(async () => {
-      if (currentRoom.value?.isAllScreenShareDisabled && isLocalSharing.value) {
-        await stopScreenShare();
-      }
-      await participantState.transferOwner({ userId });
-    });
+    // A role change keeps a share running; only turning the share ban on ends a member's share.
+    const done = confirmed && await runParticipantAction(() => participantState.transferOwner({ userId }));
     if (done) {
       TUIToast.success(t('Participants.TransferOwnerDone', { name }));
     }
@@ -218,6 +221,18 @@ export function useParticipantActions() {
       cancelText: t('Participants.Cancel'),
     });
     if (confirmed && await runParticipantAction(() => participantState.kickUser({ userId }))) {
+      // Education toasts one line for a member disappearing, kicked or not:
+      // the leave tip from useRoomTips. The class timeline reads the removal
+      // from this teacher-published line instead.
+      if (options.education) {
+        const roomId = currentRoom.value?.roomId || '';
+        if (roomId) {
+          void sendNotice(EDU_CLASS_EVENT_ID, roomId, 'member-kicked', { targetName: name }).catch((error) => {
+            console.error('[RoomKit.kick] notice failed:', error);
+          });
+        }
+        return;
+      }
       TUIToast.success(t('Participants.KickDone', { name }));
     }
   }
@@ -260,7 +275,7 @@ export function useParticipantActions() {
   };
 }
 
-export function useRoomControlActions() {
+export function useRoomControlActions(options: { education?: boolean } = {}) {
   const { currentRoom } = useRoomState();
   const { participantList, disableAllDevices } = useRoomParticipantState();
 
@@ -270,8 +285,27 @@ export function useRoomControlActions() {
 
   async function toggleAllMicrophone() {
     const disable = !currentRoom.value?.isAllMicrophoneDisabled;
+    const roomId = currentRoom.value?.roomId || '';
     if (await setAllDevicesDisabled(DeviceType.Microphone, disable)) {
-      TUIToast.success(t(disable ? 'Participants.MuteAllDone' : 'Participants.UnmuteAllDone'));
+      let doneKey = 'Participants.UnmuteAllDone';
+      if (options.education) {
+        doneKey = disable ? 'Education.Settings.MuteAllOnSelf' : 'Education.Settings.MuteAllOffSelf';
+      } else if (disable) {
+        doneKey = 'Participants.MuteAllDone';
+      }
+      TUIToast.success(t(doneKey));
+      // Education mute-all is the small-class roster switch. Students do not toast;
+      // this timeline line is what they read in the message list.
+      if (options.education && roomId) {
+        await sendNotice(
+          MIC_MUTE_ALL_EVENT_ID,
+          roomId,
+          disable ? 'mic-disabled' : 'mic-allowed',
+          {},
+        ).catch((error) => {
+          console.error('[RoomKit.muteAll] notice failed:', error);
+        });
+      }
     }
   }
 

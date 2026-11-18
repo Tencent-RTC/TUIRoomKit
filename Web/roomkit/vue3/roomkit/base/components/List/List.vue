@@ -64,7 +64,7 @@
       :aria-label="jumpLabel"
       @click="jumpToEnd"
     >
-      <IconChevron :size="14" />
+      <IconCollapse :size="14" />
     </button>
   </div>
 </template>
@@ -72,7 +72,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useSlots, watch } from 'vue';
 import type { ComponentPublicInstance, VNode } from 'vue';
-import { IconChevron } from '../../icons';
+import { IconCollapse } from '../../icons';
 import { flattenVNodes } from './flattenVNodes';
 import {
   canCommitRowHeight,
@@ -319,10 +319,6 @@ function distanceFromBottom() {
 
 function isAtBottom() {
   return distanceFromBottom() < props.atBottomThreshold;
-}
-
-function isNearBottom() {
-  return isAtBottom();
 }
 
 function rowHeight(key: PropertyKey) {
@@ -698,7 +694,6 @@ defineExpose({
   scrollToOffset,
   scrollToKey,
   scrollToBottom: pinToBottom,
-  isNearBottom,
   distanceFromBottom,
   rowHeight,
 });
