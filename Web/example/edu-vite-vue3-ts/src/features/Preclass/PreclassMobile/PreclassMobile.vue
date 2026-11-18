@@ -26,10 +26,10 @@
           </button>
         </header>
         <ResumeBanner
-          v-if="shouldShowResume"
-          :room-id="linkRoomId"
-          :course="courses.find(course => course.roomId === linkRoomId)"
-          @back="emit('join', linkRoomId)"
+          v-if="resumeRoomId"
+          :room-id="resumeRoomId"
+          :course="courses.find(course => course.roomId === resumeRoomId)"
+          @back="emit('join', resumeRoomId)"
           @dismiss="dismissResume"
         />
 
@@ -41,13 +41,7 @@
             <PreclassPreviewMobile />
           </section>
           <section class="preclass-mobile-list">
-            <TUISegmented v-model="activeTab" class="preclass-mobile-tabs" :options="tabOptions" />
-            <JoinClassForm
-              v-if="activeTab === 'join'"
-              :initial-room-id="isInviteLink ? linkRoomId : ''"
-              @join="emit('join', $event)"
-            />
-            <div v-else class="preclass-mobile-cards">
+            <div class="preclass-mobile-cards">
               <div v-if="!groups.length && !isLoaded" class="preclass-mobile-empty" role="status">
                 <TUILoading size="lg" />
               </div>
@@ -70,7 +64,7 @@
                   @keydown.enter.prevent="openDetail(course)"
                 >
                   <span class="preclass-mobile-when">
-                    <em class="preclass-mobile-mode">{{ t('Preclass.ClassModeOneOnOne') }}</em>
+                    <em class="preclass-mobile-mode" :class="`is-${course.classMode}`">{{ t(CLASS_MODES[course.classMode].label) }}</em>
                     <b>{{ formatClock(course.start) }}</b>
                     <em>{{ formatClock(course.end) }}</em>
                   </span>
@@ -83,7 +77,7 @@
                     </span>
                     <span class="preclass-mobile-meta">
                       <span class="preclass-mobile-meta-text">
-                        {{ t('Preclass.Minutes', { n: Math.round((course.end - course.start) / 60) }) }}
+                        {{ durationLabel(Math.round((course.end - course.start) / 60)) }}
                         · {{ t('Preclass.RoomId') }} {{ course.roomId }}
                       </span>
                       <button
@@ -104,7 +98,7 @@
                       <button
                         class="preclass-mobile-action"
                         type="button"
-                        @click.stop="copy(`invite:${course.roomId}`, inviteText(course, classLink(course.roomId)))"
+                        @click.stop="copy(`invite:${course.roomId}`, inviteText(course, classLink()))"
                       >
                         {{ copied === `invite:${course.roomId}` ? t('Preclass.Copied') : t('Preclass.CopyInvite') }}
                       </button>
@@ -149,7 +143,7 @@
               </div>
               <div class="preclass-mobile-line">
                 <span>{{ t('Preclass.Duration') }}</span>
-                <b>{{ t('Preclass.Minutes', { n: durationMinutes }) }}</b>
+                <b>{{ durationLabel(durationMinutes) }}</b>
               </div>
               <div class="preclass-mobile-line">
                 <span>{{ t('Preclass.Timezone') }}</span>
@@ -157,7 +151,7 @@
               </div>
               <div class="preclass-mobile-line">
                 <span>{{ t('Preclass.ClassMode') }}</span>
-                <b>{{ t('Preclass.ClassModeOneOnOne') }}</b>
+                <b v-if="selected">{{ t(CLASS_MODES[selected.classMode].label) }}</b>
               </div>
               <button
                 class="preclass-mobile-line"
@@ -295,33 +289,25 @@ import {
   TUIAvatar,
   TUIDialog,
   TUILoading,
-  TUISegmented,
   TUIToast,
   t,
 } from '@tencentcloud/roomkit-web-vue3';
 import type { PickedContact } from '@tencentcloud/roomkit-web-vue3';
-import JoinClassForm from '../JoinClassForm.vue';
 import ResumeBanner from '../ResumeBanner.vue';
+import { CLASS_MODES } from '../classMode';
 import type { ClassCourse } from '../types';
-import { useLinkRoom } from '../useLinkRoom';
+import { useResumeRoom } from '../useResumeRoom';
 import PreclassPreviewMobile from './PreclassPreviewMobile.vue';
 import { copyText, inviteText, useCopyFeedback } from '../PreclassPC/schedule/courseCopy';
-import { browserTimezoneLabel, formatClock, formatDayLabel, toDateKey } from '../PreclassPC/schedule/scheduleTime';
+import { browserTimezoneLabel, durationLabel, formatClock, formatDayLabel, toDateKey } from '../PreclassPC/schedule/scheduleTime';
 import { classLink, useClassSchedule } from '../PreclassPC/schedule/useClassSchedule';
 
 const emit = defineEmits<{
-  /** Kept so the shared home listener does not fall through onto the root. */
-  create: [];
   join: [roomId: string];
   logout: [];
 }>();
 
 type Screen = 'home' | 'detail' | 'members';
-
-const tabOptions = computed(() => [
-  { value: 'list', label: t('Preclass.CourseList') },
-  { value: 'join', label: t('Preclass.Join') },
-]);
 
 const { loginUserInfo } = useLoginState();
 const userName = computed(() => loginUserInfo.value?.userName || loginUserInfo.value?.userId || '');
@@ -330,9 +316,7 @@ const avatarUrl = computed(() => loginUserInfo.value?.avatarUrl || '');
 const { courses, isLoaded, fetchAttendees } = useClassSchedule();
 const { copied, copy, reset } = useCopyFeedback();
 
-const { linkRoomId, isInviteLink, shouldShowResume, dismissResume } = useLinkRoom();
-// A class link lands on the join tab with the id filled in.
-const activeTab = ref(isInviteLink.value ? 'join' : 'list');
+const { resumeRoomId, dismissResume } = useResumeRoom();
 
 const screen = ref<Screen>('home');
 const selected = ref<ClassCourse>();
@@ -365,7 +349,7 @@ const faceAttendees = computed(() => (attendees.value ?? []).slice(0, 3));
 const memberCount = computed(() => (
   attendees.value ? t('Schedule.AttendeeCount', { count: attendees.value.length }) : '—'
 ));
-const shareLink = computed(() => (selected.value ? classLink(selected.value.roomId) : ''));
+const shareLink = computed(() => (selected.value ? classLink() : ''));
 const startLabel = computed(() => {
   if (!selected.value) {
     return '';

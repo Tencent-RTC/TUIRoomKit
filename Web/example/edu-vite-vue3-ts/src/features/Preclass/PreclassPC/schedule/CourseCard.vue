@@ -1,13 +1,13 @@
 <template>
   <article
     class="preclass-course"
-    :class="{ 'is-live': live, 'is-focused': isFocused }"
+    :class="{ 'is-live': live }"
     tabindex="0"
     @click="emit('open', course)"
     @keydown.enter.self.prevent="emit('open', course)"
   >
     <div class="preclass-course-when">
-      <span class="preclass-course-mode is-1v1">{{ t('Preclass.ClassModeOneOnOne') }}</span>
+      <span class="preclass-course-mode" :class="`is-${course.classMode}`">{{ t(CLASS_MODES[course.classMode].label) }}</span>
       <b class="preclass-course-start">{{ formatClock(course.start) }}</b>
       <span class="preclass-course-end">{{ formatClock(course.end) }}</span>
     </div>
@@ -21,7 +21,7 @@
         </em>
       </div>
       <p class="preclass-course-sub">
-        <span>{{ t('Preclass.Minutes', { n: Math.round((course.end - course.start) / 60) }) }}</span>
+        <span>{{ durationLabel(Math.round((course.end - course.start) / 60)) }}</span>
         <span class="preclass-course-id">
           {{ t('Preclass.RoomId') }} {{ course.roomId }}
           <button
@@ -70,7 +70,8 @@ import { computed } from 'vue';
 import { IconCheck, IconCopy, TUIButton, t } from '@tencentcloud/roomkit-web-vue3';
 import CourseMoreMenu from './CourseMoreMenu.vue';
 import { inviteText, useCopyFeedback } from './courseCopy';
-import { formatClock } from './scheduleTime';
+import { durationLabel, formatClock } from './scheduleTime';
+import { CLASS_MODES } from '../../classMode';
 import type { ClassCourse } from '../../types';
 import type { CourseMoreCommand } from './useClassSchedule';
 
@@ -78,8 +79,6 @@ const props = defineProps<{
   course: ClassCourse;
   link: string;
   canManage: boolean;
-  /** Highlighted when a class link points at this class. */
-  isFocused?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -110,8 +109,7 @@ const live = computed(() => props.course.status === 'live');
   background: var(--pre-fill-hover);
 }
 
-.preclass-course:focus-visible,
-.preclass-course.is-focused {
+.preclass-course:focus-visible {
   box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--rk-brand) 60%, transparent);
 }
 
@@ -144,7 +142,12 @@ const live = computed(() => props.course.status === 'live');
   border-radius: 4px;
 }
 
-.preclass-course-mode.is-1v1 {
+.preclass-course-mode.is-small {
+  color: var(--rk-green-500);
+  background: color-mix(in srgb, var(--rk-green-500) 14%, transparent);
+}
+
+.preclass-course-mode.is-oneOnOne {
   color: var(--rk-orange-500);
   background: color-mix(in srgb, var(--rk-orange-500) 14%, transparent);
 }

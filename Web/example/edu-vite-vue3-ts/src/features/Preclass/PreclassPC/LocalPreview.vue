@@ -130,6 +130,7 @@
       :open="settingsOpen"
       :active-tab="settingsTab"
       :hidden-items="['theme']"
+      :virtual-background-img-list="EDUCATION_VIRTUAL_BACKGROUND_IMG_LIST"
       @select="settingsTab = $event"
       @close="handleSettingsClose"
     />
@@ -149,6 +150,7 @@ import {
   IconImage,
   IconMicOff,
   AudioDeviceMenu,
+  EDUCATION_VIRTUAL_BACKGROUND_IMG_LIST,
   MicLevelIcon,
   SettingsDialogPC,
   TUIAvatar,

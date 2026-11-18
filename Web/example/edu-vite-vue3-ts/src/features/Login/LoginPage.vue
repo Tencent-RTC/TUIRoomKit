@@ -181,16 +181,14 @@ function toggleLanguage() {
 @media (width <= 767px) {
   .login-page {
     flex-direction: column;
-    padding: 72px 28px 40px;
+    padding: 72px 0 0;
   }
 
+  /* In flow after the card, so a keyboard-shortened page scrolls instead of lifting the art over the form */
   .login-page-stage {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    align-items: flex-end;
+    flex: none;
     justify-content: flex-end;
+    order: 1;
     padding: 0 16px 22px;
     pointer-events: none;
     background: none;
@@ -214,9 +212,9 @@ function toggleLanguage() {
   }
 
   .login-page-card {
-    flex: 1;
+    flex: 1 0 auto;
     align-items: stretch;
-    padding: 0 0 108px;
+    padding: 0 28px 24px;
   }
 
   /* Same top inset and height as the language button, so both sit on one line */

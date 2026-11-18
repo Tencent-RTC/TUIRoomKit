@@ -4,7 +4,7 @@ import type { ClassRole } from './types';
 
 const ROLE_STORAGE_KEY = 'tuiRoom-classRole';
 
-/** H5 is student-only; on PC the tab keeps the last pick, and a class link opened in a fresh tab means a student. */
+/** H5 is student-only; on PC the tab keeps the last pick and a fresh tab starts as a teacher. */
 function readInitialRole(): ClassRole {
   if (getPlatform() !== 'pc') {
     return 'student';
@@ -13,8 +13,7 @@ function readInitialRole(): ClassRole {
   if (storedRole === 'teacher' || storedRole === 'student') {
     return storedRole;
   }
-  const hashQuery = new URLSearchParams(window.location.hash.split('?')[1]);
-  return hashQuery.has('roomId') ? 'student' : 'teacher';
+  return 'teacher';
 }
 
 export const classRole = ref<ClassRole>(readInitialRole());

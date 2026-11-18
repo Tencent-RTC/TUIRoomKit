@@ -9,11 +9,12 @@ import router from './router/index';
 import App from '@/App.vue';
 
 // Forwarded immediately to static setAssetsPath. Must run before getInstance().
-const WHITEBOARD_ASSETS_PATH = 'https://unpkg.com/trtc-sdk-v5@5.20.2-beta.6/assets';
+// Deploy the assets directory of the trtc-sdk-v5 npm package and set its URL here.
+const TRTC_SDK_ASSETS_PATH = '';
 
 callExperimentalAPI({
   api: 'setRtcAssetsPath',
-  params: { assetsPath: WHITEBOARD_ASSETS_PATH },
+  params: { assetsPath: TRTC_SDK_ASSETS_PATH },
 });
 
 setupVConsole();

@@ -11,7 +11,7 @@ const routes = [
     component: Login,
   },
   {
-    // The lobby and the class share this page; a `roomId` query means "in that class".
+    // The lobby and the class share this page.
     path: '/home',
     component: () => import('@/views/home/HomeView.vue'),
   },

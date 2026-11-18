@@ -9,13 +9,13 @@
         @input="clearError(form.userID)"
       />
     </LoginField>
+    <LoginAgreement :checked="form.checked" :error="errors.check" @toggle="toggleAgreement" />
     <TUIButton class="login-submit" variant="primary" native-type="submit" block :disabled="isSubmitting">
       {{ submitText }}
     </TUIButton>
     <TUIButton v-if="isLogin" class="login-secondary" block @click="logout">
       {{ t('Login.SwitchAccount') }}
     </TUIButton>
-    <LoginAgreement :checked="form.checked" :error="errors.check" @toggle="toggleAgreement" />
   </form>
 </template>
 
