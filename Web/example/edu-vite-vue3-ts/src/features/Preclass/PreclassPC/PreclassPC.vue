@@ -12,10 +12,10 @@
         </template>
       </PreconferenceTopbar>
       <ResumeBanner
-        v-if="shouldShowResume"
-        :room-id="linkRoomId"
-        :course="findCourseByRoomId(linkRoomId)"
-        @back="emit('join', linkRoomId)"
+        v-if="resumeRoomId"
+        :room-id="resumeRoomId"
+        :course="findCourseByRoomId(resumeRoomId)"
+        @back="emit('join', resumeRoomId)"
         @dismiss="dismissResume"
       />
       <div v-if="faultBannerKey" class="preclass-fault-banner">
@@ -35,6 +35,7 @@
 
           <section class="preclass-panel">
             <TUISegmented
+              v-if="isTeacher"
               class="preclass-tabs"
               size="sm"
               :model-value="activeTab"
@@ -50,7 +51,6 @@
                 :is-loaded="isLoaded"
                 :now="now"
                 :link-of="classLink"
-                :focus-room-id="isTeacher && isInviteLink ? linkRoomId : undefined"
                 @join="emit('join', $event)"
                 @open="openDetail"
                 @more="onMore"
@@ -61,18 +61,11 @@
               <BookForm
                 :key="formKey"
                 :course="editingCourse"
-                :attendee="editingCourse ? attendeesOf(editingCourse.roomId)?.[0] : undefined"
+                :attendees="editingCourse ? attendeesOf(editingCourse.roomId) : undefined"
                 :default-title="t('Classroom.DefaultName', { name: userName })"
                 :submitting="submitting"
                 @submit="submitBook"
                 @cancel="closeBook"
-              />
-            </div>
-
-            <div v-if="!isTeacher && activeTab === 'join'" class="preclass-pane" role="tabpanel">
-              <JoinClassForm
-                :initial-room-id="isInviteLink ? linkRoomId : ''"
-                @join="emit('join', $event)"
               />
             </div>
           </section>
@@ -82,7 +75,7 @@
       <CourseDetailDialog
         v-model:open="detailOpen"
         :course="detailCourse"
-        :link="detailCourse ? classLink(detailCourse.roomId) : ''"
+        :link="detailCourse ? classLink() : ''"
         :attendees="detailCourse ? attendeesOf(detailCourse.roomId) ?? [] : []"
         @join="emit('join', $event)"
       />
@@ -102,11 +95,10 @@ import {
   t,
 } from '@tencentcloud/roomkit-web-vue3';
 import type { PickedContact } from '@tencentcloud/roomkit-web-vue3';
-import JoinClassForm from '../JoinClassForm.vue';
 import ResumeBanner from '../ResumeBanner.vue';
 import type { ClassCourse } from '../types';
 import { classRole } from '../classRole';
-import { useLinkRoom } from '../useLinkRoom';
+import { useResumeRoom } from '../useResumeRoom';
 import LocalPreview from './LocalPreview.vue';
 import PreconferenceTopbar from './PreconferenceTopbar.vue';
 import RoleSwitch from './RoleSwitch.vue';
@@ -117,11 +109,9 @@ import CourseDetailDialog from './schedule/CourseDetailDialog.vue';
 import { classLink, useClassSchedule } from './schedule/useClassSchedule';
 import type { BookInput, CourseMoreCommand } from './schedule/useClassSchedule';
 
-type PanelTab = 'list' | 'book' | 'join';
+type PanelTab = 'list' | 'book';
 
 const emit = defineEmits<{
-  /** Mobile only; kept so the shared HomeView listener does not fall through to the root. */
-  create: [];
   join: [roomId: string];
   logout: [];
 }>();
@@ -132,9 +122,8 @@ const avatarUrl = computed(() => loginUserInfo.value?.avatarUrl || '');
 const isTeacher = computed(() => classRole.value === 'teacher');
 
 const faultBannerKey = ref<string>();
-const { linkRoomId, isInviteLink, shouldShowResume, dismissResume } = useLinkRoom();
-// A student opening a class link lands on the join tab with the id filled in.
-const activeTab = ref<PanelTab>(!isTeacher.value && isInviteLink.value ? 'join' : 'list');
+const { resumeRoomId, dismissResume } = useResumeRoom();
+const activeTab = ref<PanelTab>('list');
 
 const { now, courses, isLoaded, fetchAttendees, book, update, cancel } = useClassSchedule();
 
@@ -181,17 +170,15 @@ function closeBook() {
   activeTab.value = 'list';
 }
 
+// Students only have the course list, so the tabs are teacher-only.
 const tabOptions = computed(() => [
   { value: 'list', label: t('Preclass.CourseList') },
-  isTeacher.value
-    ? { value: 'book', label: editingCourse.value ? t('Preclass.EditClass') : t('Preclass.Book') }
-    : { value: 'join', label: t('Preclass.Join') },
+  { value: 'book', label: editingCourse.value ? t('Preclass.EditClass') : t('Preclass.Book') },
 ]);
 
 function selectTab(tab: string) {
   if (tab === 'list') closeBook();
-  else if (tab === 'book') openBook();
-  else activeTab.value = 'join';
+  else openBook();
 }
 
 async function submitBook(input: BookInput) {
@@ -204,7 +191,7 @@ async function submitBook(input: BookInput) {
       return;
     }
     TUIToast.success(t(editing ? 'Preclass.Updated' : 'Preclass.BookedToast'));
-    attendeeCache.value = { ...attendeeCache.value, [outcome.roomId]: input.attendee ? [input.attendee] : [] };
+    attendeeCache.value = { ...attendeeCache.value, [outcome.roomId]: input.attendees };
     closeBook();
     boardRef.value?.showDay(new Date(input.start * 1000));
   } finally {

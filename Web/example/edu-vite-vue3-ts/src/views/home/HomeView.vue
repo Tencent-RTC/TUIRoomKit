@@ -4,7 +4,6 @@
       :is="preclassView"
       v-if="!showClass"
       class="home-preclass"
-      @create="startClass"
       @join="enterFromLobby"
       @logout="logout"
     />
@@ -14,21 +13,20 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { LoginStatus, useDeviceState, useLoginState, useRoomState } from 'tuikit-atomicx-vue3/room';
-import { RoomKit, RoomScene, t } from '@tencentcloud/roomkit-web-vue3';
+import { RoomKit, RoomScene } from '@tencentcloud/roomkit-web-vue3';
 import { resolvePreclass } from '../../features/Preclass';
-import { generateRoomId } from '../../utils/generateRoomId';
+import { forgetResumeRoom, rememberResumeRoom } from '../../features/Preclass/useResumeRoom';
 
 const preclassView = resolvePreclass();
 
 const user = JSON.parse(sessionStorage.getItem('tuiRoom-userInfo') || '{}');
 const credentials = { sdkAppId: user.SDKAppID, userId: user.userID, userSig: user.userSig };
 
-const route = useRoute();
 const router = useRouter();
-const { login, logout: logoutUser, loginStatus, loginUserInfo } = useLoginState();
-const { currentRoom, getRoomInfo } = useRoomState();
+const { login, logout: logoutUser, loginStatus } = useLoginState();
+const { currentRoom } = useRoomState();
 const {
   isCameraTesting,
   isMicrophoneTesting,
@@ -41,8 +39,9 @@ const roomContainer = ref<HTMLElement>();
 const showClass = ref(false);
 
 const roomKit = RoomKit.getInstance(credentials);
-const offExited = roomKit.on('exited', async () => {
-  await router.replace({ query: { ...route.query, roomId: undefined } });
+// Every exit RoomKit reports is a deliberate end, so only a refresh keeps the record.
+const offExited = roomKit.on('exited', () => {
+  forgetResumeRoom();
   showClass.value = false;
 });
 
@@ -50,28 +49,6 @@ async function ensureLogin() {
   if (loginStatus.value !== LoginStatus.LOGINED) {
     await login(credentials);
   }
-}
-
-async function startClass() {
-  const devices = { camera: isCameraTesting.value, microphone: isMicrophoneTesting.value };
-  showClass.value = true;
-  // Room ID generation queries the engine, so it needs a logged-in user first.
-  await ensureLogin();
-  const roomId = await generateRoomId(candidate => getRoomInfo({ roomId: candidate }));
-  if (!roomId) {
-    showClass.value = false;
-    return;
-  }
-  const name = loginUserInfo.value?.userName || credentials.userId;
-  await roomKit.createAndJoin({
-    roomId,
-    roomName: t('Classroom.DefaultName', { name }),
-    scene: RoomScene.Education,
-    container: { appendTo: roomContainer.value! },
-  });
-  // A refresh then rejoins the class instead of creating another one.
-  await router.replace({ query: { ...route.query, roomId } });
-  await openPreviewDevices(devices);
 }
 
 async function joinClass(roomId: string) {
@@ -82,7 +59,7 @@ async function joinClass(roomId: string) {
     scene: RoomScene.Education,
     container: { appendTo: roomContainer.value! },
   });
-  await router.replace({ query: { ...route.query, roomId } });
+  rememberResumeRoom(roomId);
   await openPreviewDevices(devices);
 }
 
@@ -107,12 +84,12 @@ async function openPreviewDevices(devices: { camera: boolean; microphone: boolea
 
 async function logout() {
   sessionStorage.removeItem('tuiRoom-userInfo');
+  forgetResumeRoom();
   await logoutUser().catch(() => {});
   router.replace('/login');
 }
 
-// A class link or a refresh inside a class leaves `roomId` in the URL; the lobby
-// offers the way in (resume banner or prefilled class id) instead of entering here.
+// A refresh inside a class lands in the lobby, which offers the resume banner instead of entering here.
 onMounted(async () => {
   // The lobby preview and the course list both need a logged-in engine.
   await ensureLogin();

@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import TUIRoomEngine from '@tencentcloud/tuiroom-engine-js';
-import { DeviceError, DeviceType, LoginStatus, MirrorType, useDeviceState, useLoginState } from 'tuikit-atomicx-vue3/room';
+import { DeviceError, DeviceType, LoginStatus, MirrorType, VideoQuality, useDeviceState, useLoginState } from 'tuikit-atomicx-vue3/room';
 import {
   IconCam,
   IconCamOff,
@@ -101,6 +101,7 @@ const {
   stopMicrophoneTest,
   switchCamera,
   switchMirror,
+  updateVideoQuality,
 } = useDeviceState();
 const {
   errorTitle,
@@ -121,6 +122,11 @@ async function startCameraPreview() {
     if (!previewRef.value) {
       return;
     }
+    // The in-room publish pipeline captures at 720p, and the engine keeps that setting
+    // after leaving a room; without this the pre-class camera test used the engine's
+    // default 480p, so the preview framing jumped when entering a class and again
+    // after leaving it. Align the camera test to the same 720p quality.
+    await updateVideoQuality({ quality: VideoQuality.Quality720P });
     await startCameraTest({ view: previewRef.value });
     clearDeviceFault(DeviceType.Camera);
   } catch (error) {

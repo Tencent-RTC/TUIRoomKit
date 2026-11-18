@@ -43,7 +43,7 @@
             v-for="minutes in DURATIONS"
             :key="minutes"
             :value="minutes"
-            :label="t('Preclass.Minutes', { n: minutes })"
+            :label="durationLabel(minutes)"
           />
         </TUISelect>
       </div>
@@ -64,22 +64,27 @@
         <span class="preclass-field-label">{{ t('Preclass.ClassMode') }}</span>
         <div class="preclass-book-mode">
           <button
-            v-for="item in CLASS_MODES"
-            :key="item.value"
+            v-for="(config, mode) in CLASS_MODES"
+            :key="mode"
             type="button"
             class="preclass-book-mode-item"
-            :class="{ 'is-active': item.value === classMode }"
-            @click="selectMode(item.value)"
+            :class="{ 'is-active': mode === classMode }"
+            :disabled="!!course"
+            @click="selectMode(mode)"
           >
-            {{ t(item.label) }}
+            {{ t(config.label) }}
           </button>
         </div>
-        <span class="preclass-book-mode-hint">{{ t('Preclass.ClassModeOneOnOneDesc') }}</span>
+        <span v-if="CLASS_MODES[classMode].hint" class="preclass-book-mode-hint">{{ t(CLASS_MODES[classMode].hint!) }}</span>
       </div>
 
       <div class="preclass-field is-top">
         <span class="preclass-field-label">{{ t('Preclass.Members') }}</span>
-        <MemberField v-model="member" />
+        <MemberField
+          ref="membersField"
+          v-model="members"
+          :max-count="CLASS_MODES[classMode].maxMembers"
+        />
       </div>
 
       <div v-if="classMode !== 'oneOnOne'" class="preclass-field">
@@ -127,36 +132,30 @@ import {
   DURATIONS,
   TIMEZONES,
   clockOptions,
+  durationLabel,
   formatDate,
   formatMonth,
   fromEpochSeconds,
   localTimezone,
   nextSlot,
-  snapDuration,
+  normalizeDuration,
   timezoneLabel,
   toEpochSeconds,
   weekdayLabels,
 } from './scheduleTime';
+import { CLASS_MODES } from '../../classMode';
+import type { ClassMode } from '../../classMode';
 import type { ClassCourse } from '../../types';
 import type { BookInput } from './useClassSchedule';
 
-const TITLE_MAX = 40;
+const TITLE_MAX = 25;
 const CLOCKS = clockOptions();
-
-type ClassMode = 'large' | 'small' | 'oneOnOne';
-/** Only 1v1 is supported for now; other modes are placeholders. */
-const SUPPORTED_MODE: ClassMode = 'oneOnOne';
-const CLASS_MODES: { value: ClassMode; label: string }[] = [
-  { value: 'oneOnOne', label: 'Preclass.ClassModeOneOnOne' },
-  { value: 'small', label: 'Preclass.ClassModeSmall' },
-  { value: 'large', label: 'Preclass.ClassModeLarge' },
-];
 
 const props = defineProps<{
   /** Set when editing; the form is remounted per open, so it only seeds once. */
   course?: ClassCourse;
   /** Loaded after mount when editing. */
-  attendee?: PickedContact;
+  attendees?: PickedContact[];
   defaultTitle: string;
   submitting: boolean;
 }>();
@@ -176,28 +175,40 @@ const dateKey = ref(initialSlot.dateKey);
 type SelectValue = string | number | null;
 const clock = ref<SelectValue>(initialSlot.clock);
 const duration = ref<SelectValue>(props.course
-  ? snapDuration((props.course.end - props.course.start) / 60)
+  ? normalizeDuration((props.course.end - props.course.start) / 60)
   : DEFAULT_DURATION);
 const timezone = ref<SelectValue>(initialZone);
-const member = ref<PickedContact | undefined>(props.attendee);
+const members = ref<PickedContact[]>(props.attendees ?? []);
 const muteAll = ref(props.course?.muteAll ?? false);
-const classMode = ref<ClassMode>(SUPPORTED_MODE);
+// The engine cannot change seats after booking, so editing keeps the booked mode.
+const classMode = ref<ClassMode>(props.course?.classMode ?? 'oneOnOne');
+const membersField = ref<{ showMemberLimit: () => void } | null>(null);
 
 function selectMode(value: ClassMode) {
-  if (value !== SUPPORTED_MODE) {
+  const { isAvailable, maxMembers } = CLASS_MODES[value];
+  if (!isAvailable) {
     TUIToast.info(t('Preclass.ComingSoon'));
+    return;
+  }
+  if (maxMembers !== undefined && members.value.length > maxMembers) {
+    TUIToast.warning(t(value === 'small' ? 'Preclass.SmallMember' : 'Preclass.OneMember'));
     return;
   }
   classMode.value = value;
 }
 
-watch(() => props.attendee, (value) => {
-  if (value && !member.value) member.value = value;
+watch(() => props.attendees, (value) => {
+  if (value && !members.value.length) members.value = value;
 });
 
 function submit() {
   const name = title.value.trim();
   if (!name || props.submitting) return;
+  const maxMembers = CLASS_MODES[classMode.value].maxMembers;
+  if (maxMembers !== undefined && members.value.length > maxMembers) {
+    membersField.value?.showMemberLimit();
+    return;
+  }
   const start = toEpochSeconds(dateKey.value, String(clock.value), String(timezone.value));
   if (start * 1000 <= Date.now()) {
     TUIToast.warning(t('Preclass.StartInPast'));
@@ -207,8 +218,9 @@ function submit() {
     title: name,
     start,
     end: start + (Number(duration.value) || DEFAULT_DURATION) * 60,
-    attendee: member.value,
+    attendees: members.value,
     muteAll: muteAll.value,
+    classMode: classMode.value,
   });
 }
 </script>
@@ -337,8 +349,13 @@ function submit() {
   border-radius: 9px;
 }
 
-.preclass-book-mode-item:hover {
+.preclass-book-mode-item:hover:not(:disabled):not(.is-active) {
   background: var(--pre-fill-hover);
+}
+
+.preclass-book-mode-item:disabled:not(.is-active) {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .preclass-book-mode-item.is-active {

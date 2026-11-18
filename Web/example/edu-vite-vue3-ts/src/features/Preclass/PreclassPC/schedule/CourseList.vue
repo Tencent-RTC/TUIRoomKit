@@ -14,8 +14,6 @@
       :course="course"
       :link="linkOf(course.roomId)"
       :can-manage="canManage"
-      :is-focused="course.roomId === focusRoomId"
-      :data-room-id="course.roomId"
       @join="emit('join', $event)"
       @open="emit('open', $event)"
       @more="(item, command) => emit('more', item, command)"
@@ -34,7 +32,6 @@ defineProps<{
   canManage: boolean;
   isLoaded: boolean;
   linkOf: (roomId: string) => string;
-  focusRoomId?: string;
 }>();
 
 const emit = defineEmits<{

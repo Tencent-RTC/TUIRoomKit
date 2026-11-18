@@ -1,9 +1,37 @@
 import { t, useI18n } from '@tencentcloud/roomkit-web-vue3';
 
-export const DURATIONS = [30, 45, 60, 90] as const;
+/** Same options as the conference schedule panel: 15/30/45 minutes, 1/2/3 hours. */
+export const DURATIONS = [15, 30, 45, 60, 120, 180] as const;
 export const DEFAULT_DURATION = 45;
 
-export const TIMEZONES = ['UTC+08:00', 'UTC+09:00', 'UTC+00:00', 'UTC-05:00'] as const;
+export const TIMEZONES = [
+  'UTC-12:00',
+  'UTC-11:00',
+  'UTC-10:00',
+  'UTC-09:00',
+  'UTC-08:00',
+  'UTC-07:00',
+  'UTC-06:00',
+  'UTC-05:00',
+  'UTC-04:00',
+  'UTC-03:00',
+  'UTC-02:00',
+  'UTC-01:00',
+  'UTC+00:00',
+  'UTC+01:00',
+  'UTC+02:00',
+  'UTC+03:00',
+  'UTC+04:00',
+  'UTC+05:00',
+  'UTC+05:30',
+  'UTC+06:00',
+  'UTC+07:00',
+  'UTC+08:00',
+  'UTC+09:00',
+  'UTC+10:00',
+  'UTC+11:00',
+  'UTC+12:00',
+] as const;
 export type Timezone = (typeof TIMEZONES)[number];
 
 const SLOT_MINUTES = 15;
@@ -88,11 +116,19 @@ export function clockOptions(): string[] {
   return slots;
 }
 
-export function snapDuration(minutes: number): number {
-  return DURATIONS.reduce<number>(
-    (best, item) => (Math.abs(item - minutes) < Math.abs(best - minutes) ? item : best),
-    DEFAULT_DURATION,
-  );
+/** Matches the conference schedule panel's duration labels. */
+export function durationLabel(minutes: number): string {
+  if (minutes < 60) {
+    return t('Schedule.DurationMinutes', { count: minutes });
+  }
+  const hours = minutes / 60;
+  return t(hours === 1 ? 'Schedule.DurationHour' : 'Schedule.DurationHours', { count: hours });
+}
+
+/** Keeps the duration if it is one of the options, otherwise falls back to the default. */
+export function normalizeDuration(minutes: number): number {
+  const rounded = Math.round(minutes);
+  return (DURATIONS as readonly number[]).includes(rounded) ? rounded : DEFAULT_DURATION;
 }
 
 export function toEpochSeconds(dateKey: string, clock: string, timezone: string): number {

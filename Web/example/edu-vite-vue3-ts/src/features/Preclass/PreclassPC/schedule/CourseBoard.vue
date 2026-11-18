@@ -1,5 +1,5 @@
 <template>
-  <div ref="rootRef" class="preclass-board">
+  <div class="preclass-board">
     <WeekStrip
       :selected="selectedDay"
       :marked-days="markedDays"
@@ -11,7 +11,6 @@
       :can-manage="canManage"
       :is-loaded="isLoaded"
       :link-of="linkOf"
-      :focus-room-id="focusRoomId"
       @join="emit('join', $event)"
       @open="emit('open', $event)"
       @more="(course, command) => emit('more', course, command)"
@@ -20,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import CourseList from './CourseList.vue';
 import WeekStrip from './WeekStrip.vue';
 import { dayStart, sameDay, toDateKey } from './scheduleTime';
@@ -33,8 +32,6 @@ const props = defineProps<{
   isLoaded: boolean;
   now: number;
   linkOf: (roomId: string) => string;
-  /** A class link points here: jump to its day and scroll it into view once loaded. */
-  focusRoomId?: string;
 }>();
 
 const emit = defineEmits<{
@@ -44,7 +41,6 @@ const emit = defineEmits<{
 }>();
 
 const selectedDay = ref(dayStart(new Date(props.now)));
-const rootRef = ref<HTMLElement>();
 
 function startDate(course: ClassCourse): Date {
   return new Date(course.start * 1000);
@@ -55,18 +51,6 @@ const markedDays = computed(() => new Set(props.courses
 const dayCourses = computed(() => props.courses
   .filter(course => sameDay(startDate(course), selectedDay.value))
   .sort((a, b) => a.start - b.start));
-
-// The schedule loads after mount, so wait for the focused class to show up once.
-let hasFocusedCourse = false;
-watch(() => props.courses.find(course => course.roomId === props.focusRoomId), async (course) => {
-  if (!course || hasFocusedCourse) return;
-  hasFocusedCourse = true;
-  selectedDay.value = dayStart(startDate(course));
-  await nextTick();
-  rootRef.value
-    ?.querySelector(`[data-room-id="${course.roomId}"]`)
-    ?.scrollIntoView({ block: 'nearest' });
-}, { immediate: true });
 
 function showDay(day: Date) {
   selectedDay.value = dayStart(day);

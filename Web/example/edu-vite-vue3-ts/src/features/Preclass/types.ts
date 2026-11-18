@@ -1,3 +1,5 @@
+import type { ClassMode } from './classMode';
+
 export type ClassRole = 'teacher' | 'student';
 
 export interface ClassCourse {
@@ -11,4 +13,5 @@ export interface ClassCourse {
   isMine: boolean;
   status: 'idle' | 'live';
   muteAll: boolean;
+  classMode: ClassMode;
 }

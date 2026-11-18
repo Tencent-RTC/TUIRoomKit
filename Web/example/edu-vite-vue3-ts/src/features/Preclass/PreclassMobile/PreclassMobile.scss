@@ -139,22 +139,6 @@
   overflow: hidden;
 }
 
-.preclass-mobile-tabs {
-  flex: none;
-  align-self: center;
-  margin: 12px 0 4px;
-  background: var(--rk-bg-page);
-}
-
-.preclass-mobile-tabs :deep(.rk-segmented-item) {
-  padding: 0 16px;
-  font-weight: 400;
-}
-
-.preclass-mobile-tabs :deep(.rk-segmented-item.is-active) {
-  font-weight: 600;
-}
-
 .preclass-mobile-cards {
   display: flex;
   flex: 1;
@@ -349,10 +333,18 @@
   font-style: normal;
   font-weight: 650;
   line-height: 1;
-  color: var(--rk-orange-500);
   letter-spacing: 0.02em;
-  background: color-mix(in srgb, var(--rk-orange-500) 14%, transparent);
   border-radius: 4px;
+}
+
+.preclass-mobile-mode.is-small {
+  color: var(--rk-green-500);
+  background: color-mix(in srgb, var(--rk-green-500) 14%, transparent);
+}
+
+.preclass-mobile-mode.is-oneOnOne {
+  color: var(--rk-orange-500);
+  background: color-mix(in srgb, var(--rk-orange-500) 14%, transparent);
 }
 
 .preclass-mobile-actions {

@@ -27,6 +27,7 @@
 import { computed } from 'vue';
 import { getPlatform } from '@tencentcloud/universal-api';
 import { IconClose, TUIButton, t } from '@tencentcloud/roomkit-web-vue3';
+import { CLASS_MODES } from './classMode';
 import type { ClassCourse } from './types';
 
 const props = defineProps<{
@@ -48,7 +49,7 @@ const title = computed(() => (props.course
 
 const subtitle = computed(() => [
   `${t('Preclass.RoomId')} ${props.roomId}`,
-  props.course ? t('Preclass.ClassModeOneOnOne') : '',
+  props.course ? t(CLASS_MODES[props.course.classMode].label) : '',
 ].filter(Boolean).join(' · '));
 </script>
 

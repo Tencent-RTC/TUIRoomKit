@@ -5,6 +5,8 @@ import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import { LoginStatus, useLoginState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import type { RoomInfo, RoomUser } from 'tuikit-atomicx-vue3/room';
 import type { PickedContact, ScheduleOutcome } from '@tencentcloud/roomkit-web-vue3';
+import { getClassMode } from '../../classMode';
+import type { ClassMode } from '../../classMode';
 import type { ClassCourse } from '../../types';
 
 export type CourseMoreCommand = 'detail' | 'edit' | 'cancel';
@@ -14,12 +16,16 @@ export interface BookInput {
   start: number;
   end: number;
   /** Optional: a class can be booked first and members invited by link. */
-  attendee?: PickedContact;
+  attendees: PickedContact[];
   muteAll: boolean;
+  /** Only read when booking; the engine cannot change seats afterwards. */
+  classMode: ClassMode;
 }
 
 const CLOCK_MS = 60000;
 const ROOM_ID_ATTEMPTS = 5;
+// Each page is 20 classes; cap the list at 60.
+const MAX_SCHEDULE_PAGES = 3;
 // IM can already be LOGINED while room-engine SSO is still initializing.
 const ENGINE_READY_RETRY_DELAYS_MS = [100, 200, 400, 800, 1500];
 
@@ -38,10 +44,10 @@ function wait(ms: number) {
   });
 }
 
-/** Students open the link; the router guard sends them through login first. */
-export function classLink(roomId: string): string {
+/** Students open the link; the router guard sends them through login first. It leaves out the class id, so classes are entered only from the course list. */
+export function classLink(): string {
   const { origin, pathname } = window.location;
-  return `${origin}${pathname}#/home?roomId=${roomId}`;
+  return `${origin}${pathname}#/home`;
 }
 
 export function useClassSchedule() {
@@ -67,6 +73,7 @@ export function useClassSchedule() {
       isMine: !!owner?.userId && owner.userId === selfId.value,
       status: now.value >= start * 1000 ? 'live' : 'idle',
       muteAll: !!room.isAllMicrophoneDisabled,
+      classMode: getClassMode(room),
     };
   }
 
@@ -97,9 +104,11 @@ export function useClassSchedule() {
     loading.value = true;
     try {
       let cursor = '';
+      let page = 0;
       do {
         ({ cursor } = await fetchPage(cursor));
-      } while (cursor);
+        page += 1;
+      } while (cursor && page < MAX_SCHEDULE_PAGES);
     } catch (error) {
       console.error('[Preclass] Failed to load scheduled classes:', error);
     } finally {
@@ -134,14 +143,15 @@ export function useClassSchedule() {
       roomName: input.title,
       scheduleStartTime: input.start,
       scheduleEndTime: input.end,
-      scheduleAttendees: input.attendee ? [input.attendee.userId] : [],
+      scheduleAttendees: input.attendees.map(user => user.userId),
       password: '',
       isAllMicrophoneDisabled: input.muteAll,
       isAllCameraDisabled: false,
     };
     try {
       for (let attempt = 0; attempt < ROOM_ID_ATTEMPTS; attempt += 1) {
-        const roomId = String(Math.floor(100000 + Math.random() * 900000));
+        const prefix = input.classMode === 'small' ? 'edu_small_' : 'edu_1v1_';
+        const roomId = `${prefix}${Math.floor(100000 + Math.random() * 900000)}`;
         if (await isRoomIdFree(roomId)) {
           try {
             await roomState.scheduleRoom({ roomId, options });
@@ -162,7 +172,7 @@ export function useClassSchedule() {
   async function update(roomId: string, input: BookInput): Promise<ScheduleOutcome> {
     try {
       const before = (await fetchAttendees(roomId)).map(user => user.userId);
-      const after = input.attendee ? [input.attendee.userId] : [];
+      const after = input.attendees.map(user => user.userId);
       const added = after.filter(userId => !before.includes(userId));
       const removed = before.filter(userId => !after.includes(userId));
       await roomState.updateScheduledRoom({

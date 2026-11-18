@@ -21,7 +21,7 @@
     <div v-if="course" class="preclass-detail" :class="{ 'is-solo': hasNoAttendees }">
       <div class="preclass-detail-main">
         <div class="preclass-detail-tags">
-          <span class="preclass-detail-tag">{{ t('Preclass.ClassModeOneOnOne') }}</span>
+          <span class="preclass-detail-tag">{{ t(CLASS_MODES[course.classMode].label) }}</span>
           <span class="preclass-detail-status" :class="{ 'is-live': isLive }">
             {{ t(isLive ? 'Preclass.StatusLive' : 'Preclass.StatusIdle') }}
           </span>
@@ -31,7 +31,7 @@
         </h3>
         <div class="preclass-detail-when">
           <b>{{ formatRange(course.start, course.end) }}</b>
-          <span> · {{ t('Preclass.Minutes', { n: minutes }) }} · {{ browserTimezoneLabel() }}</span>
+          <span> · {{ durationLabel(minutes) }} · {{ browserTimezoneLabel() }}</span>
         </div>
 
         <div class="preclass-detail-people">
@@ -117,7 +117,8 @@ import {
 } from '@tencentcloud/roomkit-web-vue3';
 import type { PickedContact } from '@tencentcloud/roomkit-web-vue3';
 import { inviteText, useCopyFeedback } from './courseCopy';
-import { browserTimezoneLabel, formatRange } from './scheduleTime';
+import { browserTimezoneLabel, durationLabel, formatRange } from './scheduleTime';
+import { CLASS_MODES } from '../../classMode';
 import type { ClassCourse } from '../../types';
 
 const props = defineProps<{

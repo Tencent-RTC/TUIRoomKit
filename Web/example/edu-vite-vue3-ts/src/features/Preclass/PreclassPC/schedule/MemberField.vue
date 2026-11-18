@@ -52,37 +52,37 @@
       </template>
     </TUIPopover>
 
-    <div v-if="modelValue" class="preclass-member-chips">
-      <span class="preclass-member-chip">
-        <TUIAvatar :size="18" :src="avatarOf(modelValue.userId)" :alt="modelValue.userName" />
-        <b>{{ modelValue.userName }}</b>
+    <div v-if="modelValue.length" class="preclass-member-chips">
+      <span v-for="user in modelValue" :key="user.userId" class="preclass-member-chip">
+        <TUIAvatar :size="18" :src="avatarOf(user.userId)" :alt="user.userName" />
+        <b>{{ user.userName }}</b>
         <button
           type="button"
           class="preclass-member-remove"
-          :aria-label="t('Schedule.RemoveParticipant', { userId: modelValue.userName })"
-          @click="emit('update:modelValue', undefined)"
+          :aria-label="t('Schedule.RemoveParticipant', { userId: user.userName })"
+          @click="remove(user.userId)"
         >
           <IconClose :size="10" />
         </button>
       </span>
-      <span class="preclass-member-count">{{ t('Schedule.AttendeeCount', { count: 1 }) }}</span>
+      <span class="preclass-member-count">{{ t('Schedule.AttendeeCount', { count: modelValue.length }) }}</span>
     </div>
 
     <UserPickerPC
       v-model:open="pickerOpen"
       mode="schedule"
-      :selected-ids="modelValue ? [modelValue.userId] : []"
+      :selected-ids="modelValue.map(user => user.userId)"
       @confirm="onPicked"
     />
     <TUIDialog
       v-model:open="oneMemberOpen"
       width="380px"
-      :title="t('Preclass.OneMemberTitle')"
+      :title="t(isSmallLimit ? 'Preclass.SmallMemberTitle' : 'Preclass.OneMemberTitle')"
       :confirm-text="t('Preclass.GotIt')"
       cancel-text=""
       @confirm="oneMemberOpen = false"
     >
-      {{ t('Preclass.OneMember') }}
+      {{ t(isSmallLimit ? 'Preclass.SmallMember' : 'Preclass.OneMember') }}
     </TUIDialog>
   </div>
 </template>
@@ -103,14 +103,16 @@ import {
   useResolvedContacts,
 } from '@tencentcloud/roomkit-web-vue3';
 import type { PickedContact, PickerContact } from '@tencentcloud/roomkit-web-vue3';
+import { CLASS_MODES } from '../../classMode';
 
 const props = defineProps<{
-  /** A 1v1 class takes exactly one student. */
-  modelValue?: PickedContact;
+  modelValue: PickedContact[];
+  /** Unset means no limit. The search field ignores it; the contact picker still enforces it. */
+  maxCount?: number;
 }>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: PickedContact | undefined];
+  'update:modelValue': [value: PickedContact[]];
 }>();
 
 const { loginUserInfo } = useLoginState();
@@ -126,11 +128,12 @@ const menuOpen = ref(false);
 const menuWidth = ref(0);
 const pickerOpen = ref(false);
 const oneMemberOpen = ref(false);
+const isSmallLimit = computed(() => props.maxCount === CLASS_MODES.small.maxMembers);
 
 const hits = computed<PickerContact[]>(() => {
   const keyword = query.value.trim().toLowerCase();
   if (!keyword) return [];
-  return contacts.value.filter(item => item.userId !== props.modelValue?.userId
+  return contacts.value.filter(item => !props.modelValue.some(user => user.userId === item.userId)
     && (item.userName.toLowerCase().includes(keyword)
       || item.userId.toLowerCase().includes(keyword)));
 });
@@ -158,7 +161,8 @@ function onMenuToggle(open: boolean) {
 }
 
 function pick(contact: PickerContact) {
-  emit('update:modelValue', { userId: contact.userId, userName: contact.userName });
+  const user = { userId: contact.userId, userName: contact.userName };
+  emit('update:modelValue', [...props.modelValue, user]);
   query.value = '';
   menuOpen.value = false;
 }
@@ -172,14 +176,24 @@ function openPicker() {
   pickerOpen.value = true;
 }
 
+function remove(userId: string) {
+  emit('update:modelValue', props.modelValue.filter(user => user.userId !== userId));
+}
+
 function onPicked(users: PickedContact[]) {
-  if (users.length > 1) {
+  if (props.maxCount !== undefined && users.length > props.maxCount) {
     oneMemberOpen.value = true;
     return;
   }
-  emit('update:modelValue', users[0]);
+  emit('update:modelValue', users);
   pickerOpen.value = false;
 }
+
+function showMemberLimit() {
+  oneMemberOpen.value = true;
+}
+
+defineExpose({ showMemberLimit });
 </script>
 
 <style scoped lang="scss">
