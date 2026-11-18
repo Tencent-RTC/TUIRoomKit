@@ -6,15 +6,9 @@
       </div>
 
       <OverflowMenu
-        :actions="overflowActions"
-        :submenu="submenu"
+        :entries="overflowEntries"
         :fullscreen="fullscreen"
         :minimizable="minimizable"
-        @action="activate"
-        @drill="drill"
-        @leave="leaveSubmenu"
-        @close="leaveSubmenu"
-        @open="refreshOnMenuOpen"
         @minimize="emit('minimize')"
         @fullscreen="emit('fullscreen')"
       />
@@ -23,11 +17,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, provide, ref, shallowRef, watch } from 'vue';
 import OverflowMenu from './OverflowMenu.vue';
-import { hasOverflowSubmenu, OVERFLOW_SUBMENU_READY, readOverflowSubmenu } from './overflowSubmenu';
-import { measureAvailableWidth, resolveVisibleCount } from './useToolbarOverflow';
-import type { OverflowMenuEntry } from './useToolbarOverflow';
+import { OVERFLOW_ITEM_KEY } from './overflowItem';
+import type { OverflowMenuEntry, RegisteredOverflowItem } from './overflowItem';
+import { measureAvailableWidth, resolveOverflowEntries, resolveVisibleCount } from './toolbarOverflow';
 
 const props = withDefaults(defineProps<{
   fullscreen?: boolean;
@@ -52,37 +46,42 @@ defineSlots<{
 
 const barRef = ref<HTMLElement | null>(null);
 const itemsRef = ref<HTMLElement | null>(null);
-const overflowActions = ref<OverflowMenuEntry[]>([]);
-const submenuHost = ref<HTMLElement | null>(null);
-const submenu = computed(() => (
-  submenuHost.value ? readOverflowSubmenu(submenuHost.value) : null
+
+// Toolbar controls describe themselves here; the menu never reads meaning off the DOM.
+const sources = shallowRef<Array<() => RegisteredOverflowItem | null>>([]);
+provide(OVERFLOW_ITEM_KEY, (source) => {
+  sources.value = [...sources.value, source];
+  return () => {
+    sources.value = sources.value.filter(item => item !== source);
+  };
+});
+
+/** Slot children hidden by the last layout, in toolbar order. */
+const collapsed = shallowRef<HTMLElement[]>([]);
+
+const childIds = new WeakMap<HTMLElement, string>();
+let childSeed = 0;
+function idOf(element: HTMLElement): string {
+  let id = childIds.get(element);
+  if (!id) {
+    childSeed += 1;
+    id = `item-${childSeed}`;
+    childIds.set(element, id);
+  }
+  return id;
+}
+
+const overflowEntries = computed<OverflowMenuEntry[]>(() => resolveOverflowEntries(
+  collapsed.value,
+  sources.value.map(source => source()).filter((item): item is RegisteredOverflowItem => !!item),
+  idOf,
 ));
 
 let barObserver: ResizeObserver | null = null;
 let itemsObserver: MutationObserver | null = null;
-let submenuReadyTarget: HTMLElement | null = null;
-let itemElements: HTMLElement[] = [];
 let cachedWidths: number[] = [];
 let layoutFrame = 0;
 let lastVisibleCount = -1;
-
-function readLabel(element: HTMLElement): string {
-  return element.getAttribute('aria-label')
-    || element.querySelector<HTMLElement>('[aria-label]')?.getAttribute('aria-label')
-    || element.querySelector('.toolbar-button-label')?.textContent?.trim()
-    || element.querySelector('.participant-button-tip')?.textContent?.trim()
-    || '';
-}
-
-/**
- * Locale-proof identity scraped off the collapsed control (data-overflow-key).
- * Falls back to '' for items that do not expose one.
- */
-function readOverflowKey(element: HTMLElement): string {
-  return element.dataset.overflowKey
-    || element.querySelector<HTMLElement>('[data-overflow-key]')?.dataset.overflowKey
-    || '';
-}
 
 function itemChildren(): HTMLElement[] {
   if (!itemsRef.value) {
@@ -111,9 +110,8 @@ function siblingWidths(parent: HTMLElement): number[] {
 
 function itemWidths(items: HTMLElement[]): number[] {
   if (cachedWidths.length !== items.length) {
-    items.forEach((element) => {
-      element.style.display = '';
-      element.style.flexShrink = '0';
+    items.forEach(({ style }) => {
+      Object.assign(style, { display: '', flexShrink: '0' });
     });
     cachedWidths = items.map(element => element.getBoundingClientRect().width);
     return cachedWidths;
@@ -123,7 +121,7 @@ function itemWidths(items: HTMLElement[]): number[] {
     if (element.style.display === 'none') {
       return;
     }
-    const width = element.getBoundingClientRect().width;
+    const { width } = element.getBoundingClientRect();
     if (width > 0) {
       cachedWidths[index] = width;
     }
@@ -133,12 +131,10 @@ function itemWidths(items: HTMLElement[]): number[] {
 
 function layout() {
   const items = itemChildren();
-  itemElements = items;
   if (items.length === 0) {
-    overflowActions.value = [];
+    collapsed.value = [];
     cachedWidths = [];
     lastVisibleCount = -1;
-    submenuHost.value = null;
     return;
   }
 
@@ -155,30 +151,15 @@ function layout() {
     : Math.max(0, (barRef.value?.clientWidth ?? 0) - props.moreWidth - props.gap);
   const visibleCount = resolveVisibleCount(widths, available, props.gap);
 
-  if (visibleCount === lastVisibleCount && !submenuFlagsStale(items)) {
+  if (visibleCount === lastVisibleCount) {
     return;
   }
   lastVisibleCount = visibleCount;
 
-  const overflow: OverflowMenuEntry[] = [];
-  items.forEach((element, index) => {
-    const hidden = index >= visibleCount;
-    element.style.display = hidden ? 'none' : '';
-    if (!hidden) {
-      return;
-    }
-    overflow.push({
-      id: String(index),
-      label: readLabel(element) || `Item ${index + 1}`,
-      overflowKey: readOverflowKey(element),
-      icon: '',
-      hasSubmenu: hasOverflowSubmenu(element),
-    });
+  items.forEach(({ style }, index) => {
+    Object.assign(style, { display: index >= visibleCount ? 'none' : '' });
   });
-  overflowActions.value = overflow;
-  if (submenuHost.value && !overflow.some(entry => itemElements[Number(entry.id)] === submenuHost.value)) {
-    submenuHost.value = null;
-  }
+  collapsed.value = items.slice(visibleCount);
 }
 
 function scheduleLayout() {
@@ -191,53 +172,9 @@ function scheduleLayout() {
   });
 }
 
-/**
- * Snapshot labels/keys right before the more menu is shown: a locale switch or
- * an aria-label change does not resize anything, so the observers would not
- * fire and the menu would render whatever was scraped earlier.
- */
-function refreshOnMenuOpen() {
-  lastVisibleCount = -1;
-  layout();
-}
-
-function submenuFlagsStale(items: HTMLElement[]): boolean {
-  return overflowActions.value.some((entry) => {
-    const element = items[Number(entry.id)];
-    return !!element && Boolean(entry.hasSubmenu) !== hasOverflowSubmenu(element);
-  });
-}
-
-function activate(id: string) {
-  const element = itemElements[Number(id)];
-  if (!element || hasOverflowSubmenu(element)) {
-    return;
-  }
-  element.querySelector<HTMLElement>('button, [role="button"]')?.click();
-}
-
-function drill(id: string) {
-  const element = itemElements[Number(id)];
-  if (!element || !hasOverflowSubmenu(element)) {
-    return;
-  }
-  submenuHost.value = element;
-}
-
-function leaveSubmenu() {
-  submenuHost.value = null;
-}
-
-function onSubmenuReady() {
-  lastVisibleCount = -1;
-  scheduleLayout();
-}
-
 function observe() {
   barObserver?.disconnect();
   itemsObserver?.disconnect();
-  submenuReadyTarget?.removeEventListener(OVERFLOW_SUBMENU_READY, onSubmenuReady);
-  submenuReadyTarget = null;
 
   barObserver = new ResizeObserver(() => {
     scheduleLayout();
@@ -254,8 +191,6 @@ function observe() {
       void nextTick(scheduleLayout);
     });
     itemsObserver.observe(itemsRef.value, { childList: true });
-    submenuReadyTarget = itemsRef.value;
-    submenuReadyTarget.addEventListener(OVERFLOW_SUBMENU_READY, onSubmenuReady);
   }
 
   void nextTick(scheduleLayout);
@@ -268,8 +203,6 @@ watch([barRef, itemsRef], () => {
 onBeforeUnmount(() => {
   barObserver?.disconnect();
   itemsObserver?.disconnect();
-  submenuReadyTarget?.removeEventListener(OVERFLOW_SUBMENU_READY, onSubmenuReady);
-  submenuReadyTarget = null;
   if (layoutFrame) {
     cancelAnimationFrame(layoutFrame);
     layoutFrame = 0;

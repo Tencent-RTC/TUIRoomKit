@@ -412,16 +412,17 @@ const showNetworkBars = computed(() =>
   color: #fff;
 }
 
-/* Box is in IconMic's 16-unit viewBox: the capsule's outer edge inset by a quarter
-   stroke, so the stroke hides the fill's edge. Update it if the icon path changes.
+/* Box is in IconMic's 16-unit viewBox: it matches the capsule's hollow cavity
+   (x 5.5-10.5, y 2-10.5) so the fill never escapes the outline.
+   Update it if the icon path changes.
    The level is clipped from the top, since scaling would flatten the round bottom. */
 .participant-view-overlay-mic-core {
   position: absolute;
-  top: calc(1.25 / 16 * 100%);
-  left: calc(4.75 / 16 * 100%);
+  top: calc(2 / 16 * 100%);
+  left: calc(5.5 / 16 * 100%);
   z-index: 0;
-  width: calc(6.5 / 16 * 100%);
-  height: calc(10 / 16 * 100%);
+  width: calc(5 / 16 * 100%);
+  height: calc(8.5 / 16 * 100%);
   background: #34c759;
   border-radius: 999px;
   transition: clip-path 0.2s ease-out;

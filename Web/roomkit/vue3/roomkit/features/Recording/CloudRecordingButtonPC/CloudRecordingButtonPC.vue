@@ -2,7 +2,6 @@
   <ToolbarButtonPC
     v-if="canRecord"
     :label="label"
-    overflow-key="CloudRecording.RecordLabel"
     :icon="isRecording ? IconRecording : IconRecord"
     :loading="isBusy"
     @click="handleClick"

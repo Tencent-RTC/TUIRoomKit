@@ -59,7 +59,8 @@ watch([viewRef, isWhiteboardOn], ([view, on]) => {
    the canvas ratio; margin: auto keeps the box centered in the tile. z-index plus
    isolation keep those layers inside the tile, under the caption floating on the stage.
    Remote viewers get the board as a screen share, letterboxed black by the video, so the
-   margins left by the canvas ratio are black here too.
+   margins left by the canvas ratio are black here too. A scene can repaint the board through
+   --whiteboard-view-bg (the classroom uses its chalkboard surface).
    overflow is clip, not hidden: a hidden box is still a scroll container, so the caret of a
    long text line scrolls it and shifts the whole board out of place. */
 .whiteboard-view {
@@ -67,7 +68,7 @@ watch([viewRef, isWhiteboardOn], ([view, on]) => {
   inset: 0;
   z-index: 0;
   overflow: clip;
-  background: #000;
+  background: var(--whiteboard-view-bg, #000);
   isolation: isolate;
   border-radius: inherit;
 }

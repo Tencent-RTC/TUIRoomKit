@@ -5,8 +5,8 @@
     :disabled="isProcessing"
     @click="toggleMicrophone"
   >
-    <MicLevelIcon v-if="microphoneOn" :size="20" />
-    <IconMicOff v-else :size="20" />
+    <MicLevelIcon v-if="microphoneOn" :size="size" />
+    <IconMicOff v-else :size="size" />
     <span v-if="hasDeviceError" class="mic-button-mobile-fault">!</span>
   </ToolbarButtonMobile>
 </template>
@@ -17,19 +17,24 @@ import {
   DeviceError,
   DeviceStatus,
   DeviceType,
-  RoomParticipantRole,
   useDeviceState,
   useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-vue3/room';
 import { IconMicOff, TUIToast, t } from '../../../base';
+import { useParticipantPermission } from '../../Participants/participantData';
 import ToolbarButtonMobile from '../../../layouts/ToolbarButtonMobile/ToolbarButtonMobile.vue';
 import { useDeviceFault } from '../useDeviceFault';
 import MicLevelIcon from './MicLevelIcon.vue';
 
+withDefaults(defineProps<{
+  /** Glyph box in px. Keep it equal to the toolbar slot, or the level drifts off the capsule. */
+  size?: number;
+}>(), { size: 20 });
+
 const { microphoneStatus, microphoneLastError, openLocalMicrophone } = useDeviceState();
 const { currentRoom } = useRoomState();
-const { localParticipant, muteMicrophone, unmuteMicrophone } = useRoomParticipantState();
+const { muteMicrophone, unmuteMicrophone } = useRoomParticipantState();
 const { handleDeviceError, microphoneFault } = useDeviceFault();
 
 const isProcessing = ref(false);
@@ -37,10 +42,7 @@ const microphoneOn = computed(() => microphoneStatus.value === DeviceStatus.On);
 const hasDeviceError = computed(() =>
   microphoneLastError.value !== DeviceError.NoError || !!microphoneFault.value,
 );
-const isPrivileged = computed(() =>
-  localParticipant.value?.role === RoomParticipantRole.Owner
-  || localParticipant.value?.role === RoomParticipantRole.Admin,
-);
+const { isHostOrAdmin: isPrivileged } = useParticipantPermission();
 
 /** Host and admin keep control; others cannot unmute while the room mutes everyone. */
 const isMicrophoneDisabled = computed(() => {

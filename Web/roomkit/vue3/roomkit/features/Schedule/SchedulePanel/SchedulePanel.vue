@@ -108,6 +108,7 @@ import {
 } from './scheduleForm';
 import type { ScheduleOutcome, ScheduleRoomInput } from './scheduleForm';
 import {
+  DURATION_MINUTES,
   clampScheduleDate,
   dateKey,
   epochMsToWall,
@@ -175,10 +176,10 @@ function resetForm() {
     title.value = meeting.roomName;
     date.value = wall.date;
     time.value = wall.time;
-    duration.value = Math.max(
-      DURATION_MIN,
-      Math.round(((meeting.scheduledEndTime ?? start) - start) / 60),
-    );
+    const meetingDuration = Math.round(((meeting.scheduledEndTime ?? start) - start) / 60);
+    duration.value = (DURATION_MINUTES as readonly number[]).includes(meetingDuration)
+      ? meetingDuration
+      : DEFAULT_DURATION;
     participants.value = (meeting.scheduleAttendees ?? []).map(user => user.userId);
     passwordProtected.value = !!meeting.password;
     password.value = meeting.password || '';
@@ -187,7 +188,7 @@ function resetForm() {
   } else {
     date.value = clampScheduleDate(dateKey(next));
     time.value = `${String(next.getHours()).padStart(2, '0')}:${String(Math.floor(next.getMinutes() / 15) * 15).padStart(2, '0')}`;
-    title.value = t('Schedule.DefaultTopic', { name: props.userName.trim() });
+    title.value = t('Schedule.DefaultTopic', { name: [...props.userName.trim()].slice(0, 10).join('') });
     duration.value = DEFAULT_DURATION;
     participants.value = [];
     passwordProtected.value = false;

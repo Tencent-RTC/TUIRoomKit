@@ -30,6 +30,7 @@
     <VirtualBackgroundSettings
       v-show="panel === 'background'"
       :preview-ready="isPreviewing"
+      :virtual-background-img-list="virtualBackgroundImgList"
     />
     <BeautySettings
       v-show="panel === 'beauty'"
@@ -44,8 +45,13 @@ import { t } from '../../../base';
 import CameraPreview from '../../Device/VideoSettings/CameraPreview.vue';
 import BeautySettings from '../../VideoEffect/BeautySettings/BeautySettings.vue';
 import VirtualBackgroundSettings from '../../VideoEffect/VirtualBackgroundSettings/VirtualBackgroundSettings.vue';
+import type { BackgroundPhoto } from '../../VideoEffect/VirtualBackgroundSettings/virtualBackground';
 
 defineOptions({ name: 'VideoEffectSettings' });
+
+defineProps<{
+  virtualBackgroundImgList?: BackgroundPhoto[];
+}>();
 
 type EffectPanel = 'background' | 'beauty';
 

@@ -188,6 +188,10 @@ export function useContactPicker(occupiedIds: MaybeRefOrGetter<Iterable<string>>
     void refreshContacts();
   }
 
+  function clear() {
+    pickedIds.value = new Set();
+  }
+
   /** Preselected ids may be missing from the friend list; they fall back to the user id. */
   function pickedContacts(): PickedContact[] {
     const names = new Map(contacts.value.map(item => [item.userId, item.userName.trim()]));
@@ -199,11 +203,11 @@ export function useContactPicker(occupiedIds: MaybeRefOrGetter<Iterable<string>>
     searchKeyword,
     visibleContacts,
     picked,
-    pickedCount: computed(() => pickedIds.value.size),
     emptyText,
     isPicked,
     toggle,
     reset,
+    clear,
     pickedContacts,
   };
 }

@@ -1,17 +1,17 @@
 <template>
   <Teleport v-if="host && faultView && open" :to="host">
-    <div class="device-fault-dialog-mask" @click.self="close()">
-      <div class="device-fault-dialog" role="dialog" aria-modal="true">
+    <div class="device-fault-dialog-mask" :class="{ 'is-compact': compact }" @click.self="close()">
+      <div class="device-fault-dialog" :class="{ 'is-compact': compact }" role="dialog" aria-modal="true">
         <div
           class="device-fault-dialog-icon"
           :class="{
             'is-lock': faultView.kind === 'browser-blocked' || faultView.kind === 'system-blocked',
           }"
         >
-          <IconLock v-if="faultView.kind === 'browser-blocked' || faultView.kind === 'system-blocked'" :size="22" />
-          <IconCam v-else-if="faultView.kind === 'no-device' && faultView.target === 'camera'" :size="22" />
-          <IconMic v-else-if="faultView.kind === 'no-device' && faultView.target === 'microphone'" :size="22" />
-          <IconWarning v-else :size="22" />
+          <IconLock v-if="faultView.kind === 'browser-blocked' || faultView.kind === 'system-blocked'" :size="iconSize" />
+          <IconCam v-else-if="faultView.kind === 'no-device' && faultView.target === 'camera'" :size="iconSize" />
+          <IconMic v-else-if="faultView.kind === 'no-device' && faultView.target === 'microphone'" :size="iconSize" />
+          <IconWarning v-else :size="iconSize" />
         </div>
         <h3 class="device-fault-dialog-title">
           {{ title }}
@@ -37,42 +37,73 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { IconCam, IconLock, IconMic, IconWarning, t } from '../../base';
 import type { DeviceFaultView } from './useDeviceFault';
 
-defineProps<{
+const props = withDefaults(defineProps<{
   open: boolean;
   faultView: DeviceFaultView | null;
   host: HTMLElement | null;
   title: string;
   description: string;
+  /** Landscape H5: the same dialog, sized for a short phone viewport. */
+  compact?: boolean;
   close: () => void;
-}>();
+}>(), {
+  compact: false,
+});
+
+const iconSize = computed(() => (props.compact ? 16 : 22));
 
 </script>
 
 <style scoped lang="scss">
 .device-fault-dialog-mask {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 80;
   display: grid;
   place-items: center;
   padding: 24px;
   pointer-events: auto;
-  background: rgb(0 0 0 / 55%);
-  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.55);
+
+  /* Rides the dialog mask token so the edu scene drops the blur, same as TUIDialog. */
+  backdrop-filter: var(--rk-dialog-mask-blur, blur(6px));
+}
+
+.device-fault-dialog-mask.is-compact {
+  padding: 12px;
 }
 
 .device-fault-dialog {
+  /* Density dial: the card's coupled sizes all read from these, so the landscape
+     compact variant below only retunes the dial instead of re-declaring rules. */
+  --fault-pad: 28px;
+  --fault-pad-bottom: 22px;
+  --fault-radius: 22px;
+  --fault-icon: 48px;
+  --fault-icon-radius: 14px;
+  --fault-icon-gap: 16px;
+  --fault-title-fs: 17px;
+  --fault-title-gap: 8px;
+  --fault-body-fs: 13px;
+  --fault-body-gap: 20px;
+  --fault-actions-gap: 8px;
+  --fault-btn-h: var(--rk-control-md);
+  --fault-btn-pad: 20px;
+  --fault-btn-fs: 13px;
+  --fault-btn-radius: var(--rk-radius-md);
+
   display: flex;
   flex-direction: column;
   align-items: stretch;
   width: min(400px, 100%);
-  padding: 28px 28px 22px;
+  padding: var(--fault-pad) var(--fault-pad) var(--fault-pad-bottom);
   text-align: center;
   background: var(--rk-bg-surface);
-  border-radius: 22px;
+  border-radius: var(--fault-radius);
   box-shadow: var(--rk-shadow-dialog);
 }
 
@@ -81,13 +112,13 @@ defineProps<{
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 16px;
+  width: var(--fault-icon);
+  height: var(--fault-icon);
+  margin: 0 auto var(--fault-icon-gap);
   color: var(--rk-danger);
   background: color-mix(in srgb, var(--rk-danger) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--rk-danger) 28%, transparent);
-  border-radius: 14px;
+  border-radius: var(--fault-icon-radius);
 }
 
 /* A blocked permission is a condition to act on, not a failure, so the lock borrows the
@@ -99,16 +130,16 @@ defineProps<{
 }
 
 .device-fault-dialog-title {
-  margin: 0 0 8px;
-  font-size: 17px;
+  margin: 0 0 var(--fault-title-gap);
+  font-size: var(--fault-title-fs);
   font-weight: 600;
-  letter-spacing: -0.01em;
   color: var(--rk-text-primary);
+  letter-spacing: -0.01em;
 }
 
 .device-fault-dialog-body {
-  margin: 0 0 20px;
-  font-size: 13px;
+  margin: 0 0 var(--fault-body-gap);
+  font-size: var(--fault-body-fs);
   font-weight: 400;
   line-height: 1.5;
   color: var(--rk-text-secondary);
@@ -119,28 +150,61 @@ defineProps<{
 .device-fault-dialog-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--fault-actions-gap);
   width: 100%;
 }
 
 .device-fault-dialog-button {
   box-sizing: border-box;
   width: 100%;
-  height: 44px;
-  padding: 0 20px;
+  height: var(--fault-btn-h);
+  padding: 0 var(--fault-btn-pad);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--fault-btn-fs);
   font-weight: 600;
   line-height: 1;
   color: var(--rk-text-primary);
   cursor: pointer;
   background: var(--rk-dialog-cancel-bg, var(--rk-bg-muted));
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--fault-btn-radius);
 }
 
 .device-fault-dialog-button.is-primary {
   color: var(--rk-on-accent);
   background: var(--rk-brand);
+}
+
+/* Landscape H5 shares this dialog. The 400px card is too tall for the phone,
+   so retune the density dial; only viewport-fit layout stays in rules. */
+.device-fault-dialog.is-compact {
+  --fault-pad: 14px;
+  --fault-pad-bottom: 12px;
+  --fault-radius: 14px;
+  --fault-icon: 32px;
+  --fault-icon-radius: 9px;
+  --fault-icon-gap: 8px;
+  --fault-title-fs: var(--rk-fs-lg);
+  --fault-title-gap: 4px;
+  --fault-body-fs: var(--rk-fs-md);
+  --fault-body-gap: 10px;
+  --fault-actions-gap: 6px;
+  --fault-btn-h: 32px;
+  --fault-btn-pad: 12px;
+  --fault-btn-fs: var(--rk-fs-md);
+  --fault-btn-radius: var(--rk-radius-sm);
+
+  width: min(280px, 100%);
+  max-height: calc(100% - 8px);
+  overflow: hidden;
+}
+
+.device-fault-dialog.is-compact .device-fault-dialog-title {
+  line-height: 1.4;
+}
+
+.device-fault-dialog.is-compact .device-fault-dialog-body {
+  min-height: 0;
+  overflow: auto;
 }
 </style>

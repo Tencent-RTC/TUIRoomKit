@@ -60,7 +60,7 @@ defineOptions({ name: 'TUIDropdown' });
 
 const props = withDefaults(defineProps<{
   open?: boolean;
-  trigger?: 'click' | 'hover';
+  trigger?: 'click' | 'hover' | 'manual';
   placement?: Placement;
   offset?: number;
   disabled?: boolean;

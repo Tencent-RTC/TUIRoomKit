@@ -20,7 +20,7 @@
         <component :is="icon" v-if="icon" />
       </slot>
     </span>
-    <span class="rk-btn-text">
+    <span v-if="$slots.default" class="rk-btn-text">
       <slot />
     </span>
     <span v-if="!loading && iconPosition === 'end' && (icon || $slots.icon)" class="rk-btn-icon">

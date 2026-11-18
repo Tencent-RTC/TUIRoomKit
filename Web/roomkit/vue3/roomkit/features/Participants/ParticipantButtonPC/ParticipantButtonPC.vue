@@ -1,7 +1,7 @@
 <template>
   <ToolbarButtonPC
     :label="label || t('Participants.Panel')"
-    overflow-key="Participants.Panel"
+    :icon="IconMembers"
     :active="active"
     @click="handleClick"
   >
@@ -17,7 +17,7 @@ import { IconMembers, t } from '../../../base';
 import ToolbarButtonPC from '../../../layouts/ToolbarButtonPC/ToolbarButtonPC.vue';
 import { useParticipantAutoLoad, useParticipantCount } from '../participantData';
 
-withDefaults(defineProps<{ active?: boolean }>(), { active: false });
+withDefaults(defineProps<{ active?: boolean; label?: string }>(), { active: false, label: '' });
 const emit = defineEmits<{ click: [] }>();
 
 const { refreshParticipants } = useParticipantAutoLoad();

@@ -114,10 +114,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onScopeDispose, reactive, ref, watch } from 'vue';
+import { computed, ref, toRef, watch } from 'vue';
 import { useLoginState, useRoomState } from 'tuikit-atomicx-vue3/room';
-import { IconCheck, IconChevron, IconClose, IconCopy, TUIPopover, resolveShareLink, t } from '../../../base';
-import { copyTextToClipboard, formatCopyFields } from '../../../utils/clipboard';
+import { IconCheck, IconChevron, IconClose, IconCopy, TUIPopover, t } from '../../../base';
+import { formatCopyFields } from '../../../utils/clipboard';
+import { formatRoomId, useRoomElapsed, useRoomIdentity, useRoomInfoCopy } from './useRoomInfo';
 
 const props = defineProps<{
   narrow?: boolean;
@@ -125,23 +126,19 @@ const props = defineProps<{
   inviteUrl?: string;
 }>();
 
-const COPY_RESET_MS = 1800;
 const INVITE_COPY_RESET_MS = 2000;
 
 const { currentRoom } = useRoomState();
 const { loginUserInfo } = useLoginState();
 
 const isOpen = ref(false);
-const copiedKeys = reactive(new Set<string>());
-const copyError = ref('');
-const now = ref(Date.now());
-const resetTimers = new Map<string, ReturnType<typeof setTimeout>>();
-const clock = setInterval(() => {
-  now.value = Date.now();
-}, 1000);
+const { roomId, displayRoomName, shareLink: inviteUrl } = useRoomIdentity(
+  toRef(props, 'roomName'),
+  toRef(props, 'inviteUrl'),
+);
+const duration = useRoomElapsed();
+const { copiedKeys, copyError, copy: copyValue } = useRoomInfoCopy(roomId);
 
-const roomId = computed(() => currentRoom.value?.roomId ?? '');
-const displayRoomName = computed(() => currentRoom.value?.roomName || props.roomName || '');
 const password = computed(() => currentRoom.value?.password ?? '');
 const owner = computed(() => currentRoom.value?.roomOwner);
 const ownerName = computed(() => {
@@ -153,23 +150,11 @@ const ownerName = computed(() => {
 const ownerInitial = computed(
   () => (owner.value?.userName || owner.value?.userId || '').trim().slice(0, 1).toUpperCase() || '?',
 );
-const inviteUrl = computed(() => {
-  if (props.inviteUrl) return props.inviteUrl;
-  if (!roomId.value) return '';
-  return resolveShareLink(roomId.value) ?? window.location.href;
-});
-const duration = computed(() => {
-  const start = currentRoom.value?.createTime;
-  const seconds = start ? Math.max(0, Math.floor((now.value - start) / 1000)) : 0;
-  const parts = [Math.floor(seconds / 60) % 60, seconds % 60];
-  if (seconds >= 3600) parts.unshift(Math.floor(seconds / 3600));
-  return parts.map(value => String(value).padStart(2, '0')).join(':');
-});
 const fields = computed(() => [
   {
     key: 'id',
     label: t('Invitation.RoomId'),
-    value: roomId.value.replace(/^(\d{3})(\d{3})(\d{3})$/, '$1 $2 $3'),
+    value: formatRoomId(roomId.value),
     raw: roomId.value,
   },
   ...(password.value
@@ -191,41 +176,17 @@ const invitationText = computed(() =>
   ]),
 );
 
-async function copy(key: string) {
-  const text = key === 'invitation'
-    ? invitationText.value
-    : fields.value.find(field => field.key === key)?.raw;
-  if (!text) return;
-  try {
-    await copyTextToClipboard(text);
-  } catch {
-    copyError.value = t('RoomInfo.CopyFailed');
-    return;
+/** The card decides what a key copies; the shared machine owns the feedback. */
+function copy(key: string) {
+  if (key === 'invitation') {
+    return copyValue('invitation', invitationText.value, INVITE_COPY_RESET_MS);
   }
-  copyError.value = '';
-  copiedKeys.add(key);
-  clearTimeout(resetTimers.get(key));
-  resetTimers.set(key, setTimeout(() => {
-    copiedKeys.delete(key);
-    resetTimers.delete(key);
-  }, key === 'invitation' ? INVITE_COPY_RESET_MS : COPY_RESET_MS));
-}
-
-function resetCopyState() {
-  resetTimers.forEach(clearTimeout);
-  resetTimers.clear();
-  copiedKeys.clear();
+  const text = fields.value.find(field => field.key === key)?.raw;
+  return text ? copyValue(key, text) : undefined;
 }
 
 watch(roomId, () => {
   isOpen.value = false;
-  copyError.value = '';
-  resetCopyState();
-});
-
-onScopeDispose(() => {
-  clearInterval(clock);
-  resetCopyState();
 });
 </script>
 

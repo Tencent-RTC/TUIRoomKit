@@ -2,7 +2,7 @@ import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import { useAITranscriberState } from 'tuikit-atomicx-vue3/room';
 import { IconAI, IconAISubtitleCC, IconAITranscription, t } from '../../../base';
-import type { OverflowSubmenuItem } from '../../../layouts/OverflowToolbarPC/overflowSubmenu';
+import type { OverflowSubmenuItem } from '../../../layouts/OverflowToolbarPC/overflowItem';
 import { hasDisplayableText } from '../display';
 import { useASRState } from '../useASRState';
 import { useSubtitleViewState } from '../useSubtitleViewState';
@@ -45,27 +45,27 @@ export function useCaptionEntryMenu(
       ? t('AITools.RealtimeMessageListClose')
       : t('AITools.RealtimeMessageListOpen')
   ));
-  const hint = computed(() => (showWaitHint.value ? t('AITools.WaitHost') : ''));
+  const note = computed(() => (showWaitHint.value ? t('AITools.WaitHost') : ''));
 
   const items = computed<OverflowSubmenuItem[]>(() => {
     const rows: OverflowSubmenuItem[] = [];
     if (canManageASR.value) {
       rows.push({
-        act: 'transcription',
+        command: 'transcription',
         label: transcriptionLabel.value,
         icon: IconAI,
-        on: asrOn.value,
+        checked: asrOn.value,
       });
       rows.push({ divider: true });
     }
     rows.push({
-      act: 'caption',
+      command: 'caption',
       label: captionLabel.value,
       icon: IconAISubtitleCC,
       disabled: captionDisabled.value,
     });
     rows.push({
-      act: 'transcript',
+      command: 'transcript',
       label: recordLabel.value,
       icon: IconAITranscription,
       disabled: transcriptDisabled.value,
@@ -73,8 +73,8 @@ export function useCaptionEntryMenu(
     return rows;
   });
 
-  function run(act: string): boolean {
-    if (act === 'transcription') {
+  function run(command: string): boolean {
+    if (command === 'transcription') {
       if (!canManageASR.value) {
         return false;
       }
@@ -85,7 +85,7 @@ export function useCaptionEntryMenu(
       }
       return true;
     }
-    if (act === 'caption') {
+    if (command === 'caption') {
       if (captionDisabled.value) {
         return false;
       }
@@ -96,7 +96,7 @@ export function useCaptionEntryMenu(
       }
       return true;
     }
-    if (act === 'transcript') {
+    if (command === 'transcript') {
       if (transcriptDisabled.value) {
         return false;
       }
@@ -116,7 +116,7 @@ export function useCaptionEntryMenu(
     transcriptionLabel,
     captionLabel,
     recordLabel,
-    hint,
+    note,
     items,
     run,
   };

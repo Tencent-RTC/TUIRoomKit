@@ -1,0 +1,36 @@
+/* Isolates the kit from the host page's bare element rules (`button {}`, `header {}`, `body { font }` ...).
+   Vue `scoped` only stops our styles leaking out; it does not stop host styles leaking in.
+
+   - `.rk-root :where(...)` is (0,1,0): beats a host `button {}` (0,0,1) whatever the load order,
+     and loses to our own `.foo[data-v]` / `button[data-v]` rules, so component styles are untouched.
+   - `all: revert` rolls back to the browser defaults, i.e. what the kit looks like on a clean page.
+   - Must load before the theme: the later `.rk-root *` rules (box-sizing, hidden scrollbars) share
+     its specificity and have to win. So it is imported first in `roomkit/index.ts`, not from
+     `theme/index.scss` (RoomKitProvider re-emits that file after its own `.rk-root *` rule).
+   - List only tags the kit renders; never add `svg` (revert would drop icon fill/stroke). */
+
+.rk-root {
+  /* Clean-page baseline, so inherited text styles no longer come from the host `body`. */
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-align: left;
+  text-transform: none;
+  word-spacing: normal;
+  white-space: normal;
+}
+
+.rk-root :where(
+  header, main, footer, aside, section, nav,
+  h2, h3, p, label, ul, li,
+  button, input, textarea
+) {
+  all: revert;
+}
+
+/* Product decision: no focus ring anywhere in the kit, keyboard focus included.
+   `!important` overrides component-level focus outlines too. */
+.rk-root :focus-visible {
+  outline: none !important;
+}

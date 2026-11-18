@@ -48,11 +48,15 @@
         <span class="participant-view-overlay-mic" aria-hidden="true">
           <IconMic v-if="micOn" :size="14" />
           <IconMicOff v-else :size="14" />
-          <span
+          <svg
             v-if="isSpeaking"
             class="participant-view-overlay-mic-core"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
             :style="{ clipPath: `inset(${waveInset}% 0 0 0)` }"
-          />
+          >
+            <rect x="5.5" y="2" width="5" height="8.5" rx="2.5" />
+          </svg>
         </span>
 
         <span
@@ -141,11 +145,16 @@ const WAVE_MAX_SCALE = 1;
 /* A share tile carries the sharer's volume; the halo belongs on their camera tile. */
 const isSpeaking = computed(() => !isScreenStream.value && micOn.value && volume.value > 0);
 
-/** How much of the fill is cut away from the top; the rest reads as the level. */
+/**
+ * Top inset of the whole icon. The fill is a viewBox rect of the capsule
+ * (y 2, height 8.5), so the cut is measured on the icon, not on the rect.
+ */
 const waveInset = computed(() => {
   const level = Math.min(volume.value / SPEECH_PEAK, 1);
   const scale = WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level;
-  return ((1 - scale) * 100).toFixed(1);
+  const capsuleTop = 12.5;
+  const capsuleHeight = 53.125;
+  return (capsuleTop + (1 - scale) * capsuleHeight).toFixed(1);
 });
 
 const isOwner = computed(() => props.participant.role === RoomParticipantRole.Owner);
@@ -356,26 +365,35 @@ const showNetworkBars = computed(() => !props.inPip && networkQuality.value >= N
   color: #fff;
 }
 
-/* Box is in IconMic's 16-unit viewBox: the capsule's outer edge inset by a quarter
-   stroke, so the stroke hides the fill's edge. Update it if the icon path changes.
-   The level is clipped from the top, since scaling would flatten the round bottom. */
-.participant-view-overlay-mic-core {
+.participant-view-overlay-mic :deep(.rk-icon) {
   position: absolute;
-  top: calc(1.25 / 16 * 100%);
-  left: calc(4.75 / 16 * 100%);
-  z-index: 0;
-  width: calc(6.5 / 16 * 100%);
-  height: calc(10 / 16 * 100%);
-  background: #34c759;
-  border-radius: 999px;
-  transition: clip-path 0.2s ease-out;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.participant-view-overlay-mic :deep(svg) {
+.participant-view-overlay-mic :deep(.rk-icon svg) {
   position: relative;
   z-index: 1;
   width: 100%;
   height: 100%;
+}
+
+/* Same viewBox as IconMic, so the rect is the capsule hole (x 5.5-10.5, y 2-10.5)
+   and cannot drift off the outline at a 14px slot.
+   Clipped from the top of the icon; scaling the rect would flatten its round bottom. */
+.participant-view-overlay-mic-core {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: clip-path 0.2s ease-out;
+}
+
+.participant-view-overlay-mic-core rect {
+  fill: #34c759;
 }
 
 .participant-view-overlay-name {

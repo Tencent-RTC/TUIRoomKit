@@ -1,0 +1,413 @@
+.chat-overlay {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: flex-end;
+  width: 220px;
+  max-width: 100%;
+  pointer-events: none;
+}
+
+.chat-overlay-lines-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+}
+
+.chat-overlay-lines {
+  width: 100%;
+  min-height: 0;
+  pointer-events: auto;
+
+  &.is-empty {
+    display: none;
+  }
+}
+
+.chat-overlay-lines :deep(.rk-list-scroller) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 42dvh;
+  overflow: auto;
+  overflow-anchor: none;
+  overscroll-behavior: contain;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 18%);
+}
+
+.chat-overlay-lines :deep(.rk-list-row) {
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+/* Landscape barrage unread pill (views-edu rk-edu-chat-overlay__jump):
+   solid chip on the lines' bottom-left, accent text with an 11px chevron. */
+.chat-overlay-jump {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  z-index: 1;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px 0 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--rk-brand);
+  white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
+  background: var(--rk-bg-raised);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px color-mix(in srgb, #1c1b1c 18%, transparent);
+  animation: chat-overlay-jump-in 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-rk-theme='dark'] .chat-overlay-jump {
+  box-shadow: 0 2px 8px color-mix(in srgb, #000 18%, transparent);
+}
+
+.chat-overlay-jump:active {
+  transform: scale(0.96);
+}
+
+@keyframes chat-overlay-jump-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.chat-overlay-hint {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  padding: 4px 10px 4px 7px;
+  margin: 0 0 2px;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  pointer-events: none;
+  background: #000;
+  border-radius: 999px;
+
+  &[hidden] {
+    display: none !important;
+  }
+
+  :deep(.rk-icon) {
+    color: var(--rk-brand);
+  }
+}
+
+.chat-overlay-item {
+  min-width: 0;
+  max-width: 100%;
+  padding: 4px 10px;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgba(255, 255, 255, 0.95);
+
+  /* word-break must back up overflow-wrap: break-word/anywhere only break a
+     long word as a last resort, so a long unbroken string moves whole to the
+     line below the name pill and leaves the header line empty. break-all turns
+     those breaks into ordinary wrap points, so the text keeps flowing right
+     after "name :" and fills each line (verified in Chrome). */
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  background: #000;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+}
+
+.chat-overlay-item.is-system {
+  width: max-content;
+  padding: 1px 12px;
+  font-size: 11px;
+  line-height: 16px;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(0, 0, 0, 0.36);
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.chat-overlay-who {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  max-width: 100%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.chat-overlay-name {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  height: 16px;
+  padding: 0 6px;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 3px;
+}
+
+.chat-overlay-colon,
+.chat-overlay-text {
+  vertical-align: middle;
+}
+
+.chat-overlay-tag {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 16px;
+  padding: 0 6px;
+  margin: 0;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--rk-brand);
+  background: color-mix(in srgb, var(--rk-brand) 22%, transparent);
+  border-radius: 3px;
+}
+
+.chat-overlay-composer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  height: 34px;
+  padding: 0 6px 0 10px;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(14px) saturate(1.5);
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+}
+
+.chat-overlay-field {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 34px;
+  color: #fff;
+  background: transparent;
+  border: 0;
+  outline: none;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.78);
+  }
+}
+
+.chat-overlay-send {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--rk-on-accent);
+  cursor: pointer;
+  background: var(--rk-brand);
+  border: 0;
+  border-radius: 50%;
+  transition: filter 0.15s ease, opacity 0.15s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.38;
+  }
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
+
+  :deep(.is-fold) {
+    display: none;
+    transform: rotate(90deg);
+  }
+
+  :deep(.is-fold svg) {
+    fill: none;
+    stroke: currentcolor;
+  }
+}
+
+.chat-overlay.is-fold-mode .chat-overlay-send {
+  color: #fff;
+  background: color-mix(in srgb, #fff 14%, transparent);
+
+  :deep(.is-send) {
+    display: none;
+  }
+
+  :deep(.is-fold) {
+    display: block;
+  }
+}
+
+[data-rk-theme='light'] .chat-overlay-hint {
+  color: var(--rk-text-secondary);
+  background: var(--rk-bg-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+[data-rk-theme='light'] .chat-overlay-item {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+[data-rk-theme='light'] .chat-overlay-item.is-system {
+  color: var(--rk-text-secondary);
+  background: color-mix(in srgb, var(--rk-text-primary) 8%, var(--rk-bg-surface));
+  box-shadow: none;
+}
+
+[data-rk-theme='light'] .chat-overlay-name {
+  font-weight: 500;
+  color: var(--rk-text-secondary);
+  background: color-mix(in srgb, var(--rk-text-primary) 5%, transparent);
+}
+
+[data-rk-theme='light'] .chat-overlay-composer {
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+[data-rk-theme='light'] .chat-overlay-field {
+  color: var(--rk-text-primary);
+
+  &::placeholder {
+    color: var(--rk-text-tertiary);
+  }
+}
+
+.chat-overlay.is-collapsed .chat-overlay-lines-wrap,
+.chat-overlay.is-collapsed .chat-overlay-lines,
+.chat-overlay.is-collapsed .chat-overlay-hint,
+.chat-overlay.is-collapsed .chat-overlay-composer {
+  display: none !important;
+}
+
+.chat-overlay.is-muted .chat-overlay-composer {
+  opacity: 0.45;
+}
+
+.chat-overlay.is-muted .chat-overlay-field {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+[data-rk-theme='light'] .chat-overlay.is-muted .chat-overlay-field {
+  color: var(--rk-text-primary);
+}
+
+.chat-overlay.is-muted .chat-overlay-send {
+  opacity: 0.38;
+}
+
+.chat-overlay.is-collapsible.is-muted .chat-overlay-composer {
+  opacity: 1;
+}
+
+.chat-overlay.is-collapsible.is-muted .chat-overlay-field {
+  opacity: 0.45;
+}
+
+.chat-overlay.is-collapsible.is-muted .chat-overlay-send {
+  opacity: 1;
+}
+
+[data-rk-theme='light'] .chat-overlay.is-fold-mode .chat-overlay-send {
+  color: var(--rk-text-secondary);
+  background: color-mix(in srgb, var(--rk-text-primary) 8%, transparent);
+}
+
+.chat-overlay-fab {
+  display: none;
+}
+
+.chat-overlay.is-collapsed .chat-overlay-fab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  align-self: flex-start;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: #fff;
+  pointer-events: auto;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(14px) saturate(1.5);
+  border: 1px solid var(--rk-border);
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+  animation: chat-overlay-fab-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-rk-theme='light'] .chat-overlay.is-collapsed .chat-overlay-fab {
+  color: var(--rk-text-primary);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.chat-overlay-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 16px;
+  color: #fff;
+  text-align: center;
+  background: var(--rk-danger);
+  border-radius: 8px;
+}
+
+@keyframes chat-overlay-fab-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-overlay.is-collapsed .chat-overlay-fab,
+  .chat-overlay-jump {
+    animation: none;
+  }
+}

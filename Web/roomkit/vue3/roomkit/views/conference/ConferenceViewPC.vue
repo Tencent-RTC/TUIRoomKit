@@ -36,7 +36,7 @@
                 />
                 <!-- A thumbnail is too small to draw on; the room holds the stage while annotating. -->
                 <div v-if="tileRole === 'stage'" class="conference-share-actions">
-                  <AnnotationButton :participant="participant" :stream-type="streamType" />
+                  <AnnotationButton v-if="uiConfig.widgetVisible.AnnotationWidget !== false" :participant="participant" :stream-type="streamType" />
                 </div>
               </template>
             </RoomViewPC>
@@ -47,29 +47,32 @@
             />
 
             <div class="conference-toolbar">
-              <MicButton />
-              <CameraButton @open-setting="openSettings" />
+              <MicButton v-if="uiConfig.widgetVisible.MicWidget !== false" />
+              <CameraButton v-if="uiConfig.widgetVisible.CameraWidget !== false" @open-setting="openSettings" />
 
               <OverflowToolbarPC class="conference-toolbar-overflow" :fullscreen="fullscreen" :minimizable="pipSupported" @minimize="miniViewRef?.minimize()" @fullscreen="toggleFullscreen">
-                <ParticipantButtonPC :active="openedPanels.includes('participants')" @click="sidePanelRef?.toggle('participants')" />
+                <ParticipantButtonPC v-if="uiConfig.widgetVisible.MemberWidget !== false" :active="openedPanels.includes('participants')" @click="sidePanelRef?.toggle('participants')" />
                 <ChatButton
+                  v-if="uiConfig.widgetVisible.RoomChatWidget !== false"
                   :active="openedPanels.includes('chat')"
                   :is-chat-active="activePanel === 'chat'"
                   @click="sidePanelRef?.toggle('chat')"
                 />
-                <ScreenShareButton>
-                  <WhiteboardButton />
+                <ScreenShareButton v-if="uiConfig.widgetVisible.ScreenShareWidget !== false">
+                  <WhiteboardButton v-if="uiConfig.widgetVisible.WhiteboardWidget !== false" />
                 </ScreenShareButton>
-                <CloudRecordingButtonPC />
+                <CloudRecordingButtonPC v-if="uiConfig.widgetVisible.RecordingWidget !== false" />
                 <CaptionButton
+                  v-if="uiConfig.widgetVisible.AIToolsWidget !== false"
                   :active="isCaptionShown || openedPanels.includes('transcript')"
                   :transcript-open="openedPanels.includes('transcript')"
                   @toggle-transcript="toggleTranscriptPanel"
                 />
-                <SettingButtonPC :active="settingsOpen" @click="openSettings()" />
+                <SettingButtonPC v-if="uiConfig.widgetVisible.SettingsWidget !== false" :active="settingsOpen" @click="openSettings()" />
               </OverflowToolbarPC>
 
               <TUIPopover
+                v-if="uiConfig.widgetVisible.LeaveRoomWidget !== false"
                 :open="leaveMenuOpen"
                 :disabled="!canEndRoom"
                 placement="top-end"
@@ -87,10 +90,12 @@
                   :aria-expanded="canEndRoom ? leaveMenuOpen : undefined"
                   @click="!canEndRoom && exit('leave')"
                 >
-                  <template v-if="leaveMenuOpen">
+                  <template v-if="leaveMenuOpen" #default>
                     {{ t('Room.Cancel') }}
                   </template>
-                  <IconPhone v-else class="conference-leave-icon" :size="22" />
+                  <template v-else #icon>
+                    <IconPhone class="conference-leave-icon" :size="22" />
+                  </template>
                 </TUIButton>
                 <template #content>
                   <div class="conference-leave-menu" role="menu">
@@ -118,10 +123,9 @@
           >
             <template #default="{ activeId }">
               <slot name="panel" :active-id="activeId" :opened="openedPanels">
-                <RoomChatPC
+                <RoomChat
                   v-if="openedPanels.includes('chat')"
                   v-show="activeId === 'chat'"
-                  :is-active="activeId === 'chat'"
                 />
                 <ParticipantListPC
                   v-if="openedPanels.includes('participants')"
@@ -177,7 +181,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import type { ComponentPublicInstance } from 'vue';
-import { useLoginState, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
+import { useLoginState, useRoomState } from 'tuikit-atomicx-vue3/room';
 import {
   IconMembers,
   IconChat,
@@ -212,7 +216,7 @@ import {
   isPictureInPictureSupported,
   ParticipantButtonPC,
   ParticipantListPC,
-  RoomChatPC,
+  RoomChat,
   RoomViewPC,
   ScreenShareButton,
   SettingButtonPC,
@@ -243,8 +247,7 @@ const rootRef = computed<HTMLElement | null>(() => (hostRef.value?.$el as HTMLEl
 const { layoutTemplate, stageStream, setLayoutTemplate, handleStreamDoubleClick } = useRoomLayoutState();
 const { uiConfig } = useUIConfig();
 const { currentRoom } = useRoomState();
-const { participantList } = useRoomParticipantState();
-const participantCount = computed(() => currentRoom.value?.participantCount || participantList.value.length);
+const participantCount = computed(() => currentRoom.value?.participantCount ?? 0);
 // Mounted before the join runs, unlike the meeting chrome below, which is what the
 // recording notice inside needs to catch the start event a late joiner receives.
 useRoomTips({ onLeave: () => emit('leave') });

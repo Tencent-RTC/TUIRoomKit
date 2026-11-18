@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { TUISwitch, t } from '../../../base';
-import { shareSystemAudio } from '../ScreenShareButton/useScreenShare';
+import { shareSystemAudio } from '../useScreenShare';
 </script>
 
 <style scoped lang="scss">

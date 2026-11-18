@@ -1,7 +1,7 @@
 export { default as ChatButton } from './Chat/ChatButton/ChatButton.vue';
 export { default as ChatButtonMobile } from './Chat/ChatButton/ChatButtonMobile.vue';
-export { default as RoomChatPC } from './Chat/RoomChatPC/RoomChatPC.vue';
-export { default as RoomChatMobile } from './Chat/RoomChatMobile/RoomChatMobile.vue';
+export { default as RoomChat } from './Chat/RoomChat/RoomChat.vue';
+export { default as ChatOverlayMobile } from './Chat/ChatOverlayMobile/ChatOverlayMobile.vue';
 
 export { default as CameraButton } from './Device/CameraButton/index.vue';
 export { default as CameraButtonMobile } from './Device/CameraButton/CameraButtonMobile.vue';
@@ -24,6 +24,11 @@ export { default as ParticipantButtonPC } from './Participants/ParticipantButton
 export { default as ParticipantButtonMobile } from './Participants/ParticipantButtonMobile/ParticipantButtonMobile.vue';
 export { default as ParticipantListPC } from './Participants/ParticipantListPC/ParticipantListPC.vue';
 export { default as ParticipantListMobile } from './Participants/ParticipantListMobile/ParticipantListMobile.vue';
+export { default as Trophy } from './EduTools/Trophy/Trophy.vue';
+export { default as EduRosterPC } from './EduRoster/EduRosterPC/EduRosterPC.vue';
+export { default as UserPickerPC } from './Participants/UserPickerPC/UserPickerPC.vue';
+export { useResolvedContacts } from './Participants/contactData';
+export type { PickedContact, PickerContact } from './Participants/contactData';
 
 export { default as CloudRecordingButtonPC } from './Recording/CloudRecordingButtonPC/CloudRecordingButtonPC.vue';
 export { default as CloudRecordingButtonMobile } from './Recording/CloudRecordingButtonMobile/CloudRecordingButtonMobile.vue';
@@ -31,7 +36,9 @@ export { default as CloudRecordingStatusPC } from './Recording/CloudRecordingSta
 export { default as CloudRecordingStatusMobile } from './Recording/CloudRecordingStatusMobile/CloudRecordingStatusMobile.vue';
 
 export { default as CurrentRoomInfoPC } from './RoomInfo/CurrentRoomInfoPC/CurrentRoomInfoPC.vue';
+export { default as CurrentEduRoomInfoPC } from './RoomInfo/CurrentRoomInfoPC/CurrentEduRoomInfoPC.vue';
 export { default as CurrentRoomInfoMobile } from './RoomInfo/CurrentRoomInfoMobile/CurrentRoomInfoMobile.vue';
+export { default as CurrentEduRoomInfoMobile } from './RoomInfo/CurrentRoomInfoMobile/CurrentEduRoomInfoMobile.vue';
 export { default as LocalNetworkInfoPC } from './RoomInfo/LocalNetworkInfoPC/LocalNetworkInfoPC.vue';
 export { default as LocalNetworkInfoMobile } from './RoomInfo/LocalNetworkInfoMobile/LocalNetworkInfoMobile.vue';
 
@@ -53,6 +60,7 @@ export { default as WhiteboardButton } from './Whiteboard/WhiteboardButton/White
 export { default as WhiteboardView } from './Whiteboard/WhiteboardView/WhiteboardView.vue';
 export { default as AnnotationButton } from './Whiteboard/AnnotationButton/AnnotationButton.vue';
 export { default as AnnotationButtonMobile } from './Whiteboard/AnnotationButtonMobile/AnnotationButtonMobile.vue';
+export { default as WhiteboardToolsMobile } from './Whiteboard/WhiteboardToolsMobile/WhiteboardToolsMobile.vue';
 export { useWhiteboardState } from './Whiteboard/WhiteboardState';
 
 export { default as LanguageButton } from './Setting/LanguageButton/LanguageButton.vue';
@@ -61,6 +69,8 @@ export { default as SettingButtonMobile } from './Setting/SettingButtonMobile/Se
 export { default as SettingsDialogPC } from './Setting/SettingsDialogPC/SettingsDialogPC.vue';
 export { default as SettingsDialogMobile } from './Setting/SettingsDialogMobile/SettingsDialogMobile.vue';
 export type { SettingsTab } from './Setting/SettingsDialogPC/SettingsDialogPC.vue';
+export type { SettingsItem } from './Setting/GeneralSettings/GeneralSettings.vue';
+export type { BackgroundPhoto } from './VideoEffect/VirtualBackgroundSettings/virtualBackground';
 export { default as ThemeButton } from './Setting/ThemeButton/ThemeButton.vue';
 
 export { default as CaptionButton } from './Transcription/CaptionButton/CaptionButton.vue';

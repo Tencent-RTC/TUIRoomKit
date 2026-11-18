@@ -7,7 +7,7 @@
     @click.stop="toggle"
   >
     <template #icon>
-      <IconMark :size="10" />
+      <IconMark :size="14" />
     </template>
     {{ isAnnotationOn ? t('Whiteboard.EndAnnotation') : t('Whiteboard.Annotation') }}
   </TUIButton>
@@ -24,6 +24,7 @@ import {
 import type { RoomParticipant } from 'tuikit-atomicx-vue3/room';
 import { IconMark, TUIButton, t } from '../../../base';
 import { useWhiteboardState } from '../WhiteboardState';
+import { toastRoomError } from '../../../utils/roomError';
 
 const props = defineProps<{
   participant: RoomParticipant;
@@ -40,9 +41,11 @@ const isLocalBoard = computed(() => isLocal.value && screenStatus.value === Devi
 const isShareTile = computed(() => props.streamType === VideoStreamType.Screen && !isLocalBoard.value);
 
 function toggle() {
-  const run = isAnnotationOn.value ? stopAnnotation() : startAnnotation();
+  const isStopping = isAnnotationOn.value;
+  const run = isStopping ? stopAnnotation() : startAnnotation();
   run.catch((error: unknown) => {
     console.warn('[AnnotationButton] toggle annotation failed:', error);
+    toastRoomError(error, { fallback: isStopping ? 'Whiteboard.AnnotationStopFailed' : 'Whiteboard.AnnotationStartFailed' });
   });
 }
 </script>

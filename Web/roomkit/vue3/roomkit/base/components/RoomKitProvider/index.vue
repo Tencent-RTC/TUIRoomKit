@@ -2,7 +2,7 @@
   <div
     ref="rootRef"
     class="rk-root"
-    :class="{ 'rk-root-cover': cover, 'is-h5': !isPC }"
+    :class="[{ 'rk-root-cover': cover, 'is-h5': !isPC }, `rk-scene-${sceneClass}`]"
     :style="rootStyle"
     :data-rk-theme="currentTheme"
   >
@@ -23,7 +23,7 @@
 import { getPlatform } from '@tencentcloud/universal-api';
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue';
 import { provideIcons } from '../../icons/context';
-import { removeOverlayContext, setActiveOverlayContext } from '../../overlayRegistry';
+import { activeScene, removeOverlayContext, setActiveOverlayContext, setActiveScene } from '../../overlayRegistry';
 import { LANE_BASE, OVERLAY_CONTEXT_KEY } from '../../tokens';
 import { useUIConfig } from '../../uiConfig';
 import type { ThemeName } from '../../uiConfig';
@@ -42,6 +42,8 @@ const { uiConfig, setUIConfig } = useUIConfig();
 const props = withDefaults(defineProps<{
   baseZ?: number;
   theme?: ThemeName;
+  /** Appended to the root as an `rk-scene-*` class; defaults to `conference`, `education` renders the edu token pack. `'auto'` (append hosts) mirrors the most recently mounted explicit scene. */
+  scene?: string;
   /** Register this host for command TUIToast / TUIMessageBox. */
   command?: boolean;
   /** Transparent cover used by appendTo. */
@@ -49,6 +51,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   baseZ: 0,
   theme: undefined,
+  scene: 'conference',
   command: true,
   cover: false,
 });
@@ -56,6 +59,17 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   'update:theme': [theme: ThemeName];
 }>();
+
+/** 'auto' (append hosts) mirrors the most recently mounted explicit scene,
+ * so body-level notices keep the active scene's brand tokens. */
+const sceneClass = computed(() => (props.scene === 'auto' ? activeScene.value : props.scene));
+
+// Explicit scenes register themselves so append hosts can mirror them.
+watch(() => props.scene, (scene) => {
+  if (scene !== 'auto') {
+    setActiveScene(scene);
+  }
+}, { immediate: true });
 
 type OverlayLayer = {
   lane: OverlayLane;

@@ -58,12 +58,23 @@ const LEVELS = {
   [NetworkQuality.Down]: { level: 'disconnected', label: 'Network.Disconnected' },
 } as const;
 
+const props = withDefaults(defineProps<{
+  /**
+   * H5 landscape keeps the bars before the engine reports a quality.
+   * PC leaves the chip out until a report arrives.
+   */
+  showWhenUnknown?: boolean;
+}>(), {
+  showWhenUnknown: false,
+});
+
 const { networkInfo } = useDeviceState();
 
-/** Unknown has nothing to report, so the chip stays out of the topbar until stats arrive */
+/** Unknown has nothing to report, so the PC chip stays out of the topbar until stats arrive */
 const state = computed(() => {
   const quality = networkInfo.value?.quality ?? NetworkQuality.Unknown;
-  return LEVELS[quality as keyof typeof LEVELS] ?? null;
+  return LEVELS[quality as keyof typeof LEVELS]
+    ?? (props.showWhenUnknown ? LEVELS[NetworkQuality.Good] : null);
 });
 
 /**

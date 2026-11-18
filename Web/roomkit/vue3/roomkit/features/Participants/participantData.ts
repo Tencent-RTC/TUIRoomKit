@@ -364,7 +364,7 @@ export function useParticipantList() {
     .filter(participant => matchesParticipantQuery(participant, searchKeyword.value))
     .map(toPendingRow));
 
-  const joinedCount = computed(() => joinedParticipants.value.length);
+  const joinedCount = computed(() => currentRoom.value?.participantCount ?? 0);
   const pendingCount = computed(() => pendingParticipants.value.length);
   const hasPending = computed(() => pendingCount.value > 0);
   const canCallAll = computed(() => (
@@ -373,12 +373,6 @@ export function useParticipantList() {
   const isSearchEmpty = computed(() => (
     isSearching.value && joinedRows.value.length === 0 && pendingRows.value.length === 0
   ));
-  /** The no-result copy split around the query, so the view can highlight it. */
-  const searchEmptyParts = computed(() => {
-    const marker = '\u0000';
-    const [before = '', after = ''] = t('Participants.SearchEmptyDesc', { query: marker }).split(marker);
-    return { before, query: searchKeyword.value.trim(), after };
-  });
   /** Members already in the room or being rung cannot be picked again. */
   const occupiedIds = computed(() => [...new Set([
     ...joinedParticipants.value.map(item => item.userId),
@@ -406,7 +400,6 @@ export function useParticipantList() {
     searchKeyword,
     isSearching,
     isSearchEmpty,
-    searchEmptyParts,
     joinedRows,
     pendingRows,
     joinedCount,
@@ -501,11 +494,10 @@ export function useRoomControls() {
   return { canManageMembers, microphoneControl, cameraControl, screenShareControl };
 }
 
-/** Badge count follows the room record until the member list has loaded. */
+/** Badge count comes from the room record reported by the server. */
 export function useParticipantCount() {
   const { currentRoom } = useRoomState();
-  const { participantList } = useRoomParticipantState();
-  const count = computed(() => currentRoom.value?.participantCount || participantList.value.length);
+  const count = computed(() => currentRoom.value?.participantCount ?? 0);
   const countLabel = computed(() => (count.value > 99 ? '99+' : String(count.value)));
   return { count, countLabel };
 }

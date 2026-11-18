@@ -95,6 +95,7 @@
   </div>
   <UserPicker
     v-model:open="contactsOpen"
+    mode="schedule"
     :selected-ids="modelValue"
     @confirm="applyContacts"
   />

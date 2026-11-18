@@ -6,7 +6,7 @@
           <CurrentRoomInfoMobile :room-name="roomName" />
           <LocalNetworkInfoMobile />
           <CloudRecordingStatusMobile />
-          <div class="conference-mobile-leave">
+          <div v-if="uiConfig.widgetVisible.LeaveRoomWidget !== false" class="conference-mobile-leave">
             <TUIPopover
               :open="leaveMenuOpen"
               :disabled="!canEndRoom"
@@ -25,10 +25,12 @@
                 :aria-expanded="canEndRoom ? leaveMenuOpen : undefined"
                 @click="!canEndRoom && exit('leave')"
               >
-                <template v-if="leaveMenuOpen">
+                <template v-if="leaveMenuOpen" #default>
                   {{ t('Room.Cancel') }}
                 </template>
-                <IconPhone v-else class="conference-mobile-leave-icon" :size="15" />
+                <template v-else #icon>
+                  <IconPhone class="conference-mobile-leave-icon" :size="15" />
+                </template>
               </TUIButton>
               <template #content>
                 <div class="conference-mobile-leave-menu" role="menu">
@@ -67,19 +69,20 @@
         </main>
 
         <footer class="conference-mobile-toolbar">
-          <MicButtonMobile />
-          <CameraButtonMobile />
+          <MicButtonMobile v-if="uiConfig.widgetVisible.MicWidget !== false" />
+          <CameraButtonMobile v-if="uiConfig.widgetVisible.CameraWidget !== false" />
           <OverflowToolbarMobile class="conference-mobile-toolbar-overflow">
-            <ParticipantButtonMobile :active="activePanel === 'participants'" @click="togglePanel('participants')" />
+            <ParticipantButtonMobile v-if="uiConfig.widgetVisible.MemberWidget !== false" :active="activePanel === 'participants'" @click="togglePanel('participants')" />
             <ChatButtonMobile
+              v-if="uiConfig.widgetVisible.RoomChatWidget !== false"
               :active="activePanel === 'chat'"
               :is-chat-active="activePanel === 'chat'"
               @click="togglePanel('chat')"
             />
-            <CaptionEntryMobile :active="capViewOpen" @click="togglePanel('captions')" />
-            <CloudRecordingButtonMobile />
-            <AnnotationButtonMobile @update:active="annotating = $event" />
-            <SettingButtonMobile @click="settingsOpen = true" />
+            <CaptionEntryMobile v-if="uiConfig.widgetVisible.AIToolsWidget !== false" :active="capViewOpen" @click="togglePanel('captions')" />
+            <CloudRecordingButtonMobile v-if="uiConfig.widgetVisible.RecordingWidget !== false" />
+            <AnnotationButtonMobile v-if="uiConfig.widgetVisible.AnnotationWidget !== false" @update:active="annotating = $event" />
+            <SettingButtonMobile v-if="uiConfig.widgetVisible.SettingsWidget !== false" @click="settingsOpen = true" />
           </OverflowToolbarMobile>
         </footer>
 
@@ -89,7 +92,7 @@
           :title="t('Chat.Title')"
           @update:open="!$event && closePanel('chat')"
         >
-          <RoomChatMobile class="conference-mobile-panel" :is-active="activePanel === 'chat'" />
+          <RoomChat class="conference-mobile-panel" mobile :active="activePanel === 'chat'" />
         </TUIPopup>
         <TUIPopup
           :open="activePanel === 'participants'"
@@ -161,7 +164,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { useRoomParticipantState, useRoomState } from 'tuikit-atomicx-vue3/room';
+import { useRoomState } from 'tuikit-atomicx-vue3/room';
 import {
   IconPhone,
   RoomKitProvider,
@@ -192,7 +195,7 @@ import {
   MicButtonMobile,
   ParticipantButtonMobile,
   ParticipantListMobile,
-  RoomChatMobile,
+  RoomChat,
   RoomViewMobile,
   SettingButtonMobile,
   SettingsDialogMobile,
@@ -216,10 +219,9 @@ const { phase } = roomEntry;
 const { uiConfig } = useUIConfig();
 const annotating = ref(false);
 const { currentRoom } = useRoomState();
-const { participantList } = useRoomParticipantState();
 // The share page's corner window follows the speaker, like the desktop mini window.
 const { speakerStream } = useSingleStageStream();
-const participantCount = computed(() => currentRoom.value?.participantCount || participantList.value.length);
+const participantCount = computed(() => currentRoom.value?.participantCount ?? 0);
 // Mounted before the join runs, so the recording notice catches the start event a late joiner receives.
 useRoomTips({ onLeave: () => emit('leave') });
 useAutoPlayDialog();

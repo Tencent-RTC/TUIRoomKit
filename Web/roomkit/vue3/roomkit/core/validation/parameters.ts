@@ -1,5 +1,7 @@
 import { t } from '../../base';
+import { RoomWidget } from '../../base';
 import type { UIConfig } from '../../base';
+import { RoomScene } from '../types';
 import type { Credentials } from '../types';
 
 function throwInvalidParameter(api: string, reason: string, solution: string, field?: string): never {
@@ -91,6 +93,7 @@ const nonEmptyString = check('NonEmptyString', isNonEmptyString, 'string');
 const positiveInteger = check('PositiveInteger', value => typeof value === 'number' && Number.isSafeInteger(value) && value > 0, 'number');
 const roomId = check('RoomId', value => isNonEmptyString(value) && /^[a-zA-Z0-9 !#$%&()+\-:;<=>?@[\]^_{|}~,.]{1,64}$/.test(value), 'string');
 const password = check('Password', value => typeof value === 'string' && /^\d{6}$/.test(value), 'string');
+const scene = check('Scene', value => Object.values(RoomScene).includes(value as RoomScene), 'string');
 
 function isValidCSSValue(value: unknown, property: string): boolean {
   return isNonEmptyString(value) && typeof CSS !== 'undefined' && CSS.supports(property, value);
@@ -121,6 +124,10 @@ const themeFields: FieldTable = {
   textColor: optional(cssColor),
 };
 
+const widgetVisibleFields: FieldTable = Object.fromEntries(
+  Object.values(RoomWidget).map(widget => [widget, optional(boolean)]),
+);
+
 const uiConfigFields: FieldTable = {
   theme: optional((value, api, field) => {
     if (isObject(value)) {
@@ -135,11 +142,19 @@ const uiConfigFields: FieldTable = {
   participantViewUI: optional(check('Component', value => isObject(value) || typeof value === 'function')),
   shareLink: optional(check('ShareLink', value => typeof value === 'string' || typeof value === 'function')),
   contactList: optional(check('ContactProvider', value => typeof value === 'function', 'function')),
+  widgetVisible: optional((value, api, field) => validateFields(value, widgetVisibleFields, api, field)),
+};
+
+const mediaPreferenceFields: FieldTable = {
+  preferMicrophoneOn: optional(boolean),
+  preferCameraOn: optional(boolean),
 };
 
 const joinFields: FieldTable = {
   roomId,
   password: optional(password),
+  scene: optional(scene),
+  mediaPreference: optional((value, api, field) => validateFields(value, mediaPreferenceFields, api, field)),
   container: (value, api, field) => validateFields(value, containerFields, api, field),
 };
 
@@ -221,4 +236,3 @@ export function validateInterceptor(action: unknown, handler: unknown): void {
 export function validateUIConfig(value: unknown): asserts value is UIConfig {
   validateFields(value, uiConfigFields, 'setUIConfig', 'options');
 }
-

@@ -1,136 +1,52 @@
-.invite-dialog-content {
-  display: flex;
+.user-picker-pc {
+  display: grid;
   flex: 1;
-  flex-direction: column;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   min-height: 0;
+  color: var(--rk-text-primary);
 }
 
-/* Filled 36px pill. width:auto beats TUIInput's width:100% so 16px
-   side margins do not overflow the dialog. */
-.invite-dialog-content .invite-dialog-search {
+.user-picker-pc-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-right: 1px solid var(--rk-border);
+}
+
+/* width:auto beats TUIInput's width:100% so the side margins do not overflow the column. */
+.user-picker-pc-main .user-picker-pc-search {
   box-sizing: border-box;
   flex: none;
   gap: 6px;
-  align-self: stretch;
   width: auto;
   height: 36px;
   min-height: 36px;
   padding: 0 12px;
-  margin: 4px 16px 8px;
-  background: var(--rk-bg-muted);
-  border: 0;
-  border-radius: 999px;
+  margin: 0 16px 8px;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border);
+  border-radius: var(--rk-radius-pill);
   box-shadow: none;
 }
 
-.invite-dialog-search :deep(.rk-input-addon),
-.invite-dialog-search :deep(.rk-input-field) {
+.user-picker-pc-main .user-picker-pc-search:focus-within {
+  border-color: var(--rk-border-strong);
+  box-shadow: none;
+}
+
+.user-picker-pc-search :deep(.rk-input-addon),
+.user-picker-pc-search :deep(.rk-input-field) {
   padding: 0;
 }
 
-.invite-dialog-list {
-  flex: 1;
-  min-height: 0;
-  padding: 4px 8px 8px;
-  overflow: auto;
-  scrollbar-width: none;
-}
-
-.invite-dialog-list::-webkit-scrollbar {
-  display: none;
-}
-
-.invite-dialog-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  width: 100%;
-  padding: 8px;
-  text-align: left;
-  cursor: pointer;
-  border-radius: 10px;
-}
-
-.invite-dialog-row:hover:not(.disabled) {
-  background: color-mix(in srgb, var(--rk-brand) 1.6%, var(--rk-bg-page));
-}
-
-.invite-dialog-row.disabled {
-  pointer-events: none;
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.invite-dialog-avatar,
-.invite-dialog-chip-av {
-  flex: none;
-}
-
-.invite-dialog-meta {
+.user-picker-pc-list,
+.user-picker-pc-side-list {
   display: flex;
   flex: 1;
   flex-direction: column;
-  min-width: 0;
-}
-
-.invite-dialog-name {
-  overflow: hidden;
-  font-size: var(--rk-fs-md);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.invite-dialog-sub {
-  margin-top: 1px;
-  font-size: var(--rk-fs-sm);
-  color: var(--rk-text-tertiary);
-}
-
-.invite-dialog-check {
-  box-sizing: border-box;
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  margin-left: auto;
-  color: var(--rk-on-accent);
-  border: 1.5px solid var(--rk-border-strong);
-  border-radius: 50%;
-}
-
-.invite-dialog-check-icon {
-  display: grid;
-  opacity: 0;
-}
-
-.invite-dialog-row.sel .invite-dialog-check {
-  background: var(--rk-brand);
-  border-color: var(--rk-brand);
-}
-
-.invite-dialog-row.sel .invite-dialog-check-icon {
-  opacity: 1;
-}
-
-.invite-dialog-empty {
-  display: grid;
-  place-items: center;
-  height: 100%;
-  min-height: 160px;
-  font-size: var(--rk-fs-md);
-  color: var(--rk-text-tertiary);
-}
-
-/* Keep three chip rows even when empty so selecting people cannot resize the dialog. */
-.invite-dialog-picked {
-  display: flex;
-  flex: none;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-content: flex-start;
-  max-height: 108px;
-  padding: 8px 16px 4px;
+  gap: 2px;
+  min-height: 0;
   overflow-y: auto;
   scrollbar-width: none;
 
@@ -139,39 +55,171 @@
   }
 }
 
-.invite-dialog-chip {
-  display: inline-flex;
-  flex: 0 0 auto;
-  gap: 6px;
-  align-items: center;
-  max-width: 160px;
-  height: 28px;
-  padding: 0 6px 0 4px;
-  color: var(--rk-text-primary);
-  background: var(--rk-bg-muted);
-  border-radius: 999px;
+.user-picker-pc-list {
+  padding: 0 16px 8px;
 }
 
-.invite-dialog-chip-name {
+.user-picker-pc-row,
+.user-picker-pc-side-row {
+  display: flex;
+  flex: none;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 8px;
+  border-radius: var(--rk-radius-md);
+  outline: none;
+}
+
+.user-picker-pc-row {
+  cursor: pointer;
+}
+
+.user-picker-pc-row:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--rk-brand);
+}
+
+.user-picker-pc-row:hover:not(.is-disabled),
+.user-picker-pc-side-row:hover,
+.user-picker-pc-side-row:focus-within {
+  background: var(--rk-bg-hover);
+}
+
+.user-picker-pc-row.is-disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.user-picker-pc-avatar {
+  flex: none;
+}
+
+.user-picker-pc-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-picker-pc-name {
+  flex: 1;
   min-width: 0;
   overflow: hidden;
-  font-size: var(--rk-fs-sm);
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+  line-height: 18px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.invite-dialog-chip-close {
+.user-picker-pc-sub {
+  margin-top: 1px;
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-tertiary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-picker-pc-check {
+  box-sizing: border-box;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  color: var(--rk-on-accent);
+  border: 1.5px solid color-mix(in srgb, var(--rk-text-primary) 22%, transparent);
+  border-radius: var(--rk-radius-sm);
+
+  :deep(svg) {
+    opacity: 0;
+  }
+}
+
+.user-picker-pc-row.is-selected .user-picker-pc-check {
+  background: var(--rk-brand);
+  border-color: var(--rk-brand);
+}
+
+.user-picker-pc-row.is-disabled .user-picker-pc-check {
+  color: var(--rk-text-tertiary);
+  background: var(--rk-border-strong);
+  border-color: transparent;
+}
+
+.user-picker-pc-row.is-selected .user-picker-pc-check :deep(svg),
+.user-picker-pc-row.is-disabled .user-picker-pc-check :deep(svg) {
+  opacity: 1;
+}
+
+.user-picker-pc-row:hover:not(.is-selected, .is-disabled) .user-picker-pc-check {
+  border-color: var(--rk-brand);
+}
+
+.user-picker-pc-empty,
+.user-picker-pc-side-empty {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 160px;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-tertiary);
+}
+
+.user-picker-pc-side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.user-picker-pc-side-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 0 20px 0 24px;
+  margin-bottom: 8px;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-secondary);
+}
+
+.user-picker-pc-side-head .user-picker-pc-clear {
+  height: 28px;
+  padding: 0 8px;
+  color: var(--rk-brand);
+  border-radius: var(--rk-radius-sm);
+}
+
+.user-picker-pc-side-head .user-picker-pc-clear:disabled {
+  color: var(--rk-text-disabled);
+}
+
+.user-picker-pc-side-list {
+  flex: 0 1 auto;
+  padding: 0 16px 8px;
+}
+
+.user-picker-pc-side-row .user-picker-pc-remove {
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  min-width: 16px;
-  height: 16px;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
   padding: 0;
   color: var(--rk-text-tertiary);
-  cursor: pointer;
-  background: transparent;
-  border: 0;
   border-radius: 50%;
+  opacity: 0;
+}
+
+.user-picker-pc-side-row:hover .user-picker-pc-remove,
+.user-picker-pc-side-row:focus-within .user-picker-pc-remove {
+  opacity: 1;
+}
+
+.user-picker-pc-side-row .user-picker-pc-remove:hover {
+  color: var(--rk-text-primary);
 }

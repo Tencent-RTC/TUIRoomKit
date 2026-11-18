@@ -1,7 +1,6 @@
 <template>
   <ToolbarButtonPC
     :label="t('Settings.Title')"
-    overflow-key="Settings.Title"
     :icon="IconSettings"
     :active="active"
     @click="$emit('click')"

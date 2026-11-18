@@ -53,7 +53,9 @@
             :disabled="!canJoin"
             :aria-label="t('Preconference.Join')"
           >
-            <IconArrowRight class="join-arrow" :size="16" />
+            <template #icon>
+              <IconArrowRight class="join-arrow" :size="16" />
+            </template>
           </TUIButton>
         </template>
       </TUIInput>
