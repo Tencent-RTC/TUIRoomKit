@@ -7,7 +7,7 @@ import {
   useLoginState,
   useRoomParticipantState,
 } from 'tuikit-atomicx-react/room';
-import { IconFlipCamera, IconHostRole, IconMic, IconMicOff, IconRoleUser } from '../../../base';
+import { IconFlipCamera, IconMic, IconMicOff, IconRoleUser } from '../../../base';
 import { useI18n } from '../../../i18n';
 import type { RoomParticipant } from 'tuikit-atomicx-react/room';
 import './ParticipantViewOverlayMobile.scss';
@@ -17,6 +17,8 @@ export interface ParticipantViewOverlayMobileProps {
   streamType: VideoStreamType;
   /** The camera window on the share page: no signal bars, and a smaller flip. */
   inPip?: boolean;
+  /** A camera flip is still running; the flip button stays dimmed until it lands. */
+  flipPending?: boolean;
   /** The stage owns the flip: it outlives the tile, which paging remounts. */
   onFlipCamera?: () => void;
   className?: string;
@@ -32,6 +34,7 @@ export function ParticipantViewOverlayMobile({
   participant,
   streamType,
   inPip,
+  flipPending = false,
   onFlipCamera,
   className,
   style,
@@ -67,9 +70,16 @@ export function ParticipantViewOverlayMobile({
   /* A share tile carries the sharer's volume; the halo belongs on their camera tile. */
   const isSpeaking = !isScreenStream && micOn && volume > 0;
 
-  const waveScale = (() => {
+  /**
+   * Top inset of the whole icon. The fill is a viewBox rect of the capsule
+   * (y 2, height 8.5), so the cut is measured on the icon, not on the rect.
+   */
+  const waveInset = (() => {
     const level = Math.min(volume / SPEECH_PEAK, 1);
-    return (WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level).toFixed(2);
+    const scale = WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level;
+    const capsuleTop = 12.5;
+    const capsuleHeight = 53.125;
+    return (capsuleTop + (1 - scale) * capsuleHeight).toFixed(1);
   })();
 
   const isOwner = participant.role === RoomParticipantRole.Owner;
@@ -94,7 +104,6 @@ export function ParticipantViewOverlayMobile({
   return (
     <div
       className={[
-        'participant-view-overlay',
         'participant-view-overlay-mobile',
         isSpeaking ? 'is-speaking' : '',
         inPip ? 'is-pip' : '',
@@ -104,14 +113,14 @@ export function ParticipantViewOverlayMobile({
     >
       {showCameraOffMask && (
         <div
-          className="participant-view-overlay-mask"
+          className="participant-view-overlay-mobile-mask"
           aria-hidden="true"
         >
-          <div className="participant-view-overlay-avatar">
+          <div className="participant-view-overlay-mobile-avatar">
             {avatarUrl
               ? (
                 <img
-                  className="participant-view-overlay-avatar-img"
+                  className="participant-view-overlay-mobile-avatar-img"
                   src={avatarUrl}
                   alt=""
                   draggable="false"
@@ -124,8 +133,9 @@ export function ParticipantViewOverlayMobile({
 
       {showFlipCamera && (
         <button
-          className="participant-view-overlay-flip"
+          className={['participant-view-overlay-mobile-flip', flipPending ? 'is-pending' : ''].filter(Boolean).join(' ')}
           type="button"
+          disabled={flipPending}
           aria-label={t('Device.FlipCamera')}
           onClick={(event) => {
             event.stopPropagation();
@@ -139,7 +149,7 @@ export function ParticipantViewOverlayMobile({
 
       {showNetworkBars && (
         <span
-          className="participant-view-overlay-network"
+          className="participant-view-overlay-mobile-network"
           aria-hidden="true"
         >
           <i />
@@ -148,31 +158,35 @@ export function ParticipantViewOverlayMobile({
         </span>
       )}
 
-      <div className="participant-view-overlay-stack">
-        <div className="participant-view-overlay-pill">
-          <span className="participant-view-overlay-mic" aria-hidden="true">
-            {micOn ? <IconMic size={12} /> : <IconMicOff size={12} />}
+      <div className="participant-view-overlay-mobile-stack">
+        <div className="participant-view-overlay-mobile-pill">
+          <span className="participant-view-overlay-mobile-mic" aria-hidden="true">
+            {micOn ? <IconMic size={14} /> : <IconMicOff size={14} />}
             {isSpeaking && (
-              <span
-                className="participant-view-overlay-mic-core"
-                style={{ transform: `scaleY(${waveScale})` }}
-              />
+              <svg
+                className="participant-view-overlay-mobile-mic-core"
+                viewBox="0 0 16 16"
+                aria-hidden="true"
+                style={{ clipPath: `inset(${waveInset}% 0 0 0)` }}
+              >
+                <rect x="5.5" y="2" width="5" height="8.5" rx="2.5" />
+              </svg>
             )}
           </span>
 
           {roleLabel && (
             <span
-              className={['participant-view-overlay-role-mark', roleClass].filter(Boolean).join(' ')}
+              className={['participant-view-overlay-mobile-role-mark', roleClass].filter(Boolean).join(' ')}
               role="img"
               aria-label={roleLabel}
             >
-              {isOwner ? <IconHostRole size={12} /> : <IconRoleUser size={11} />}
+              <IconRoleUser size={14} />
             </span>
           )}
 
-          <span className="participant-view-overlay-name">{displayName}</span>
+          <span className="participant-view-overlay-mobile-name">{displayName}</span>
 
-          {isSelf && <span className="participant-view-overlay-me">{t('Participants.Me')}</span>}
+          {isSelf && <span className="participant-view-overlay-mobile-me">{t('Participants.Me')}</span>}
         </div>
       </div>
     </div>

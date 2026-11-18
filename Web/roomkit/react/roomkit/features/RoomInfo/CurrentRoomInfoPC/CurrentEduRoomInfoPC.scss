@@ -1,0 +1,77 @@
+/* Classroom chip: no hover plate, only a slight fade, per the design. */
+.edu-room-info {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  max-width: min(460px, 42vw);
+  height: 34px;
+  padding: 0 4px;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  outline: none;
+  transition: opacity 0.15s;
+}
+
+.edu-room-info:hover {
+  opacity: 0.88;
+}
+
+.edu-room-info.is-open {
+  opacity: 1;
+}
+
+.edu-room-info-mark {
+  flex-shrink: 0;
+  color: var(--rk-brand);
+}
+
+.edu-room-info-title {
+  min-width: 0;
+  max-width: 200px;
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.edu-room-info-time {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding-left: 10px;
+  margin-left: 2px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--rk-text-primary);
+  letter-spacing: 0.02em;
+  border-left: 1px solid var(--rk-border-strong);
+}
+
+.edu-room-info-caret {
+  flex-shrink: 0;
+  margin-left: 2px;
+  color: var(--rk-text-tertiary);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.edu-room-info.is-open .edu-room-info-caret {
+  color: var(--rk-brand-hover);
+  transform: rotate(180deg);
+}
+
+.rk-root[data-rk-theme='light'] .edu-room-info.is-open .edu-room-info-caret {
+  color: var(--rk-brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edu-room-info,
+  .edu-room-info-caret {
+    transition: none;
+  }
+}

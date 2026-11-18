@@ -9,7 +9,7 @@ import {
 } from 'tuikit-atomicx-react/room';
 import { IconMic, IconMicOff, IconMore, IconShare } from '../../../base/icons';
 import { useI18n } from '../../../i18n';
-import ParticipantMoreMenu from '../../Participants/ParticipantListPC/ParticipantMoreMenu.tsx';
+import ParticipantMoreMenu from '../../Participants/ParticipantListPC/ParticipantMoreMenu';
 import type { RoomParticipant } from 'tuikit-atomicx-react/room';
 import './ParticipantViewOverlayPC.scss';
 
@@ -67,10 +67,11 @@ export function ParticipantViewOverlayPC({
      Engine reports 0 when silent, so any positive volume counts as speaking. */
   const isSpeaking = !isScreenStream && micOn && volume > 0;
 
-  /** How tall the bar stands right now, as a share of the slot it sits in. */
-  const waveScale = (() => {
+  /** How much of the fill is cut away from the top; the rest reads as the level. */
+  const waveInset = (() => {
     const level = Math.min(volume / SPEECH_PEAK, 1);
-    return (WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level).toFixed(2);
+    const scale = WAVE_MIN_SCALE + (WAVE_MAX_SCALE - WAVE_MIN_SCALE) * level;
+    return ((1 - scale) * 100).toFixed(1);
   })();
 
   const roleLabel = (() => {
@@ -135,7 +136,8 @@ export function ParticipantViewOverlayPC({
         </div>
       )}
 
-      {!hideActions && (
+      {/* Share tiles, screen or board alike, carry no participant actions; the sharer's camera tile does. */}
+      {!hideActions && !isScreenStream && (
         <ParticipantMoreMenu
           participant={participant}
           placement="bottom-end"
@@ -162,7 +164,7 @@ export function ParticipantViewOverlayPC({
             {isSpeaking && (
               <span
                 className="participant-view-overlay-mic-core"
-                style={{ transform: `scaleY(${waveScale})` }}
+                style={{ clipPath: `inset(${waveInset}% 0 0 0)` }}
               />
             )}
           </span>

@@ -1,24 +1,38 @@
 .mic-level-icon {
   position: relative;
   display: inline-flex;
+  flex: none;
 }
 
-/* Percentages map to the capsule cavity of IconMic (16x16 viewBox) */
-.mic-level-icon-track {
+/* Toolbars set every svg to a fixed px size. That draws the glyph in a
+   different box from the level and shifts the green off the capsule. */
+.mic-level-icon .rk-icon {
   position: absolute;
-  top: 12.5%;
-  left: 34.375%;
-  width: 31.25%;
-  height: 53.125%;
-  overflow: hidden;
-  border-radius: var(--rk-radius-pill);
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-.mic-level-icon-fill {
+.mic-level-icon .rk-icon svg {
+  position: relative;
+  z-index: 1;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Same viewBox as IconMic, so the rect is the capsule hole (x 5.5-10.5, y 2-10.5).
+   Clipped from the top of the icon; scaling the rect would flatten its round bottom. */
+.mic-level-icon-core {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: var(--rk-green-500);
-  transition: height 0.2s;
+  inset: 0;
+  z-index: 0;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible;
+  pointer-events: none;
+  transition: clip-path 0.2s ease-out;
+}
+
+.mic-level-icon-core rect {
+  fill: var(--rk-success);
 }

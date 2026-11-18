@@ -17,22 +17,16 @@ export function HomeView() {
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const { login, logout: logoutUser, loginStatus, loginUserInfo } = useLoginState();
-  const { currentRoom, getRoomInfo } = useRoomState();
-  const {
-    isCameraTesting,
-    isMicrophoneTesting,
-    openLocalCamera,
-    openLocalMicrophone,
-    unmuteLocalAudio,
-  } = useDeviceState();
+  const { getRoomInfo } = useRoomState();
+  const { isCameraTesting, isMicrophoneTesting } = useDeviceState();
 
   const roomContainer = useRef<HTMLDivElement>(null);
   const [showConference, setShowConference] = useState(false);
   const [roomKit] = useState(() => RoomKit.getInstance(credentials));
 
   // Read after an await, so these must be the values of the latest render.
-  const latestRef = useRef({ currentRoom, setSearchParams });
-  latestRef.current = { currentRoom, setSearchParams };
+  const latestRef = useRef({ setSearchParams });
+  latestRef.current = { setSearchParams };
 
   function setRoomQuery(roomId?: string) {
     latestRef.current.setSearchParams((prev) => {
@@ -46,8 +40,13 @@ export function HomeView() {
     }, { replace: true });
   }
 
+  /** Carry the preconference preview into the room. */
+  function getMediaPreference() {
+    return { preferCameraOn: isCameraTesting, preferMicrophoneOn: isMicrophoneTesting };
+  }
+
   async function createMeeting() {
-    const devices = { camera: isCameraTesting, microphone: isMicrophoneTesting };
+    const mediaPreference = getMediaPreference();
     setShowConference(true);
 
     const roomId = await generateRoomId(candidate => getRoomInfo({ roomId: candidate }));
@@ -55,37 +54,23 @@ export function HomeView() {
       setShowConference(false);
       return;
     }
-    const name = loginUserInfo?.userName || credentials.userId;
+    // Cap the name so a long nickname can't push roomName past the create limit.
+    const name = [...(loginUserInfo?.userName || credentials.userId)].slice(0, 10).join('');
     await roomKit.createAndJoin({
       roomId,
       roomName: t('Schedule.DefaultTopic', { name }),
       container: { appendTo: roomContainer.current! },
+      mediaPreference,
     });
     setRoomQuery(roomId);
-    await openPreviewDevices(devices);
   }
 
   async function joinMeeting(roomId: string, password?: string) {
-    const devices = { camera: isCameraTesting, microphone: isMicrophoneTesting };
+    const mediaPreference = getMediaPreference();
     setShowConference(true);
 
-    await roomKit.join({ roomId, password, container: { appendTo: roomContainer.current! } });
+    await roomKit.join({ roomId, password, container: { appendTo: roomContainer.current! }, mediaPreference });
     setRoomQuery(roomId);
-    await openPreviewDevices(devices);
-  }
-
-  async function openPreviewDevices(devices: { camera: boolean; microphone: boolean }) {
-    if (!latestRef.current.currentRoom) {
-      return;
-    }
-    if (devices.camera) {
-      await openLocalCamera().catch(error => console.error('Failed to open camera:', error));
-    }
-    if (devices.microphone) {
-      await openLocalMicrophone()
-        .then(() => unmuteLocalAudio())
-        .catch(error => console.error('Failed to open microphone:', error));
-    }
   }
 
   async function logout() {
@@ -115,6 +100,7 @@ export function HomeView() {
   return (
     <RoomKitProvider
       className="home-host"
+      scene="conference"
     >
       <div className="home-view">
         {!showConference && (

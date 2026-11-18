@@ -21,6 +21,17 @@
   color: var(--rk-text-tertiary);
 }
 
+/* Classroom chat has no emoji or attachment (views-edu [classroom] .rk-chat-tools).
+   The scene class sits on an ancestor; the data attribute stays on these nodes. */
+.rk-scene-education .room-chat-mobile .message-input-tools {
+  display: none;
+}
+
+.rk-scene-education .room-chat-mobile .message-input {
+  padding: 10px;
+  border-top: 0;
+}
+
 .room-chat-mobile .message-input-tool {
   position: relative;
   display: inline-flex;
@@ -71,7 +82,7 @@
   overflow-y: auto;
   font-family: inherit;
   font-size: var(--rk-fs-md);
-  line-height: 1.4;
+  line-height: var(--rk-lh-md, 1.4);
   color: var(--rk-text-primary);
   resize: none;
   scrollbar-width: none;
@@ -95,6 +106,12 @@
 
 .room-chat-mobile .message-input-disabled .message-input-field {
   color: var(--rk-text-disabled);
+}
+
+.rk-scene-education .room-chat-mobile .message-input-field {
+  min-height: 36px;
+  padding: 10px 14px;
+  border-radius: 18px;
 }
 
 .room-chat-mobile .message-input-send {

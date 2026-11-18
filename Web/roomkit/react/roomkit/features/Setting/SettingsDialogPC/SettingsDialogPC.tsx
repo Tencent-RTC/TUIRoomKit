@@ -17,6 +17,8 @@ import AudioSettings from '../../Device/AudioSettings';
 import VideoSettings from '../../Device/VideoSettings/index';
 import ShareSettings from '../../ScreenShare/ShareSettings/ShareSettings';
 import GeneralSettings from '../GeneralSettings/GeneralSettings';
+import type { SettingsItem } from '../GeneralSettings/GeneralSettings';
+import type { BackgroundPhoto } from '../../VideoEffect/VirtualBackgroundSettings/virtualBackground';
 import VideoEffectSettings from './VideoEffectSettings';
 import './SettingsDialogPC.scss';
 
@@ -42,6 +44,9 @@ const TABS: SettingsTabConfig[] = [
 export interface SettingsDialogPCProps {
   open: boolean;
   activeTab: SettingsTab;
+  hiddenItems?: SettingsItem[];
+  /** Replaces the built-in virtual background photos on the video effect tab. */
+  virtualBackgroundImgList?: BackgroundPhoto[];
   onClose?: () => void;
   onSelect?: (tab: SettingsTab) => void;
 }
@@ -49,14 +54,22 @@ export interface SettingsDialogPCProps {
 const NAV_COMPACT_WIDTH = 560;
 
 export function SettingsDialogPC(props: SettingsDialogPCProps) {
-  const { open, activeTab, onClose, onSelect } = props;
+  const {
+    open,
+    activeTab,
+    hiddenItems = [],
+    virtualBackgroundImgList,
+    onClose,
+    onSelect,
+  } = props;
   const { t } = useI18n();
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   const [navOpen, setNavOpen] = useState(false);
   const [compactNav, setCompactNav] = useState(false);
   const compactNavRef = useRef(false);
-  const currentTab = TABS.find(tab => tab.id === activeTab) ?? TABS[0];
+  const visibleTabs = TABS.filter(tab => !hiddenItems.includes(tab.id as SettingsItem));
+  const currentTab = visibleTabs.find(tab => tab.id === activeTab) ?? visibleTabs[0];
 
   const navCompactObserverRef = useRef<ResizeObserver | null>(null);
 
@@ -136,6 +149,13 @@ export function SettingsDialogPC(props: SettingsDialogPCProps) {
   }
 
   const CurrentTabComponent = currentTab.component;
+  // Only the owning tab gets each prop.
+  let tabBody = <CurrentTabComponent />;
+  if (currentTab.id === 'general') {
+    tabBody = <GeneralSettings hiddenItems={hiddenItems} />;
+  } else if (currentTab.id === 'videoEffect') {
+    tabBody = <VideoEffectSettings virtualBackgroundImgList={virtualBackgroundImgList} />;
+  }
 
   return createPortal(
     open
@@ -168,7 +188,7 @@ export function SettingsDialogPC(props: SettingsDialogPCProps) {
               <div className="settings-nav-title">
                 {t('Settings.Title')}
               </div>
-              {TABS.map((tab) => {
+              {visibleTabs.map((tab) => {
                 const TabIcon = tab.icon;
                 return (
                   <button
@@ -198,7 +218,9 @@ export function SettingsDialogPC(props: SettingsDialogPCProps) {
                     <IconChevron size={16} />
                   </button>
                 )}
-                <h3 className="settings-content-title">{t(currentTab.titleKey)}</h3>
+                <h3 className="settings-content-title">
+                  {t(currentTab.titleKey)}
+                </h3>
                 <button
                   className="settings-close"
                   type="button"
@@ -209,7 +231,7 @@ export function SettingsDialogPC(props: SettingsDialogPCProps) {
                 </button>
               </header>
               <div className="settings-body">
-                <CurrentTabComponent />
+                {tabBody}
               </div>
             </section>
           </div>

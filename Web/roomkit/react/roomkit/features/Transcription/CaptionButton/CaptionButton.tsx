@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { IconAISubtitles, TUIDropdown } from '../../../base';
 import { useI18n } from '../../../i18n';
-import { bindOverflowSubmenu } from '../../../layouts/OverflowToolbarPC/overflowSubmenu';
+import type { OverflowBehavior } from '../../../layouts/OverflowToolbarPC/overflowItem';
 import ToolbarButtonPC from '../../../layouts/ToolbarButtonPC/ToolbarButtonPC';
 import CaptionConfirmDialog from './CaptionConfirmDialog';
 import CaptionEntryMenu from './CaptionEntryMenu';
@@ -17,39 +17,20 @@ export function CaptionButton(props: CaptionButtonProps) {
   const { transcriptOpen, active, onToggleTranscript } = props;
   const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
-  const anchorRef = useRef<HTMLDivElement | null>(null);
   const menu = useCaptionEntryMenu(transcriptOpen, () => onToggleTranscript?.());
-  const menuRef = useRef(menu);
-  menuRef.current = menu;
 
-  useEffect(() => {
-    const el = anchorRef.current;
-    if (!el) {
-      return undefined;
-    }
-    const keepCollapsedClosed = (event: MouseEvent) => {
-      if (getComputedStyle(el).display === 'none') {
-        event.stopPropagation();
-      }
-    };
-    el.addEventListener('click', keepCollapsedClosed, true);
-    const unbindSubmenu = bindOverflowSubmenu(el, () => {
-      const { current } = menuRef;
-      return {
-        title: t('AITools.Entry'),
-        hint: current.hint,
-        items: current.items,
-        run: current.run,
-      };
-    });
-    return () => {
-      el.removeEventListener('click', keepCollapsedClosed, true);
-      unbindSubmenu();
-    };
-  }, [t]);
+  /** Collapsed into the more menu, the same actions drill in place there. */
+  const overflowBehavior: OverflowBehavior = {
+    submenu: {
+      title: t('AITools.Entry'),
+      note: menu.note,
+      items: menu.items,
+      run: menu.run,
+    },
+  };
 
   return (
-    <div ref={anchorRef}>
+    <div>
       <TUIDropdown
         open={menuOpen}
         trigger="click"
@@ -66,6 +47,7 @@ export function CaptionButton(props: CaptionButtonProps) {
           icon={IconAISubtitles}
           active={active}
           hideMenu
+          overflowBehavior={overflowBehavior}
         />
       </TUIDropdown>
       <CaptionConfirmDialog />

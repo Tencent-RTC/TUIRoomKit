@@ -1,21 +1,19 @@
-import { IconCheck, IconChevron, IconGlobe, useI18n } from '../../../base';
+import { IconCheck, IconChevron, IconGlobe, i18n, useI18n } from '../../../base';
 import TopbarButton from '../../../layouts/TopbarButton';
 import './LanguageButton.scss';
 
-const LANGUAGE_STORAGE_KEY = 'tuiRoom-language';
 const options = [
   { code: 'zh-CN', label: '中文' },
   { code: 'en-US', label: 'English' },
 ];
 
 export function LanguageButton() {
-  const { language, setLanguage, t } = useI18n();
+  const { language, t } = useI18n();
   const label = language === 'en-US' ? 'English' : '中文';
 
   function selectLanguage(code: string, close: () => void) {
     if (code !== language) {
-      setLanguage(code);
-      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
+      i18n.changeLanguage(code);
     }
     close();
   }

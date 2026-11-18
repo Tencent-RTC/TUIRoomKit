@@ -12,10 +12,13 @@ import {
 } from './messageListScroll';
 import type { MessageAction } from './useMessageActions';
 import { provideMessageOverlay } from './useMessageOverlay';
+import { EDU_CLASS_EVENT_ID, EDU_TROPHY_EVENT_ID, isProtocolMessage, shouldHideMemberNotice } from '../customMessage';
 
 export interface MessageListProps {
   readonly channel: string;
   readonly messageActionList: readonly MessageAction[];
+  /** Whether member notices render in this list. */
+  readonly isShowMemberNotice?: boolean;
 }
 
 /** Provided by MessageList; toggles on every user scroll so open message menus can close. */
@@ -31,7 +34,6 @@ type ListHandle = {
   rowHeight: (key: PropertyKey) => number;
 };
 
-const MINUTE_MS = 60 * 1000;
 const HISTORY_SUPPRESS_MS = 2000;
 
 export function useMessageList(props: MessageListProps) {
@@ -69,12 +71,19 @@ export function useMessageList(props: MessageListProps) {
     const messages = (messageList ?? []).filter((message) => {
       if (overlay.statusOf(message) === MessageStatus.Deleted) return false;
       if (message.messageType === MessageType.Tips) return false;
+      // Protocol notices describe delivered changes, never pending or failed sends.
+      if (message.messageType === MessageType.Custom && overlay.statusOf(message) !== MessageStatus.SendSuccess) return false;
+      if (shouldHideMemberNotice(message)) return false;
+      // Member notices render only in chats that opt in.
+      if (isProtocolMessage(message, EDU_CLASS_EVENT_ID) && !props.isShowMemberNotice) return false;
+      // Trophy awards are pure celebration signals; they never render as bubbles.
+      if (isProtocolMessage(message, EDU_TROPHY_EVENT_ID)) return false;
       return true;
     });
     return keepInFlightAtEnd(messages, message => (
       isInFlightMessage(message, overlay.statusOf(message))
     ));
-  }, [messageList, overlay]);
+  }, [messageList, overlay, props.isShowMemberNotice]);
   const visibleMessagesRef = useRef(visibleMessages);
   visibleMessagesRef.current = visibleMessages;
   const overlayRef = useRef(overlay);
@@ -84,27 +93,6 @@ export function useMessageList(props: MessageListProps) {
   function setStickToBottom(value: boolean) {
     stickToBottomRef.current = value;
     setStickToBottomState(value);
-  }
-
-  function isCompact(index: number) {
-    const messages = visibleMessages;
-    const current = messages[index];
-    const previous = messages[index - 1];
-    if (!current || !previous) {
-      return false;
-    }
-    if (
-      overlay.statusOf(current) === MessageStatus.Recalled
-      || overlay.statusOf(previous) === MessageStatus.Recalled
-    ) {
-      return false;
-    }
-    if ((current.from?.userID || '') !== (previous.from?.userID || '')) {
-      return false;
-    }
-    const currentTime = overlay.timestampOf(current)?.getTime() ?? 0;
-    const previousTime = overlay.timestampOf(previous)?.getTime() ?? 0;
-    return Math.floor(currentTime / MINUTE_MS) === Math.floor(previousTime / MINUTE_MS);
   }
 
   function isNearBottom() {
@@ -252,6 +240,5 @@ export function useMessageList(props: MessageListProps) {
     visibleMessages,
     actions,
     onScroll,
-    isCompact,
   };
 }

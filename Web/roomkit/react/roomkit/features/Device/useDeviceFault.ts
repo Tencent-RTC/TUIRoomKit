@@ -4,9 +4,9 @@ import type { Root } from 'react-dom/client';
 import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
 import { getPlatform } from '@tencentcloud/universal-api';
 import { DeviceError, DeviceType, useDeviceState } from 'tuikit-atomicx-react/room';
-import { TUIToast } from '../../base';
+import { TUIToast, resolveOverlayHost } from '../../base';
 import { t } from '../../i18n';
-import { ensureAppendHost } from '../../base/command/appendTo';
+import { resolveOrientation } from '../../base/headless/useOrientation';
 import DeviceFaultDialog from './DeviceFaultDialog';
 import DeviceFaultSheet from './DeviceFaultSheet';
 
@@ -438,6 +438,14 @@ const H5_COPY: Record<DeviceFaultKind, Record<'camera' | 'microphone', FaultCopy
   ),
 };
 
+/** Landscape H5 uses the centered dialog. Portrait H5 keeps the sheet. */
+function isH5Landscape(root: HTMLElement | null): boolean {
+  if (!isH5 || !root) {
+    return false;
+  }
+  return resolveOrientation(root.clientWidth, root.clientHeight) === 'landscape';
+}
+
 export function resolveDeviceFaultView(
   kind: DeviceFaultKind,
   target: DeviceFaultTarget,
@@ -536,38 +544,61 @@ function clearDeviceFault(deviceType: DeviceType.Camera | DeviceType.Microphone)
   });
 }
 
-function getDialogView(): DeviceFaultView | null {
-  const fault = state.dialogFault;
-  return fault ? resolveDeviceFaultView(fault.kind, fault.target) : null;
+let dialogRoot: Root | null = null;
+let orientationObserver: ResizeObserver | null = null;
+
+function stopOrientationWatch() {
+  orientationObserver?.disconnect();
+  orientationObserver = null;
 }
 
-let dialogRoot: Root | null = null;
+/** A turn while the fault is open swaps the sheet and the dialog. */
+function watchOrientation(host: HTMLElement) {
+  if (orientationObserver) {
+    return;
+  }
+  if (typeof ResizeObserver === 'undefined') {
+    return;
+  }
+  orientationObserver = new ResizeObserver(() => renderDialog());
+  orientationObserver.observe(host);
+}
+
 function renderDialog() {
-  const dialogView = getDialogView();
-  if (!state.faultDialogOpen || !dialogView) {
+  const fault = state.dialogFault;
+  if (!state.faultDialogOpen || !fault) {
+    stopOrientationWatch();
     if (dialogRoot) {
       dialogRoot.render(null);
     }
     return;
   }
-  /* The dialog belongs to no room or page, so it goes to a host on the body. That host
-     is a RoomKitProvider of its own, which is what carries the theme tokens. */
-  const { host } = ensureAppendHost(document.body);
+  /* Stay on the mounted scene provider so education green (or a host primaryColor)
+     reaches the lock and the primary button. Fall back to a body host only when
+     no RoomKitProvider is on the page. */
+  const { root, host } = resolveOverlayHost();
   if (!host) {
     return;
   }
+  if (root) {
+    watchOrientation(root);
+  }
+  const faultView = resolveDeviceFaultView(fault.kind, fault.target);
   dialogRoot ??= createRoot(document.createElement('div'));
-  /* Screen share stays a centered dialog. Camera and microphone faults on H5 use the
-     bottom sheet from the mobile design. */
-  const sheet = isH5 && dialogView.target !== 'screen';
-  dialogRoot.render(createElement(sheet ? DeviceFaultSheet : DeviceFaultDialog, {
+  /* Microphone and camera faults on H5 use the bottom sheet. Landscape H5
+     uses the compact dialog, with the same phone copy. */
+  const isLandscape = isH5Landscape(root);
+  const shared = {
     open: true,
-    faultView: dialogView,
+    faultView,
     host,
     title: state.errorTitle,
     description: state.errorDesc,
     close: closeDialog,
-  }));
+  };
+  dialogRoot.render(isH5 && !isLandscape
+    ? createElement(DeviceFaultSheet, shared)
+    : createElement(DeviceFaultDialog, { ...shared, compact: isLandscape }));
 }
 
 let watching = false;

@@ -97,18 +97,26 @@
   height: 22px;
 }
 
-.toolbar-button-notice {
+/* The device-fault badge: a "!" round tag hung on the icon's top-right corner.
+   Sizes read custom properties so a compact scene (education topbar) can scale
+   it without re-styling. */
+.toolbar-button-fault-badge {
   position: absolute;
-  right: -1px;
-  bottom: 0;
-  color: var(--rk-danger);
+  top: var(--rk-fault-badge-top, -4px);
+  right: var(--rk-fault-badge-right, -6px);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--rk-fault-badge, 14px);
+  height: var(--rk-fault-badge, 14px);
+  font-size: var(--rk-fault-badge-font, 9px);
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
   pointer-events: none;
-}
-
-/* The rule above sizes every icon in the chip to 22px; the badge keeps its own box. */
-.toolbar-button-notice svg {
-  width: 100%;
-  height: 100%;
+  background: var(--rk-warning);
+  border: 1.5px solid var(--rk-bg-surface);
+  border-radius: 50%;
 }
 
 /* The popover wraps the caret in its own anchor, so the stretch has to start there
@@ -156,4 +164,13 @@
 
 .toolbar-button[data-menu-open='1'] .toolbar-button-caret svg {
   transform: rotate(180deg);
+}
+
+/* Down variant rests pointing down and flips up while the menu is open */
+.toolbar-button[data-caret-direction='down'] .toolbar-button-caret svg {
+  transform: rotate(180deg);
+}
+
+.toolbar-button[data-caret-direction='down'][data-menu-open='1'] .toolbar-button-caret svg {
+  transform: none;
 }

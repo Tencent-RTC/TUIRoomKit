@@ -1,0 +1,21 @@
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--rk-fs-md);
+
+  .rk-input-field {
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.login-field-label,
+.login-field-error {
+  font-size: var(--rk-fs-sm);
+  line-height: 18px;
+  color: var(--rk-text-secondary);
+}
+
+.login-field-error {
+  color: var(--rk-danger);
+}

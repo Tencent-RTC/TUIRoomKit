@@ -1,8 +1,11 @@
 import { TUIErrorCode } from '@tencentcloud/tuiroom-engine-js';
+import { getRoomErrorKey } from '../../utils/roomError';
 import type { RoomEntryPhase } from './roomEntry';
 
 export type PasswordChallenge = 'required' | 'incorrect';
-export type RoomEntryFailureReason = 'login' | 'profile' | 'roomNotFound' | 'roomFull' | 'cleanup' | 'unknown';
+
+/** IM login error: the SDKAppID's daily active users exceed the current package limit. */
+const DAU_LIMIT_EXCEEDED_CODE = 72000;
 
 /** Preserve both the entry failure and the failed attempt to release SDK resources. */
 export class RoomCleanupError extends AggregateError {
@@ -23,19 +26,22 @@ export function getPasswordChallenge(error: unknown): PasswordChallenge | undefi
   return undefined;
 }
 
-export function getRoomEntryFailureReason(error: unknown, phase: RoomEntryPhase): RoomEntryFailureReason {
+/**
+ * i18n key of the entry-failure notice. Login and profile errors come from IM, whose
+ * codes overlap the engine's, so only the joining phase resolves through roomError.
+ */
+export function getRoomEntryFailureKey(error: unknown, phase: RoomEntryPhase): string {
   if (error instanceof RoomCleanupError) {
-    return 'cleanup';
+    return 'RoomEntry.Failure.cleanup';
   }
-  if (phase === 'login' || phase === 'profile') {
-    return phase;
+  if (phase === 'login') {
+    const code = (error as { code?: number })?.code;
+    return code === DAU_LIMIT_EXCEEDED_CODE ? 'RoomEntry.Failure.dauLimitExceeded' : 'RoomEntry.Failure.login';
   }
-  const code = (error as { code?: number })?.code;
-  if (code === TUIErrorCode.ERR_ROOM_ID_NOT_EXIST) {
-    return 'roomNotFound';
+  if (phase === 'profile') {
+    return 'RoomEntry.Failure.profile';
   }
-  if (code === TUIErrorCode.ERR_ROOM_USER_FULL) {
-    return 'roomFull';
-  }
-  return 'unknown';
+  return getRoomErrorKey(error, {
+    featureErrors: { [TUIErrorCode.ERR_ROOM_USER_FULL]: 'RoomEntry.Failure.roomFull' },
+  });
 }

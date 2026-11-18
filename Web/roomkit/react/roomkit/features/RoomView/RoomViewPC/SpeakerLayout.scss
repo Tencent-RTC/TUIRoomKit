@@ -48,18 +48,20 @@
   display: none;
 }
 
-/* The tile is the one clip for the video and the overlay. */
+/* The tile only sets the corners; the participant view rounds its own video to them.
+   It must not clip, or the overlay's speaking glow would be cut off. */
 .speaker-layout-tile {
   position: relative;
   flex-shrink: 0;
-  overflow: hidden;
   background: var(--room-view-tile-bg);
   border-radius: var(--speaker-tile-radius);
 }
 
+/* Passes the tile's corners down to the participant view inside. */
 .speaker-layout-video {
   width: 100%;
   height: 100%;
+  border-radius: inherit;
 }
 
 .speaker-layout-video.is-hidden {
@@ -74,15 +76,6 @@
 .speaker-layout-tile:not(.speaker-layout-tile-main) {
   width: var(--speaker-tile-width);
   height: var(--speaker-tile-height);
-}
-
-/* The speaking halo reads outside the tile box, so the layout that owns the box draws
-   it: a shadow on the tile is not clipped by the tile's own overflow, while anything
-   the overlay could draw would be. The overlay stays the single source of the state. */
-.speaker-layout-tile:has(.participant-view-overlay.is-speaking) {
-  box-shadow:
-    0 0 0 1.5px color-mix(in srgb, #34c759 60%, transparent),
-    0 0 18px color-mix(in srgb, #34c759 18%, transparent);
 }
 
 /* Speaker on the side: the strip is pinned right, the main area takes the rest of the row. */

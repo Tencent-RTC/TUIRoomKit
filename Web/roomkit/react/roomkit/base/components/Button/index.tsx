@@ -69,9 +69,11 @@ export function TUIButton(props: TUIButtonProps) {
             </span>
           )
           : null}
-      <span className="rk-btn-text">
-        {children}
-      </span>
+      {children != null && children !== false && (
+        <span className="rk-btn-text">
+          {children}
+        </span>
+      )}
       {!loading && iconPosition === 'end' && hasIcon && (
         <span className="rk-btn-icon">
           {iconNode}

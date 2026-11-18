@@ -18,8 +18,8 @@
   flex: 1;
   min-height: 0;
 
-  /* The PC panel insets the list; mobile keeps the inset on `.message-list-mobile`. */
-  padding: 0;
+  /* This class shares the MessageList root, so it must preserve the mobile inset. */
+  padding: 10px 12px;
   overflow: hidden;
 }
 

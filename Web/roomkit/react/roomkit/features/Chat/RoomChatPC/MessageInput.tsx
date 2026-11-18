@@ -17,6 +17,8 @@ export interface MessageInputProps {
   disabled?: boolean;
   placeholder?: string;
   maxLength?: number;
+  /** Hides the toolbar row; the tools stay mounted but hidden. */
+  isHideOperator?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -27,6 +29,7 @@ export function MessageInput(props: MessageInputProps) {
     disabled = false,
     placeholder = undefined,
     maxLength = 1000,
+    isHideOperator = false,
     className,
     style,
   } = props;
@@ -58,7 +61,7 @@ export function MessageInput(props: MessageInputProps) {
   return (
     <div
       ref={setMessageInputEl}
-      className={['message-input', disabled ? 'message-input-disabled' : '', className].filter(Boolean).join(' ')}
+      className={['message-input', disabled ? 'message-input-disabled' : '', isHideOperator ? 'message-input-bare' : '', className].filter(Boolean).join(' ')}
       style={style}
     >
       <div className="message-input-toolbar">

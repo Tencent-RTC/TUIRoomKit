@@ -15,7 +15,13 @@ import { useDeviceFault } from '../useDeviceFault';
 import MicLevelIcon from './MicLevelIcon';
 import './MicButtonMobile.scss';
 
-export function MicButtonMobile() {
+export interface MicButtonMobileProps {
+  /** Glyph box in px. Keep it equal to the toolbar slot, or the level drifts off the capsule. */
+  size?: number;
+}
+
+export function MicButtonMobile(props: MicButtonMobileProps) {
+  const { size = 20 } = props;
   const { t } = useI18n();
 
   const { microphoneStatus, microphoneLastError, openLocalMicrophone } = useDeviceState();
@@ -74,7 +80,7 @@ export function MicButtonMobile() {
         void toggleMicrophone();
       }}
     >
-      {microphoneOn ? <MicLevelIcon size={20} /> : <IconMicOff size={20} />}
+      {microphoneOn ? <MicLevelIcon size={size} /> : <IconMicOff size={size} />}
       {hasDeviceError && <span className="mic-button-mobile-fault">!</span>}
     </ToolbarButtonMobile>
   );

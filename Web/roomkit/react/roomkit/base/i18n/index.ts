@@ -1,10 +1,10 @@
-import { useSyncExternalStore } from 'react';
+import i18next from 'i18next';
+import type { i18n as I18nInstance } from 'i18next';
+import { useCallback, useSyncExternalStore } from 'react';
 
 export type Language = string;
 
 const DEFAULT_LANGUAGE = 'en-US';
-
-const resources: Record<string, Record<string, string>> = {};
 
 function getBrowserLanguage(): Language {
   if (typeof navigator === 'undefined' || !navigator.language) {
@@ -13,85 +13,59 @@ function getBrowserLanguage(): Language {
   return navigator.language.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en-US';
 }
 
-let currentLanguage: Language = getBrowserLanguage();
-const listeners = new Set<() => void>();
+/**
+ * The RoomKit i18next instance, exposed as is: use the i18next API on it directly
+ * (`changeLanguage`, `addResourceBundle`, `getFixedT`, ...).
+ *
+ * - Private, so a host app that also runs i18next keeps its own resources and language.
+ * - Base wording lives in the default `translation` namespace; each scene rewords it in
+ *   a namespace named after the scene and falls back to the base wording.
+ */
+// Annotated so the published typings reference i18next's own `i18n` type.
+export const i18n: I18nInstance = i18next.createInstance();
 
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
+i18n.init({
+  lng: getBrowserLanguage(),
+  fallbackLng: DEFAULT_LANGUAGE,
+  fallbackNS: 'translation',
+  resources: {},
+  // Keys are flat strings that may contain `.` and `:` (e.g. `Schedule.TZ.UTC+08:00`).
+  keySeparator: false,
+  nsSeparator: false,
+  // React escapes rendered text; escaping here too would show names like `A&B` as `A&amp;B`.
+  interpolation: { escapeValue: false },
+  // Resources are added in code, so init finishes synchronously.
+  initImmediate: false,
+});
+
+function subscribeLanguage(listener: () => void): () => void {
+  i18n.on('languageChanged', listener);
   return () => {
-    listeners.delete(listener);
+    i18n.off('languageChanged', listener);
   };
 }
 
 function getLanguage(): Language {
-  return currentLanguage;
+  return i18n.language;
 }
 
-function interpolate(template: string, params?: Record<string, unknown>): string {
-  if (!params) {
-    return template;
-  }
-  return template.replace(/\{\{(\w+)\}\}/g, (placeholder, name: string) =>
-    Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : placeholder,
-  );
-}
+type TFunction = (key: string, params?: Record<string, unknown>) => string;
 
-/** Falls back to the default language, then to the key itself. */
-export function t(key: string, params?: Record<string, unknown>): string {
-  const table = resources[currentLanguage];
-  const template = table?.[key] ?? resources[DEFAULT_LANGUAGE]?.[key] ?? key;
-  return interpolate(template, params);
-}
-
-export function setLanguage(language: Language): void {
-  if (currentLanguage === language) {
-    return;
-  }
-  currentLanguage = language;
-  listeners.forEach(listener => listener());
-}
-
-export function addTranslations(
-  language: Language,
-  translations: Record<string, string>,
-  overwrite = true,
-): void {
-  if (!resources[language]) {
-    resources[language] = {};
-  }
-  const table = resources[language];
-  if (overwrite) {
-    Object.assign(table, translations);
-    return;
-  }
-  Object.entries(translations).forEach(([key, value]) => {
-    if (!Object.prototype.hasOwnProperty.call(table, key)) {
-      table[key] = value;
-    }
-  });
-}
+/** Base wording in the current language. Components call `useI18n` so they re-render on a switch. */
+export const t: TFunction = (key, params) => i18n.t(key, params) as string;
 
 /**
- * Subscribes the calling component to language changes. Components that render
- * translated text must call this so they re-render when the language switches.
+ * Subscribes the calling component to language changes.
+ * With a `namespace`, `t` reads that namespace first and the base wording second.
  */
-export function useI18n() {
-  const language = useSyncExternalStore(subscribe, getLanguage, getLanguage);
+export function useI18n(namespace?: string) {
+  const language = useSyncExternalStore(subscribeLanguage, getLanguage, getLanguage);
+  const namespacedT = useCallback<TFunction>(
+    (key, params) => i18n.getFixedT(language, namespace ?? null)(key, params) as string,
+    [language, namespace],
+  );
   return {
+    t: namespace ? namespacedT : t,
     language,
-    t,
-    setLanguage,
-    addTranslations,
   };
 }
-
-export const i18n = {
-  get language(): Language {
-    return currentLanguage;
-  },
-
-  setLanguage,
-  changeLanguage: setLanguage,
-  addTranslations,
-  subscribe,
-};

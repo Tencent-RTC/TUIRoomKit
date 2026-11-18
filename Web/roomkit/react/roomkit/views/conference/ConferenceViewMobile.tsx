@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { useRoomParticipantState, useRoomState } from 'tuikit-atomicx-react/room';
+import { useRoomState } from 'tuikit-atomicx-react/room';
 import {
   IconPhone,
   RoomKitProvider,
@@ -15,6 +15,7 @@ import { useI18n } from '../../i18n';
 import { roomEntry } from '../../core/session';
 import type { RoomEntryPhase } from '../../core/session';
 import {
+  AnnotationButtonMobile,
   CameraButtonMobile,
   CaptionConfirmDialog,
   CaptionEntryMobile,
@@ -35,6 +36,7 @@ import {
   SettingsDialogMobile,
   TranscriptListMobile,
   useASRState,
+  useSingleStageStream,
   useSubtitleViewState,
 } from '../../features';
 import OverflowToolbarMobile from '../../layouts/OverflowToolbarMobile';
@@ -57,8 +59,10 @@ export function ConferenceViewMobile(props: ConferenceViewMobileProps) {
   const { uiConfig } = useUIConfig();
   const ParticipantViewUI = uiConfig.participantViewUI;
   const { currentRoom } = useRoomState();
-  const { participantList } = useRoomParticipantState();
-  const participantCount = currentRoom?.participantCount || participantList.length;
+  const [annotating, setAnnotating] = useState(false);
+  // The share page's corner window follows the speaker, like the desktop mini window.
+  const { speakerStream } = useSingleStageStream();
+  const participantCount = currentRoom?.participantCount ?? 0;
   // Mounted before the join runs, so the recording notice catches the start event a late joiner receives.
   useRoomTips({ onLeave: () => onLeave?.() });
   useAutoPlayDialog();
@@ -135,49 +139,52 @@ export function ConferenceViewMobile(props: ConferenceViewMobileProps) {
               <CurrentRoomInfoMobile roomName={roomName} />
               <LocalNetworkInfoMobile />
               <CloudRecordingStatusMobile />
-              <div className="conference-mobile-leave">
-                <TUIPopover
-                  open={leaveMenuOpen}
-                  disabled={!canEndRoom}
-                  placement="bottom-end"
-                  offset={10}
-                  padded={false}
-                  showArrow
-                  onUpdateOpen={setLeaveMenuOpen}
-                  contentSlot={(
-                    <div className="conference-mobile-leave-menu" role="menu">
-                      <TUIButton variant="danger" block role="menuitem" onClick={() => exit('end')}>
-                        {t('Room.End')}
-                      </TUIButton>
-                      <TUIButton variant="ghost" block role="menuitem" onClick={() => exit('leave')}>
-                        {t('Room.Leave')}
-                      </TUIButton>
-                    </div>
-                  )}
-                >
-                  <TUIButton
-                    className={['conference-mobile-leave-trigger', leaveMenuOpen ? 'is-open' : ''].filter(Boolean).join(' ')}
-                    variant="danger"
-                    aria-label={leaveMenuOpen ? t('Room.Cancel') : t('Room.Leave')}
-                    aria-haspopup={canEndRoom ? 'menu' : undefined}
-                    aria-expanded={canEndRoom ? leaveMenuOpen : undefined}
-                    onClick={() => {
-                      if (!canEndRoom) {
-                        void exit('leave');
-                      }
-                    }}
+              {uiConfig.widgetVisible.LeaveRoomWidget !== false && (
+                <div className="conference-mobile-leave">
+                  <TUIPopover
+                    open={leaveMenuOpen}
+                    disabled={!canEndRoom}
+                    placement="bottom-end"
+                    offset={10}
+                    padded={false}
+                    showArrow
+                    onUpdateOpen={setLeaveMenuOpen}
+                    contentSlot={(
+                      <div className="conference-mobile-leave-menu" role="menu">
+                        <TUIButton variant="danger" block role="menuitem" onClick={() => exit('end')}>
+                          {t('Room.End')}
+                        </TUIButton>
+                        <TUIButton variant="ghost" block role="menuitem" onClick={() => exit('leave')}>
+                          {t('Room.Leave')}
+                        </TUIButton>
+                      </div>
+                    )}
                   >
-                    {leaveMenuOpen
-                      ? t('Room.Cancel')
-                      : <IconPhone className="conference-mobile-leave-icon" size={15} />}
-                  </TUIButton>
-                </TUIPopover>
-              </div>
+                    <TUIButton
+                      className={['conference-mobile-leave-trigger', leaveMenuOpen ? 'is-open' : ''].filter(Boolean).join(' ')}
+                      variant="danger"
+                      aria-label={leaveMenuOpen ? t('Room.Cancel') : t('Room.Leave')}
+                      aria-haspopup={canEndRoom ? 'menu' : undefined}
+                      aria-expanded={canEndRoom ? leaveMenuOpen : undefined}
+                      onClick={() => {
+                        if (!canEndRoom) {
+                          void exit('leave');
+                        }
+                      }}
+                      iconSlot={leaveMenuOpen ? undefined : <IconPhone className="conference-mobile-leave-icon" size={15} />}
+                    >
+                      {leaveMenuOpen ? t('Room.Cancel') : null}
+                    </TUIButton>
+                  </TUIPopover>
+                </div>
+              )}
             </header>
 
             <main className="conference-mobile-stage">
               <RoomViewMobile
                 hideOverlay={Boolean(ParticipantViewUI)}
+                shareLocked={annotating}
+                pipParticipant={speakerStream?.participant}
                 participantViewUISlot={ParticipantViewUI
                   ? ({ participant, streamType }) => (
                     <ParticipantViewUI participant={participant} streamType={streamType} />
@@ -193,24 +200,31 @@ export function ConferenceViewMobile(props: ConferenceViewMobileProps) {
             </main>
 
             <footer className="conference-mobile-toolbar">
-              <MicButtonMobile />
-              <CameraButtonMobile />
+              {uiConfig.widgetVisible.MicWidget !== false && <MicButtonMobile />}
+              {uiConfig.widgetVisible.CameraWidget !== false && <CameraButtonMobile />}
               <OverflowToolbarMobile className="conference-mobile-toolbar-overflow">
-                <ParticipantButtonMobile
-                  active={activePanel === 'participants'}
-                  onClick={() => togglePanel('participants')}
-                />
-                <ChatButtonMobile
-                  active={activePanel === 'chat'}
-                  isChatActive={activePanel === 'chat'}
-                  onClick={() => togglePanel('chat')}
-                />
-                <CaptionEntryMobile
-                  active={capViewOpen}
-                  onClick={() => togglePanel('captions')}
-                />
-                <CloudRecordingButtonMobile />
-                <SettingButtonMobile onClick={() => setSettingsOpen(true)} />
+                {uiConfig.widgetVisible.MemberWidget !== false && (
+                  <ParticipantButtonMobile
+                    active={activePanel === 'participants'}
+                    onClick={() => togglePanel('participants')}
+                  />
+                )}
+                {uiConfig.widgetVisible.RoomChatWidget !== false && (
+                  <ChatButtonMobile
+                    active={activePanel === 'chat'}
+                    isChatActive={activePanel === 'chat'}
+                    onClick={() => togglePanel('chat')}
+                  />
+                )}
+                {uiConfig.widgetVisible.AIToolsWidget !== false && (
+                  <CaptionEntryMobile
+                    active={capViewOpen}
+                    onClick={() => togglePanel('captions')}
+                  />
+                )}
+                {uiConfig.widgetVisible.RecordingWidget !== false && <CloudRecordingButtonMobile />}
+                {uiConfig.widgetVisible.AnnotationWidget !== false && <AnnotationButtonMobile onUpdateActive={setAnnotating} />}
+                {uiConfig.widgetVisible.SettingsWidget !== false && <SettingButtonMobile onClick={() => setSettingsOpen(true)} />}
               </OverflowToolbarMobile>
             </footer>
 

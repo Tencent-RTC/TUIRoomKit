@@ -3,11 +3,17 @@ import { useI18n } from '../../../i18n';
 import CameraPreview from '../../Device/VideoSettings/CameraPreview';
 import BeautySettings from '../../VideoEffect/BeautySettings/BeautySettings';
 import VirtualBackgroundSettings from '../../VideoEffect/VirtualBackgroundSettings/VirtualBackgroundSettings';
+import type { BackgroundPhoto } from '../../VideoEffect/VirtualBackgroundSettings/virtualBackground';
 import './VideoEffectSettings.scss';
+
+export interface VideoEffectSettingsProps {
+  virtualBackgroundImgList?: BackgroundPhoto[];
+}
 
 type EffectPanel = 'background' | 'beauty';
 
-export function VideoEffectSettings() {
+export function VideoEffectSettings(props: VideoEffectSettingsProps) {
+  const { virtualBackgroundImgList } = props;
   const { t } = useI18n();
   const [panel, setPanel] = useState<EffectPanel>('background');
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -42,6 +48,7 @@ export function VideoEffectSettings() {
       <VirtualBackgroundSettings
         style={panel === 'background' ? undefined : { display: 'none' }}
         previewReady={isPreviewing}
+        virtualBackgroundImgList={virtualBackgroundImgList}
       />
       <BeautySettings
         style={panel === 'beauty' ? undefined : { display: 'none' }}

@@ -1,0 +1,61 @@
+/* Inline rather than an <img>: the strokes and fills follow the theme tokens.
+   Fixed accents come from the views-edu illustration. */
+.edu-stage-empty-art {
+  --art-stroke: color-mix(in srgb, var(--rk-text-primary) 34%, transparent);
+  --art-sun: #f5c14a;
+  --art-purple: #ba68c8;
+
+  width: min(200px, 36%);
+  height: auto;
+  stroke-width: 1.6;
+
+  .art-shadow { fill: color-mix(in srgb, var(--rk-text-primary) 6%, transparent); }
+  .art-line { stroke: var(--art-stroke); }
+
+  .art-board {
+    fill: color-mix(in srgb, var(--rk-text-primary) 6%, var(--rk-bg-surface));
+    stroke: var(--art-stroke);
+  }
+
+  .art-slot {
+    fill: color-mix(in srgb, var(--rk-brand) 6%, transparent);
+    stroke: color-mix(in srgb, var(--rk-brand) 55%, transparent);
+    stroke-dasharray: 4 4;
+  }
+
+  .art-ink {
+    stroke: var(--rk-brand);
+    stroke-width: 2.4;
+  }
+
+  .art-sun { fill: var(--art-sun); }
+  .art-brand { fill: var(--rk-brand); }
+  .art-purple { fill: var(--art-purple); }
+
+  .art-tray {
+    fill: color-mix(in srgb, var(--rk-text-primary) 12%, var(--rk-bg-surface));
+    stroke: var(--art-stroke);
+  }
+
+  .art-pen { fill: color-mix(in srgb, var(--rk-text-primary) 22%, var(--rk-bg-surface)); }
+  .art-pen-cap { fill: var(--rk-brand); }
+
+  .art-card {
+    fill: color-mix(in srgb, var(--rk-text-primary) 10%, var(--rk-bg-surface));
+    stroke: var(--art-stroke);
+  }
+
+  .art-screen { fill: color-mix(in srgb, var(--art-purple) 22%, transparent); }
+
+  .art-share {
+    stroke: var(--art-purple);
+    stroke-width: 2;
+  }
+
+  .art-bubble { fill: color-mix(in srgb, var(--rk-brand) 30%, transparent); }
+
+  .art-dash {
+    stroke: var(--art-stroke);
+    stroke-dasharray: 2 4;
+  }
+}

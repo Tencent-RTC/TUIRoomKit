@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { MessageInfo } from 'tuikit-atomicx-react/chat';
 import {
   TUIAvatar,
@@ -23,10 +23,20 @@ import './ChatMessage.scss';
 export interface ChatMessageProps {
   message: MessageInfo;
   actions?: readonly MessageAction[];
-  compact?: boolean;
   mobile?: boolean;
+  /** Hides the message timestamp. */
+  isHideTimestamp?: boolean;
+  /** Tints the room owner's bubbles with the self-message accent. */
+  isHighlightOwner?: boolean;
+  /** Replaces the timestamp after the sender name. */
+  metaSlot?: (scope: ChatMessageMetaScope) => ReactNode;
   className?: string;
   style?: CSSProperties;
+}
+
+export interface ChatMessageMetaScope {
+  message: MessageInfo;
+  timeText: string;
 }
 
 const EMPTY_ACTIONS: MessageAction[] = [];
@@ -35,8 +45,10 @@ export function ChatMessage(props: ChatMessageProps) {
   const {
     message,
     actions = EMPTY_ACTIONS,
-    compact = false,
     mobile = false,
+    isHideTimestamp = false,
+    isHighlightOwner = false,
+    metaSlot,
     className,
     style,
   } = props;
@@ -48,6 +60,7 @@ export function ChatMessage(props: ChatMessageProps) {
     recalledText,
     senderAvatar,
     senderName,
+    isOwnerMessage,
     timeText,
     isFailed,
     isSending,
@@ -64,11 +77,12 @@ export function ChatMessage(props: ChatMessageProps) {
     videoPoster,
     videoDurationText,
     fallbackText,
+    noticeText,
     reeditRecalled,
     retrySend,
     onActionCommand,
     downloadFile,
-  } = useChatMessage({ message, actions, compact });
+  } = useChatMessage({ message, actions, isHighlightOwner });
 
   const menuIconSize = mobile ? 14 : 16;
 
@@ -146,109 +160,105 @@ export function ChatMessage(props: ChatMessageProps) {
         'chat-message',
         mobile ? 'chat-message-mobile' : '',
         isRecalled ? 'chat-message-recalled' : '',
-        !isRecalled && message.isSentBySelf ? 'chat-message-self' : '',
-        !isRecalled && compact ? 'chat-message-compact' : '',
+        !isRecalled && bubbleKind === 'notice' ? 'chat-message-notice' : '',
+        !isRecalled && bubbleKind !== 'notice' && message.isSentBySelf ? 'chat-message-self' : '',
+        !isRecalled && bubbleKind !== 'notice' && isOwnerMessage ? 'chat-message-owner' : '',
         className,
       ].filter(Boolean).join(' ')}
       style={style}
     >
-      {isRecalled
-        ? (
-          <>
-            <span>{recalledText}</span>
-            {canReedit && (
-              <button
-                type="button"
-                className="chat-message-reedit"
-                onClick={reeditRecalled}
-              >
-                {t('RoomChat.reedit')}
-              </button>
-            )}
-          </>
-        )
-        : (
-          <>
-            {!compact
-              ? (
-                <TUIAvatar
-                  className="chat-message-avatar"
-                  src={senderAvatar}
-                  alt={senderName}
-                  size={mobile ? 28 : 32}
-                />
-              )
-              : (
-                <span
-                  className="chat-message-avatar-spacer"
-                  aria-hidden="true"
-                />
+      {isRecalled && (
+        <>
+          <span>{recalledText}</span>
+          {canReedit && (
+            <button
+              type="button"
+              className="chat-message-reedit"
+              onClick={reeditRecalled}
+            >
+              {t('RoomChat.reedit')}
+            </button>
+          )}
+        </>
+      )}
+      {!isRecalled && bubbleKind === 'notice' && (
+        <span className="chat-message-notice-text">
+          {noticeText}
+        </span>
+      )}
+      {!isRecalled && bubbleKind !== 'notice' && (
+        <>
+          <TUIAvatar
+            className="chat-message-avatar"
+            src={senderAvatar}
+            alt={senderName}
+            size={mobile ? 28 : 32}
+          />
+          <div className="chat-message-body">
+            <div className="chat-message-meta">
+              <span className="chat-message-name">{senderName}</span>
+              {metaSlot
+                ? metaSlot({ message, timeText })
+                : timeText && !isHideTimestamp && <span className="chat-message-time">{timeText}</span>}
+            </div>
+            <div className="chat-message-row">
+              {message.isSentBySelf && (
+                <span className="chat-message-aside">
+                  {isFailed && (
+                    <button
+                      type="button"
+                      className="chat-message-fail"
+                      aria-label={t('RoomChat.retry')}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        retrySend();
+                      }}
+                    >
+                      <IconFail size={16} />
+                    </button>
+                  )}
+                  {!isFailed && isSending && (
+                    <span className="chat-message-status">
+                      <IconLoading size={14} spin />
+                    </span>
+                  )}
+                </span>
               )}
-            <div className="chat-message-body">
-              {!compact && (
-                <div className="chat-message-meta">
-                  <span className="chat-message-name">{senderName}</span>
-                  {timeText && <span className="chat-message-time">{timeText}</span>}
-                </div>
-              )}
-              <div className="chat-message-row">
-                {message.isSentBySelf && (
-                  <span className="chat-message-aside">
-                    {isFailed && (
-                      <button
-                        type="button"
-                        className="chat-message-fail"
-                        aria-label={t('RoomChat.retry')}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          retrySend();
-                        }}
-                      >
-                        <IconFail size={16} />
-                      </button>
-                    )}
-                    {!isFailed && isSending && (
-                      <span className="chat-message-status">
-                        <IconLoading size={14} spin />
-                      </span>
-                    )}
-                  </span>
-                )}
-                <div className="chat-message-hit">
-                  <TUIDropdown
-                    open={menuOpen}
-                    disabled={visibleActions.length === 0}
-                    placement={message.isSentBySelf ? 'bottom-end' : 'bottom-start'}
-                    offset={2}
-                    contextmenu
-                    onCommand={onActionCommand}
-                    onUpdateOpen={setMenuOpen}
-                    menuSlot={(
-                      <div className={['chat-message-menu', mobile ? 'chat-message-menu-mobile' : ''].filter(Boolean).join(' ')}>
-                        {visibleActions.map(action => (
-                          <TUIDropdownItem
-                            key={action.key}
-                            command={action.key}
-                            danger={action.danger}
-                          >
-                            {action.key === 'copy' && <IconCopy size={menuIconSize} />}
-                            {action.key === 'recall' && <IconRecall size={menuIconSize} />}
-                            {action.key === 'delete' && <IconDelete size={menuIconSize} />}
-                            <span>{action.label}</span>
-                          </TUIDropdownItem>
-                        ))}
-                      </div>
-                    )}
-                  >
-                    <div className={`chat-message-bubble chat-message-bubble-${bubbleKind}`}>
-                      {renderBubble()}
+              <div className="chat-message-hit">
+                <TUIDropdown
+                  open={menuOpen}
+                  disabled={visibleActions.length === 0}
+                  placement={message.isSentBySelf ? 'bottom-end' : 'bottom-start'}
+                  offset={2}
+                  contextmenu
+                  onCommand={onActionCommand}
+                  onUpdateOpen={setMenuOpen}
+                  menuSlot={(
+                    <div className={['chat-message-menu', mobile ? 'chat-message-menu-mobile' : ''].filter(Boolean).join(' ')}>
+                      {visibleActions.map(action => (
+                        <TUIDropdownItem
+                          key={action.key}
+                          command={action.key}
+                          danger={action.danger}
+                        >
+                          {action.key === 'copy' && <IconCopy size={menuIconSize} />}
+                          {action.key === 'recall' && <IconRecall size={menuIconSize} />}
+                          {action.key === 'delete' && <IconDelete size={menuIconSize} />}
+                          <span>{action.label}</span>
+                        </TUIDropdownItem>
+                      ))}
                     </div>
-                  </TUIDropdown>
-                </div>
+                  )}
+                >
+                  <div className={`chat-message-bubble chat-message-bubble-${bubbleKind}`}>
+                    {renderBubble()}
+                  </div>
+                </TUIDropdown>
               </div>
             </div>
-          </>
-        )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

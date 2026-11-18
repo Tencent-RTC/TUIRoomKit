@@ -1,18 +1,30 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
-import { useLoginState } from 'tuikit-atomicx-react/room';
-import { TUIAvatar, TUIButton, TUIDialog, TUIInput, IconCheck, IconClose, IconSearch } from '../../../base';
+import {
+  TUIAvatar,
+  TUIButton,
+  TUIDialog,
+  TUIInput,
+  IconCheck,
+  IconClose,
+  IconSearch,
+} from '../../../base';
 import { useI18n } from '../../../i18n';
-import { filterContacts, pickedContacts, selectedContacts, toggleSelectedId } from './contactPicker';
-import type { PickedContact } from './contactPicker';
-import { useResolvedContacts } from './useResolvedContacts';
+import { useContactPicker } from '../contactData';
+import type { PickedContact, PickerContact } from '../contactData';
 import './UserPickerPC.scss';
+// The dialog shell is teleported, so its panel chrome has to be matched from outside the component.
+import './UserPickerPC.global.scss';
 
 const EMPTY_IDS: string[] = [];
 
 export interface UserPickerPCProps {
   open: boolean;
+  /** Schedule collects attendees and permits an empty confirmation. */
+  mode?: 'meeting' | 'schedule';
+  /** Ids already in the room or being called; shown checked and locked. Pass a memoised array. */
   occupiedIds?: string[];
+  /** Ids preselected every time the picker opens. */
   selectedIds?: string[];
   onUpdateOpen?: (open: boolean) => void;
   onConfirm?: (users: PickedContact[]) => void;
@@ -31,141 +43,144 @@ export function UserPickerPC(props: UserPickerPCProps) {
     style,
   } = props;
   const { t } = useI18n();
+  const mainRef = useRef<HTMLDivElement | null>(null);
+  const sideListRef = useRef<HTMLDivElement | null>(null);
+  const {
+    searchKeyword,
+    setSearchKeyword,
+    visibleContacts,
+    picked,
+    emptyText,
+    isPicked,
+    toggle,
+    reset,
+    clear,
+    pickedContacts,
+  } = useContactPicker(occupiedIds);
 
-  const [query, setQuery] = useState('');
-  const [pickedIds, setPickedIds] = useState(() => new Set<string>());
-  const pickedRef = useRef<HTMLDivElement | null>(null);
-  const { loginUserInfo } = useLoginState();
-  const loginUserId = loginUserInfo?.userId;
-  const occupiedIdSet = useMemo(() => new Set(occupiedIds), [occupiedIds]);
-  const excludeIds = useMemo(() => (loginUserId ? [loginUserId] : []), [loginUserId]);
-  const { contacts, refreshContacts } = useResolvedContacts(occupiedIdSet, excludeIds);
+  const isMeeting = props.mode !== 'schedule';
+  let confirmText = t('Participants.Confirm');
+  if (isMeeting) {
+    confirmText = picked.length ? t('UserPicker.InviteCount', { count: picked.length }) : t('UserPicker.Invite');
+  }
 
   const selectedIdsRef = useRef(selectedIds);
   selectedIdsRef.current = selectedIds;
-  const refreshContactsRef = useRef(refreshContacts);
-  refreshContactsRef.current = refreshContacts;
-  const isFirstOpenRun = useRef(true);
+  const resetRef = useRef(reset);
+  resetRef.current = reset;
   useEffect(() => {
-    if (isFirstOpenRun.current) {
-      isFirstOpenRun.current = false;
-      return;
-    }
-    if (!open) {
-      return;
-    }
-    setQuery('');
-    setPickedIds(new Set(selectedIdsRef.current));
-    void refreshContactsRef.current();
+    if (!open) return undefined;
+    resetRef.current(selectedIdsRef.current);
+    // The dialog focuses its panel one frame after opening; focus the input on the next frame.
+    let focusFrame = requestAnimationFrame(() => {
+      focusFrame = requestAnimationFrame(() => {
+        mainRef.current?.querySelector<HTMLInputElement>('.user-picker-pc-search input')?.focus();
+      });
+    });
+    return () => cancelAnimationFrame(focusFrame);
   }, [open]);
 
-  const visibleContacts = filterContacts(contacts, query);
-
-  const picked = selectedContacts(pickedIds, contacts);
-
-  const confirmText = pickedIds.size
-    ? t('Participants.ConfirmCount', { count: pickedIds.size })
-    : t('Participants.Confirm');
-
-  function toggle(userId: string) {
-    const contact = contacts.find(item => item.userId === userId);
-    if (!contact) {
-      return;
+  function pick(contact: PickerContact) {
+    if (contact.occupied) return;
+    const adding = !isPicked(contact.userId);
+    toggle(contact.userId);
+    if (adding) {
+      requestAnimationFrame(() => {
+        const element = sideListRef.current;
+        if (element) element.scrollTop = element.scrollHeight;
+      });
     }
-    setPickedIds(toggleSelectedId(pickedIds, userId, contact.occupied));
-    /* Chips wrap downwards, so keep the row that was just added in view. */
-    requestAnimationFrame(() => {
-      const element = pickedRef.current;
-      if (element) {
-        element.scrollTop = element.scrollHeight;
-      }
-    });
-  }
-
-  function confirm() {
-    onConfirm?.(pickedContacts([...pickedIds], contacts));
   }
 
   return (
     <div className={['invite-dialog', className ?? ''].filter(Boolean).join(' ')} style={style}>
       <TUIDialog
         open={open}
-        title={t('Participants.ContactsTitle', { count: contacts.length })}
-        width="420px"
+        title={t('UserPicker.Title')}
+        width="min(640px, calc(100% - 32px))"
         confirmText={confirmText}
+        confirmDisabled={isMeeting && !picked.length}
         cancelText={t('Participants.Cancel')}
         closable
         onUpdateOpen={value => onUpdateOpen?.(value)}
-        onConfirm={confirm}
+        onConfirm={() => onConfirm?.(pickedContacts())}
       >
-        <div className="invite-dialog-content">
-          <TUIInput
-            modelValue={query}
-            onUpdateModelValue={value => setQuery(String(value ?? ''))}
-            className="invite-dialog-search"
-            type="text"
-            size="sm"
-            clearable
-            placeholder={t('Participants.SearchPlaceholder')}
-            prefixSlot={<IconSearch size={14} />}
-          />
-
-          <div className="invite-dialog-list">
-            {visibleContacts.map(contact => (
-              <div
-                key={contact.userId}
-                className={[
-                  'invite-dialog-row',
-                  contact.occupied || pickedIds.has(contact.userId) ? 'sel' : '',
-                  contact.occupied ? 'disabled' : '',
-                ].filter(Boolean).join(' ')}
-                onClick={() => toggle(contact.userId)}
-              >
-                <TUIAvatar
-                  className="invite-dialog-avatar"
-                  size={32}
-                  src={contact.avatarUrl}
-                  alt={contact.userName}
-                />
-                <span className="invite-dialog-meta">
-                  <span className="invite-dialog-name">{contact.userName}</span>
-                  {contact.occupied && <span className="invite-dialog-sub">{t('Participants.ContactInvited')}</span>}
-                </span>
-                <span className="invite-dialog-check">
-                  <span className="invite-dialog-check-icon">
-                    <IconCheck size={11} />
-                  </span>
-                </span>
-              </div>
-            ))}
-            {visibleContacts.length === 0 && (
-              <div className="invite-dialog-empty">
-                {query.trim() ? t('Participants.ContactNotFound') : t('Participants.ContactEmpty')}
-              </div>
-            )}
-          </div>
-
-          <div ref={pickedRef} className="invite-dialog-picked">
-            {picked.map(contact => (
-              <span key={contact.userId} className="invite-dialog-chip">
-                <TUIAvatar
-                  className="invite-dialog-chip-av"
-                  size={20}
-                  src={contact.avatarUrl}
-                  alt={contact.userName}
-                />
-                <span className="invite-dialog-chip-name">{contact.userName}</span>
-                <TUIButton
-                  className="invite-dialog-chip-close"
-                  variant="ghost"
-                  size="sm"
-                  aria-label={t('Participants.ContactDeselect', { name: contact.userName })}
-                  onClick={() => toggle(contact.userId)}
+        <div className="user-picker-pc">
+          <div ref={mainRef} className="user-picker-pc-main">
+            <TUIInput
+              modelValue={searchKeyword}
+              onUpdateModelValue={value => setSearchKeyword(String(value ?? ''))}
+              className="user-picker-pc-search"
+              type="text"
+              size="sm"
+              clearable
+              placeholder={t('Participants.SearchPlaceholder')}
+              prefixSlot={<IconSearch size={14} />}
+            />
+            <div
+              className="user-picker-pc-list"
+              role="listbox"
+              aria-multiselectable="true"
+              aria-label={t('UserPicker.Title')}
+            >
+              {visibleContacts.map(contact => (
+                <div
+                  key={contact.userId}
+                  className={[
+                    'user-picker-pc-row',
+                    isPicked(contact.userId) ? 'is-selected' : '',
+                    contact.occupied ? 'is-disabled' : '',
+                  ].filter(Boolean).join(' ')}
+                  role="option"
+                  aria-selected={isPicked(contact.userId)}
+                  aria-disabled={contact.occupied || undefined}
+                  tabIndex={contact.occupied ? -1 : 0}
+                  onClick={() => pick(contact)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      pick(contact);
+                    }
+                  }}
                 >
-                  <IconClose size={10} />
-                </TUIButton>
-              </span>
-            ))}
+                  <TUIAvatar className="user-picker-pc-avatar" size={32} src={contact.avatarUrl} alt={contact.userName} />
+                  <div className="user-picker-pc-meta">
+                    <div className="user-picker-pc-name">{contact.userName}</div>
+                    {contact.occupied && (
+                      <div className="user-picker-pc-sub">{t('Participants.ContactInvited')}</div>
+                    )}
+                  </div>
+                  <div className="user-picker-pc-check"><IconCheck size={10} /></div>
+                </div>
+              ))}
+              {!visibleContacts.length && <div className="user-picker-pc-empty">{emptyText}</div>}
+            </div>
+          </div>
+          <div className="user-picker-pc-side">
+            <div className="user-picker-pc-side-head">
+              <span className="user-picker-pc-side-count">{t('UserPicker.SelectedCount', { count: picked.length })}</span>
+              <TUIButton className="user-picker-pc-clear" variant="ghost" size="sm" disabled={!picked.length} onClick={clear}>
+                {t('UserPicker.Clear')}
+              </TUIButton>
+            </div>
+            <div ref={sideListRef} className="user-picker-pc-side-list">
+              {picked.map(contact => (
+                <div key={contact.userId} className="user-picker-pc-side-row">
+                  <TUIAvatar className="user-picker-pc-avatar" size={32} src={contact.avatarUrl} alt={contact.userName} />
+                  <div className="user-picker-pc-name">{contact.userName}</div>
+                  <TUIButton
+                    className="user-picker-pc-remove"
+                    variant="ghost"
+                    size="sm"
+                    aria-label={t('Participants.ContactDeselect', { name: contact.userName })}
+                    onClick={() => toggle(contact.userId)}
+                  >
+                    <IconClose size={10} />
+                  </TUIButton>
+                </div>
+              ))}
+            </div>
+            {!picked.length && <div className="user-picker-pc-side-empty">{t('UserPicker.PickedEmpty')}</div>}
           </div>
         </div>
       </TUIDialog>

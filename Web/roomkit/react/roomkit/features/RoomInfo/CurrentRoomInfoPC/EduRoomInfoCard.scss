@@ -1,0 +1,154 @@
+.edu-room-info-card {
+  display: flex;
+  flex-direction: column;
+  width: 330px;
+  max-width: min(330px, calc(100vw - 40px));
+  overflow: hidden;
+  color: var(--rk-text-primary);
+  letter-spacing: -0.005em;
+  pointer-events: auto;
+  background: var(--rk-bg-surface);
+  border: 1px solid var(--rk-border-strong);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.edu-room-info-card.is-plain {
+  width: auto;
+  max-width: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.edu-room-info-rows {
+  padding: 12px 18px;
+}
+
+.edu-room-info-card.is-plain .edu-room-info-rows {
+  padding: 0 0 4px;
+}
+
+.edu-room-info-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 9px 0;
+  font-size: var(--rk-fs-md);
+  border-bottom: 1px dashed var(--rk-border);
+}
+
+.edu-room-info-row:last-child {
+  border-bottom: none;
+}
+
+.edu-room-info-card.is-plain .edu-room-info-row {
+  padding: 12px 0;
+  font-size: 14px;
+}
+
+html[lang='en-US'] .edu-room-info-card.is-plain .edu-room-info-row {
+  gap: 16px;
+}
+
+.edu-room-info-label {
+  flex-shrink: 0;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-tertiary);
+  white-space: nowrap;
+}
+
+.edu-room-info-card.is-plain .edu-room-info-label {
+  margin-right: 8px;
+  font-size: 14px;
+  color: var(--rk-text-secondary);
+}
+
+.edu-room-info-value {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--rk-text-primary);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edu-room-info-copyable {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.edu-room-info-copy {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  color: var(--rk-text-tertiary);
+  cursor: pointer;
+  background: var(--rk-bg-surface);
+  border: 0;
+  border-radius: var(--rk-radius-sm);
+  transition: background 0.14s, color 0.14s, transform 0.1s;
+}
+
+.edu-room-info-copy:focus-visible {
+  outline: 2px solid var(--rk-focus-ring);
+  outline-offset: 2px;
+}
+
+.edu-room-info-copy.is-copied {
+  color: color-mix(in srgb, var(--rk-success) 80%, var(--rk-text-primary));
+  background: color-mix(in srgb, var(--rk-success) 12%, transparent);
+}
+
+.edu-room-info-copy:active {
+  transform: scale(0.88);
+}
+
+.edu-room-info-card.is-plain .edu-room-info-copy {
+  width: 26px;
+  height: 26px;
+}
+
+.edu-room-info-row:hover .edu-room-info-copy:not(.is-copied) {
+  color: var(--rk-text-secondary);
+}
+
+.edu-room-info-row .edu-room-info-copy:not(.is-copied):hover {
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-hover);
+}
+
+.edu-room-info-error {
+  padding: 0 18px 10px;
+  margin: 0;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edu-room-info-copy:active {
+    transform: none;
+  }
+}
+
+/* TUIPopover teleports the card; strip the float chrome so the card owns the surface. */
+.rk-float.rk-popover:has(> .edu-room-info-card) {
+  min-width: 0;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 14px;
+  box-shadow: none;
+}

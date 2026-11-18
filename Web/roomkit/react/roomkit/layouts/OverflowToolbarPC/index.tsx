@@ -1,10 +1,9 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import OverflowMenu from './OverflowMenu';
-import { hasOverflowSubmenu, OVERFLOW_SUBMENU_READY, readOverflowSubmenu } from './overflowSubmenu';
-import type { OverflowSubmenu } from './overflowSubmenu';
-import { measureAvailableWidth, resolveVisibleCount } from './useToolbarOverflow';
-import type { OverflowMenuEntry } from './useToolbarOverflow';
+import { OVERFLOW_ITEM_KEY } from './overflowItem';
+import type { OverflowItemRegistry, OverflowMenuEntry, RegisteredOverflowItem } from './overflowItem';
+import { measureAvailableWidth, resolveOverflowEntries, resolveVisibleCount } from './toolbarOverflow';
 import './index.scss';
 
 export interface OverflowToolbarPCProps {
@@ -34,28 +33,58 @@ export function OverflowToolbarPC(props: OverflowToolbarPCProps) {
 
   const barRef = useRef<HTMLDivElement | null>(null);
   const itemsRef = useRef<HTMLDivElement | null>(null);
-  const [overflowActions, setOverflowActions] = useState<OverflowMenuEntry[]>([]);
-  const [submenuHost, setSubmenuHost] = useState<HTMLElement | null>(null);
-  const submenu: OverflowSubmenu | null = submenuHost ? readOverflowSubmenu(submenuHost) : null;
+  /** Slot children hidden by the last layout, in toolbar order. */
+  const [collapsed, setCollapsed] = useState<HTMLElement[]>([]);
+  const collapsedRef = useRef(collapsed);
+  collapsedRef.current = collapsed;
+  const [, refresh] = useReducer((tick: number) => tick + 1, 0);
+
+  // Toolbar controls describe themselves here; the menu never reads meaning off the DOM.
+  const sourcesRef = useRef<Array<() => RegisteredOverflowItem | null>>([]);
+  const registry = useMemo<OverflowItemRegistry>(() => ({
+    register: (source) => {
+      sourcesRef.current = [...sourcesRef.current, source];
+      refresh();
+      return () => {
+        sourcesRef.current = sourcesRef.current.filter(item => item !== source);
+        refresh();
+      };
+    },
+    // Only a collapsed control shows in the menu, so a visible one changing needs no render.
+    refresh: () => {
+      if (collapsedRef.current.length > 0) {
+        refresh();
+      }
+    },
+  }), []);
+
+  const childIds = useRef(new WeakMap<HTMLElement, string>());
+  const childSeed = useRef(0);
+  function idOf(element: HTMLElement): string {
+    let id = childIds.current.get(element);
+    if (!id) {
+      childSeed.current += 1;
+      id = `item-${childSeed.current}`;
+      childIds.current.set(element, id);
+    }
+    return id;
+  }
+
+  const overflowEntries: OverflowMenuEntry[] = resolveOverflowEntries(
+    collapsed,
+    sourcesRef.current.map(source => source()).filter((item): item is RegisteredOverflowItem => !!item),
+    idOf,
+  );
 
   // Layout runs from observers bound once; it reads the latest sizing props here.
   const sizingRef = useRef({ gap, moreWidth });
   sizingRef.current = { gap, moreWidth };
 
   const stateRef = useRef({
-    itemElements: [] as HTMLElement[],
     cachedWidths: [] as number[],
     layoutFrame: 0,
     lastVisibleCount: -1,
   });
-
-  function readLabel(element: HTMLElement): string {
-    return element.getAttribute('aria-label')
-      || element.querySelector<HTMLElement>('[aria-label]')?.getAttribute('aria-label')
-      || element.querySelector('.toolbar-button-label')?.textContent?.trim()
-      || element.querySelector('.participant-button-tip')?.textContent?.trim()
-      || '';
-  }
 
   function itemChildren(): HTMLElement[] {
     if (!itemsRef.current) {
@@ -110,12 +139,10 @@ export function OverflowToolbarPC(props: OverflowToolbarPCProps) {
     const state = stateRef.current;
     const { gap: itemGap, moreWidth: moreButtonWidth } = sizingRef.current;
     const items = itemChildren();
-    state.itemElements = items;
     if (items.length === 0) {
-      setOverflowActions([]);
+      setCollapsed([]);
       state.cachedWidths = [];
       state.lastVisibleCount = -1;
-      setSubmenuHost(null);
       return;
     }
 
@@ -132,37 +159,16 @@ export function OverflowToolbarPC(props: OverflowToolbarPCProps) {
       : Math.max(0, (barRef.current?.clientWidth ?? 0) - moreButtonWidth - itemGap);
     const visibleCount = resolveVisibleCount(widths, available, itemGap);
 
-    if (visibleCount === state.lastVisibleCount && !submenuFlagsStale(items)) {
+    if (visibleCount === state.lastVisibleCount) {
       return;
     }
     state.lastVisibleCount = visibleCount;
 
-    const overflow: OverflowMenuEntry[] = [];
     items.forEach((element, index) => {
-      const hidden = index >= visibleCount;
       const { style: itemStyle } = element;
-      itemStyle.display = hidden ? 'none' : '';
-      if (!hidden) {
-        return;
-      }
-      overflow.push({
-        id: String(index),
-        label: readLabel(element) || `Item ${index + 1}`,
-        icon: '',
-        hasSubmenu: hasOverflowSubmenu(element),
-      });
+      itemStyle.display = index >= visibleCount ? 'none' : '';
     });
-    setOverflowActions(overflow);
-    if (submenuHost && !overflow.some(entry => items[Number(entry.id)] === submenuHost)) {
-      setSubmenuHost(null);
-    }
-  }
-
-  function submenuFlagsStale(items: HTMLElement[]): boolean {
-    return overflowActions.some((entry) => {
-      const element = items[Number(entry.id)];
-      return !!element && Boolean(entry.hasSubmenu) !== hasOverflowSubmenu(element);
-    });
+    setCollapsed(items.slice(visibleCount));
   }
 
   function scheduleLayout() {
@@ -174,27 +180,6 @@ export function OverflowToolbarPC(props: OverflowToolbarPCProps) {
       state.layoutFrame = 0;
       layout();
     });
-  }
-
-  function activate(id: string) {
-    const index = Number(id);
-    const element = stateRef.current.itemElements[index];
-    if (!element || hasOverflowSubmenu(element)) {
-      return;
-    }
-    element.querySelector<HTMLElement>('button, [role="button"]')?.click();
-  }
-
-  function drill(id: string) {
-    const element = stateRef.current.itemElements[Number(id)];
-    if (!element || !hasOverflowSubmenu(element)) {
-      return;
-    }
-    setSubmenuHost(element);
-  }
-
-  function leaveSubmenu() {
-    setSubmenuHost(null);
   }
 
   const scheduleLayoutRef = useRef(scheduleLayout);
@@ -211,20 +196,13 @@ export function OverflowToolbarPC(props: OverflowToolbarPCProps) {
     }
 
     let itemsObserver: MutationObserver | null = null;
-    const items = itemsRef.current;
-    if (items) {
+    if (itemsRef.current) {
       itemsObserver = new MutationObserver(() => {
         state.cachedWidths = [];
         state.lastVisibleCount = -1;
         scheduleLayoutRef.current();
       });
-      itemsObserver.observe(items, { childList: true });
-      items.addEventListener(OVERFLOW_SUBMENU_READY, onSubmenuReady);
-    }
-
-    function onSubmenuReady() {
-      state.lastVisibleCount = -1;
-      scheduleLayoutRef.current();
+      itemsObserver.observe(itemsRef.current, { childList: true });
     }
 
     scheduleLayoutRef.current();
@@ -232,7 +210,6 @@ export function OverflowToolbarPC(props: OverflowToolbarPCProps) {
     return () => {
       barObserver.disconnect();
       itemsObserver?.disconnect();
-      items?.removeEventListener(OVERFLOW_SUBMENU_READY, onSubmenuReady);
       if (state.layoutFrame) {
         cancelAnimationFrame(state.layoutFrame);
         state.layoutFrame = 0;
@@ -244,18 +221,15 @@ export function OverflowToolbarPC(props: OverflowToolbarPCProps) {
     <div ref={barRef} className={['overflow-toolbar', className ?? ''].filter(Boolean).join(' ')} style={style}>
       <div className="overflow-toolbar-actions" style={{ gap: `${gap}px` }}>
         <div ref={itemsRef} className="overflow-toolbar-items" style={{ gap: `${gap}px` }}>
-          {children}
+          <OVERFLOW_ITEM_KEY.Provider value={registry}>
+            {children}
+          </OVERFLOW_ITEM_KEY.Provider>
         </div>
 
         <OverflowMenu
-          actions={overflowActions}
-          submenu={submenu}
+          entries={overflowEntries}
           fullscreen={fullscreen}
           minimizable={minimizable}
-          onAction={activate}
-          onDrill={drill}
-          onLeave={leaveSubmenu}
-          onClose={leaveSubmenu}
           onMinimize={() => onMinimize?.()}
           onFullscreen={() => onFullscreen?.()}
         />

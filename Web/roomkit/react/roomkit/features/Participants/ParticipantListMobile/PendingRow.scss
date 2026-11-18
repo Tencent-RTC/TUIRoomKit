@@ -1,0 +1,102 @@
+.participant-list-mobile-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.participant-list-mobile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.participant-list-mobile-name {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-md);
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--rk-text-primary);
+}
+
+.participant-list-mobile-name-text {
+  flex: 0 1 auto;
+  min-width: 1em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.participant-list-mobile-wait {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 36px;
+}
+
+.participant-list-mobile-wait-call {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  color: var(--rk-on-accent);
+  cursor: pointer;
+  background: var(--rk-success);
+  border-radius: 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.participant-list-mobile-wait-call:active {
+  transform: scale(0.96);
+}
+
+.participant-list-mobile-wait-call.is-calling {
+  width: auto;
+  padding-right: 2px;
+  font-weight: 500;
+  color: var(--rk-success);
+  cursor: default;
+  background: transparent;
+  border-radius: 0;
+}
+
+.participant-list-mobile-wait-pulse {
+  animation: participant-list-mobile-pulse 1.5s ease-in-out infinite;
+}
+
+.participant-list-mobile-wait-failed {
+  max-width: 120px;
+  padding: 0 2px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--rk-text-tertiary);
+  text-align: right;
+}
+
+@keyframes participant-list-mobile-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .participant-list-mobile-wait-pulse {
+    animation: none;
+  }
+}

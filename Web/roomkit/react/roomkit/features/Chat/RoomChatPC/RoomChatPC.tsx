@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
-import type { CSSProperties } from 'react';
-import { useLoginState, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-react/room';
-import { TUIToast } from '../../../base';
+import ChatNoticeCard from './ChatNoticeCard';
+import type { CSSProperties, ReactNode } from 'react';
+import { useSilenceAll } from '../customMessage';
+import { RoomParticipantRole, useLoginState, useRoomParticipantState, useRoomState } from 'tuikit-atomicx-react/room';
 import { t, useI18n } from '../../../base/i18n';
+import ChatContextSync from '../ChatButton/ChatContextSync';
 import MessageInput from './MessageInput';
 import MessageList from './MessageList';
+import type { ChatMessageMetaScope } from './ChatMessage';
 import { CHAT_COMPOSER_KEY, provideChatComposer } from './useChatComposer';
 import { useMessageActions } from './useMessageActions';
 import './RoomChatPC.scss';
@@ -15,12 +17,43 @@ export interface RoomChatPCProps {
    * RoomChatPC.vue receives it as an unused fallthrough attribute.
    */
   isActive?: boolean;
+  isShowNotice?: boolean;
+  /** Notice editing permission supplied by the scene view. */
+  canEditNotice?: boolean;
+  /** Whether member notices render here; protocol notices do not count as unread. */
+  isShowMemberNotice?: boolean;
+  /** Hides the composer's toolbar row. */
+  isHideOperator?: boolean;
+  /** Hides message timestamps. */
+  isHideTimestamp?: boolean;
+  /** Tints the room owner's bubbles with the self-message accent. */
+  isHighlightOwner?: boolean;
+  /** Composer placeholder; the room default applies when unset. */
+  placeholder?: string;
+  /** Swaps the jump circle for an "N new messages" pill while rows land unread. */
+  isShowNewMessages?: boolean;
+  /** Scene chrome (the education title bar); the panel itself stays scene-agnostic. */
+  headerSlot?: ReactNode;
+  /** Replaces each message's timestamp after the sender name. */
+  metaSlot?: (scope: ChatMessageMetaScope) => ReactNode;
   className?: string;
   style?: CSSProperties;
 }
 
 export function RoomChatPC(props: RoomChatPCProps) {
-  const { className, style } = props;
+  const {
+    isActive = true,
+    isShowMemberNotice = false,
+    isHideOperator = false,
+    isHideTimestamp = false,
+    isHighlightOwner = false,
+    placeholder: placeholderProp,
+    isShowNewMessages = false,
+    headerSlot,
+    metaSlot,
+    className,
+    style,
+  } = props;
 
   useI18n();
   const { localParticipant } = useRoomParticipantState();
@@ -29,33 +62,19 @@ export function RoomChatPC(props: RoomChatPCProps) {
 
   const channel = currentRoom?.roomId || '';
   const canUseChatContext = Boolean(currentRoom?.roomId && loginUserInfo?.userId);
-  const role = localParticipant?.role as number | undefined;
-  const isHostOrAdmin = role === 0 || role === 1;
+  const isHostOrAdmin = localParticipant?.role === RoomParticipantRole.Owner
+    || localParticipant?.role === RoomParticipantRole.Admin;
+  const { silenceAll } = useSilenceAll();
   const inputDisabled = (
-    Boolean(localParticipant?.isMessageDisabled)
+    (silenceAll && !isHostOrAdmin)
+    || Boolean(localParticipant?.isMessageDisabled)
     || Boolean(currentRoom?.isAllMessageDisabled && !isHostOrAdmin)
   );
-  const placeholder = inputDisabled ? t('RoomChat.disabled_placeholder') : t('RoomChat.input_placeholder');
+  const placeholder = inputDisabled
+    ? t('RoomChat.disabled_placeholder')
+    : placeholderProp ?? t('RoomChat.input_placeholder');
   const messageActionList = useMessageActions();
   const composer = provideChatComposer();
-
-  const isMessageDisabled = localParticipant?.isMessageDisabled;
-  const prevMessageDisabledRef = useRef(isMessageDisabled);
-  useEffect(() => {
-    const wasMuted = prevMessageDisabledRef.current;
-    prevMessageDisabledRef.current = isMessageDisabled;
-    if (wasMuted == null || isMessageDisabled === wasMuted) return;
-    TUIToast.info(isMessageDisabled ? t('RoomChat.muted_toast') : t('RoomChat.unmuted_toast'));
-  }, [isMessageDisabled]);
-
-  const isAllMessageDisabled = currentRoom?.isAllMessageDisabled;
-  const prevAllMessageDisabledRef = useRef(isAllMessageDisabled);
-  useEffect(() => {
-    const wasMuted = prevAllMessageDisabledRef.current;
-    prevAllMessageDisabledRef.current = isAllMessageDisabled;
-    if (wasMuted == null || isAllMessageDisabled === wasMuted) return;
-    TUIToast.info(isAllMessageDisabled ? t('RoomChat.all_muted_toast') : t('RoomChat.all_unmuted_toast'));
-  }, [isAllMessageDisabled]);
 
   return (
     <CHAT_COMPOSER_KEY.Provider value={composer}>
@@ -65,17 +84,28 @@ export function RoomChatPC(props: RoomChatPCProps) {
           className={['chat-panel', className].filter(Boolean).join(' ')}
           style={style}
         >
+          {headerSlot}
+          {props.isShowNotice && <ChatNoticeCard channel={channel} canEdit={props.canEditNotice} />}
           <MessageList
             className="chat-panel-list"
             channel={channel}
             messageActionList={messageActionList}
+            isShowMemberNotice={isShowMemberNotice}
+            isHideTimestamp={isHideTimestamp}
+            isHighlightOwner={isHighlightOwner}
+            isShowNewMessages={isShowNewMessages}
+            metaSlot={metaSlot}
           />
           <MessageInput
             className="chat-panel-input"
             channel={channel}
             placeholder={placeholder}
             disabled={inputDisabled}
+            isHideOperator={isHideOperator}
           />
+          {/* The classroom panel has no ChatButton, so it binds the IM group itself:
+              activates the conversation so the list loads, and marks it read. */}
+          <ChatContextSync channel={channel} isActive={isActive} isShowMemberNotice={isShowMemberNotice} />
         </div>
       )}
     </CHAT_COMPOSER_KEY.Provider>

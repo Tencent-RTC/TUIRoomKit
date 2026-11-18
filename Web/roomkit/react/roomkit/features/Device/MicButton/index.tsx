@@ -8,7 +8,7 @@ import {
   useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-react/room';
-import { IconMicOff, TUIToast } from '../../../base';
+import { IconMic, IconMicOff, TUIToast } from '../../../base';
 import { useI18n } from '../../../i18n';
 import ToolbarButtonPC from '../../../layouts/ToolbarButtonPC/ToolbarButtonPC';
 import AudioDeviceMenu from '../AudioDeviceMenu/index';
@@ -17,10 +17,14 @@ import { useDeviceFault } from '../useDeviceFault';
 
 export interface MicButtonProps {
   hideMenu?: boolean;
+  /** Icon size in px; the level overlay follows it. Compact scenes (education topbar) pass 16. */
+  iconSize?: number;
+  /** Resting caret direction, forwarded to ToolbarButtonPC */
+  caretDirection?: 'up' | 'down';
 }
 
 export function MicButton(props: MicButtonProps) {
-  const { hideMenu = false } = props;
+  const { hideMenu = false, iconSize = 22, caretDirection = 'up' } = props;
   const { t } = useI18n();
 
   const { microphoneStatus, microphoneLastError, openLocalMicrophone } = useDeviceState();
@@ -77,12 +81,19 @@ export function MicButton(props: MicButtonProps) {
   return (
     <ToolbarButtonPC
       label={microphoneOn ? t('Device.MicClose') : t('Device.MicOpen')}
-      icon={microphoneOn ? MicLevelIcon : IconMicOff}
       menuLabel={t('Device.MicSettings')}
       blocked={isMicrophoneDisabled}
       loading={isProcessing}
       notice={hasDeviceError}
       hideMenu={hideMenu}
+      caretDirection={caretDirection}
+      /* Sized via prop (not the toolbar CSS) so the level overlay matches the glyph */
+      iconSlot={(() => {
+        if (!microphoneOn) {
+          return <IconMicOff size={iconSize} />;
+        }
+        return hasDeviceError ? <IconMic size={iconSize} /> : <MicLevelIcon size={iconSize} />;
+      })()}
       onClick={toggleMicrophone}
       menuSlot={() => <AudioDeviceMenu />}
     />

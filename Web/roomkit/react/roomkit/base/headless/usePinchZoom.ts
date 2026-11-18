@@ -117,7 +117,8 @@ export function usePinchZoom(
     pointers: new Map<number, Point>(),
     pinchStart: null as { transform: ZoomTransform; origin: Point; distance: number; center: Point } | null,
     panStart: null as { transform: ZoomTransform; point: Point } | null,
-    listening: false,
+    stopListening: null as (() => void) | null,
+    detach: null as (() => void) | null,
   }).current;
 
   function apply(next: ZoomTransform) {
@@ -208,19 +209,24 @@ export function usePinchZoom(
   }
 
   function listenWindow(on: boolean) {
-    if (local.listening === on) {
+    if (!on) {
+      local.stopListening?.();
+      local.stopListening = null;
       return;
     }
-    local.listening = on;
-    if (on) {
-      window.addEventListener('pointermove', onMove, { passive: false });
-      window.addEventListener('pointerup', onUp);
-      window.addEventListener('pointercancel', onUp);
-    } else {
+    if (local.stopListening) {
+      return;
+    }
+    window.addEventListener('pointermove', onMove, { passive: false });
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    // A reset may come from a later render; remove the callbacks that were
+    // actually attached, not that render's new function instances.
+    local.stopListening = () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
-    }
+    };
   }
 
   function endGesture() {
@@ -252,28 +258,34 @@ export function usePinchZoom(
     apply({ ...IDENTITY_TRANSFORM });
   }
 
-  // The ref value is read during render so the effect re-runs when the target
-  // element swaps, matching the Vue `watch(target)` behaviour.
-  const node = target.current;
-
+  // React assigns DOM refs during commit, after render. Read the committed
+  // target on every effect, but only reset/rebind when the actual node changes.
   useEffect(() => {
-    if (!node) {
-      return undefined;
+    const el = target.current ?? null;
+    if (local.element === el) {
+      return;
     }
-    const el = node;
+    local.detach?.();
+    local.detach = null;
+    if (!el) {
+      return;
+    }
     local.element = el;
     el.style.transformOrigin = '0 0';
     el.addEventListener('pointerdown', onDown);
-    return () => {
+    local.detach = () => {
       reset();
       el.removeEventListener('pointerdown', onDown);
       el.style.transformOrigin = '';
-      if (local.element === el) {
-        local.element = null;
-      }
+      local.element = null;
     };
+  });
+
+  useEffect(() => () => {
+    local.detach?.();
+    local.detach = null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [node]);
+  }, []);
 
   const enabledFirstRun = useRef(true);
   useEffect(() => {

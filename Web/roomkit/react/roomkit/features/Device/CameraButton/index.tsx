@@ -17,12 +17,14 @@ import { useDeviceFault } from '../useDeviceFault';
 
 export interface CameraButtonProps {
   hideMenu?: boolean;
+  /** Resting caret direction, forwarded to ToolbarButtonPC */
+  caretDirection?: 'up' | 'down';
   /** The shell owns the settings dialog; the button only forwards which tab was asked for. */
   onOpenSetting?: (tab: SettingsTab) => void;
 }
 
 export function CameraButton(props: CameraButtonProps) {
-  const { hideMenu = false, onOpenSetting } = props;
+  const { hideMenu = false, caretDirection = 'up', onOpenSetting } = props;
   const { t } = useI18n();
 
   const {
@@ -92,6 +94,7 @@ export function CameraButton(props: CameraButtonProps) {
       loading={isProcessing}
       notice={hasDeviceError}
       hideMenu={hideMenu}
+      caretDirection={caretDirection}
       onClick={toggleCamera}
       menuSlot={({ close }) => (
         <VideoDeviceMenu onOpenSetting={tab => leaveForSetting(tab, close)} />

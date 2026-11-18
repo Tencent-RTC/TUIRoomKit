@@ -6,6 +6,7 @@ import {
   IconHash,
   TUIButton,
   TUIInput,
+  TUIToast,
   useI18n,
 } from '@tencentcloud/roomkit-web-react';
 import './JoinCard.scss';
@@ -34,6 +35,10 @@ export function JoinCard(props: JoinCardProps) {
     event.preventDefault();
     const id = roomInput == null ? '' : String(roomInput).trim();
     if (!id) {
+      return;
+    }
+    if (!/^\d+$/.test(id)) {
+      TUIToast.info(t('Preconference.InvalidRoomId'));
       return;
     }
     onJoin?.(id);
@@ -92,9 +97,8 @@ export function JoinCard(props: JoinCardProps) {
               nativeType="submit"
               disabled={!canJoin}
               aria-label={t('Preconference.Join')}
-            >
-              <IconArrowRight className="join-arrow" size={16} />
-            </TUIButton>
+              iconSlot={<IconArrowRight className="join-arrow" size={16} />}
+            />
           )}
         />
       </form>

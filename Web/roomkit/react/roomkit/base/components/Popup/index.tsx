@@ -161,6 +161,8 @@ export function TUIPopup(props: TUIPopupProps) {
     presentRef.current = false;
     setShown(false);
     setPresent(false);
+    // Drag visuals live beyond the portal DOM and must not carry into the next open.
+    clearInline();
     requestClose();
   }
 

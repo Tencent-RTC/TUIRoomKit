@@ -1,6 +1,6 @@
 export { default as RoomKitProvider } from './components/RoomKitProvider/index';
 export type { RoomKitProviderExpose, RoomKitProviderProps } from './components/RoomKitProvider/index';
-export { loadContactList, resolveShareLink, setUIConfig, useUIConfig } from './uiConfig';
+export { loadContactList, resolveShareLink, RoomWidget, setUIConfig, useUIConfig } from './uiConfig';
 export type {
   ContactListProvider,
   ParticipantViewUIComponent,
@@ -11,6 +11,7 @@ export type {
   ThemeOptions,
   UIConfig,
   UILanguage,
+  WidgetVisible,
 } from './uiConfig';
 export { default as TUIAvatar } from './components/Avatar/index';
 export { default as TUIButton } from './components/Button/index';
@@ -19,6 +20,7 @@ export { default as TUILoading } from './components/Loading/index';
 export { default as TUIBadge } from './components/Badge/index';
 export { default as TUIInput } from './components/Input/index';
 export { default as TUISwitch } from './components/Switch/index';
+export { default as TUISegmented } from './components/Segmented/index';
 export { default as TUICheckbox } from './components/Checkbox/index';
 export { default as TUIDatePicker } from './components/DatePicker/index';
 export { default as TUISlider } from './components/Slider/index';
@@ -39,7 +41,8 @@ export type { MessageBoxHandle } from './components/MessageBox';
 export { TUIToast } from './components/Toast';
 export { i18n, t, useI18n } from './i18n';
 export type { Language } from './i18n';
-export { ensureAppendHost } from './command/appendTo';
+export { ensureAppendHost, resolveOverlayHost } from './command/appendTo';
+export { getActiveScene, subscribeActiveScene } from './overlayRegistry';
 export * from './icons';
 export * from './headless';
 export * from './tokens';
