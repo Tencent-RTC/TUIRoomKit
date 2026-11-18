@@ -23,16 +23,18 @@ import {
   toVirtualBackgroundParams,
   VIRTUAL_BACKGROUND_ASSETS_PATH,
 } from './virtualBackground';
-import type { BackgroundOption, VirtualBackgroundParams } from './virtualBackground';
+import type { BackgroundOption, BackgroundPhoto, VirtualBackgroundParams } from './virtualBackground';
 import './VirtualBackgroundSettings.scss';
 
 export interface VirtualBackgroundSettingsProps {
   previewReady?: boolean;
+  /** Replaces the built-in photo set. Ids must be unique across sets: the image cache is keyed by id. */
+  virtualBackgroundImgList?: BackgroundPhoto[];
   className?: string;
   style?: React.CSSProperties;
 }
 
-const BACKGROUND_PHOTOS = [
+const BACKGROUND_PHOTOS: BackgroundPhoto[] = [
   { id: 'g1', imagePath: meetingRoom },
   { id: 'g2', imagePath: cafe },
   { id: 'g3', imagePath: cityscape },
@@ -78,7 +80,7 @@ function handleAbort() {
 }
 
 export function VirtualBackgroundSettings(props: VirtualBackgroundSettingsProps) {
-  const { previewReady = true, className, style } = props;
+  const { previewReady = true, virtualBackgroundImgList, className, style } = props;
   const { t: translate } = useI18n();
   const {
     virtualBackgroundConfig,
@@ -91,7 +93,7 @@ export function VirtualBackgroundSettings(props: VirtualBackgroundSettingsProps)
   } = useVirtualBackgroundState();
 
   const [options, setOptionsState] = useState<BackgroundOption[]>(
-    () => hydratePhotoPaths(createDefaultBackgroundOptions(BACKGROUND_PHOTOS)),
+    () => hydratePhotoPaths(createDefaultBackgroundOptions(virtualBackgroundImgList ?? BACKGROUND_PHOTOS)),
   );
   const [selectedId, setSelectedIdState] = useState('none');
   const [isReady, setIsReadyState] = useState(false);
@@ -173,7 +175,9 @@ export function VirtualBackgroundSettings(props: VirtualBackgroundSettingsProps)
   }
 
   async function applyCurrent() {
-    const current = optionsRef.current.find(item => item.id === selectedIdRef.current) ?? optionsRef.current[0];
+    // A saved image missing from this panel's list (e.g. another scene's set) is
+    // left as-is instead of falling back to 'none' and overwriting it.
+    const current = optionsRef.current.find(item => item.id === selectedIdRef.current);
     if (!current || !previewReadyRef.current) {
       return;
     }

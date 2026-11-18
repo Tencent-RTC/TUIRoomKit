@@ -11,12 +11,7 @@
   flex-direction: row-reverse;
 }
 
-.chat-message-compact {
-  padding-top: 4px;
-}
-
-.chat-message-avatar,
-.chat-message-avatar-spacer {
+.chat-message-avatar {
   flex: 0 0 32px;
   width: 32px;
   height: 32px;
@@ -41,8 +36,25 @@
   justify-content: center;
   padding: 8px 0;
   font-size: var(--rk-fs-sm);
-  line-height: 16px;
+  line-height: var(--rk-lh-sm, 16px);
   color: var(--rk-text-tertiary);
+}
+
+.chat-message-notice {
+  gap: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.chat-message-notice-text {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  line-height: var(--rk-lh-sm, 18px);
+  color: var(--rk-text-tertiary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chat-message-reedit {
@@ -66,7 +78,7 @@
   overflow: hidden;
   font-size: var(--rk-fs-sm);
   font-weight: 600;
-  line-height: 16px;
+  line-height: var(--rk-lh-sm, 16px);
   color: var(--rk-text-primary);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -74,7 +86,7 @@
 
 .chat-message-time {
   font-size: var(--rk-fs-sm);
-  line-height: 16px;
+  line-height: var(--rk-lh-sm, 16px);
   color: var(--rk-text-tertiary);
 }
 
@@ -165,9 +177,17 @@
   border-top-right-radius: 4px;
 }
 
+/* Owner-highlighted bubbles share the self-message tint but keep the
+ * other-side radius, so the owner stands out while staying left-aligned. */
+.chat-message-owner .chat-message-bubble-text,
+.chat-message-owner .chat-message-bubble-unknown {
+  color: var(--rk-bubble-self-fg);
+  background: var(--rk-bubble-self-bg);
+}
+
 .chat-message-text {
   font-size: var(--rk-fs-md);
-  line-height: 1.5;
+  line-height: var(--rk-lh-md, 1.5);
   word-break: break-word;
   white-space: pre-wrap;
 }
@@ -237,7 +257,7 @@
 .chat-file-name {
   overflow: hidden;
   font-size: var(--rk-fs-md);
-  line-height: 18px;
+  line-height: var(--rk-lh-md, 18px);
   color: var(--rk-text-primary);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -263,13 +283,7 @@
   margin-left: auto;
 }
 
-.chat-message-mobile.chat-message-compact {
-  padding-top: 0;
-  padding-bottom: 8px;
-}
-
-.chat-message-mobile .chat-message-avatar,
-.chat-message-mobile .chat-message-avatar-spacer {
+.chat-message-mobile .chat-message-avatar {
   flex-basis: 28px;
   width: 28px;
   height: 28px;
@@ -331,6 +345,28 @@
   border-radius: 12px;
 }
 
+/* Keep the classroom bubble geometry and typography aligned with Vue. */
+.rk-scene-education .chat-message {
+  padding-top: 14px;
+}
+
+.rk-scene-education .chat-message-body {
+  gap: 5px;
+}
+
+.rk-scene-education .chat-message-bubble-text,
+.rk-scene-education .chat-message-bubble-unknown {
+  padding: 9px 12px;
+  font-size: var(--rk-fs-md);
+  line-height: var(--rk-lh-md, 16px);
+  border-radius: 5px 16px 16px;
+}
+
+.rk-scene-education .chat-message-self .chat-message-bubble-text,
+.rk-scene-education .chat-message-self .chat-message-bubble-unknown {
+  border-radius: 16px 5px 16px 16px;
+}
+
 .chat-message-mobile.chat-message-self .chat-message-bubble-text,
 .chat-message-mobile.chat-message-self .chat-message-bubble-unknown {
   color: var(--rk-h5-bubble-self-fg);
@@ -338,8 +374,32 @@
   border-radius: 12px;
 }
 
+.chat-message-mobile.chat-message-owner .chat-message-bubble-text,
+.chat-message-mobile.chat-message-owner .chat-message-bubble-unknown {
+  color: var(--rk-h5-bubble-self-fg);
+  background: var(--rk-h5-bubble-self-bg);
+}
+
+/* Classroom bubbles keep one square corner on the speaker's side
+   (views-edu [classroom] .rk-chat-msg-body). A teacher's message stays
+   left-aligned, so it keeps that corner and only takes the accent wash. */
+.rk-scene-education .chat-message-mobile .chat-message-bubble-text,
+.rk-scene-education .chat-message-mobile .chat-message-bubble-unknown {
+  padding: 9px 12px;
+  border-radius: 5px 16px 16px;
+}
+
+.rk-scene-education .chat-message-mobile.chat-message-self .chat-message-bubble-text,
+.rk-scene-education .chat-message-mobile.chat-message-self .chat-message-bubble-unknown {
+  border-radius: 16px 5px 16px 16px;
+}
+
+.rk-scene-education .chat-message-mobile.chat-message-self .chat-message-meta {
+  flex-direction: row-reverse;
+}
+
 .chat-message-mobile .chat-message-text {
-  line-height: 1.45;
+  line-height: var(--rk-lh-md, 1.45);
   word-break: normal;
   overflow-wrap: break-word;
 }

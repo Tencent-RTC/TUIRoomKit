@@ -1,14 +1,20 @@
 /* eslint-disable class-methods-use-this */
-import { useLayoutEffect } from 'react';
+import { Suspense, useLayoutEffect } from 'react';
+import type { ComponentType } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
-import { KickedOutOfRoomReason, LoginStatus, useLoginState, useRoomState } from 'tuikit-atomicx-react/room';
-import { TUIMessageBox } from '../base';
-import { t } from '../i18n';
-import { ConferenceView } from '../views/conference';
+import {
+  KickedOutOfRoomReason,
+  LoginStatus,
+  useLoginState,
+  useRoomParticipantState,
+  useRoomState,
+} from 'tuikit-atomicx-react/room';
+import type { RoomInfo, RoomParticipantRole } from 'tuikit-atomicx-react/room';
+import { TUIMessageBox, i18n } from '../base';
 import type { RoomEntryKind } from './session';
-import type { RoomEntryFailureReason } from './session/roomEntryError';
+import { RoomScene } from './types';
 import type { RoomContainer } from './types';
 
 /** Session-exit alerts outlive the conference tree. */
@@ -17,6 +23,20 @@ const EXIT_NOTICE_TARGET = 'body';
 const OVERLAY_RADIUS = '12px';
 const OVERLAY_SHADOW = '0 0 0 0.5px color-mix(in srgb, black 24%, transparent), 0 24px 64px -12px color-mix(in srgb, black 45%, transparent)';
 const MAX_Z_INDEX = 2147483647;
+
+/**
+ * i18n key of the notice for each kick reason. A scene rewords these in its i18n
+ * namespace, so core never needs to know which scenes exist.
+ */
+const KICKED_OUT_NOTICE_KEYS: Partial<Record<KickedOutOfRoomReason, string>> = {
+  [KickedOutOfRoomReason.KickedByAdmin]: 'RoomNotifications.KickedByAdmin',
+  [KickedOutOfRoomReason.ReplacedByAnotherDevice]: 'RoomNotifications.ReplacedByAnotherDevice',
+  [KickedOutOfRoomReason.KickedByServer]: 'RoomNotifications.KickedByServer',
+  [KickedOutOfRoomReason.ConnectionTimeout]: 'RoomNotifications.ConnectionTimeout',
+  [KickedOutOfRoomReason.InvalidStatusOnReconnect]: 'RoomNotifications.InvalidStatusOnReconnect',
+  [KickedOutOfRoomReason.RoomLimitExceeded]: 'RoomNotifications.RoomLimitExceeded',
+};
+const DEFAULT_KICKED_OUT_NOTICE_KEY = 'RoomNotifications.DefaultKickedOut';
 
 function isFullSize(value: number | string | undefined): boolean {
   if (value === undefined) {
@@ -88,22 +108,50 @@ function applyOverlayStyle(host: HTMLElement, isFullscreen: boolean): void {
   }
 }
 
+export interface SceneViewProps {
+  roomName?: string;
+  onLeave?: () => void;
+}
+
+/** The view each scene mounts. Lazy views render inside a `Suspense` boundary. */
+export type SceneViews = Record<RoomScene, ComponentType<SceneViewProps>>;
+
+let sceneViews: SceneViews | undefined;
+
+/**
+ * Called once by the package entry. The views layer decides which component each
+ * scene renders, so core never imports views.
+ */
+export function registerSceneViews(views: SceneViews): void {
+  sceneViews = views;
+}
+
+function getSceneView(scene: RoomScene): ComponentType<SceneViewProps> {
+  if (!sceneViews) {
+    throw new Error('[RoomKit] Scene views are not registered. Import RoomKit from the package entry, not from a core module.');
+  }
+  return sceneViews[scene];
+}
+
 export interface MountOptions {
   mountTarget: HTMLElement;
   container: RoomContainer;
   roomName: string;
+  scene?: RoomScene;
 }
 
 export class RoomKitMount {
   private hostElement?: HTMLElement;
   private root?: Root;
   private restorePageScroll?: () => void;
+  /** Outlives unmount: exit notices are raised as the view tears down and stay open after it. */
+  private scene = RoomScene.Conference;
 
   get isMounted(): boolean {
     return this.root !== undefined;
   }
 
-  mount({ mountTarget, container, roomName }: MountOptions): void {
+  mount({ mountTarget, container, roomName, scene = RoomScene.Conference }: MountOptions): void {
     this.unmount();
 
     const host = createHostElement(container);
@@ -119,11 +167,18 @@ export class RoomKitMount {
     }
     this.hostElement = host;
 
+    this.scene = scene;
+
     try {
       const root = createRoot(host);
       this.root = root;
+      const SceneView = getSceneView(scene);
       flushSync(() => {
-        root.render(<ConferenceView roomName={roomName} />);
+        root.render(
+          <Suspense fallback={null}>
+            <SceneView roomName={roomName} />
+          </Suspense>,
+        );
       });
     } catch (error) {
       this.unmount();
@@ -143,51 +198,32 @@ export class RoomKitMount {
     }
   }
 
-  notifyEnterFailed(kind: RoomEntryKind, reason: RoomEntryFailureReason): void {
+  /** Notices are raised while the view tears down, so they read the scene namespace directly. */
+  private get t() {
+    return i18n.getFixedT(null, this.scene);
+  }
+
+  notifyEnterFailed(kind: RoomEntryKind, messageKey: string): void {
     TUIMessageBox.alert({
-      title: t(kind === 'create' ? 'RoomEntry.CreateFailed' : 'RoomEntry.JoinFailed'),
-      message: t(`RoomEntry.Failure.${reason}`),
+      title: this.t(kind === 'create' ? 'RoomEntry.CreateFailed' : 'RoomEntry.JoinFailed'),
+      message: this.t(messageKey),
       closable: false,
       appendTo: EXIT_NOTICE_TARGET,
     });
   }
 
   notifyKickedOut(reason: KickedOutOfRoomReason): void {
-    let notice = t('RoomNotifications.DefaultKickedOut');
-    switch (reason) {
-      case KickedOutOfRoomReason.KickedByAdmin:
-        notice = t('RoomNotifications.KickedByAdmin');
-        break;
-      case KickedOutOfRoomReason.ReplacedByAnotherDevice:
-        notice = t('RoomNotifications.ReplacedByAnotherDevice');
-        break;
-      case KickedOutOfRoomReason.KickedByServer:
-        notice = t('RoomNotifications.KickedByServer');
-        break;
-      case KickedOutOfRoomReason.ConnectionTimeout:
-        notice = t('RoomNotifications.ConnectionTimeout');
-        break;
-      case KickedOutOfRoomReason.InvalidStatusOnReconnect:
-        notice = t('RoomNotifications.InvalidStatusOnReconnect');
-        break;
-      case KickedOutOfRoomReason.RoomLimitExceeded:
-        notice = t('RoomNotifications.RoomLimitExceeded');
-        break;
-      default:
-        break;
-    }
-    TUIMessageBox.alert({
-      title: t('Room.Notify'),
-      message: notice,
-      closable: false,
-      appendTo: EXIT_NOTICE_TARGET,
-    });
+    this.alertNotice(KICKED_OUT_NOTICE_KEYS[reason] ?? DEFAULT_KICKED_OUT_NOTICE_KEY);
   }
 
   notifyRoomEnded(): void {
+    this.alertNotice('Room.RoomEnded');
+  }
+
+  private alertNotice(messageKey: string): void {
     TUIMessageBox.alert({
-      title: t('Room.Notify'),
-      message: t('Room.RoomEnded'),
+      title: this.t('Room.Notify'),
+      message: this.t(messageKey),
       closable: false,
       appendTo: EXIT_NOTICE_TARGET,
     });
@@ -209,18 +245,22 @@ export function resolveMountTarget(appendTo: string | HTMLElement): HTMLElement 
  */
 export interface AtomicStateMirror {
   readonly currentRoomId: string | undefined;
+  readonly currentRoom: RoomInfo | null;
   readonly loginStatus: LoginStatus;
   readonly loginUserId: string | undefined;
+  /** Undefined until the local participant is fetched, which happens after the join resolves. */
+  readonly localParticipantRole: RoomParticipantRole | undefined;
   /** Fires after any mirrored value changes. */
   subscribe: (listener: () => void) => () => void;
 }
 
-let roomStateRef: { currentRoom: { roomId?: string } | null } | null = null;
+let roomStateRef: { currentRoom: RoomInfo | null } | null = null;
 let loginSnapshot: { loginStatus: LoginStatus; loginUserId: string | undefined } = {
   loginStatus: LoginStatus.UNKNOWN,
   loginUserId: undefined,
 };
 let lastRoomId: string | undefined;
+let localRoleSnapshot: RoomParticipantRole | undefined;
 const mirrorListeners = new Set<() => void>();
 let bridgeRoot: Root | undefined;
 
@@ -231,20 +271,24 @@ function notifyMirror(): void {
 function AtomicStateBridge() {
   const roomState = useRoomState();
   const { loginStatus, loginUserInfo } = useLoginState();
+  const { localParticipant } = useRoomParticipantState();
   roomStateRef = roomState;
   const roomId = roomState.currentRoom?.roomId;
   const loginUserId = loginUserInfo?.userId;
+  const localRole = localParticipant?.role;
 
   useLayoutEffect(() => {
     const changed = loginSnapshot.loginStatus !== loginStatus
       || loginSnapshot.loginUserId !== loginUserId
-      || lastRoomId !== roomId;
+      || lastRoomId !== roomId
+      || localRoleSnapshot !== localRole;
     loginSnapshot = { loginStatus, loginUserId };
     lastRoomId = roomId;
+    localRoleSnapshot = localRole;
     if (changed) {
       notifyMirror();
     }
-  }, [loginStatus, loginUserId, roomId]);
+  }, [loginStatus, loginUserId, roomId, localRole]);
 
   return null;
 }
@@ -266,6 +310,10 @@ export const atomicState: AtomicStateMirror = {
     // The AtomicX getter reads the live store, so this is current even mid-render.
     return roomStateRef?.currentRoom?.roomId;
   },
+  get currentRoom() {
+    ensureBridge();
+    return roomStateRef?.currentRoom ?? null;
+  },
   get loginStatus() {
     ensureBridge();
     return loginSnapshot.loginStatus;
@@ -273,6 +321,10 @@ export const atomicState: AtomicStateMirror = {
   get loginUserId() {
     ensureBridge();
     return loginSnapshot.loginUserId;
+  },
+  get localParticipantRole() {
+    ensureBridge();
+    return localRoleSnapshot;
   },
   subscribe(listener: () => void) {
     ensureBridge();

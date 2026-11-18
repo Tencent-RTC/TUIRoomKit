@@ -5,9 +5,11 @@ import {
   MessageType,
   useLoginStore,
 } from 'tuikit-atomicx-react/chat';
+import { useRoomState } from 'tuikit-atomicx-react/room';
 import { TUIMessageBox, TUIToast } from '../../../base';
 import { t } from '../../../base/i18n';
 import { formatTimestampToTime } from '../../../utils/formatTimestamp';
+import { findNoticeCopy } from '../customMessage';
 import { emojiBaseUrl, emojiUrlMap } from './emoji';
 import { getSendErrorMessage } from './getSendErrorMessage';
 import { useChatComposer } from './useChatComposer';
@@ -19,7 +21,8 @@ import { useSenderProfile } from './useSenderName';
 export interface ChatMessageProps {
   readonly message: MessageInfo;
   readonly actions: readonly MessageAction[];
-  readonly compact: boolean;
+  /** Tints the room owner's bubbles with the self-message accent. */
+  readonly isHighlightOwner?: boolean;
 }
 
 function splitTextWithEmoji(text: string) {
@@ -78,6 +81,7 @@ export function useChatMessage(props: ChatMessageProps) {
     return text ?? '';
   });
   const retryLockedRef = useRef(false);
+  const { currentRoom } = useRoomState();
   const messageRef = useRef(props.message);
   messageRef.current = props.message;
 
@@ -106,6 +110,14 @@ export function useChatMessage(props: ChatMessageProps) {
   const senderProfile = resolveProfile(message);
   const senderName = senderProfile.name;
   const senderAvatar = senderProfile.avatarUrl;
+  /* Only when the panel opts in: the design paints the room owner's bubbles
+   * with the same accent tint as one's own messages, so the owner stands out
+   * while staying left-aligned. */
+  const isOwnerMessage = (
+    Boolean(props.isHighlightOwner)
+    && Boolean(message.from?.userID)
+    && message.from?.userID === currentRoom?.roomOwner?.userId
+  );
   const displayStatus = overlay?.statusOf(message) ?? message.status;
   const isRecalled = displayStatus === MessageStatus.Recalled;
   const isFailed = displayStatus === MessageStatus.SendFail;
@@ -131,7 +143,7 @@ export function useChatMessage(props: ChatMessageProps) {
     if (typeof action.visible === 'function') return action.visible(messageForActions);
     return action.visible !== false;
   });
-  let bubbleKind: 'text' | 'file' | 'image' | 'video' | 'unknown';
+  let bubbleKind: 'text' | 'file' | 'image' | 'video' | 'notice' | 'unknown';
   switch (message.messageType) {
     case MessageType.Text:
       bubbleKind = 'text';
@@ -144,6 +156,10 @@ export function useChatMessage(props: ChatMessageProps) {
       break;
     case MessageType.Video:
       bubbleKind = 'video';
+      break;
+    case MessageType.Custom:
+      // Known custom protocols render as centered notice lines.
+      bubbleKind = findNoticeCopy(message) !== undefined ? 'notice' : 'unknown';
       break;
     default:
       bubbleKind = 'unknown';
@@ -187,6 +203,8 @@ export function useChatMessage(props: ChatMessageProps) {
     ? formatDuration(videoPayload.videoDuration)
     : '';
   const fallbackText = t('RoomChat.unsupported');
+  const noticeCopy = bubbleKind === 'notice' ? findNoticeCopy(message) : undefined;
+  const noticeText = noticeCopy ? t(noticeCopy.key, noticeCopy.params) : '';
 
   function reeditRecalled() {
     composer?.fillDraft(lastTextPayload);
@@ -254,6 +272,7 @@ export function useChatMessage(props: ChatMessageProps) {
     recalledText,
     senderAvatar,
     senderName,
+    isOwnerMessage,
     timeText,
     isFailed,
     isSending,
@@ -270,6 +289,7 @@ export function useChatMessage(props: ChatMessageProps) {
     videoPoster,
     videoDurationText,
     fallbackText,
+    noticeText,
     reeditRecalled,
     retrySend,
     onActionCommand,

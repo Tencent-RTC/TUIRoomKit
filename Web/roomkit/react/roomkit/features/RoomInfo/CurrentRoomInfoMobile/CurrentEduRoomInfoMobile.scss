@@ -1,0 +1,88 @@
+/* H5 classroom chip: 36px, 11px type, no plate. Both orientations keep the divider and caret.
+   Vue scopes these rules; here `is-edu` keeps them off the meeting chip, which shares
+   the class names, and resets the meeting chip's plate. */
+.current-room-info-mobile.is-edu {
+  display: inline-flex;
+  flex: 0 1 auto;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  height: 36px;
+  padding: 0 2px;
+  margin-left: 0;
+  color: var(--rk-text-primary);
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border-radius: 0;
+  outline: none;
+}
+
+.current-room-info-mobile.is-edu:active {
+  background: transparent;
+  opacity: 0.88;
+}
+
+.current-room-info-mobile.is-edu.is-open {
+  opacity: 1;
+}
+
+.current-room-info-mobile.is-edu .current-room-info-mobile-title {
+  min-width: 0;
+  max-width: 200px;
+  overflow: hidden;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.current-room-info-mobile.is-edu.is-landscape .current-room-info-mobile-title {
+  max-width: min(42vw, 280px);
+}
+
+.current-room-info-mobile.is-edu .current-room-info-mobile-time {
+  flex-shrink: 0;
+  padding-left: 10px;
+  margin-left: 2px;
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--rk-text-primary);
+  letter-spacing: 0.02em;
+  border-left: 1px solid var(--rk-border-strong);
+}
+
+.current-room-info-mobile.is-edu .current-room-info-mobile-caret {
+  flex-shrink: 0;
+  margin-left: 2px;
+  color: var(--rk-text-tertiary);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.current-room-info-mobile.is-edu.is-open .current-room-info-mobile-caret {
+  color: var(--rk-brand-hover);
+  transform: rotate(180deg);
+}
+
+.rk-root[data-rk-theme='light'] .current-room-info-mobile.is-edu.is-open .current-room-info-mobile-caret {
+  color: var(--rk-brand);
+}
+
+/* Popup head is 4px + 30px + 10px, the design's 44px centered title. */
+.edu-room-info-sheet-title {
+  width: 100%;
+  height: 30px;
+  font-size: var(--rk-fs-lg);
+  font-weight: 600;
+  line-height: 30px;
+  color: var(--rk-text-primary);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .current-room-info-mobile.is-edu .current-room-info-mobile-caret {
+    transition: none;
+  }
+}

@@ -38,20 +38,22 @@
   place-content: stretch;
 }
 
-/* The tile is the one clip for the video and the overlay. */
+/* The tile only sets the corners; the participant view rounds its own video to them.
+   It must not clip, or the overlay's speaking glow would be cut off. */
 .grid-layout-mobile-tile {
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: hidden;
   background: var(--room-view-tile-bg);
   isolation: isolate;
   border-radius: 12px;
 }
 
+/* Passes the tile's corners down to the participant view inside. */
 .grid-layout-mobile-video {
   width: 100%;
   height: 100%;
+  border-radius: inherit;
 }
 
 .grid-layout-mobile-video.is-hidden {
@@ -68,19 +70,6 @@
 .grid-layout-mobile-tile.is-pair-shifted {
   width: var(--grid-layout-mobile-tile-width);
   margin-inline-start: calc((var(--grid-layout-mobile-tile-width) + var(--grid-layout-mobile-gap)) / 2);
-}
-
-/* The ring sits on the tile, which owns the corners and the clip; the 4px gallery gap
-   leaves no room for an outer glow. */
-.grid-layout-mobile-pip:has(.participant-view-overlay.is-speaking)::after,
-.grid-layout-mobile-tile:has(.participant-view-overlay.is-speaking)::after {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  content: '';
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 2px var(--rk-success);
 }
 
 .grid-layout-mobile-content.is-share-page .grid-layout-mobile-tile {
@@ -212,7 +201,6 @@
   z-index: 13;
   width: 112px;
   aspect-ratio: 9 / 16;
-  overflow: hidden;
   touch-action: none;
   cursor: grab;
   user-select: none;

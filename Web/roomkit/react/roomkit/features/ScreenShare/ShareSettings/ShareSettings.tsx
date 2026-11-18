@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import type { CSSProperties } from 'react';
 import { TUISwitch } from '../../../base';
 import { useI18n } from '../../../i18n';
-import { shareSystemAudio } from '../ScreenShareButton/useScreenShare';
+import { shareSystemAudio } from '../useScreenShare';
 import './ShareSettings.scss';
 
 export interface ShareSettingsProps {

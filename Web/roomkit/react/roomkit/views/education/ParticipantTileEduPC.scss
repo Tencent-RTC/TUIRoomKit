@@ -1,0 +1,229 @@
+.edu-tile {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--rk-bg-camera-off);
+  border-radius: 10px;
+  container-type: size;
+}
+
+.edu-tile-view {
+  width: 100%;
+  height: 100%;
+}
+
+.edu-tile-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Same frame as the avatar: covers the player, which paints its own black a frame later. */
+.edu-tile-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--rk-bg-camera-off);
+  border-radius: inherit;
+}
+
+.edu-tile-face {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  transform: translate(-50%, -50%);
+}
+
+.edu-tile-net {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 6;
+  display: inline-flex;
+  color: var(--rk-danger);
+}
+
+.edu-tile-trophy {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 4;
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  padding: 2px 4px;
+  font-size: var(--rk-fs-xs);
+  color: var(--rk-warning);
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 8px;
+}
+
+.edu-tile-trophy b {
+  font-weight: 500;
+}
+
+.edu-tile-meta {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  max-width: calc(100% - 12px);
+  font-size: 11px;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+}
+
+.edu-tile-mic {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.edu-tile-mic svg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+/* Box is in IconMic's 16-unit viewBox: it matches the capsule's hollow cavity
+   (x 5.5-10.5, y 2-10.5) so the fill never escapes the outline.
+   Update it if the icon path changes.
+   The level is clipped from the top, since scaling would flatten the round bottom. */
+.edu-tile-mic-core {
+  position: absolute;
+  top: calc(2 / 16 * 100%);
+  left: calc(5.5 / 16 * 100%);
+  z-index: 0;
+  width: calc(5 / 16 * 100%);
+  height: calc(8.5 / 16 * 100%);
+  background: var(--rk-success);
+  border-radius: 999px;
+  transition: clip-path 0.2s ease-out;
+}
+
+.edu-tile-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edu-tile-tag {
+  flex: none;
+  padding: 0 6px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--rk-brand);
+  background: color-mix(in srgb, var(--rk-brand) 18%, transparent);
+  border-radius: 4px;
+}
+
+.edu-tile-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 6;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.46);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.edu-tile:hover .edu-tile-actions,
+.edu-tile:has(:focus-visible) .edu-tile-actions {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.edu-tile:hover .edu-tile-overlay:has(.edu-tile-actions) .edu-tile-meta,
+.edu-tile:has(:focus-visible) .edu-tile-overlay:has(.edu-tile-actions) .edu-tile-meta {
+  opacity: 0;
+}
+
+.edu-tile-actions button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  border-radius: 6px;
+}
+
+.edu-tile-actions button:hover,
+.edu-tile-actions button.is-on {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.edu-tile-wait {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 12px;
+  overflow: hidden;
+}
+
+.edu-tile-wait-figure {
+  display: block;
+  width: auto;
+  max-width: 88%;
+  height: clamp(32px, 48cqh, 58px);
+  object-fit: contain;
+}
+
+.edu-tile-wait-label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: clamp(10px, 13cqmin, 14px);
+  font-weight: 500;
+  color: var(--rk-text-secondary);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@container (min-height: 120px) {
+  .edu-tile-wait {
+    gap: 8px;
+  }
+
+  .edu-tile-wait-figure {
+    height: clamp(64px, 46cqh, 108px);
+  }
+}
+
+@container (max-height: 52px) {
+  .edu-tile-wait-label {
+    display: none;
+  }
+
+  .edu-tile-wait-figure {
+    height: clamp(22px, 64cqh, 30px);
+  }
+}

@@ -13,3 +13,9 @@
 .rk-root[data-rk-theme='dark'] .room-view {
   --room-view-tile-bg: color-mix(in srgb, var(--rk-brand) 2%, #141414);
 }
+
+/* The tile overlay lets presses through, so a right-click would open the browser's
+   video menu (save, picture-in-picture) on the stream. */
+.room-view video {
+  pointer-events: none;
+}

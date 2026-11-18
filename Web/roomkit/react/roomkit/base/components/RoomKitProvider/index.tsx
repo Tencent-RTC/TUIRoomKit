@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, us
 import { getPlatform } from '@tencentcloud/universal-api';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { ProvideIcons } from '../../icons/context';
-import { removeOverlayContext, setActiveOverlayContext } from '../../overlayRegistry';
+import { getActiveScene, removeOverlayContext, setActiveOverlayContext, setActiveScene, subscribeActiveScene } from '../../overlayRegistry';
 import { LANE_BASE, OVERLAY_CONTEXT_KEY } from '../../tokens';
 import { setUIConfig, useUIConfig } from '../../uiConfig';
 import type { ThemeName } from '../../uiConfig';
@@ -18,6 +18,8 @@ export interface RoomKitProviderProps extends Omit<HTMLAttributes<HTMLDivElement
   baseZ?: number;
   /** Theme to apply; omitted keeps the stored theme. */
   theme?: ThemeName;
+  /** Appended to the root as an `rk-scene-*` class; defaults to `conference`, `education` renders the edu token pack. `'auto'` (append hosts) mirrors the most recently mounted explicit scene. */
+  scene?: string;
   /** Register this host for command TUIToast / TUIMessageBox. */
   command?: boolean;
   /** Transparent cover used by appendTo. */
@@ -89,6 +91,7 @@ export const RoomKitProvider = forwardRef<RoomKitProviderExpose, RoomKitProvider
   const {
     baseZ = 0,
     theme,
+    scene = 'conference',
     command = true,
     cover = false,
     onUpdateTheme,
@@ -104,6 +107,26 @@ export const RoomKitProvider = forwardRef<RoomKitProviderExpose, RoomKitProvider
   const hostRef = useRef<HTMLDivElement | null>(null);
   const baseZRef = useRef(baseZ);
   baseZRef.current = baseZ;
+
+  /** 'auto' (append hosts) mirrors the most recently mounted explicit scene,
+   * so body-level notices keep the active scene's brand tokens. */
+  const isAutoScene = scene === 'auto';
+  const [mirroredScene, setMirroredScene] = useState(() => getActiveScene());
+  useEffect(() => {
+    if (!isAutoScene) {
+      return undefined;
+    }
+    setMirroredScene(getActiveScene());
+    return subscribeActiveScene(setMirroredScene);
+  }, [isAutoScene]);
+  const resolvedScene = isAutoScene ? mirroredScene : scene;
+
+  // Explicit scenes register themselves so append hosts can mirror them.
+  useEffect(() => {
+    if (scene !== 'auto') {
+      setActiveScene(scene);
+    }
+  }, [scene]);
 
   // A stable object: command stores and the overlay registry key by its identity.
   const [context] = useState(() => createOverlayContext(() => baseZRef.current));
@@ -190,7 +213,7 @@ export const RoomKitProvider = forwardRef<RoomKitProviderExpose, RoomKitProvider
     <div
       {...rootAttrs}
       ref={rootRef}
-      className={[cover ? 'rk-root rk-root-cover' : 'rk-root', isH5 ? 'is-h5' : '', className].filter(Boolean).join(' ')}
+      className={[cover ? 'rk-root rk-root-cover' : 'rk-root', isH5 ? 'is-h5' : '', `rk-scene-${resolvedScene}`, className].filter(Boolean).join(' ')}
       style={rootStyle}
       data-rk-theme={currentTheme}
     >

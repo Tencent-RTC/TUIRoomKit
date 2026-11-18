@@ -11,6 +11,7 @@ import { t } from '../../i18n';
 import { DEFAULT_SOURCE_LANGUAGE, DEFAULT_TARGET_LANGUAGE } from './constants';
 import {
   presentCaptionHint,
+  resetCaptionForNewSession,
   setCapViewOpen,
   setEmptyDismissed,
   useSubtitleViewState,
@@ -95,6 +96,11 @@ function setASROn(next: boolean) {
   // the fact that transcription just started or stopped. Whether captions are
   // shown stays each participant's own choice.
   setEmptyDismissed(false);
+
+  // Announce a fresh start to the room audience; the host started it themselves.
+  if (next && !canManageASRNow) {
+    TUIToast.info({ message: t('AITools.RecordStatusOn') });
+  }
 }
 
 function resetASRState() {
@@ -162,7 +168,7 @@ function bindTranscriberEvents(subscribeEvent: ReturnType<typeof useAITranscribe
     // previous session's opt-in must not carry over, the member re-opens the
     // caption window manually. The owner keeps their own window open.
     if (!canManageASRNow) {
-      setCapViewOpen(false);
+      resetCaptionForNewSession();
     }
     setASROn(true);
   });

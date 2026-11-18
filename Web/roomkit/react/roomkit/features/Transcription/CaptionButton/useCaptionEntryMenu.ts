@@ -1,7 +1,7 @@
 import { useAITranscriberState } from 'tuikit-atomicx-react/room';
 import { IconAI, IconAISubtitleCC, IconAITranscription } from '../../../base';
 import { useI18n } from '../../../i18n';
-import type { OverflowSubmenuItem } from '../../../layouts/OverflowToolbarPC/overflowSubmenu';
+import type { OverflowSubmenuItem } from '../../../layouts/OverflowToolbarPC/overflowItem';
 import { hasDisplayableText } from '../display';
 import { useASRState } from '../useASRState';
 import { useSubtitleViewState } from '../useSubtitleViewState';
@@ -36,33 +36,33 @@ export function useCaptionEntryMenu(
   const recordLabel = transcriptOpen
     ? t('AITools.RealtimeMessageListClose')
     : t('AITools.RealtimeMessageListOpen');
-  const hint = showWaitHint ? t('AITools.WaitHost') : '';
+  const note = showWaitHint ? t('AITools.WaitHost') : '';
 
   const items: OverflowSubmenuItem[] = [];
   if (canManageASR) {
     items.push({
-      act: 'transcription',
+      command: 'transcription',
       label: transcriptionLabel,
       icon: IconAI,
-      on: asrOn,
+      checked: asrOn,
     });
     items.push({ divider: true });
   }
   items.push({
-    act: 'caption',
+    command: 'caption',
     label: captionLabel,
     icon: IconAISubtitleCC,
     disabled: captionDisabled,
   });
   items.push({
-    act: 'transcript',
+    command: 'transcript',
     label: recordLabel,
     icon: IconAITranscription,
     disabled: transcriptDisabled,
   });
 
-  function run(act: string): boolean {
-    if (act === 'transcription') {
+  function run(command: string): boolean {
+    if (command === 'transcription') {
       if (!canManageASR) {
         return false;
       }
@@ -73,7 +73,7 @@ export function useCaptionEntryMenu(
       }
       return true;
     }
-    if (act === 'caption') {
+    if (command === 'caption') {
       if (captionDisabled) {
         return false;
       }
@@ -84,7 +84,7 @@ export function useCaptionEntryMenu(
       }
       return true;
     }
-    if (act === 'transcript') {
+    if (command === 'transcript') {
       if (transcriptDisabled) {
         return false;
       }
@@ -104,7 +104,7 @@ export function useCaptionEntryMenu(
     transcriptionLabel,
     captionLabel,
     recordLabel,
-    hint,
+    note,
     items,
     run,
   };

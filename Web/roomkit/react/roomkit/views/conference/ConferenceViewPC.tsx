@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
-import { useDeviceState, useLoginState, useRoomParticipantState, useRoomState, DeviceStatus } from 'tuikit-atomicx-react/room';
+import { useLoginState, useRoomState } from 'tuikit-atomicx-react/room';
 import {
   IconMembers,
   IconChat,
@@ -22,6 +22,7 @@ import { useI18n } from '../../i18n';
 import { roomEntry } from '../../core/session';
 import type { RoomEntryPhase } from '../../core/session';
 import {
+  AnnotationButton,
   CameraButton,
   CaptionButton,
   CaptionOverlay,
@@ -43,6 +44,8 @@ import {
   SettingsDialogPC,
   TranscriptList,
   useASRState,
+  WhiteboardButton,
+  WhiteboardView,
 } from '../../features';
 import type { SettingsTab } from '../../features';
 import type { MiniWindowExpose } from '../../features/MiniWindow/MiniWindow';
@@ -75,12 +78,11 @@ export function ConferenceViewPC(props: ConferenceViewPCProps) {
     },
   }), []);
 
-  const { layoutTemplate, setLayoutTemplate } = useRoomLayoutState();
+  const { layoutTemplate, stageStream, setLayoutTemplate, handleStreamDoubleClick } = useRoomLayoutState();
   const { uiConfig } = useUIConfig();
   const ParticipantViewUI = uiConfig.participantViewUI;
   const { currentRoom } = useRoomState();
-  const { participantList } = useRoomParticipantState();
-  const participantCount = currentRoom?.participantCount || participantList.length;
+  const participantCount = currentRoom?.participantCount ?? 0;
   // Mounted before the join runs, unlike the meeting chrome below, which is what the
   // recording notice inside needs to catch the start event a late joiner receives.
   useRoomTips({ onLeave: () => onLeave?.() });
@@ -144,19 +146,6 @@ export function ConferenceViewPC(props: ConferenceViewPCProps) {
   const miniViewRef = useRef<MiniWindowExpose | null>(null);
   // Without Document PiP there is nowhere useful to minimize to, so the menu entry stays hidden.
   const [pipSupported] = useState(() => isPictureInPictureSupported());
-  const { screenStatus } = useDeviceState();
-  const screenStatusWatchedRef = useRef(false);
-  useEffect(() => {
-    if (!screenStatusWatchedRef.current) {
-      screenStatusWatchedRef.current = true;
-      return;
-    }
-    if (screenStatus === DeviceStatus.On) {
-      void miniViewRef.current?.minimize({ auto: true });
-    } else {
-      miniViewRef.current?.dismissAuto();
-    }
-  }, [screenStatus]);
 
   const { isCaptionShown } = useASRState();
 
@@ -238,12 +227,21 @@ export function ConferenceViewPC(props: ConferenceViewPCProps) {
               <section className={['conference-stage', size === 'wide' && openedPanels.length > 0 ? 'conference-stage-docked' : ''].filter(Boolean).join(' ')}>
                 <RoomViewPC
                   layoutTemplate={layoutTemplate}
+                  stageStream={stageStream}
                   hideOverlay={Boolean(ParticipantViewUI)}
-                  participantViewUISlot={ParticipantViewUI
-                    ? ({ participant, streamType }) => (
-                      <ParticipantViewUI participant={participant} streamType={streamType} />
-                    )
-                    : undefined}
+                  onStreamDoubleClick={handleStreamDoubleClick}
+                  participantViewUISlot={({ participant, streamType, tileRole }) => (
+                    <>
+                      <WhiteboardView participant={participant} streamType={streamType} />
+                      {ParticipantViewUI && <ParticipantViewUI participant={participant} streamType={streamType} />}
+                      {/* A thumbnail is too small to draw on; the room holds the stage while annotating. */}
+                      {tileRole === 'stage' && (
+                        <div className="conference-share-actions">
+                          {uiConfig.widgetVisible.AnnotationWidget !== false && <AnnotationButton participant={participant} streamType={streamType} />}
+                        </div>
+                      )}
+                    </>
+                  )}
                 />
                 {isCaptionShown && (
                   <CaptionOverlay
@@ -253,8 +251,8 @@ export function ConferenceViewPC(props: ConferenceViewPCProps) {
                 )}
 
                 <div className="conference-toolbar">
-                  <MicButton />
-                  <CameraButton onOpenSetting={openSettings} />
+                  {uiConfig.widgetVisible.MicWidget !== false && <MicButton />}
+                  {uiConfig.widgetVisible.CameraWidget !== false && <CameraButton onOpenSetting={openSettings} />}
 
                   <OverflowToolbarPC
                     className="conference-toolbar-overflow"
@@ -263,61 +261,72 @@ export function ConferenceViewPC(props: ConferenceViewPCProps) {
                     onMinimize={() => miniViewRef.current?.minimize()}
                     onFullscreen={toggleFullscreen}
                   >
-                    <ParticipantButtonPC
-                      active={openedPanels.includes('participants')}
-                      onClick={() => sidePanelRef.current?.toggle('participants')}
-                    />
-                    <ChatButton
-                      active={openedPanels.includes('chat')}
-                      isChatActive={activePanel === 'chat'}
-                      onClick={() => sidePanelRef.current?.toggle('chat')}
-                    />
-                    <ScreenShareButton />
-                    <CloudRecordingButtonPC />
-                    <CaptionButton
-                      active={isCaptionShown || openedPanels.includes('transcript')}
-                      transcriptOpen={openedPanels.includes('transcript')}
-                      onToggleTranscript={toggleTranscriptPanel}
-                    />
-                    <SettingButtonPC active={settingsOpen} onClick={() => openSettings()} />
+                    {uiConfig.widgetVisible.MemberWidget !== false && (
+                      <ParticipantButtonPC
+                        active={openedPanels.includes('participants')}
+                        onClick={() => sidePanelRef.current?.toggle('participants')}
+                      />
+                    )}
+                    {uiConfig.widgetVisible.RoomChatWidget !== false && (
+                      <ChatButton
+                        active={openedPanels.includes('chat')}
+                        isChatActive={activePanel === 'chat'}
+                        onClick={() => sidePanelRef.current?.toggle('chat')}
+                      />
+                    )}
+                    {uiConfig.widgetVisible.ScreenShareWidget !== false && (
+                      <ScreenShareButton>
+                        {uiConfig.widgetVisible.WhiteboardWidget !== false && <WhiteboardButton />}
+                      </ScreenShareButton>
+                    )}
+                    {uiConfig.widgetVisible.RecordingWidget !== false && <CloudRecordingButtonPC />}
+                    {uiConfig.widgetVisible.AIToolsWidget !== false && (
+                      <CaptionButton
+                        active={isCaptionShown || openedPanels.includes('transcript')}
+                        transcriptOpen={openedPanels.includes('transcript')}
+                        onToggleTranscript={toggleTranscriptPanel}
+                      />
+                    )}
+                    {uiConfig.widgetVisible.SettingsWidget !== false && <SettingButtonPC active={settingsOpen} onClick={() => openSettings()} />}
                   </OverflowToolbarPC>
 
-                  <TUIPopover
-                    open={leaveMenuOpen}
-                    disabled={!canEndRoom}
-                    placement="top-end"
-                    offset={14}
-                    padded={false}
-                    showArrow
-                    onUpdateOpen={setLeaveMenuOpen}
-                    contentSlot={(
-                      <div className="conference-leave-menu" role="menu">
-                        <TUIButton variant="danger" block role="menuitem" onClick={() => exit('end')}>
-                          {t('Room.End')}
-                        </TUIButton>
-                        <TUIButton variant="ghost" block role="menuitem" onClick={() => exit('leave')}>
-                          {t('Room.Leave')}
-                        </TUIButton>
-                      </div>
-                    )}
-                  >
-                    <TUIButton
-                      className={['conference-leave', leaveMenuOpen ? 'is-open' : ''].filter(Boolean).join(' ')}
-                      variant="danger"
-                      aria-label={leaveMenuOpen ? t('Room.Cancel') : t('Room.Leave')}
-                      aria-haspopup={canEndRoom ? 'menu' : undefined}
-                      aria-expanded={canEndRoom ? leaveMenuOpen : undefined}
-                      onClick={() => {
-                        if (!canEndRoom) {
-                          void exit('leave');
-                        }
-                      }}
+                  {uiConfig.widgetVisible.LeaveRoomWidget !== false && (
+                    <TUIPopover
+                      open={leaveMenuOpen}
+                      disabled={!canEndRoom}
+                      placement="top-end"
+                      offset={14}
+                      padded={false}
+                      showArrow
+                      onUpdateOpen={setLeaveMenuOpen}
+                      contentSlot={(
+                        <div className="conference-leave-menu" role="menu">
+                          <TUIButton variant="danger" block role="menuitem" onClick={() => exit('end')}>
+                            {t('Room.End')}
+                          </TUIButton>
+                          <TUIButton variant="ghost" block role="menuitem" onClick={() => exit('leave')}>
+                            {t('Room.Leave')}
+                          </TUIButton>
+                        </div>
+                      )}
                     >
-                      {leaveMenuOpen
-                        ? t('Room.Cancel')
-                        : <IconPhone className="conference-leave-icon" size={22} />}
-                    </TUIButton>
-                  </TUIPopover>
+                      <TUIButton
+                        className={['conference-leave', leaveMenuOpen ? 'is-open' : ''].filter(Boolean).join(' ')}
+                        variant="danger"
+                        aria-label={leaveMenuOpen ? t('Room.Cancel') : t('Room.Leave')}
+                        aria-haspopup={canEndRoom ? 'menu' : undefined}
+                        aria-expanded={canEndRoom ? leaveMenuOpen : undefined}
+                        onClick={() => {
+                          if (!canEndRoom) {
+                            void exit('leave');
+                          }
+                        }}
+                        iconSlot={leaveMenuOpen ? undefined : <IconPhone className="conference-leave-icon" size={22} />}
+                      >
+                        {leaveMenuOpen ? t('Room.Cancel') : null}
+                      </TUIButton>
+                    </TUIPopover>
+                  )}
                 </div>
               </section>
 

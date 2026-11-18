@@ -9,7 +9,6 @@ import {
   IconChevronUp,
   IconImage,
   IconMicOff,
-  IconUnSupport,
   AudioDeviceMenu,
   MicLevelIcon,
   SettingsDialogPC,
@@ -40,6 +39,7 @@ export function LocalPreview(props: LocalPreviewProps) {
   const [camMenuOpen, setCamMenuOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const cameraOnBeforeSettingsRef = useRef(false);
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('videoEffect');
   const {
     isCameraTesting,
@@ -105,8 +105,23 @@ export function LocalPreview(props: LocalPreviewProps) {
   }
 
   function openSettings(tab: SettingsTab = 'videoEffect') {
+    // Snapshot at open time: at close-handler time the panel's own test stream
+    // is still running, so isCameraTesting there cannot tell this fact apart.
+    cameraOnBeforeSettingsRef.current = isCameraTesting;
     setSettingsTab(tab);
     setSettingsOpen(true);
+  }
+
+  function handleSettingsClose() {
+    setSettingsOpen(false);
+    // Respect the camera state the user had before opening the panel: a camera
+    // that was off started the panel's own test stream and stops with it.
+    if (!cameraOnBeforeSettingsRef.current) {
+      return;
+    }
+    // The effect panel borrowed the shared camera test's render view; the
+    // stream is still ours, take the view back.
+    startCameraPreview().catch(() => {});
   }
 
   useEffect(() => {
@@ -193,7 +208,6 @@ export function LocalPreview(props: LocalPreviewProps) {
           className={[
             'media-btn',
             !isMicrophoneTesting ? 'is-off' : '',
-            hasMicrophoneError ? 'is-abnormal' : '',
           ].filter(Boolean).join(' ')}
         >
           <button
@@ -204,7 +218,7 @@ export function LocalPreview(props: LocalPreviewProps) {
           >
             <span className="media-btn-icon-wrap">
               {isMicrophoneTesting ? <MicLevelIcon size={20} /> : <IconMicOff size={20} />}
-              {hasMicrophoneError && <IconUnSupport className="media-btn-badge" size={10} />}
+              {hasMicrophoneError && <span className="media-btn-badge" aria-hidden="true">!</span>}
             </span>
           </button>
           <i className="media-btn-divider" />
@@ -231,7 +245,6 @@ export function LocalPreview(props: LocalPreviewProps) {
           className={[
             'media-btn',
             !isCameraTesting ? 'is-off' : '',
-            hasCameraError ? 'is-abnormal' : '',
           ].filter(Boolean).join(' ')}
         >
           <button
@@ -243,7 +256,7 @@ export function LocalPreview(props: LocalPreviewProps) {
           >
             <span className="media-btn-icon-wrap">
               {isCameraTesting ? <IconCam size={20} /> : <IconCamOff size={20} />}
-              {hasCameraError && <IconUnSupport className="media-btn-badge" size={10} />}
+              {hasCameraError && <span className="media-btn-badge" aria-hidden="true">!</span>}
             </span>
           </button>
           <i className="media-btn-divider" />
@@ -271,7 +284,7 @@ export function LocalPreview(props: LocalPreviewProps) {
         open={settingsOpen}
         activeTab={settingsTab}
         onSelect={setSettingsTab}
-        onClose={() => setSettingsOpen(false)}
+        onClose={handleSettingsClose}
       />
     </div>
   );

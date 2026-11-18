@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import type { ButtonHTMLAttributes, ComponentType, ReactNode } from 'react';
-import { IconChevronUp, IconUnSupport, TUIPopover, TUITooltip } from '../../base';
+import { IconChevronUp, TUIPopover, TUITooltip } from '../../base';
 import type { IconProps } from '../../base';
+import { OVERFLOW_ITEM_KEY } from '../OverflowToolbarPC/overflowItem';
+import type { OverflowBehavior } from '../OverflowToolbarPC/overflowItem';
 import './ToolbarButtonPC.scss';
 
 export interface ToolbarButtonPCProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'disabled'> {
   label: string;
   icon?: string | ComponentType<IconProps>;
+  /**
+   * What picking this control from the overflow more-menu does, once it has collapsed there.
+   * Defaults to its own click; a control whose click opens a dropdown passes its real action.
+   */
+  overflowBehavior?: OverflowBehavior;
   /** Accessible name for the menu trigger, defaults to the button label */
   menuLabel?: string;
   active?: boolean;
@@ -16,6 +23,11 @@ export interface ToolbarButtonPCProps extends Omit<ButtonHTMLAttributes<HTMLButt
   /** Looks unavailable but still emits click, so the handler can explain why */
   blocked?: boolean;
   loading?: boolean;
+  /**
+   * The device-fault notice: a "!" round tag hung on the icon's top-right
+   * corner. Sizing of the badge reads the `--rk-fault-badge*` custom
+   * properties so scenes can scale it per chip.
+   */
   notice?: boolean;
   showTooltip?: boolean;
   /**
@@ -24,6 +36,8 @@ export interface ToolbarButtonPCProps extends Omit<ButtonHTMLAttributes<HTMLButt
    * document — the picture-in-picture mini window — would open the menu out of sight.
    */
   hideMenu?: boolean;
+  /** Resting direction of the caret glyph; the menu-open state always points the opposite way. */
+  caretDirection?: 'up' | 'down';
   onClick?: () => void;
   iconSlot?: ReactNode;
   menuSlot?: (scope: { close: () => void }) => ReactNode;
@@ -33,6 +47,7 @@ export function ToolbarButtonPC(props: ToolbarButtonPCProps) {
   const {
     label,
     icon = undefined,
+    overflowBehavior,
     menuLabel = '',
     active = false,
     danger = false,
@@ -43,6 +58,7 @@ export function ToolbarButtonPC(props: ToolbarButtonPCProps) {
     notice = false,
     showTooltip = true,
     hideMenu = false,
+    caretDirection = 'up',
     onClick,
     iconSlot,
     menuSlot,
@@ -52,6 +68,31 @@ export function ToolbarButtonPC(props: ToolbarButtonPCProps) {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const hasMenu = menuSlot != null && !hideMenu;
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  // Outside an overflow toolbar (H5, the mini window) there is nothing to register with.
+  const overflowRegistry = useContext(OVERFLOW_ITEM_KEY);
+  const overflowItem = {
+    label,
+    icon: typeof icon === 'string' ? undefined : icon,
+    disabled: disabled || loading,
+    behavior: overflowBehavior ?? { select: () => onClick?.() },
+  };
+  const overflowItemRef = useRef(overflowItem);
+  overflowItemRef.current = overflowItem;
+
+  useEffect(() => {
+    if (!overflowRegistry) {
+      return undefined;
+    }
+    return overflowRegistry.register(() => (rootRef.current
+      ? { el: rootRef.current, ...overflowItemRef.current }
+      : null));
+  }, [overflowRegistry]);
+
+  useEffect(() => {
+    overflowRegistry?.refresh();
+  }, [overflowRegistry, label, icon, disabled, loading, overflowBehavior]);
 
   /** Handed to the menu slot so an item that navigates elsewhere can dismiss the popover */
   function closeMenu() {
@@ -65,6 +106,7 @@ export function ToolbarButtonPC(props: ToolbarButtonPCProps) {
     // An open menu already names the button, and the tip would cover its first row.
     <TUITooltip content={label} disabled={!showTooltip || menuOpen}>
       <div
+        ref={rootRef}
         className={[
           'toolbar-button',
           active ? 'toolbar-button-active' : '',
@@ -74,6 +116,7 @@ export function ToolbarButtonPC(props: ToolbarButtonPCProps) {
           hasMenu ? 'toolbar-button-with-menu' : '',
         ].filter(Boolean).join(' ')}
         data-menu-open={menuOpen ? '1' : undefined}
+        data-caret-direction={caretDirection}
       >
         <button
           className={['toolbar-button-main', className ?? ''].filter(Boolean).join(' ')}
@@ -85,7 +128,7 @@ export function ToolbarButtonPC(props: ToolbarButtonPCProps) {
         >
           <span className="toolbar-button-icon">
             {iconSlot ?? defaultIcon}
-            {notice && <IconUnSupport className="toolbar-button-notice" size={12} />}
+            {notice && <span className="toolbar-button-fault-badge" aria-hidden="true">!</span>}
           </span>
         </button>
 

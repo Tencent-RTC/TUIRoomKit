@@ -10,6 +10,8 @@ export interface DeviceFaultDialogProps {
   host: HTMLElement | null;
   title: string;
   description: string;
+  /** Landscape H5: the same dialog, sized for a short phone viewport. */
+  compact?: boolean;
   close: () => void;
 }
 
@@ -20,6 +22,7 @@ export function DeviceFaultDialog(props: DeviceFaultDialogProps) {
     host,
     title,
     description,
+    compact = false,
     close,
   } = props;
   const { t } = useI18n();
@@ -28,29 +31,35 @@ export function DeviceFaultDialog(props: DeviceFaultDialogProps) {
     return null;
   }
 
+  const iconSize = compact ? 16 : 22;
+  const compactClass = compact ? 'is-compact' : '';
   const isLock = faultView.kind === 'browser-blocked' || faultView.kind === 'system-blocked';
 
   let icon;
   if (isLock) {
-    icon = <IconLock size={22} />;
+    icon = <IconLock size={iconSize} />;
   } else if (faultView.kind === 'no-device' && faultView.target === 'camera') {
-    icon = <IconCam size={22} />;
+    icon = <IconCam size={iconSize} />;
   } else if (faultView.kind === 'no-device' && faultView.target === 'microphone') {
-    icon = <IconMic size={22} />;
+    icon = <IconMic size={iconSize} />;
   } else {
-    icon = <IconWarning size={22} />;
+    icon = <IconWarning size={iconSize} />;
   }
 
   return createPortal(
     <div
-      className="device-fault-dialog-mask"
+      className={['device-fault-dialog-mask', compactClass].filter(Boolean).join(' ')}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           close();
         }
       }}
     >
-      <div className="device-fault-dialog" role="dialog" aria-modal="true">
+      <div
+        className={['device-fault-dialog', compactClass].filter(Boolean).join(' ')}
+        role="dialog"
+        aria-modal="true"
+      >
         <div
           className={['device-fault-dialog-icon', isLock ? 'is-lock' : ''].filter(Boolean).join(' ')}
         >

@@ -12,6 +12,7 @@ import {
 import { i18n, useI18n } from '../../../i18n';
 import type { Language } from '../../../i18n';
 import type { ThemeName } from '../../../base';
+import type { SettingsItem } from '../GeneralSettings/GeneralSettings';
 import './SettingsDialogMobile.scss';
 
 type PickKey = 'resolution' | 'language' | 'theme';
@@ -48,19 +49,21 @@ const PICKS: Record<PickKey, PickConfig> = {
   },
 };
 
-const GENERAL_PICKS: PickKey[] = ['language', 'theme'];
+const GENERAL_PICKS = ['language', 'theme'] as const;
 
 /** Long enough for the check mark to register before the list slides back. */
 const AUTO_BACK_DELAY = 180;
 
 export interface SettingsDialogMobileProps {
   open: boolean;
+  hiddenItems?: SettingsItem[];
   onClose?: () => void;
 }
 
 export function SettingsDialogMobile(props: SettingsDialogMobileProps) {
-  const { open, onClose } = props;
-  const { t } = useI18n();
+  const { open, hiddenItems = [], onClose } = props;
+  const { t, language } = useI18n();
+  const generalPicks = GENERAL_PICKS.filter(key => !hiddenItems.includes(key));
   const { isFrontCamera, localMirrorType, localVideoQuality, switchMirror, updateVideoQuality } = useDeviceState();
   const { uiConfig, setUIConfig } = useUIConfig();
 
@@ -91,7 +94,7 @@ export function SettingsDialogMobile(props: SettingsDialogMobileProps) {
       return localVideoQuality;
     }
     if (key === 'language') {
-      return i18n.language as Language;
+      return language as Language;
     }
     return uiConfig.theme;
   }
@@ -238,7 +241,7 @@ export function SettingsDialogMobile(props: SettingsDialogMobileProps) {
             {t('Settings.TabGeneral')}
           </h3>
           <div className="settings-dialog-mobile-section">
-            {GENERAL_PICKS.map(key => (
+            {generalPicks.map(key => (
               <div
                 key={key}
                 className="settings-dialog-mobile-row is-pickable"

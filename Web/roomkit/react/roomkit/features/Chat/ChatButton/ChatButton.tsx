@@ -60,6 +60,7 @@ export function ChatButton(props: ChatButtonProps) {
     >
       <ToolbarButtonPC
         label={t('Chat.Title')}
+        icon={IconChat}
         active={active}
         onClick={() => onClick?.()}
         iconSlot={(

@@ -37,9 +37,7 @@ export function MessageInput(props: MessageInputProps) {
 
   useI18n();
   const [emojiOpen, setEmojiOpen] = useState(false);
-  const [keyboardArmed, setKeyboardArmed] = useState(false);
   const emojiOpenRef = useRef(false);
-  const keyboardArmedRef = useRef(false);
 
   const {
     emojiChars,
@@ -63,7 +61,7 @@ export function MessageInput(props: MessageInputProps) {
     focusDraft: false,
     prepareFocus() {
       setEmojiOpenValue(false);
-      armKeyboard();
+      draftRef.current?.focus();
     },
   });
 
@@ -72,31 +70,10 @@ export function MessageInput(props: MessageInputProps) {
     setEmojiOpen(next);
   }
 
-  function disarmKeyboard() {
-    keyboardArmedRef.current = false;
-    setKeyboardArmed(false);
-    const el = draftRef.current;
-    if (!el) return;
-    el.readOnly = true;
-    el.inputMode = 'none';
-    el.blur();
-  }
-
-  function armKeyboard() {
-    keyboardArmedRef.current = true;
-    setKeyboardArmed(true);
-    const el = draftRef.current;
-    if (!el) return;
-    el.readOnly = false;
-    el.inputMode = 'text';
-    el.focus();
-    const end = el.value.length;
-    el.setSelectionRange(end, end);
-  }
-
+  // Keep the field editable so iOS Chrome can focus it through the native tap.
   function releaseKeyboard() {
     setEmojiOpenValue(false);
-    disarmKeyboard();
+    draftRef.current?.blur();
   }
 
   function onEmojiPointerDown(event: PointerEvent<HTMLButtonElement>) {
@@ -105,7 +82,7 @@ export function MessageInput(props: MessageInputProps) {
     if (disabled) return;
     const next = !emojiOpenRef.current;
     setEmojiOpenValue(next);
-    if (next) disarmKeyboard();
+    if (next) draftRef.current?.blur();
   }
 
   function onEmojiClickCapture(event: MouseEvent<HTMLButtonElement>) {
@@ -113,16 +90,9 @@ export function MessageInput(props: MessageInputProps) {
     event.stopPropagation();
   }
 
-  function onDraftPointerDown() {
-    if (keyboardArmedRef.current && !emojiOpenRef.current) return;
-    if (!draftRef.current || disabled) return;
-    setEmojiOpenValue(false);
-    armKeyboard();
-  }
-
   function onDraftFocus() {
-    if (draftRef.current?.readOnly) {
-      draftRef.current.blur();
+    if (emojiOpenRef.current) {
+      draftRef.current?.blur();
     }
   }
 
@@ -228,10 +198,7 @@ export function MessageInput(props: MessageInputProps) {
           rows={1}
           placeholder={placeholder}
           disabled={disabled}
-          readOnly={!keyboardArmed}
-          inputMode={keyboardArmed ? 'text' : 'none'}
           maxLength={maxLength}
-          onPointerDown={onDraftPointerDown}
           onFocus={onDraftFocus}
           onKeyDown={onEnter}
           onChange={onDraftChange}

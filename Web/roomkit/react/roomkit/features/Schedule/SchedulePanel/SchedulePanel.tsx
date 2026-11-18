@@ -20,6 +20,7 @@ import {
 } from './scheduleForm';
 import type { ScheduleOutcome, ScheduleRoomInput } from './scheduleForm';
 import {
+  DURATION_MINUTES,
   clampScheduleDate,
   dateKey,
   epochMsToWall,
@@ -112,10 +113,10 @@ export function SchedulePanel(props: SchedulePanelProps) {
       setTitle(current.roomName);
       setDate(wall.date);
       setTime(wall.time);
-      setDuration(Math.max(
-        DURATION_MIN,
-        Math.round((current.scheduledEndTime - current.scheduledStartTime) / 60),
-      ));
+      const meetingDuration = Math.round((current.scheduledEndTime - current.scheduledStartTime) / 60);
+      setDuration((DURATION_MINUTES as readonly number[]).includes(meetingDuration)
+        ? meetingDuration
+        : DEFAULT_DURATION);
       setParticipants(current.attendees.map(user => user.userId));
       setPasswordProtected(!!current.password);
       setPassword(current.password || '');
@@ -124,7 +125,7 @@ export function SchedulePanel(props: SchedulePanelProps) {
     } else {
       setDate(clampScheduleDate(dateKey(next)));
       setTime(`${String(next.getHours()).padStart(2, '0')}:${String(Math.floor(next.getMinutes() / 15) * 15).padStart(2, '0')}`);
-      setTitle(t('Schedule.DefaultTopic', { name: propsRef.current.userName.trim() }));
+      setTitle(t('Schedule.DefaultTopic', { name: [...propsRef.current.userName.trim()].slice(0, 10).join('') }));
       setDuration(DEFAULT_DURATION);
       setParticipants([]);
       setPasswordProtected(false);

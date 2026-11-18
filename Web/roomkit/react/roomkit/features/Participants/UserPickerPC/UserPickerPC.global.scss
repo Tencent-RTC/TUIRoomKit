@@ -1,0 +1,40 @@
+/* Two-column panel modal: no shell padding, each section pads itself, and only the lists scroll. */
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) {
+  height: min(520px, 80%);
+  max-height: min(520px, 80%);
+  padding: 0;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border: 0;
+  border-radius: var(--rk-radius-dialog);
+}
+
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) .rk-dialog-header {
+  padding: 22px 24px 14px;
+  margin-bottom: 0;
+}
+
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) .rk-dialog-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-md);
+  color: var(--rk-text-primary);
+}
+
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) .rk-dialog-footer {
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 10px 24px 12px;
+  margin-top: 0;
+  border-top: 1px solid var(--rk-border);
+}
+
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) .rk-dialog-footer .rk-btn {
+  flex: 0 0 auto;
+  min-width: 80px;
+  height: 36px;
+  padding: 0 16px;
+}

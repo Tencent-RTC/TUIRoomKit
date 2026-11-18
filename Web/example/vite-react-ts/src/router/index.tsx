@@ -19,6 +19,10 @@ function LoginGuard({ children }: { children: ReactNode }) {
   return children;
 }
 
+function LoginRoute() {
+  return sessionStorage.getItem('tuiRoom-userInfo') ? <Navigate to="/home" replace /> : <Login />;
+}
+
 function RootRedirect() {
   const location = useLocation();
   // Vue Router keeps the query and hash of the original location on a string redirect.
@@ -29,7 +33,7 @@ export function RouterView() {
   return (
     <Routes>
       <Route path="/" element={<RootRedirect />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<LoginRoute />} />
       <Route
         path="/home"
         element={(

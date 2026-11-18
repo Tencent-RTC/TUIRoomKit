@@ -1,26 +1,28 @@
 import { useEffect, useRef } from 'react';
-import { TUIMessageBox, t, useI18n } from '@tencentcloud/roomkit-web-react';
+import { TUIMessageBox, t, useUIConfig } from '@tencentcloud/roomkit-web-react';
 import { LoginEvent, useLoginState } from 'tuikit-atomicx-react/room';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { RouterView } from './router/index';
 import './App.scss';
 
 const EXIT_OVERLAY_TARGET = 'body';
+export const THEME_STORAGE_KEY = 'tuiRoom-theme';
 
 export function App() {
-  const { setLanguage } = useI18n();
+  const { uiConfig } = useUIConfig();
   const { subscribeEvent, unsubscribeEvent } = useLoginState();
   const navigate = useNavigate();
   const location = useLocation();
-  const languageInitRef = useRef(false);
+  const initialThemeRef = useRef(uiConfig.theme);
 
-  if (!languageInitRef.current) {
-    languageInitRef.current = true;
-    const savedLanguage = localStorage.getItem('tuiRoom-language') || '';
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
+  // Mirrors a non-immediate watch: only real theme changes are persisted.
+  useEffect(() => {
+    if (uiConfig.theme === initialThemeRef.current) {
+      return;
     }
-  }
+    initialThemeRef.current = uiConfig.theme;
+    localStorage.setItem(THEME_STORAGE_KEY, uiConfig.theme);
+  }, [uiConfig.theme]);
 
   const latestRef = useRef({ navigate, path: location.pathname });
   latestRef.current = { navigate, path: location.pathname };

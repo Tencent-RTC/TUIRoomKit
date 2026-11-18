@@ -1,0 +1,130 @@
+/* Classroom notice card pinned above the chat message list
+   (views-edu [classroom] .rk-chat-notice). */
+
+.chat-notice-card {
+  position: relative;
+  flex-shrink: 0;
+  padding: 12px 14px;
+  margin: 10px 10px 0;
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-raised);
+  border: 1px solid var(--rk-border);
+  border-radius: 12px;
+}
+
+.chat-notice-top {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-right: 28px;
+  margin-bottom: 8px;
+}
+
+.chat-notice-badge {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  font-size: var(--rk-fs-xs);
+  font-weight: 600;
+  line-height: 14px;
+  color: var(--rk-text-secondary);
+  background: var(--rk-border);
+  border-radius: var(--rk-radius-pill);
+}
+
+.chat-notice-title {
+  min-width: 0;
+  font-size: var(--rk-fs-md);
+  font-weight: 600;
+  line-height: var(--rk-lh-md, 1.5);
+  overflow-wrap: break-word;
+}
+
+.chat-notice-list-scroll {
+  max-height: 6em;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  font-size: var(--rk-fs-sm);
+  line-height: var(--rk-lh-sm, 1.5);
+  color: var(--rk-text-secondary);
+}
+
+.chat-notice-list {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.chat-notice-edit {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  overflow: hidden;
+  color: var(--rk-text-secondary);
+  pointer-events: none;
+  cursor: pointer;
+  background: var(--rk-bg-hover);
+  border: 0;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+}
+
+.chat-notice-edit:hover {
+  color: var(--rk-text-primary);
+  background: var(--rk-border);
+}
+
+/* Revealed only while the card is in reach (views-edu behavior). */
+.chat-notice-card:hover .chat-notice-edit,
+.chat-notice-card:focus-within .chat-notice-edit {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* Notice editor dialog (views-edu #noticeEditDialog .edu-dialog-*). */
+.chat-notice-edit-hint {
+  margin: 0 0 14px;
+  font-size: var(--rk-fs-sm);
+  line-height: 1.5;
+  color: var(--rk-text-secondary);
+}
+
+.chat-notice-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.chat-notice-edit-field > span {
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--rk-text-secondary);
+}
+
+/* Soft filled fields instead of the outlined default. */
+.chat-notice-edit-field .rk-input {
+  color: var(--rk-text-primary);
+  background: color-mix(in srgb, var(--rk-text-primary) 10%, transparent);
+  border: 0;
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.chat-notice-edit-field .rk-input:focus-within {
+  border: 0;
+  box-shadow: none;
+}
+
+/* The content field stays a short box; extra lines scroll inside it. */
+.chat-notice-edit-content .rk-input-field {
+  max-height: 72px;
+  overflow-y: auto;
+  resize: none;
+}

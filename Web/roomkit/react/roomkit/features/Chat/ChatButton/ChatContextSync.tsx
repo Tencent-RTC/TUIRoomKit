@@ -6,11 +6,17 @@ import { clearSenderNameCache } from '../RoomChatPC/useSenderName';
 export interface ChatContextSyncProps {
   channel: string;
   isActive?: boolean;
+  /** Accepted for existing callers; protocol notices never count as unread. */
+  isShowMemberNotice?: boolean;
   onUnreadChange?: (count: number) => void;
 }
 
 export function ChatContextSync(props: ChatContextSyncProps) {
-  const { channel, isActive = false, onUnreadChange } = props;
+  const {
+    channel,
+    isActive = false,
+    onUnreadChange,
+  } = props;
 
   const { setActiveConversation, messageListOnEvent, loadMessages } = useChatContext(channel);
   const unreadCountRef = useRef(0);
@@ -43,7 +49,8 @@ export function ChatContextSync(props: ChatContextSyncProps) {
       if (event.message.isSentBySelf || latestRef.current.isActive) {
         return;
       }
-      if (event.message.messageType === MessageType.Tips) {
+      // System and protocol notices are not chat messages to catch up on.
+      if (event.message.messageType === MessageType.Tips || event.message.messageType === MessageType.Custom) {
         return;
       }
       if (event.message.status === MessageStatus.Recalled || event.message.status === MessageStatus.Deleted) {

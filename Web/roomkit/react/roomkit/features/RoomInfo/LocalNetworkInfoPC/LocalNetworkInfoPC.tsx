@@ -17,13 +17,23 @@ const LEVELS = {
   [NetworkQuality.Down]: { level: 'disconnected', label: 'Network.Disconnected' },
 } as const;
 
-export function LocalNetworkInfoPC() {
+export interface LocalNetworkInfoPCProps {
+  /**
+   * H5 landscape keeps the bars before the engine reports a quality.
+   * PC leaves the chip out until a report arrives.
+   */
+  showWhenUnknown?: boolean;
+}
+
+export function LocalNetworkInfoPC(props: LocalNetworkInfoPCProps) {
+  const { showWhenUnknown = false } = props;
   const { t } = useI18n();
   const { networkInfo } = useDeviceState();
 
-  /** Unknown has nothing to report, so the chip stays out of the topbar until stats arrive */
+  /** Unknown has nothing to report, so the PC chip stays out of the topbar until stats arrive */
   const quality = networkInfo?.quality ?? NetworkQuality.Unknown;
-  const state = LEVELS[quality as keyof typeof LEVELS] ?? null;
+  const state = LEVELS[quality as keyof typeof LEVELS]
+    ?? (showWhenUnknown ? LEVELS[NetworkQuality.Good] : null);
 
   /**
    * Both loss figures share the one label the previous RoomKit used; the arrow tells the

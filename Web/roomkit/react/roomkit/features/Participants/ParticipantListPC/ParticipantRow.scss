@@ -92,17 +92,6 @@
   align-items: center;
 }
 
-.participant-row-icon .rk-icon,
-.participant-row-more .rk-icon {
-  width: 14px;
-  height: 14px;
-}
-
-.participant-row-tag.is-sharing .rk-icon {
-  width: 10px;
-  height: 10px;
-}
-
 .participant-row-icon,
 .participant-row-more {
   display: grid;
@@ -135,9 +124,19 @@ button.participant-row-icon:hover,
 }
 
 /* The off icons carry their own red slash, so the glyph itself stays neutral. */
-.participant-row-icon.on,
-.participant-row-icon.muted {
+.participant-row-icon {
   color: var(--rk-text-secondary);
+}
+
+.participant-row-icon .rk-icon,
+.participant-row-more .rk-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.participant-row-tag.is-sharing .rk-icon {
+  width: 10px;
+  height: 10px;
 }
 
 .participant-row:hover .participant-row-more,

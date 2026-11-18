@@ -11,6 +11,11 @@
   color: var(--rk-text-tertiary);
 }
 
+/* The bare composer keeps only the input line; the tools stay mounted (tooltips counted) but hidden. */
+.message-input-bare .message-input-toolbar {
+  display: none;
+}
+
 .message-input-tool {
   display: inline-flex;
   align-items: center;
@@ -89,6 +94,25 @@
   &:disabled {
     cursor: not-allowed;
     opacity: 0.38;
+  }
+}
+
+/* EDU class chat (views-edu [classroom] rules): the input rides the neutral
+   hover tint instead of the brand-tinted page wash, and the send button is
+   the soft accent chip instead of the solid brand disc. */
+.rk-scene-education .message-input-field {
+  background: var(--rk-bg-hover);
+}
+
+.rk-scene-education .message-input-send {
+  box-sizing: border-box;
+  color: var(--rk-brand);
+  background: var(--rk-brand-soft);
+  border: 1px solid color-mix(in srgb, var(--rk-brand) 28%, transparent);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--rk-brand) 16%, transparent);
+    border-color: var(--rk-brand);
   }
 }
 

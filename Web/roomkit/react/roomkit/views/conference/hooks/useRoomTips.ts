@@ -4,6 +4,7 @@ import {
   RoomParticipantEvent,
   RoomType,
   roomParticipantClient,
+  useLoginState,
   useRoomParticipantState,
   useRoomState,
 } from 'tuikit-atomicx-react/room';
@@ -36,10 +37,11 @@ export function useRoomTips(options: { onLeave: () => void }) {
 
   const roomId = currentRoom?.roomId;
   const { localParticipant } = useRoomParticipantState();
+  const { loginUserInfo } = useLoginState();
 
   // Event handlers outlive the render that bound them; they read the latest state here.
-  const latestRef = useRef({ currentRoom, localParticipant });
-  latestRef.current = { currentRoom, localParticipant };
+  const latestRef = useRef({ currentRoom, localParticipant, loginUserInfo });
+  latestRef.current = { currentRoom, localParticipant, loginUserInfo };
 
   useEffect(() => {
     if (!roomId) {
@@ -101,7 +103,7 @@ export function useRoomTips(options: { onLeave: () => void }) {
     }
 
     function onAllDevicesDisabled({ device, disable, operator }: { device: DeviceType; disable: boolean; operator: RoomUser }) {
-      if (operator.userId === latestRef.current.localParticipant?.userId) {
+      if (operator.userId === latestRef.current.loginUserInfo?.userId) {
         return;
       }
       switch (device) {
@@ -135,7 +137,7 @@ export function useRoomTips(options: { onLeave: () => void }) {
     }
 
     function onAllMessagesDisabled({ disable, operator }: { disable: boolean; operator: RoomUser }) {
-      if (operator.userId === latestRef.current.localParticipant?.userId) {
+      if (operator.userId === latestRef.current.loginUserInfo?.userId) {
         return;
       }
       TUIToast({

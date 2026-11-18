@@ -1,0 +1,707 @@
+.education-root {
+  height: 100%;
+}
+
+.education-root .rk-root-slot {
+  height: 100%;
+}
+
+.education-view {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  /* clip, not hidden: a hidden box is still a scroll container, so the caret of a long
+     annotation text line scrolls it and shifts the whole view. hidden is the fallback. */
+  overflow: hidden;
+  overflow: clip;
+  color: var(--rk-text-primary);
+  background: var(--rk-bg-page);
+}
+
+.education-topbar {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 12px 0 16px;
+  background: var(--rk-bg-surface);
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-topbar-left,
+.education-topbar-right,
+.education-topbar-group {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.education-topbar-left {
+  gap: 8px;
+}
+
+.education-topbar-right {
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.education-topbar-group {
+  gap: 10px;
+}
+
+.education-topbar-divider {
+  width: 1px;
+  height: 14px;
+  margin: 0 4px;
+  background: var(--rk-border);
+}
+
+/* Toolbar chips are sized for the bottom bar; the classroom topbar runs them at 28px. */
+.education-topbar .toolbar-button {
+  min-width: 28px;
+  height: 28px;
+  background: transparent;
+  border-radius: 7px;
+}
+
+.education-topbar .toolbar-button:hover {
+  background: color-mix(in srgb, var(--rk-text-primary) 8%, transparent);
+}
+
+.education-topbar .toolbar-button-main {
+  min-width: 28px;
+  padding: 0;
+}
+
+.education-topbar .toolbar-button-icon,
+.education-topbar .toolbar-button-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Device chips with a menu keep a tinted split surface, 30px tall.
+   The design's yellow "!" fault badge reads one size smaller here. */
+.education-topbar .toolbar-button-with-menu {
+  --rk-fault-badge: 11px;
+  --rk-fault-badge-font: 7px;
+  --rk-fault-badge-top: -4px;
+  --rk-fault-badge-right: -6px;
+
+  min-width: 44px;
+  height: 30px;
+  padding: 1px;
+  background: color-mix(in srgb, var(--rk-text-primary) 8%, transparent);
+  border-radius: 8px;
+}
+
+.education-topbar .toolbar-button-with-menu .toolbar-button-main {
+  min-width: 28px;
+  padding: 0;
+}
+
+.education-topbar .toolbar-button-caret {
+  width: 14px;
+  padding: 0;
+}
+
+.education-topbar .toolbar-button-active {
+  background: color-mix(in srgb, var(--rk-brand) 14%, transparent);
+}
+
+.education-topbar .toolbar-button-active .toolbar-button-icon {
+  color: var(--rk-brand);
+}
+
+.education-leave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--rk-danger);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+}
+
+.education-leave:hover {
+  background: color-mix(in srgb, var(--rk-danger) 14%, transparent);
+}
+
+/* The design keeps the trigger plain red while the card is open. */
+.education-leave[aria-expanded='true'] {
+  background: transparent;
+}
+
+.education-workspace {
+  display: grid;
+  flex: 1;
+  grid-template:
+    'main teacher' auto
+    'main student' auto
+    'main chat' minmax(0, 1fr) / minmax(0, 1fr) clamp(280px, 20%, 360px);
+  gap: 10px;
+  min-height: 0;
+  padding: 10px;
+  background: var(--rk-bg-page);
+}
+
+.education-workspace.is-small {
+  grid-template: 'strip' auto 'main' minmax(0, 1fr) / minmax(0, 1fr);
+  padding-top: 0;
+}
+
+.education-stage-strip {
+  --strip-tile-width: 132px;
+
+  box-sizing: border-box;
+  display: flex;
+  grid-area: strip;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--strip-tile-width) * 9 / 16 + 16px);
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-stage-strip-track {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0 auto;
+}
+
+.education-stage-strip .edu-tile {
+  width: var(--strip-tile-width);
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.education-stage-strip .edu-tile.is-speaking {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--rk-success) 32%, transparent),
+    0 0 18px color-mix(in srgb, var(--rk-success) 28%, transparent),
+    0 0 36px color-mix(in srgb, var(--rk-success) 16%, transparent);
+}
+
+@media (width <= 820px) {
+  .education-workspace {
+    grid-template-columns: minmax(0, 1fr) 34%;
+  }
+}
+
+.education-slot {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The main area keeps 16:9 and letterboxes inside whatever the workspace leaves. */
+.education-slot.is-main {
+  position: relative;
+  display: flex;
+  grid-area: main;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, color-mix(in srgb, var(--rk-bg-surface) 50%, transparent), transparent 70%);
+  isolation: isolate;
+  container-type: size;
+}
+
+/* Pixel art in the letterbox corners: bottom-left, and the same art flipped and
+   smaller at top-right. Whatever the main tile covers simply stays behind it. */
+.education-slot.is-main::before,
+.education-slot.is-main::after {
+  position: absolute;
+  z-index: -1;
+  width: clamp(240px, 34cqw, 560px);
+  aspect-ratio: 308 / 126;
+  pointer-events: none;
+  content: '';
+  background: color-mix(in srgb, var(--rk-brand) 28%, transparent);
+  mask: url('./assets/stage-pixels.svg') center / contain no-repeat;
+}
+
+.education-slot.is-main::before {
+  bottom: 0;
+  left: 0;
+}
+
+.education-slot.is-main::after {
+  top: 0;
+  right: 0;
+  width: clamp(168px, 24cqw, 400px);
+  opacity: 0.7;
+  transform: scale(-1, -1);
+}
+
+.education-slot.is-main > * {
+  width: min(100cqw, calc(100cqh * 16 / 9));
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--rk-text-primary) 7%, transparent), var(--rk-shadow-dialog);
+}
+
+.education-slot.is-side {
+  grid-area: teacher;
+}
+
+.education-slot.is-student {
+  grid-area: student;
+}
+
+.education-slot.is-side > *,
+.education-slot.is-student > * {
+  aspect-ratio: 16 / 9;
+}
+
+.education-board {
+  --whiteboard-view-bg: var(--rk-bg-surface);
+
+  position: relative;
+  width: 100%;
+
+  /* clip, not hidden: a hidden box is still a scroll container, so the caret of a long
+     annotation text line scrolls it and shifts the share out of place. hidden is the fallback. */
+  overflow: hidden;
+  overflow: clip;
+  background: var(--rk-bg-surface);
+  border-radius: 10px;
+}
+
+.education-board-stream {
+  width: 100%;
+  height: 100%;
+}
+
+.education-board-live {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 4;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  max-width: calc(100% - 16px);
+  height: 24px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  pointer-events: none;
+  background: var(--rk-brand);
+  border-radius: 6px;
+}
+
+.education-board-live-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.education-board-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+/* The shared annotation chip ships the conference blue pill; the classroom uses the brand tag shape. */
+.education-board-actions .rk-btn.annotation-button {
+  height: 24px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 500;
+  background: color-mix(in srgb, var(--rk-brand) 92%, transparent);
+  backdrop-filter: none;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.education-board-actions .rk-btn.annotation-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--rk-brand) 82%, #000);
+}
+
+.education-board-actions .rk-btn.annotation-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.education-board-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  margin: 0;
+  font-size: var(--rk-fs-sm);
+  color: var(--rk-text-tertiary);
+}
+
+.education-board-empty-text {
+  max-width: 320px;
+  font-size: var(--rk-fs-md);
+  line-height: 1.5;
+  color: var(--rk-text-secondary);
+  text-align: center;
+}
+
+/* Sits on whichever block holds the teacher seat. */
+.education-swap {
+  z-index: 6;
+  display: grid;
+  grid-area: teacher;
+  place-items: center;
+  place-self: end;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin: 8px;
+  color: color-mix(in srgb, #fff 75%, transparent);
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+}
+
+.education-swap:hover {
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.education-chat {
+  display: flex;
+  flex-direction: column;
+  grid-area: chat;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: 12px;
+}
+
+.education-chat-body {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Slot content keeps the parent scope, so the classroom title bar
+   and the teacher tag styles live here. The design separates the
+   title from the message list with a border. */
+.education-chat-head {
+  display: flex;
+  flex: 0 0 36px;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0 14px;
+  background: var(--rk-bg-surface);
+  border-bottom: 1px solid var(--rk-border);
+}
+
+.education-chat-title {
+  font-size: var(--rk-fs-sm);
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--rk-text-primary);
+}
+
+.education-chat-teacher-tag {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 16px;
+  padding: 0 5px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  color: var(--rk-brand);
+  background: color-mix(in srgb, var(--rk-brand) 18%, transparent);
+  border-radius: 4px;
+}
+
+.education-join-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rk-bg-overlay);
+  backdrop-filter: blur(8px);
+}
+
+.education-join-error {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--rk-danger);
+  text-align: center;
+}
+
+.education-float-chat-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 220;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: color-mix(in srgb, var(--rk-bg-surface) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid var(--rk-border);
+  border-radius: 50%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.education-float-chat-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 16px;
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+  background: var(--rk-danger);
+  border-radius: 8px;
+}
+
+.education-float-chat-fab:hover,
+.education-float-chat-fab.is-open {
+  color: var(--rk-brand);
+  border-color: var(--rk-brand);
+}
+
+.education-float-chat {
+  position: fixed;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--rk-bg-surface);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--rk-border);
+}
+
+.education-float-chat.is-dragging {
+  user-select: none;
+}
+
+/* One header row: classroom title and mute-all on the left of the drag handle, close pinned right. */
+.education-float-chat-bar {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0 10px 0 14px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.education-float-chat-bar-lead {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.education-float-chat-bar-title {
+  font-size: var(--rk-fs-md);
+  font-weight: 600;
+  line-height: var(--rk-lh-sm, 18px);
+  color: var(--rk-text-primary);
+}
+
+.education-float-chat-bar-silence {
+  position: relative;
+  z-index: 7;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  align-self: stretch;
+  font-size: var(--rk-fs-sm);
+  font-weight: 500;
+  line-height: var(--rk-lh-sm, 18px);
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+}
+
+/* 28x14 track, 11px knob, 14px travel. An odd knob cannot split the leftover
+   3px into equal padding, so it sits on the track midline instead. The shadow
+   is unshifted so it does not fill the lower gap. */
+.education-float-chat-bar-silence .rk-switch-sm {
+  width: 28px;
+  height: 14px;
+  padding: 0;
+}
+
+.education-float-chat-bar-silence .rk-switch-sm .rk-switch-thumb {
+  position: absolute;
+  top: 50%;
+  left: 1.5px;
+  width: 11px;
+  height: 11px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.22);
+  transform: translateY(-50%);
+}
+
+.education-float-chat-bar-silence .rk-switch-on.rk-switch-sm .rk-switch-thumb {
+  transform: translate(14px, -50%);
+}
+
+.education-float-chat-close {
+  position: relative;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  align-self: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--rk-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.education-float-chat-close:hover {
+  background: var(--rk-bg-hover);
+}
+
+.education-float-chat-body {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Small-class float chat (views-edu 1v6 .rk-chat-notice / .rk-chat-jump). */
+.education-float-chat .chat-notice-card {
+  border: 0;
+}
+
+/* Jump chips (views-edu .rk-chat-jump): the small-class float chat and the
+   1v1 side chat share the same borderless raised chip as the H5 portrait chat. */
+.education-float-chat .rk-list-jump {
+  color: #3a393a;
+  background: var(--rk-bg-raised);
+  border: 0;
+  box-shadow: 0 2px 8px color-mix(in srgb, #1c1b1c 18%, transparent);
+}
+
+.education-chat .rk-list-jump {
+  color: #3a393a;
+  background: var(--rk-bg-raised);
+  border: 0;
+  box-shadow: 0 2px 8px color-mix(in srgb, #1c1b1c 18%, transparent);
+}
+
+[data-rk-theme='dark'] .education-float-chat .rk-list-jump {
+  color: #c6c6c6;
+  box-shadow: 0 2px 8px color-mix(in srgb, #000 18%, transparent);
+}
+
+[data-rk-theme='dark'] .education-chat .rk-list-jump {
+  color: #c6c6c6;
+  box-shadow: 0 2px 8px color-mix(in srgb, #000 18%, transparent);
+}
+
+.education-float-chat-resize {
+  position: absolute;
+  z-index: 6;
+  touch-action: none;
+}
+
+.education-float-chat-resize[data-dir='n'],
+.education-float-chat-resize[data-dir='s'] {
+  right: 8px;
+  left: 8px;
+  height: 6px;
+  cursor: ns-resize;
+}
+
+.education-float-chat-resize[data-dir='n'] {
+  top: 0;
+}
+
+.education-float-chat-resize[data-dir='s'] {
+  bottom: 0;
+}
+
+.education-float-chat-resize[data-dir='e'],
+.education-float-chat-resize[data-dir='w'] {
+  top: 8px;
+  bottom: 8px;
+  width: 6px;
+  cursor: ew-resize;
+}
+
+.education-float-chat-resize[data-dir='e'] {
+  right: 0;
+}
+
+.education-float-chat-resize[data-dir='w'] {
+  left: 0;
+}
+
+.education-float-chat-resize[data-dir='ne'],
+.education-float-chat-resize[data-dir='nw'],
+.education-float-chat-resize[data-dir='se'],
+.education-float-chat-resize[data-dir='sw'] {
+  width: 10px;
+  height: 10px;
+}
+
+.education-float-chat-resize[data-dir='ne'] {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
+
+.education-float-chat-resize[data-dir='nw'] {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
+
+.education-float-chat-resize[data-dir='se'] {
+  right: 0;
+  bottom: 0;
+  cursor: nwse-resize;
+}
+
+.education-float-chat-resize[data-dir='sw'] {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+}

@@ -2,6 +2,7 @@ export { default as ChatButton } from './Chat/ChatButton/ChatButton';
 export { default as ChatButtonMobile } from './Chat/ChatButton/ChatButtonMobile';
 export { default as RoomChatPC } from './Chat/RoomChatPC/RoomChatPC';
 export { default as RoomChatMobile } from './Chat/RoomChatMobile/RoomChatMobile';
+export { default as ChatOverlayMobile } from './Chat/ChatOverlayMobile/ChatOverlayMobile';
 
 export { default as CameraButton } from './Device/CameraButton/index';
 export { default as CameraButtonMobile } from './Device/CameraButton/CameraButtonMobile';
@@ -24,6 +25,11 @@ export { default as ParticipantButtonPC } from './Participants/ParticipantButton
 export { default as ParticipantButtonMobile } from './Participants/ParticipantButtonMobile/ParticipantButtonMobile';
 export { default as ParticipantListPC } from './Participants/ParticipantListPC/ParticipantListPC';
 export { default as ParticipantListMobile } from './Participants/ParticipantListMobile/ParticipantListMobile';
+export { default as Trophy } from './EduTools/Trophy/Trophy';
+export { default as EduRoster } from './EduRoster/EduRoster';
+export { default as UserPickerPC } from './Participants/UserPickerPC/UserPickerPC';
+export { useResolvedContacts } from './Participants/contactData';
+export type { PickedContact, PickerContact } from './Participants/contactData';
 
 export { default as CloudRecordingButtonPC } from './Recording/CloudRecordingButtonPC/CloudRecordingButtonPC';
 export { default as CloudRecordingButtonMobile } from './Recording/CloudRecordingButtonMobile/CloudRecordingButtonMobile';
@@ -31,13 +37,17 @@ export { default as CloudRecordingStatusPC } from './Recording/CloudRecordingSta
 export { default as CloudRecordingStatusMobile } from './Recording/CloudRecordingStatusMobile/CloudRecordingStatusMobile';
 
 export { default as CurrentRoomInfoPC } from './RoomInfo/CurrentRoomInfoPC/CurrentRoomInfoPC';
+export { default as CurrentEduRoomInfoPC } from './RoomInfo/CurrentRoomInfoPC/CurrentEduRoomInfoPC';
 export { default as CurrentRoomInfoMobile } from './RoomInfo/CurrentRoomInfoMobile/CurrentRoomInfoMobile';
+export { default as CurrentEduRoomInfoMobile } from './RoomInfo/CurrentRoomInfoMobile/CurrentEduRoomInfoMobile';
 export { default as LocalNetworkInfoPC } from './RoomInfo/LocalNetworkInfoPC/LocalNetworkInfoPC';
 export { default as LocalNetworkInfoMobile } from './RoomInfo/LocalNetworkInfoMobile/LocalNetworkInfoMobile';
 
 export { default as LayoutButton } from './RoomView/LayoutButton/index';
 export { default as RoomViewPC } from './RoomView/RoomViewPC/RoomViewPC';
 export { default as RoomViewMobile } from './RoomView/RoomViewMobile/RoomViewMobile';
+export { useSingleStageStream } from './RoomView/useParticipantStreams';
+export type { StreamInfo } from './RoomView/useParticipantStreams';
 
 export { default as ScheduledListPC } from './Schedule/ScheduledListPC/ScheduledListPC';
 export { default as ScheduledListMobile } from './Schedule/ScheduledListMobile/ScheduledListMobile';
@@ -47,12 +57,21 @@ export type { ScheduleFailure, ScheduleOutcome, ScheduleRoomInput } from './Sche
 
 export { default as ScreenShareButton } from './ScreenShare/ScreenShareButton/ScreenShareButton';
 
+export { default as WhiteboardButton } from './Whiteboard/WhiteboardButton/WhiteboardButton';
+export { default as WhiteboardView } from './Whiteboard/WhiteboardView/WhiteboardView';
+export { default as AnnotationButton } from './Whiteboard/AnnotationButton/AnnotationButton';
+export { default as AnnotationButtonMobile } from './Whiteboard/AnnotationButtonMobile/AnnotationButtonMobile';
+export { default as WhiteboardToolsMobile } from './Whiteboard/WhiteboardToolsMobile/WhiteboardToolsMobile';
+export { useShareParticipants, useWhiteboardState } from './Whiteboard/WhiteboardState';
+
 export { default as LanguageButton } from './Setting/LanguageButton/LanguageButton';
 export { default as SettingButtonPC } from './Setting/SettingButtonPC/SettingButtonPC';
 export { default as SettingButtonMobile } from './Setting/SettingButtonMobile/SettingButtonMobile';
 export { default as SettingsDialogPC } from './Setting/SettingsDialogPC/SettingsDialogPC';
 export { default as SettingsDialogMobile } from './Setting/SettingsDialogMobile/SettingsDialogMobile';
 export type { SettingsTab } from './Setting/SettingsDialogPC/SettingsDialogPC';
+export type { SettingsItem } from './Setting/GeneralSettings/GeneralSettings';
+export type { BackgroundPhoto } from './VideoEffect/VirtualBackgroundSettings/virtualBackground';
 export { default as ThemeButton } from './Setting/ThemeButton/ThemeButton';
 
 export { default as CaptionButton } from './Transcription/CaptionButton/CaptionButton';

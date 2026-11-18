@@ -233,17 +233,23 @@
   transform: rotate(180deg);
 }
 
-/* The tint carries the fault; the icon stays readable so it still says which device. */
-.media-btn.is-abnormal {
-  background: color-mix(in srgb, var(--rk-danger) 10%, transparent);
-}
-
 .media-btn-badge {
   position: absolute;
-  right: -1px;
-  bottom: 0;
-  color: var(--rk-danger);
+  top: -4px;
+  right: -6px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
   pointer-events: none;
+  background: var(--rk-warning);
+  border: 1.5px solid var(--rk-bg-surface);
+  border-radius: 50%;
 }
 
 .preview-fault-overlay {

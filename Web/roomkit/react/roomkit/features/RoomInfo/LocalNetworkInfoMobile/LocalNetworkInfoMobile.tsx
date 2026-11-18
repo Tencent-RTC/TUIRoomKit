@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NetworkQuality, useDeviceState } from 'tuikit-atomicx-react/room';
 import { IconArrowRight, TUIPopup } from '../../../base';
 import { useI18n } from '../../../i18n';
+import LocalNetworkInfoPC from '../LocalNetworkInfoPC/LocalNetworkInfoPC';
 import './LocalNetworkInfoMobile.scss';
 
 const LEVELS = {
@@ -13,7 +14,13 @@ const LEVELS = {
   [NetworkQuality.Down]: { level: 'disconnected', label: 'Network.Disconnected' },
 } as const;
 
-export function LocalNetworkInfoMobile() {
+export interface LocalNetworkInfoMobileProps {
+  /** Education H5 passes this. Conference leaves it portrait and keeps the sheet. */
+  orientation?: 'portrait' | 'landscape';
+}
+
+export function LocalNetworkInfoMobile(props: LocalNetworkInfoMobileProps) {
+  const { orientation = 'portrait' } = props;
   const { t } = useI18n();
   const { networkInfo } = useDeviceState();
 
@@ -36,6 +43,15 @@ export function LocalNetworkInfoMobile() {
   ];
 
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [orientation]);
+
+  // Landscape opens the same popover as PC. Portrait keeps the bottom sheet.
+  if (orientation === 'landscape') {
+    return <LocalNetworkInfoPC showWhenUnknown />;
+  }
 
   return (
     <>

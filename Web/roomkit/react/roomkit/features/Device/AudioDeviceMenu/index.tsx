@@ -4,10 +4,6 @@ import { IconCheck, TUIToast } from '../../../base';
 import { useI18n } from '../../../i18n';
 import './index.scss';
 
-const SPEAKER_TEST_URL
-  = 'https://web.sdk.qcloud.com/trtc/electron/download/resources/media/TestSpeaker.mp3';
-const LEVEL_BAR_COUNT = 16;
-
 /** A long list often keeps the current device below the fold; open with it in view. */
 function revealCurrentDevice(list: HTMLElement | null) {
   list?.querySelector('.device-menu-item-active')?.scrollIntoView({ block: 'nearest' });
@@ -22,27 +18,13 @@ export function AudioDeviceMenu() {
   const {
     microphoneList,
     currentMicrophone,
-    currentMicVolume,
-    testingMicVolume,
-    isMicrophoneTesting,
     speakerList,
     currentSpeaker,
-    isSpeakerTesting,
     getMicrophoneList,
     getSpeakerList,
     setCurrentMicrophone,
     setCurrentSpeaker,
-    startSpeakerTest,
-    stopSpeakerTest,
   } = useDeviceState();
-
-  const isSpeakerTestingRef = useRef(isSpeakerTesting);
-  isSpeakerTestingRef.current = isSpeakerTesting;
-
-  /** Device test reports its own volume; the published-mic value is empty before a room. */
-  const micVolume = isMicrophoneTesting ? testingMicVolume : currentMicVolume;
-
-  const activeBarCount = Math.round((Math.min(100, Math.max(0, micVolume)) / 100) * LEVEL_BAR_COUNT);
 
   async function selectMicrophone(deviceId: string) {
     try {
@@ -60,18 +42,6 @@ export function AudioDeviceMenu() {
     }
   }
 
-  async function toggleSpeakerTest() {
-    try {
-      if (isSpeakerTesting) {
-        await stopSpeakerTest();
-        return;
-      }
-      await startSpeakerTest({ filePath: SPEAKER_TEST_URL });
-    } catch {
-      TUIToast.error(t('Device.SpeakerTestFailed'));
-    }
-  }
-
   useEffect(() => {
     void (async () => {
       await Promise.allSettled([getMicrophoneList(), getSpeakerList()]);
@@ -82,11 +52,6 @@ export function AudioDeviceMenu() {
       revealCurrentDevice(microphoneListRef.current);
       revealCurrentDevice(speakerListRef.current);
     })();
-    return () => {
-      if (isSpeakerTestingRef.current) {
-        stopSpeakerTest();
-      }
-    };
   }, []);
 
   return (
@@ -126,17 +91,6 @@ export function AudioDeviceMenu() {
           </div>
         )}
 
-      <div className="device-menu-level">
-        <div className="device-menu-bars" aria-label={t('Device.MicLevel')}>
-          {Array.from({ length: LEVEL_BAR_COUNT }, (_, i) => i + 1).map(index => (
-            <span
-              key={index}
-              className={index <= activeBarCount ? 'device-menu-bar-on' : undefined}
-            />
-          ))}
-        </div>
-      </div>
-
       <div className="device-menu-divider" />
 
       <div className="device-menu-title">
@@ -173,20 +127,6 @@ export function AudioDeviceMenu() {
             {t('Device.NoSpeaker')}
           </div>
         )}
-
-      <div className="device-menu-row">
-        <span className="device-menu-label">
-          <span>{t('Device.SpeakerTest')}</span>
-          <span className="device-menu-sub">{t('Device.SpeakerTestHint')}</span>
-        </span>
-        <button
-          className={['device-menu-test', isSpeakerTesting ? 'is-playing' : ''].filter(Boolean).join(' ')}
-          type="button"
-          onClick={toggleSpeakerTest}
-        >
-          {isSpeakerTesting ? t('Device.Stop') : t('Device.Test')}
-        </button>
-      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import type { ComponentType } from 'react';
-import { setLanguage } from './i18n';
+import { i18n } from './i18n';
 import type { IconOverrides } from './icons/names';
 
 export type ThemeName = 'light' | 'dark';
@@ -26,6 +26,23 @@ export interface RoomKitContact {
 export type ContactListProvider = () => RoomKitContact[] | Promise<RoomKitContact[]>;
 
 export type ShareLink = string | ((roomId: string) => string);
+
+/** Built-in controls whose visibility `widgetVisible` can turn off in the conference and education scenes; names match the previous RoomKit package. */
+export enum RoomWidget {
+  MicWidget = 'MicWidget',
+  CameraWidget = 'CameraWidget',
+  ScreenShareWidget = 'ScreenShareWidget',
+  WhiteboardWidget = 'WhiteboardWidget',
+  AnnotationWidget = 'AnnotationWidget',
+  RoomChatWidget = 'RoomChatWidget',
+  MemberWidget = 'MemberWidget',
+  RecordingWidget = 'RecordingWidget',
+  AIToolsWidget = 'AIToolsWidget',
+  SettingsWidget = 'SettingsWidget',
+  LeaveRoomWidget = 'LeaveRoomWidget',
+}
+
+export type WidgetVisible = Partial<Record<RoomWidget, boolean>>;
 
 /**
  * base cannot reference room types, so the props stay loose here; type the component
@@ -53,6 +70,14 @@ export interface UIConfig {
   shareLink?: ShareLink;
   /** Replaces the IM friend list in invite and schedule pickers; `undefined` restores the friend list. */
   contactList?: ContactListProvider;
+  /**
+   * `false` hides a built-in control; calls merge, and `undefined` shows every control again.
+   * `true` only lifts this hiding: a control still follows its own rules, such as role checks.
+   * Hiding `LeaveRoomWidget` leaves exiting to the host page.
+   * The education scene has no `WhiteboardWidget`, `RecordingWidget` or `AIToolsWidget` control,
+   * and on mobile no `ScreenShareWidget`, `MemberWidget` or `SettingsWidget` control, so those keys do nothing there.
+   */
+  widgetVisible?: WidgetVisible;
 }
 
 export interface ResolvedUIConfig {
@@ -63,20 +88,15 @@ export interface ResolvedUIConfig {
   participantViewUI?: ParticipantViewUIComponent;
   shareLink?: ShareLink;
   contactList?: ContactListProvider;
-}
-
-const THEME_STORAGE_KEY = 'tuiRoom-theme';
-
-function readStoredTheme(): ThemeName {
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === 'dark' ? 'dark' : 'light';
+  widgetVisible: WidgetVisible;
 }
 
 /** Replaced on every change so subscribers can compare by reference. */
 let uiConfig: ResolvedUIConfig = {
-  theme: readStoredTheme(),
+  theme: 'light',
   colors: {},
   icons: {} as IconOverrides,
+  widgetVisible: {},
 };
 
 const listeners = new Set<() => void>();
@@ -96,7 +116,6 @@ function applyThemeName(next: ResolvedUIConfig, theme: ThemeName): void {
   // `next` is the draft that replaces the store snapshot below.
   // eslint-disable-next-line no-param-reassign
   next.theme = theme;
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
 }
 
 function applyThemeOptions(next: ResolvedUIConfig, { themeStyle, ...colors }: ThemeOptions): void {
@@ -121,7 +140,7 @@ export function setUIConfig(options: UIConfig): void {
     next.fontFamily = options.fontFamily;
   }
   if (options.language !== undefined) {
-    setLanguage(options.language);
+    i18n.changeLanguage(options.language);
   }
   if (options.icons !== undefined) {
     next.icons = { ...uiConfig.icons, ...options.icons };
@@ -134,6 +153,9 @@ export function setUIConfig(options: UIConfig): void {
   }
   if ('contactList' in options) {
     next.contactList = options.contactList;
+  }
+  if ('widgetVisible' in options) {
+    next.widgetVisible = options.widgetVisible ? { ...uiConfig.widgetVisible, ...options.widgetVisible } : {};
   }
   const changed = (Object.keys(next) as Array<keyof ResolvedUIConfig>)
     .some(key => next[key] !== uiConfig[key]);
