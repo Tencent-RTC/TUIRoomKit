@@ -1,0 +1,33 @@
+{
+  "name": "@tencentcloud/roomkit-web-react-next-education-sample",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite --force",
+    "dev:deep": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test test/*.test.cjs src/features/Preclass/*.test.cjs",
+    "lint": "eslint ./src --ext .ts,.tsx --no-error-on-unmatched-pattern"
+  },
+  "dependencies": {
+    "@tencentcloud/tuiroom-engine-js": "4.3.3",
+    "@tencentcloud/universal-api": "2.4.1",
+    "@tencentcloud/roomkit-web-react": "7.1.0",
+    "@tencentcloud/uikit-base-component-react": "1.4.4",
+    "tuikit-atomicx-react": "6.4.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0",
+    "vconsole": "^3.15.1"
+  },
+  "devDependencies": {
+    "@tencentcloud/eslint-config-hybrid": "~0.0.1",
+    "@types/node": "^18.19.31",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.6.0",
+    "sass": "^1.50.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.2.8"
+  }
+}
