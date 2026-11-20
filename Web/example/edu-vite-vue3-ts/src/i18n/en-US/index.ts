@@ -90,6 +90,7 @@ export const resource = {
   'Preclass.ShareLink': 'Class link',
   'Preclass.ShareTime': 'Class time',
   'Preclass.CopyRoomId': 'Copy course ID',
+  'Preclass.CopyUserId': 'Copy UserID',
   'Preclass.CopyLink': 'Copy class link',
   'Preclass.CopyInvite': 'Copy invite',
   'Preclass.Copied': 'Copied',
