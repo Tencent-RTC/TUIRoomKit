@@ -90,6 +90,7 @@ export const resource = {
   'Preclass.ShareLink': '课堂链接',
   'Preclass.ShareTime': '上课时间',
   'Preclass.CopyRoomId': '复制课程号',
+  'Preclass.CopyUserId': '复制 UserID',
   'Preclass.CopyLink': '复制课堂链接',
   'Preclass.CopyInvite': '复制邀请',
   'Preclass.Copied': '已复制',

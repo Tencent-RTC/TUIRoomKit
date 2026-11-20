@@ -4,9 +4,7 @@
       <div class="preclass-mobile-main">
         <header class="preclass-mobile-bar">
           <div class="preclass-mobile-brand">
-            <span class="preclass-mobile-mark" aria-hidden="true">
-              <IconMonitor :size="15" />
-            </span>
+            <img class="preclass-mobile-mark" :src="eduIconUrl" alt="" aria-hidden="true" draggable="false">
             <span class="preclass-mobile-brand-name">RoomKit <em>· EDU</em></span>
           </div>
           <span class="preclass-mobile-role">{{ t('Preclass.RoleStudent') }}</span>
@@ -255,7 +253,20 @@
         <div class="preclass-mobile-handle" @pointerdown="onAccountDragStart">
           <i />
         </div>
+        <div class="preclass-mobile-account-head">
+          <TUIAvatar :size="44" :src="avatarUrl" :alt="userName || t('Preconference.AvatarFallback')" />
+          <div class="preclass-mobile-account-name">
+            {{ userName }}
+          </div>
+        </div>
+        <ProfileUserId
+          v-if="loginUserInfo?.userId"
+          class="preclass-mobile-account-uid"
+          :user-id="loginUserInfo.userId"
+          size="lg"
+        />
         <button class="preclass-mobile-logout" type="button" @click="askLogout">
+          <IconLogout :size="18" />
           {{ t('Home.Logout') }}
         </button>
       </div>
@@ -284,7 +295,7 @@ import {
   IconChevronRightMobile,
   IconCopy,
   IconCourseEmpty,
-  IconMonitor,
+  IconLogout,
   RoomKitProvider,
   TUIAvatar,
   TUIDialog,
@@ -293,6 +304,8 @@ import {
   t,
 } from '@tencentcloud/roomkit-web-vue3';
 import type { PickedContact } from '@tencentcloud/roomkit-web-vue3';
+import eduIconUrl from '../../../assets/roomkit-edu-icon.svg';
+import ProfileUserId from '../ProfileUserId.vue';
 import ResumeBanner from '../ResumeBanner.vue';
 import { CLASS_MODES } from '../classMode';
 import type { ClassCourse } from '../types';

@@ -17,7 +17,7 @@
           :aria-label="t('Preclass.Members')"
           @input="openMenu"
           @focus="openMenu"
-          @enter="pickOnly"
+          @enter="onEnter"
         >
           <template #suffix>
             <TUIButton
@@ -35,8 +35,8 @@
       </div>
       <template #content>
         <div class="preclass-member-menu" :style="{ width: `${menuWidth}px` }">
-          <p v-if="!hits.length" class="preclass-member-empty">
-            {{ t('Schedule.AttendeeEmpty') }}
+          <p v-if="!hits.length && !canAddTypedUserId" class="preclass-member-empty">
+            {{ emptyText }}
           </p>
           <button
             v-for="hit in hits"
@@ -48,6 +48,22 @@
             <TUIAvatar :size="20" :src="hit.avatarUrl" :alt="hit.userName" />
             <b>{{ hit.userName }}</b>
           </button>
+          <template v-if="canAddTypedUserId">
+            <div v-if="hits.length" class="preclass-member-uid-sep" />
+            <p v-else class="preclass-member-uid-hint">
+              {{ t('UserPicker.UserIdNotInContacts', { id: typedUserId }) }}
+            </p>
+            <button type="button" class="preclass-member-hit preclass-member-uid-action" @click="addTypedUserId">
+              <span class="preclass-member-uid-icon"><IconUserPlus :size="18" /></span>
+              <span class="preclass-member-uid-text">
+                <span class="preclass-member-uid-title">
+                  {{ t('UserPicker.UserIdAddTitle') }}<code>{{ typedUserId }}</code>
+                </span>
+                <span class="preclass-member-uid-desc">{{ t('UserPicker.UserIdAddDesc') }}</span>
+              </span>
+              <span class="preclass-member-uid-btn">{{ t('UserPicker.UserIdAdd') }}</span>
+            </button>
+          </template>
         </div>
       </template>
     </TUIPopover>
@@ -71,6 +87,7 @@
     <UserPickerPC
       v-model:open="pickerOpen"
       mode="schedule"
+      can-add-by-user-id
       :selected-ids="modelValue.map(user => user.userId)"
       @confirm="onPicked"
     />
@@ -98,9 +115,11 @@ import {
   TUIDialog,
   TUIInput,
   TUIPopover,
+  TUIToast,
   UserPickerPC,
   t,
   useResolvedContacts,
+  useUserIdLookup,
 } from '@tencentcloud/roomkit-web-vue3';
 import type { PickedContact, PickerContact } from '@tencentcloud/roomkit-web-vue3';
 import { CLASS_MODES } from '../../classMode';
@@ -138,6 +157,18 @@ const hits = computed<PickerContact[]>(() => {
       || item.userId.toLowerCase().includes(keyword)));
 });
 
+const typedUserId = computed(() => query.value.trim());
+const isTypedUserIdTaken = computed(() => props.modelValue.some(user => user.userId === typedUserId.value)
+  || contacts.value.some(item => item.userId === typedUserId.value));
+const userIdLookupStatus = useUserIdLookup(() => (isTypedUserIdTaken.value ? '' : typedUserId.value));
+const canAddTypedUserId = computed(() => userIdLookupStatus.value === 'found');
+/* A missing userId falls through to the plain "not found" text. */
+const emptyText = computed(() => {
+  if (userIdLookupStatus.value === 'invalid') return t('UserPicker.UserIdInvalid');
+  if (userIdLookupStatus.value === 'checking') return t('Schedule.AttendeeSearch');
+  return t('Schedule.AttendeeEmpty');
+});
+
 onMounted(() => {
   refreshContacts();
 });
@@ -167,8 +198,22 @@ function pick(contact: PickerContact) {
   menuOpen.value = false;
 }
 
-function pickOnly() {
+// Enter adds a member and never submits the booking form.
+function onEnter(event: KeyboardEvent) {
+  event.preventDefault();
+  if (canAddTypedUserId.value) {
+    addTypedUserId();
+    return;
+  }
   if (hits.value.length === 1) pick(hits.value[0]);
+}
+
+function addTypedUserId() {
+  const userId = typedUserId.value;
+  emit('update:modelValue', [...props.modelValue, { userId, userName: userId }]);
+  TUIToast.success(t('UserPicker.UserIdAdded', { name: userId }));
+  query.value = '';
+  menuOpen.value = false;
 }
 
 function openPicker() {
@@ -279,6 +324,85 @@ defineExpose({ showMemberLimit });
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.preclass-member-uid-hint {
+  margin: 0;
+  padding: 6px 8px 4px;
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--rk-text-tertiary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preclass-member-uid-sep {
+  height: 1px;
+  margin: 4px 8px;
+  background: var(--rk-border);
+}
+
+.preclass-member-hit.preclass-member-uid-action {
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 8px;
+}
+
+.preclass-member-uid-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--rk-brand);
+  background: color-mix(in srgb, var(--rk-brand) 16%, transparent);
+  border-radius: 10px;
+}
+
+.preclass-member-uid-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.preclass-member-uid-title,
+.preclass-member-uid-desc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preclass-member-uid-title {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--rk-text-secondary);
+}
+
+.preclass-member-uid-title code {
+  font: inherit;
+  font-weight: 500;
+  color: var(--rk-text-primary);
+}
+
+.preclass-member-uid-desc {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--rk-text-tertiary);
+}
+
+.preclass-member-uid-btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rk-on-accent);
+  background: var(--rk-brand);
+  border-radius: 8px;
 }
 
 .preclass-member-chips {

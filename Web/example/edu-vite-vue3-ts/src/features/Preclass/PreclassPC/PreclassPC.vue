@@ -4,6 +4,7 @@
       <PreconferenceTopbar
         class="preclass-topbar"
         :user-name="userName"
+        :user-id="loginUserInfo?.userId"
         :avatar-url="avatarUrl"
         @logout="emit('logout')"
       >
