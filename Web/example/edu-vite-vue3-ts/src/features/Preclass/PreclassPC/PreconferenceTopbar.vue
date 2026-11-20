@@ -1,9 +1,7 @@
 <template>
   <header class="pre-topbar">
     <div class="pre-brand">
-      <span class="pre-brand-mark" aria-hidden="true">
-        <IconMonitor :size="16" />
-      </span>
+      <img class="pre-brand-mark" :src="eduIconUrl" alt="" aria-hidden="true" draggable="false">
       <span class="pre-brand-name">RoomKit <em>· EDU</em></span>
     </div>
     <div class="pre-topbar-right">
@@ -38,7 +36,9 @@
                 {{ displayName }}
               </div>
             </div>
+            <ProfileUserId v-if="userId" :user-id="userId" size="sm" />
             <button type="button" class="pre-profile-logout" @click="askLogout">
+              <IconLogout :size="16" />
               {{ t('Preconference.Logout') }}
             </button>
           </div>
@@ -64,10 +64,13 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { IconMonitor, TUIDialog, TUIPopover, t } from '@tencentcloud/roomkit-web-vue3';
+import { IconLogout, TUIDialog, TUIPopover, t } from '@tencentcloud/roomkit-web-vue3';
+import eduIconUrl from '../../../assets/roomkit-edu-icon.svg';
+import ProfileUserId from '../ProfileUserId.vue';
 
 const props = defineProps<{
   userName?: string;
+  userId?: string;
   avatarUrl?: string;
 }>();
 
@@ -115,13 +118,10 @@ function confirmLogout() {
 }
 
 .pre-brand-mark {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  color: var(--rk-on-accent);
-  background: var(--rk-brand);
-  border-radius: 8px;
+  display: block;
+  flex: none;
+  width: 36px;
+  height: 36px;
 }
 
 .pre-brand-name {
@@ -223,6 +223,10 @@ function confirmLogout() {
 }
 
 .pre-profile-logout {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 32px;
   font: inherit;

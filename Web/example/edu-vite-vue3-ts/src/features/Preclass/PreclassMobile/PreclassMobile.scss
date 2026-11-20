@@ -47,14 +47,10 @@
 }
 
 .preclass-mobile-mark {
-  display: grid;
+  display: block;
   flex: none;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  color: var(--rk-on-accent);
-  background: var(--rk-brand);
-  border-radius: 7px;
+  width: 32px;
+  height: 32px;
 }
 
 .preclass-mobile-brand-name {
@@ -671,8 +667,32 @@ button.preclass-mobile-line:disabled {
   border-radius: 2px;
 }
 
+.preclass-mobile-account-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 16px 12px;
+}
+
+.preclass-mobile-account-name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rk-fs-lg);
+  font-weight: 600;
+  color: var(--rk-text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preclass-mobile-account-uid {
+  margin: 0 16px 12px;
+}
+
 .preclass-mobile-logout {
-  display: block;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
   height: 44px;
   margin: 4px 16px 8px;
   font: inherit;

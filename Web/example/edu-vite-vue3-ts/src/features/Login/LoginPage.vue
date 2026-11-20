@@ -7,8 +7,8 @@
       <aside class="login-page-stage">
         <div class="login-page-stage-inner">
           <div class="login-page-mark">
-            <img class="login-page-logo" :src="logoUrl" alt="" width="28" height="21" draggable="false">
-            <span>TUIRoomKit</span>
+            <img class="login-page-logo" :src="eduIconUrl" alt="" width="36" height="36" draggable="false">
+            <span>RoomKit <em>· EDU</em></span>
           </div>
           <p class="login-page-brand">
             {{ t('Login.BrandLine') }}
@@ -20,8 +20,8 @@
       </aside>
       <section class="login-page-card">
         <div class="login-page-mark login-page-card-mark">
-          <img class="login-page-logo" :src="logoUrl" alt="" width="28" height="21" draggable="false">
-          <span>TUIRoomKit</span>
+          <img class="login-page-logo" :src="eduIconUrl" alt="" width="36" height="36" draggable="false">
+          <span>RoomKit <em>· EDU</em></span>
         </div>
         <h1 class="login-page-title">
           {{ t('Login.Title') }}
@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import { RoomKitProvider, TUIButton, i18n, useI18n } from '@tencentcloud/roomkit-web-vue3';
 import loginArtSvg from '../../assets/login-art.svg?raw';
-import logoUrl from '../../assets/logo.png';
+import eduIconUrl from '../../assets/roomkit-edu-icon.svg';
 
 defineProps<{
   /** Line under the title; defaults to the UserID-only copy. */
@@ -107,8 +107,14 @@ function toggleLanguage() {
 
 .login-page-logo {
   display: block;
-  width: 28px;
-  height: 21px;
+  width: 36px;
+  height: 36px;
+}
+
+.login-page-mark em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--rk-brand);
 }
 
 .login-page-brand {
