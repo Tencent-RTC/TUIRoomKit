@@ -1,0 +1,37 @@
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-color-primary);
+}
+
+/* Classroom skin for the kit contact picker: softer frame, squarer search and rows.
+   `body` outranks the kit's own frame rule regardless of stylesheet order. */
+body .rk-dialog-mask .rk-dialog:has(.user-picker-pc) {
+  border: 1px solid var(--rk-border);
+  border-radius: 12px;
+}
+
+.rk-dialog-mask .rk-dialog:has(.user-picker-pc) .rk-dialog-title {
+  font-weight: 650;
+}
+
+.rk-dialog:has(.user-picker-pc) .user-picker-pc-search.rk-input,
+.rk-dialog:has(.user-picker-pc) .user-picker-pc-search.rk-input:focus-within {
+  background: var(--rk-bg-raised);
+  border-color: var(--rk-border);
+  border-radius: 10px;
+}
+
+.rk-dialog:has(.user-picker-pc) .user-picker-pc-row,
+.rk-dialog:has(.user-picker-pc) .user-picker-pc-side-row {
+  border-radius: 8px;
+}
+
+.rk-dialog:has(.user-picker-pc) .user-picker-pc-row:hover:not(.is-selected, .is-disabled) .user-picker-pc-check {
+  border-color: color-mix(in srgb, var(--rk-text-primary) 22%, transparent);
+}

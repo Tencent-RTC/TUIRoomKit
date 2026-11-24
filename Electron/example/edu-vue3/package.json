@@ -1,0 +1,35 @@
+{
+  "name": "@tencentcloud/roomkit-electron-vue3-next-education-sample",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron shell for the RoomKit Next education sample.",
+  "author": "Tencent Cloud Client R&D Center",
+  "main": "main/index.cjs",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:deep": "node scripts/dev.mjs",
+    "build:renderer": "node scripts/build.mjs",
+    "build": "node scripts/build.mjs && electron-builder --config electron-builder.json5",
+    "build:mac": "node scripts/build.mjs && electron-builder --config electron-builder.json5 --mac",
+    "build:win": "node scripts/build.mjs && electron-builder --config electron-builder.json5 --win",
+    "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
+  },
+  "dependencies": {
+    "@tencentcloud/roomkit-web-vue3": "7.1.7"
+  },
+  "devDependencies": {
+    "@tencentcloud/eslint-config-hybrid": "~0.0.1",
+    "@tencentcloud/tuiroom-engine-js": "4.3.5",
+    "@tencentcloud/uikit-base-component-vue3": "1.5.0",
+    "tuikit-atomicx-vue3": "6.7.5",
+    "@types/node": "^18.19.31",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8",
+    "sass": "^1.50.0",
+    "typescript": "^4.5.4",
+    "vite": "^5.2.8",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14"
+  }
+}
