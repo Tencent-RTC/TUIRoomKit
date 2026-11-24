@@ -1,0 +1,42 @@
+/**
+ * @see https://www.electron.build/configuration/configuration
+ * `files` are relative to `directories.app`, not to this config file.
+ */
+{
+  appId: 'com.tencent.trtc.roomkit.education.next',
+  productName: 'RoomKit Education',
+  directories: {
+    output: 'release/${version}',
+    buildResources: 'build',
+  },
+  // The project root is the app root: production node_modules (the roomkit package,
+  // declared in `dependencies`) are collected automatically alongside these files.
+  files: ['package.json', 'main/**', 'renderer/**'],
+  asar: true,
+  npmRebuild: false,
+  artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
+  mac: {
+    category: 'public.app-category.education',
+    target: [{ target: 'dmg', arch: ['x64', 'arm64'] }],
+    hardenedRuntime: true,
+    gatekeeperAssess: false,
+    entitlements: 'build/entitlements.mac.plist',
+    entitlementsInherit: 'build/entitlements.mac.plist',
+    extendInfo: {
+      NSCameraUsageDescription: 'RoomKit Education needs camera access for video in class.',
+      NSMicrophoneUsageDescription: 'RoomKit Education needs microphone access for audio in class.',
+    },
+  },
+  dmg: {
+    sign: false,
+  },
+  win: {
+    target: [{ target: 'nsis', arch: ['x64'] }],
+  },
+  nsis: {
+    oneClick: false,
+    perMachine: false,
+    allowToChangeInstallationDirectory: true,
+    deleteAppDataOnUninstall: false,
+  },
+}
